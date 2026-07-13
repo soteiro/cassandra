@@ -1,0 +1,6 @@
+- [x] aprender a conectar el backend con la db
+- [x] aprender a mandar sql hacia la db
+- [ ] aprender a migrar la db desde goland
+- [ ] crear la estructura de tablas usando migraciones
+- [ ] crear endpoints para crear usuarios contra la db  
+- [ ] logica de autenticacion y autorizacion contra la db

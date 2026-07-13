@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS users (
+    id serial PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    alias VARCHAR(50) UNIQUE,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP ,
+    eliminado BOOL DEFAULT FALSE,
+    password VARCHAR(100)
+);

@@ -1,0 +1,24 @@
+info:
+  name: create user
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/users
+  body:
+    type: json
+    data: |-
+      {
+            "nombre": "jhon doe",
+            "alias": "jhon",
+            "email": "jhon.doe@example.com",
+            "password": "segura_password1"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
