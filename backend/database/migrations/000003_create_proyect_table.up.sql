@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS proyectos (
     comentario TEXT,
     fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     estado VARCHAR(50) DEFAULT 'No Listado' CHECK (estado IN ('No Listado', 'Pendiente', 'En Proceso', 'Completado')),
-    elimando BOOL DEFAULT false,
+    eliminado BOOL DEFAULT false,
 
     -- RELACIONES
     CONSTRAINT fk_proyectos_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
