@@ -44,6 +44,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Error interno al procesar la password", http.StatusInternalServerError)
+		return
 	}
 
 	// Reemplazar la pass en texto plano al hash
@@ -153,6 +154,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request){
 	user, err := h.repo.Update(r.Context(), id, &req)
 	if err != nil {
 		http.Error(w, "error al actualizar el usuario: "+err.Error() , http.StatusInternalServerError)
+		return
 	}
 
 	//devolver el usuario actualizado

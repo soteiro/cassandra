@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+//TODO, creat el metodo GetByEmail para la auth
 // UserRepository se encarga de hablar con la base de datos para la tabla 'users'
 type UserRepository struct {
 	db *pgxpool.Pool
@@ -101,6 +102,28 @@ func (r *UserRepository) GetById(ctx context.Context, id int) (*models.UserRespo
 	}
 
 	return &user, nil
+}
+
+func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
+	var user models.User
+
+	query := "SELECT id, nombre, alias, email, password,fecha_creacion FROM users WHERE email = $1 AND eliminado is false"
+
+	err := r.db.QueryRow(ctx, query, email).Scan(
+		&user.ID,
+		&user.Nombre,
+		&user.Alias,
+		&user.Email,
+		&user.Password,
+		&user.FechaCreacion,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+
 }
 
 // eliminar user por id

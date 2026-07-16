@@ -10,6 +10,7 @@ import (
 	"cassandra/config"
 	"cassandra/database"
 	"cassandra/handlers"
+	"cassandra/middleware"
 	"cassandra/repository"
 
 	"github.com/go-chi/chi/v5"
@@ -38,6 +39,8 @@ func main() {
 	// 4. Inicializar Capas (Inyección de Dependencias)
 	userRepo := repository.NewUserRepository(dbPool)
 	userHandler := handlers.NewUserHandler(userRepo)
+	authRepo := repository.NewAuthRepository(dbPool)
+	authHandler := handlers.NewAuthHandler(userRepo, authRepo, cfg.JwtSecret)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -85,13 +88,22 @@ func main() {
 
 	// 6. Rutas de la Entidad de Usuarios (usando nuestro Handler)
 	r.Post("/api/users", userHandler.CreateUser)
-	r.Get("/api/users", userHandler.ListUsers)
+
 	r.Get("/api/", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"response": "One Golang To Rule Them All"})
 	})
-	r.Get("/api/users/{id}", userHandler.GetUser)       // <-- GET por ID
-	r.Put("/api/users/{id}", userHandler.UpdateUser)
-	r.Delete("/api/users/{id}", userHandler.DeleteUser) // <-- DELETE
+	// Grupo de rutas protegidas
+	r.Group(func(r chi.Router) {
+		// Aplicamos el middleware de autenticación a este grupo
+		r.Use(middleware.AuthMiddleware(cfg.JwtSecret))
+		r.Get("/api/users", userHandler.ListUsers)
+		r.Get("/api/users/{id}", userHandler.GetUser)
+		r.Put("/api/users/{id}", userHandler.UpdateUser)
+		r.Delete("/api/users/{id}", userHandler.DeleteUser)
+	})
+
+	r.Post("/api/auth/login", authHandler.Login)
+	r.Post("/api/auth/refresh", authHandler.Refresh)
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)
