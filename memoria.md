@@ -1,8 +1,8 @@
 el objetivo del proyecto es:
 1.- aprender angular y go, poder empaquetar todo en un solo release.
-2.- db sqlite interna, desplegado en un server
-3.- meter aqui mi calendario, dia dia, tareas que tengo que hacer, etc.
-4.- intentar centralizar el estado de mis cuentas
+2.- db postgres en heztner, desplegado en un server
+3.- meter aqui mi calendario, dia dia, tareas que tengo que hacer, proyectos, tareas de proyectos, crm basico .
+4.- intentar centralizar el estado de mis cuentas. ver como usar actual budget con mis finanzas personales
 5.- centro de informacion, buscar data relevante para mi contexto
 6.- conexion con ticktick y con google calendar para cargar los eventos
 7.- integracion con un futuro proyecto llamado gandalf (capa de agentes de IA)
