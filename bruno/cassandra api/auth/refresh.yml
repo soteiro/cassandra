@@ -10,9 +10,17 @@ http:
     type: json
     data: |-
       {
-        "refresh_token": "C5ue4aU9vbJqEFHY2C1flgECR57UOPpW0a293BjAeOc="
+        "refresh_token": "{{refreshTokne}}"
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status == 200){
+          bru.setEnvVar("accessToken", req.body.access_token)
+        }
 
 settings:
   encodeUrl: true

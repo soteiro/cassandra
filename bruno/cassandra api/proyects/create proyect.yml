@@ -1,0 +1,23 @@
+info:
+  name: create proyect
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/proyects
+  body:
+    type: json
+    data: |-
+      {
+        "nombre" : "proyect 1",
+        "descripcion" : "centro de inteligencia",
+        "comentario" : "fase inicial de este proyecto"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,11 +1,11 @@
 info:
-  name: get user by id
+  name: list users
   type: http
-  seq: 4
+  seq: 2
 
 http:
   method: GET
-  url: http://localhost:8080/api/users/8
+  url: http://localhost:8080/api/users
   auth: inherit
 
 settings:

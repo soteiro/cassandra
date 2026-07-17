@@ -10,10 +10,19 @@ http:
     type: json
     data: |-
       {
-        "email": "soteiro@example.com",
+        "email": "sote@mail.com",
         "password": "97158700"
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status == 200) {
+          bru.setEnvVar("accessToken", res.body.access_token);
+          bru.setEnvVar("refreshTokne", res.body.refresh_token)
+        }
 
 settings:
   encodeUrl: true

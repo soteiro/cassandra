@@ -5,7 +5,7 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:8080/api/users/3
+  url: http://localhost:8080/api/users/8
   body:
     type: json
     data: |-
