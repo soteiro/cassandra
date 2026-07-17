@@ -32,3 +32,19 @@ type ProyectResponse struct{
 	Estado string `json:"estado"`
 }
 
+// el * hace opcional el parametro
+type ProyectUpdateRequest struct {
+	Nombre *string `json:"nombre"`
+	Descripcion *string `json:"descripcion"`
+	Comentario *string `json:"comentario"`
+	Estado *string `json:"estado"`
+}
+
+type ProyectUpdateResponse struct {
+	ID int `json:"id"`
+	Nombre string `json:"nombre"`
+	Descripcion string `json:"descripcion"`
+	Comentario string `json:"comentario"`
+	Estado string `json:"estado"`
+}
+

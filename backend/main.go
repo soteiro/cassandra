@@ -106,6 +106,7 @@ func main() {
 		r.Get("/api/proyects", proyectHandler.ListProyect)
 		r.Delete("/api/proyects/{id}", proyectHandler.DeleteByID)
 		r.Get("/api/proyects/{id}", proyectHandler.GetByID)
+		r.Put("/api/proyects/{id}", proyectHandler.Update)
 	})
 
 	r.Post("/api/auth/login", authHandler.Login)

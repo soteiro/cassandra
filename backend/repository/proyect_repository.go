@@ -111,6 +111,7 @@ func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*m
 	return nil, nil
 }
 
+//
 func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*models.ProyectResponse, error) {
 	var p models.ProyectResponse
 	query := `
@@ -147,4 +148,43 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 	return &p, nil
 }
 
-// falta el update
+// Update con COALLECENCE
+func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req *models.ProyectUpdateRequest) (*models.ProyectUpdateResponse, error) {
+	var p models.ProyectUpdateResponse
+
+	query := `
+		UPDATE proyectos
+		SET 
+			nombre = COALESCE($1, nombre),
+			descripcion = COALESCE($2, descripcion),
+			comentario = COALESCE($3, comentario),
+			estado = COALESCE($4, estado)
+		WHERE id = $5
+		AND user_id = $6
+		AND eliminado = false
+		RETURNING id, nombre, descripcion, comentario, estado
+	`
+	err := r.db.QueryRow(
+		ctx,
+		query,
+		req.Nombre,
+		req.Descripcion,
+		req.Comentario,
+		req.Estado,
+		id,
+		userID,
+	).Scan(
+		&p.ID,
+		&p.Nombre,
+		&p.Descripcion,
+		&p.Comentario,
+		&p.Estado,
+	)
+
+	if err != nil {
+		log.Printf("error al modificar el proyecto: %v", err)
+		return nil, err
+	}
+
+	return &p, nil
+}

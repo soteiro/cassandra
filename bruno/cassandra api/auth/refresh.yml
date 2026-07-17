@@ -20,6 +20,7 @@ runtime:
       code: |-
         if (res.status == 200){
           bru.setEnvVar("accessToken", req.body.access_token)
+          bru.setEnvVar("refreshToken", req.body.refresh_token)
         }
 
 settings:
