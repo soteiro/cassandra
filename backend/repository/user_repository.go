@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-//TODO, creat el metodo GetByEmail para la auth
 // UserRepository se encarga de hablar con la base de datos para la tabla 'users'
 type UserRepository struct {
 	db *pgxpool.Pool
@@ -22,8 +21,6 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 // Create inserta un nuevo usuario en la base de datos
 func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*models.UserResponse, error) {
 	var user models.UserResponse
-
-
 
 	query := `
             INSERT INTO users (nombre, alias, email, password)

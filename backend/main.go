@@ -41,6 +41,8 @@ func main() {
 	userHandler := handlers.NewUserHandler(userRepo)
 	authRepo := repository.NewAuthRepository(dbPool)
 	authHandler := handlers.NewAuthHandler(userRepo, authRepo, cfg.JwtSecret)
+	projectRepo := repository.NewProyectRepository(dbPool)
+	proyectHandler := handlers.NewProyectHandler(projectRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -100,6 +102,7 @@ func main() {
 		r.Get("/api/users/{id}", userHandler.GetUser)
 		r.Put("/api/users/{id}", userHandler.UpdateUser)
 		r.Delete("/api/users/{id}", userHandler.DeleteUser)
+		r.Post("/api/proyects", proyectHandler.CreateProyect)
 	})
 
 	r.Post("/api/auth/login", authHandler.Login)
