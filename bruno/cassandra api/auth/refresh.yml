@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "refresh_token": "{{refreshTokne}}"
+        "refresh_token": "{{refreshToken}}"
       }
   auth: inherit
 

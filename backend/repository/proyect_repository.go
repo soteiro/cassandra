@@ -3,6 +3,7 @@ package repository
 import (
 	"cassandra/models"
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -48,3 +49,102 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 	return &proyect, nil
 }
 
+func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.ProyectResponse, error){
+	query := `
+	SELECT p.id, p.nombre, p.descripcion, p.comentario, p.fecha_creacion 
+	from proyectos p
+	WHERE p.user_id = $1
+	AND p.eliminado is false
+	`
+
+	rows, err := r.db.Query(
+		ctx,
+		query,
+		UserID, 
+		)
+
+	if err != nil {
+		return  nil, err
+	}
+	// terminar la conexion 
+	defer rows.Close()
+
+	var proyects []models.ProyectResponse
+	for rows.Next() {
+		var p models.ProyectResponse
+		err := rows.Scan(
+			&p.ID,
+			&p.Nombre,
+			&p.Descripcion,
+			&p.Comentario,
+			&p.FechaCreacion,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		proyects = append(proyects, p)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return proyects, nil
+}
+
+func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*models.ProyectResponse, error) {
+	query := `
+	UPDATE proyectos
+	SET eliminado = true
+	WHERE id = $1
+	AND user_id = $2
+	`
+
+	res , err := r.db.Exec(ctx, query, id, user_id)
+	if err != nil {
+		log.Printf("error al borrar el proyecto: %v", err)
+		return nil, err
+	}
+	if res.RowsAffected() == 0{
+		return nil, fmt.Errorf("no se encontro el proyecto con id: %d", id) 
+	}
+
+	return nil, nil
+}
+
+func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*models.ProyectResponse, error) {
+	var p models.ProyectResponse
+	query := `
+	SELECT 
+	id, 
+	nombre, 
+	descripcion, 
+	comentario,
+	fecha_creacion,
+	estado
+	FROM proyectos
+	WHERE id = $1
+	AND user_id  = $2
+	AND eliminado IS false
+	`
+	err := r.db.QueryRow(
+		ctx,
+		query,
+		id,
+		userID,
+	).Scan(
+		&p.ID,
+		&p.Nombre,
+		&p.Descripcion,
+		&p.Comentario,
+		&p.FechaCreacion,
+		&p.Estado,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
+}
+
+// falta el update

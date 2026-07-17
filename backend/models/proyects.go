@@ -29,5 +29,6 @@ type ProyectResponse struct{
 	Descripcion string `json:"descripcion"`
 	Comentario string `json:"comentario"`
 	FechaCreacion time.Time `json:"fecha_creacion"`
+	Estado string `json:"estado"`
 }
 

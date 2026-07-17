@@ -103,6 +103,9 @@ func main() {
 		r.Put("/api/users/{id}", userHandler.UpdateUser)
 		r.Delete("/api/users/{id}", userHandler.DeleteUser)
 		r.Post("/api/proyects", proyectHandler.CreateProyect)
+		r.Get("/api/proyects", proyectHandler.ListProyect)
+		r.Delete("/api/proyects/{id}", proyectHandler.DeleteByID)
+		r.Get("/api/proyects/{id}", proyectHandler.GetByID)
 	})
 
 	r.Post("/api/auth/login", authHandler.Login)

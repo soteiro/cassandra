@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
+	"strconv"
+	"github.com/go-chi/chi/v5"
 
 	"cassandra/middleware"
 	"cassandra/models"
@@ -64,4 +65,81 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&proyect)
 	log.Printf("nuevo proyecto creado: %v", proyect)
+}
+
+//listat con getall
+func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
+	// verificar que el usuario sea dueño de sus datos
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	
+	if !ok {
+		log.Printf("acceso denegado sin auth")
+		http.Error(w, "acceso denegado", http.StatusUnauthorized)
+		return
+	}
+
+
+	proyect, err := h.repo.GetAll(r.Context(), userID)
+	if err != nil {
+		log.Printf("error al listar usuarios: %v", err)
+		http.Error(w, "error al listar usuario", http.StatusInternalServerError)
+		return
+	}
+	if proyect == nil {
+		proyect = []models.ProyectResponse{}
+	}
+	w.Header().Set("Content-type", "application/json")
+	json.NewEncoder(w).Encode(&proyect)
+}
+
+// eliminar proyecto por id, soft
+func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
+	idstr := chi.URLParam(r, "id")
+	userID , ok:= middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		log.Printf("peticion delete de proyecto sin auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	}
+
+	id , err := strconv.Atoi(idstr)
+	if err != nil {
+		log.Printf("id invalido: %v", err)
+		http.Error(w, "ID invalido", http.StatusBadRequest)
+		return
+	}
+
+	res, err := h.repo.Delete(r.Context(), id, userID)
+	if err != nil {
+		log.Printf("error al eliminar el proyecto: %v", err)
+	}
+	if res == nil {
+	w.WriteHeader(http.StatusNoContent)
+	log.Printf("proyecto con id: %d, eliminado por el usuario con id %v", id, userID)
+	}
+} 
+
+func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	proyectID := chi.URLParam(r, "id")
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	strProyectID, err := strconv.Atoi(proyectID)
+	if err != nil {
+		log.Printf("ID de proyecto invalido")
+		http.Error(w, "ID invalido", http.StatusBadRequest)
+	}
+	if !ok  {
+		log.Printf("peticion de proyecto por id sin auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	res, err := h.repo.GetById(r.Context(), strProyectID, userID)
+
+	if err != nil {
+		log.Printf("error en la peticion de proyecto: %v", err)
+		http.Error(w, "error en la peticion", http.StatusBadRequest)
+	}
+
+	//responder
+	w.Header().Set("Content-type", "application/json")
+	json.NewEncoder(w).Encode(res)
 }
