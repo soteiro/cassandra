@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
+
 	"github.com/go-chi/chi/v5"
 
 	"cassandra/middleware"
@@ -16,9 +18,9 @@ type ProyectHandler struct {
 	repo *repository.ProyectRepository
 }
 
-//constructor para inyectar el repo
+// constructor para inyectar el repo
 func NewProyectHandler(repo *repository.ProyectRepository) *ProyectHandler {
-	return &ProyectHandler{repo : repo}
+	return &ProyectHandler{repo: repo}
 }
 
 // crear proyecto
@@ -35,50 +37,49 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Printf("json enviado desde front invalido: %v", err)
-		http.Error(w, "Json invalido: "+ err.Error(), http.StatusBadRequest)
+		http.Error(w, "Json invalido: ", http.StatusBadRequest)
 		return
 	}
 
-	// validacion basica, TODO: mejorar para evitar inyecciones sql
-	// trim al nombre
+	// Limpiar espacios con TrimSpace
+	req.Nombre = strings.TrimSpace(req.Nombre)
+	req.Descripcion = strings.TrimSpace(req.Descripcion)
+	req.Comentario = strings.TrimSpace(req.Comentario)
+
+	// validacion basica
 	if req.Nombre == "" {
-		http.Error(w, "El nombre no puede estar vacio: ", http.StatusBadRequest )
+		log.Printf("error de validacion: nombre vacio")
+		http.Error(w, "El nombre no puede estar vacio: ", http.StatusBadRequest)
 		return
 	}
-
-	// obtener el user_id del contexto
-	
 
 	// inyectar el user_id desde el contexto
 	req.UserID = userID
 
-	//guardar datos 
+	// guardar datos 
 	proyect, err := h.repo.Create(r.Context(), &req)
-	// validar error
 	if err != nil {
 		log.Printf("error al guardar los datos: %v", err)
-		http.Error(w, "error al crear el proyecto: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error al crear el proyecto: ", http.StatusInternalServerError)
 		return
 	}
 
-	//responder
+	// responder
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&proyect)
 	log.Printf("nuevo proyecto creado: %v", proyect)
 }
 
-//listat con getall
+// listat con getall
 func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
 	// verificar que el usuario sea dueño de sus datos
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
-	
 	if !ok {
 		log.Printf("acceso denegado sin auth")
 		http.Error(w, "acceso denegado", http.StatusUnauthorized)
 		return
 	}
-
 
 	proyect, err := h.repo.GetAll(r.Context(), userID)
 	if err != nil {
@@ -87,6 +88,7 @@ func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if proyect == nil {
+		log.Printf("no se encontraron proyectos para el usuario: %v", userID)
 		proyect = []models.ProyectResponse{}
 		return
 	}
@@ -97,14 +99,14 @@ func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
 // eliminar proyecto por id, soft
 func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
-	userID , ok:= middleware.GetUserIDFromContext(r.Context())
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		log.Printf("peticion delete de proyecto sin auth")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	id , err := strconv.Atoi(idstr)
+	id, err := strconv.Atoi(idstr)
 	if err != nil {
 		log.Printf("id invalido: %v", err)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -114,15 +116,15 @@ func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	res, err := h.repo.Delete(r.Context(), id, userID)
 	if err != nil {
 		log.Printf("error al eliminar el proyecto: %v", err)
-		http.Error(w, "error al borrar el proyecto"+ err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error al borrar el proyecto", http.StatusInternalServerError)
 		return
 	}
 	if res == nil {
-	w.WriteHeader(http.StatusNoContent)
-	log.Printf("proyecto con id: %d, eliminado por el usuario con id %v", id, userID)
-	return
+		w.WriteHeader(http.StatusNoContent)
+		log.Printf("proyecto con id: %d, eliminado por el usuario con id %v", id, userID)
+		return
 	}
-} 
+}
 
 func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	proyectID := chi.URLParam(r, "id")
@@ -133,21 +135,19 @@ func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID invalido", http.StatusBadRequest)
 		return
 	}
-	if !ok  {
+	if !ok {
 		log.Printf("peticion de proyecto por id sin auth")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	res, err := h.repo.GetById(r.Context(), strProyectID, userID)
-
 	if err != nil {
 		log.Printf("error en la peticion de proyecto: %v", err)
 		http.Error(w, "error en la peticion", http.StatusBadRequest)
 		return
 	}
 
-	//responder
 	w.Header().Set("Content-type", "application/json")
 	json.NewEncoder(w).Encode(res)
 }
@@ -161,7 +161,6 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 		log.Printf("ID de proyecto invalido: %v", err)
 		http.Error(w, "ID de proyecto invalido", http.StatusBadRequest)
 		return
-		
 	}
 	if !ok {
 		log.Printf("intento de modificacion de proyecto sin auth")
@@ -169,22 +168,41 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//decodificar el json
-	var req *models.ProyectUpdateRequest
+	// decodificar el json
+	var req models.ProyectUpdateRequest
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Printf("update de proyecto con json invalido: %v", err)
 		http.Error(w, "json invalido", http.StatusBadRequest)
 		return
 	}
-	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, req)
+
+	// Limpiar espacios en campos de actualización opcionales (punteros)
+	if req.Nombre != nil {
+		*req.Nombre = strings.TrimSpace(*req.Nombre)
+		if *req.Nombre == "" {
+			http.Error(w, "El nombre no puede quedar vacío tras eliminar espacios", http.StatusBadRequest)
+			return
+		}
+	}
+	if req.Descripcion != nil {
+		*req.Descripcion = strings.TrimSpace(*req.Descripcion)
+	}
+	if req.Comentario != nil {
+		*req.Comentario = strings.TrimSpace(*req.Comentario)
+	}
+	if req.Estado != nil {
+		*req.Estado = strings.TrimSpace(*req.Estado)
+	}
+
+	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, &req)
 	if err != nil {
 		log.Printf("error al modificar el proyecto, %v", err)
-		http.Error(w, "error al modificar el proyecto"+ err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error al modificar el proyecto", http.StatusInternalServerError)
 		return
 	}
 
-	//responder
+	// responder
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(proyect)
 }

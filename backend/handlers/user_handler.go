@@ -2,12 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"net/mail"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/crypto/bcrypt"
 
+	"cassandra/middleware"
 	"cassandra/models"
 	"cassandra/repository"
 )
@@ -29,9 +33,15 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	// 1. Decodificar el cuerpo JSON de la petición
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "JSON inválido: "+err.Error(), http.StatusBadRequest)
+		log.Printf("json enviado desde front invalido: %v", err)
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
+
+	// Aplicar TrimSpace a los campos de texto
+	req.Nombre = strings.TrimSpace(req.Nombre)
+	req.Alias = strings.TrimSpace(req.Alias)
+	req.Email = strings.TrimSpace(req.Email)
 
 	// 2. Validación básica
 	if req.Nombre == "" || req.Email == "" {
@@ -39,21 +49,29 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// hashear password, GenerateFromPassword recibe la pass en bytes y un factor de costo DefaultCost = 10 por defecto
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-
+	// Validación de formato de email usando net/mail
+	_, err = mail.ParseAddress(req.Email)
 	if err != nil {
-		http.Error(w, "Error interno al procesar la password", http.StatusInternalServerError)
+		log.Printf("Formato de email inválido: %s", req.Email)
+		http.Error(w, "Formato de email inválido", http.StatusBadRequest)
 		return
 	}
 
-	// Reemplazar la pass en texto plano al hash
+	// Hashear password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "Error interno al procesar la contraseña", http.StatusInternalServerError)
+		return
+	}
+
+	// Reemplazar la pass en texto plano por el hash
 	req.Password = string(hashedPassword)
 	
 	// 3. Llamar al repositorio para guardar el usuario
 	user, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
-		http.Error(w, "Error al crear el usuario: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("Error al crear el usuario: %v", err)
+		http.Error(w, "Error al crear el usuario", http.StatusInternalServerError)
 		return
 	}
 
@@ -63,103 +81,161 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-// ListUsers maneja la ruta GET /api/users
+// ListUsers maneja la ruta GET /api/users (solo para fines administrativos/desarrollo)
 func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
-	// 1. Llamar al repositorio
-	users, err := h.repo.GetAll(r.Context())
-	if err != nil {
-		http.Error(w, "Error al obtener usuarios: "+err.Error(), http.StatusInternalServerError)
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
-	// 2. Si la base de datos está vacía, evitamos devolver 'null'. Es mejor devolver una lista vacía '[]'
+	log.Printf("Usuario autenticado con ID: %d", userID)
+	
+	// 1. Llamar al repositorio
+	users, err := h.repo.GetAll(r.Context())
+	if err != nil {
+		log.Printf("Error al obtener usuarios: %v", err)
+		http.Error(w, "Error al obtener usuarios", http.StatusInternalServerError)
+		return
+	}
+
+	// 2. Si la base de datos está vacía, evitamos devolver 'null'.
 	if users == nil {
 		users = []models.UserResponse{}
 	}
 
-	// 3. Devolver la lista en formato JSON (200 OK por defecto)
+	// 3. Devolver la lista en formato JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
 
+// GetUser obtiene la información del perfil del propio usuario
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
-	//obternet el id del parametro de la url
-	idSrt := chi.URLParam(r, "id")
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		log.Printf("acceso denegado sin auth")
+		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
+		return
+	}
 
-	// convertir la string a int
+	idSrt := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idSrt)
 	if err != nil {
-		http.Error(w, "ID invalido, debe ser un numero", http.StatusBadRequest)
+		log.Printf("Error al convertir el ID: %v", err)
+		http.Error(w, "ID inválido, debe ser un número", http.StatusBadRequest)
 		return
 	}
+
+	// 🔒 VALIDACIÓN BOLA: El usuario solo puede solicitar su propia información
+	if id != userID {
+		log.Printf("Usuario %d intentó obtener información del usuario %d", userID, id)
+		http.Error(w, "No tienes permiso para acceder a este recurso", http.StatusForbidden)
+		return
+	}
+
 	user, err := h.repo.GetById(r.Context(), id)
 	if err != nil {
-		// TODO:
-		// pgx tiene un error especial cuando no encuentra registros: pgx.ErrNoRows
-		// (puedes importar "github.com/jackc/pgx/v5" para validarlo si gustas,
-		// pero para simplificar ahora diremos que no se encontró)
-
-		http.Error(w, "usuario no encontrado", http.StatusNotFound)
-
+		log.Printf("Error al obtener el usuario: %v", err)
+		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
-
 }
 
-// DeleteUser realiza el borrado lógico del usuario
+// DeleteUser realiza el borrado lógico del propio usuario
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
+		return
+	}
+
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		log.Printf("Error al convertir el ID: %v", err)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
+		return
+	}
+
+	// 🔒 VALIDACIÓN BOLA: El usuario solo puede eliminarse a sí mismo
+	if id != userID {
+		log.Printf("Usuario %d intentó eliminar al usuario %d", userID, id)
+		http.Error(w, "No tienes permiso para acceder a este recurso", http.StatusForbidden)
 		return
 	}
 
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
-		http.Error(w, "Error al eliminar usuario: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("error al eliminar el usuario: %v", err)
+		http.Error(w, "Error al eliminar usuario", http.StatusInternalServerError)
 		return
 	}
 
-	// 204 No Content es la respuesta estándar de éxito para un delete si no devolvemos datos
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// UpdateUser actualiza la información del propio usuario
+func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		log.Printf("petición update de usuario sin auth")
+		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
+		return
+	}
 
-//update user
-func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request){
 	idStr := chi.URLParam(r, "id")
-	id , err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "ID invalido", http.StatusBadRequest)
+		log.Printf("Error al convertir el ID: %v", err)
+		http.Error(w, "ID inválido", http.StatusBadRequest)
+		return
+	}
+
+	// 🔒 VALIDACIÓN BOLA: El usuario solo puede actualizar su propio perfil
+	if id != userID {
+		log.Printf("Usuario %d intentó actualizar al usuario %d", userID, id)
+		http.Error(w, "No tienes permiso para acceder a este recurso", http.StatusForbidden)
 		return
 	}
 
 	var req models.UserUpdateRequest
-
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "json invalido: "+ err.Error(), http.StatusBadRequest)
+		log.Printf("json enviado desde front inválido: %v", err)
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
 
-	// validacion basica TODO: mejorar en el futuro
+	// Aplicar TrimSpace a los campos de texto al actualizar
+	req.Nombre = strings.TrimSpace(req.Nombre)
+	req.Alias = strings.TrimSpace(req.Alias)
+	req.Email = strings.TrimSpace(req.Email)
+
+	// Validación básica
 	if req.Nombre == "" || req.Email == "" {
-		http.Error(w, "Error al actualizar el usuario: ", http.StatusBadRequest)
+		log.Printf("error de validación: nombre o email vacío")
+		http.Error(w, "El nombre y el email son obligatorios", http.StatusBadRequest)
+		return
+	}
+
+	// Validación de formato de email usando net/mail
+	_, err = mail.ParseAddress(req.Email)
+	if err != nil {
+		log.Printf("Formato de email inválido al actualizar: %s", req.Email)
+		http.Error(w, "Formato de email inválido", http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.repo.Update(r.Context(), id, &req)
 	if err != nil {
-		http.Error(w, "error al actualizar el usuario: "+err.Error() , http.StatusInternalServerError)
+		log.Printf("error al actualizar el usuario: %v", err)
+		http.Error(w, "Error al actualizar el usuario", http.StatusInternalServerError)
 		return
 	}
 
-	//devolver el usuario actualizado
-	w.Header().Set("Content-type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
-
-
 }

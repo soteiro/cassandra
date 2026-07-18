@@ -15,6 +15,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/httprate"
 )
 
 func main() {
@@ -55,7 +56,7 @@ func main() {
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Content-Type", "Authorization"},
 	}))
-
+	r.Use(httprate.LimitByIP(100, time.Minute))
 	// Rutas de prueba
 	r.Get("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
@@ -120,7 +121,6 @@ func main() {
 
 	r.Post("/api/auth/login", authHandler.Login)
 	r.Post("/api/auth/refresh", authHandler.Refresh)
-
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"cassandra/middleware"
 	"cassandra/models"
@@ -38,6 +39,11 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "JSON inválido: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	// Limpiar espacios con TrimSpace
+	req.Nombre = strings.TrimSpace(req.Nombre)
+	req.Descripcion = strings.TrimSpace(req.Descripcion)
+	req.Comentario = strings.TrimSpace(req.Comentario)
 
 	// Validación básica
 	if req.Nombre == "" {
@@ -131,6 +137,24 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 		log.Printf("json enviado desde front inválido: %v", err)
 		http.Error(w, "JSON inválido: "+err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	// Limpiar espacios en campos de actualización opcionales (punteros)
+	if req.Nombre != nil {
+		*req.Nombre = strings.TrimSpace(*req.Nombre)
+		if *req.Nombre == "" {
+			http.Error(w, "El nombre de la tarea no puede quedar vacío tras eliminar espacios", http.StatusBadRequest)
+			return
+		}
+	}
+	if req.Descripcion != nil {
+		*req.Descripcion = strings.TrimSpace(*req.Descripcion)
+	}
+	if req.Comentario != nil {
+		*req.Comentario = strings.TrimSpace(*req.Comentario)
+	}
+	if req.Estado != nil {
+		*req.Estado = strings.TrimSpace(*req.Estado)
 	}
 
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)

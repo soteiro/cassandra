@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"log"
 
 	"cassandra/models"
 	"cassandra/repository"
@@ -35,10 +36,11 @@ func NewAuthHandler(userRepo *repository.UserRepository, authRepo *repository.Au
 // login
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req models.LoginRequest
-
+	log.Printf("peticion de login recibida")
 	//decodificar el json enviado desde angular
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		log.Printf("json enviado desde front invalido: %v", err)
 		http.Error(w, "json invalido", http.StatusBadRequest)
 		return
 	}
@@ -46,6 +48,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// buscar el user en la db
 	user, err := h.UserRepo.GetByEmail(r.Context(), req.Email)
 	if err != nil {
+		log.Printf("error al buscar el usuario por email: %v", err)
 		http.Error(w, "Credenciales Invalidas", http.StatusUnauthorized)
 		return
 	}
@@ -53,6 +56,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// comparar al usuario por correo en la db
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
+		log.Printf("error al comparar la password: %v", err)
 		http.Error(w, "Credenciales Invalidas", http.StatusUnauthorized)
 		return
 	}
@@ -60,6 +64,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// generar el accesstoken
 	accessToken, err := utils.GenerateAccessToken(user.ID, h.jwtSecret)
 	if err != nil {
+		log.Printf("error al generar el jwt: %v", err)
 		http.Error(w, "Error al crear el jwt", http.StatusInternalServerError)
 		return
 	}
@@ -67,6 +72,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	//generar el refreshToken
 	refreshToken, err := utils.GenerateRefreshToken()
 	if err != nil {
+		log.Printf("error al generar el refreshToken: %v", err)
 		http.Error(w, "Error al generar el refreshToken", http.StatusInternalServerError)
 		return
 	}
@@ -96,26 +102,30 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	//decodificar la peticion
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		log.Printf("json enviado desde front invalido: %v", err)
 		http.Error(w, "Json invalido", http.StatusBadRequest)
 		return
 	}
 
 	//validar que se envio el refresh token
 	if req.RefreshToken == "" {
+		log.Printf("peticion de refresh sin token")
 		http.Error(w, "el refresh token es obligatorio", http.StatusBadRequest)
 		return
 	}
 
 	userID, err := h.AuthRepo.GetUserIDByRefreshToken(r.Context(), req.RefreshToken)
 	if err != nil {
-		http.Error(w, "sesion invalida: "+ err.Error(), http.StatusUnauthorized)
+		log.Printf("error al validar el refresh token: %v", err)
+		http.Error(w, "sesion invalida: ", http.StatusUnauthorized)
 		return
 	}
 
 	// si el refreshtoken es valido, regenerar un nuevo token
 	newAccessToken, err := utils.GenerateAccessToken(userID, h.jwtSecret)
 	if err != nil {
-		http.Error(w, "error al generar un nuevo token: "+ err.Error(), http.StatusInternalServerError)
+		log.Printf("error al generar un nuevo token: %v", err)
+		http.Error(w, "error al generar un nuevo token:", http.StatusInternalServerError)
 		return
 	}
 
