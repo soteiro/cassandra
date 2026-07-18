@@ -1,0 +1,17 @@
+info:
+  name: Delete Tarea
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: http://localhost:8080/api/tareas/1
+  body:
+    type: none
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

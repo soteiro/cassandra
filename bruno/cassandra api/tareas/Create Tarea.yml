@@ -1,0 +1,25 @@
+info:
+  name: Create Tarea
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/tareas
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Nueva Tarea de Prueba",
+        "descripcion": "Descripción detallada de la tarea",
+        "comentario": "Comentario de la tarea",
+        "estado": "Pendiente",
+        "proyect_id": 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -43,6 +43,8 @@ func main() {
 	authHandler := handlers.NewAuthHandler(userRepo, authRepo, cfg.JwtSecret)
 	projectRepo := repository.NewProyectRepository(dbPool)
 	proyectHandler := handlers.NewProyectHandler(projectRepo)
+	tareasRepo := repository.NewTareasRepository(dbPool)
+	tareasHandler := handlers.NewTareasHandler(tareasRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -107,10 +109,18 @@ func main() {
 		r.Delete("/api/proyects/{id}", proyectHandler.DeleteByID)
 		r.Get("/api/proyects/{id}", proyectHandler.GetByID)
 		r.Put("/api/proyects/{id}", proyectHandler.Update)
+
+		// Rutas de Tareas Protegidas
+		r.Post("/api/tareas", tareasHandler.CreateTarea)
+		r.Get("/api/tareas", tareasHandler.GetAllTareas)
+		r.Get("/api/tareas/{id}", tareasHandler.GetTareaByID)
+		r.Put("/api/tareas/{id}", tareasHandler.UpdateTarea)
+		r.Delete("/api/tareas/{id}", tareasHandler.DeleteTarea)
 	})
 
 	r.Post("/api/auth/login", authHandler.Login)
 	r.Post("/api/auth/refresh", authHandler.Refresh)
+
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)
