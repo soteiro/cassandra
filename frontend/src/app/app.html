@@ -1,0 +1,39 @@
+<main class="bg-slate-950 h-screen flex flex-col items-center justify- gap-4">
+  <h1 class="text-2xl text-center font-bold p-4 justify-center border-b border-emerald-300 w-full">
+    {{ title() }}
+  </h1>
+
+  <div class="flex gap-4">
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      (click)="bnt1()"
+    >
+      Botón 1
+    </button>
+    <button
+      class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+      (click)="bnt2()"
+    >
+      Botón 2
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h2 class="text-xl font-bold">Receta</h2>
+    @if (recipe()) {
+      <h3><span>nombre: </span> {{ recipe()?.name }}</h3>
+      <p>descripción: {{ recipe()?.description }}</p>
+      <p>cantidad: {{servings() }}</p>
+      <pre>{{adjustedIngredients() | json}} </pre>
+      <div class="flex gap-4 justify-center">
+        <button (click)="incrementServings()" 
+        class="bg-emerald-400 rounded-full w-10 h-10 text-3xl">+</button>
+        <button (click)="decrementServigs()" 
+        class="bg-red-600 rounded-full w-10 h-10 text-3xl">-</button>
+      </div>
+      
+    } @else {
+      <p>haz click en un boton</p>
+    }
+  </div>
+</main>
