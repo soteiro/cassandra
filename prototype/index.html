@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cassandra HQ — Centro de Enfoque TDAH</title>
+  <!-- Google Fonts: Outfit (Heading & Display) + System Fallback -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Modal Paleta de Comandos (Cmd+K) -->
+  <div class="command-palette-overlay" id="cmd-overlay" role="dialog" aria-modal="true" aria-label="Paleta de comandos" hidden>
+    <div class="command-palette-modal">
+      <div class="cmd-search-input-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="cmd-search-input" placeholder="Escribe un comando o busca tareas (ej. 'Nueva tarea', 'Cassandra')..." aria-label="Buscar comandos">
+        <kbd class="kbd-badge">ESC</kbd>
+      </div>
+      <div class="cmd-results" id="cmd-results">
+        <div class="cmd-group-label">Acciones Rápidas</div>
+        <div class="cmd-item" tabindex="0" data-action="new-task">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Crear nueva tarea rápida</span>
+          <kbd class="kbd-badge">N</kbd>
+        </div>
+        <div class="cmd-item" tabindex="0" data-action="hyperfocus">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          <span>Activar Modo Hiperenfoque</span>
+          <kbd class="kbd-badge">H</kbd>
+        </div>
+        <div class="cmd-group-label">Tareas Recientes</div>
+        <div class="cmd-item" tabindex="0" data-action="open-task-1">
+          <span>Diseñar arquitectura del frontend en Angular</span>
+          <span class="cmd-meta">Project Cassandra</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <!-- Vista Hiperenfoque (Focus Mode sin temporizador Pomodoro) -->
+      <div class="hyperfocus-screen" id="hyperfocus-screen" hidden>
+        <div class="hyperfocus-content">
+          <button class="btn-exit-hyperfocus" id="btn-exit-hyperfocus" aria-label="Salir de hiperenfoque">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Salir de Hiperenfoque</span>
+          </button>
+
+          <span class="hyperfocus-tag">Tarea Activa en Progreso</span>
+          <h1 class="hyperfocus-title" id="hyperfocus-title">Diseñar arquitectura del frontend en Angular</h1>
+          <p class="hyperfocus-desc" id="hyperfocus-desc">Crear componentes modulares para tareas y drawer de detalles.</p>
+          
+          <div class="hyperfocus-actions">
+            <button class="btn-primary btn-lg" id="btn-complete-hyperfocus">Completar Tarea</button>
+            <button class="btn-secondary btn-lg" onclick="exitHyperfocus()">Volver a la Lista</button>
+          </div>
+
+          <div class="hyperfocus-subtasks" id="hyperfocus-subtasks-container">
+            <!-- Subtareas del modo enfoque -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Layout Principal -->
+      <div class="app-layout" id="main-app-layout">
+
+        <!-- Sidebar de Navegación -->
+        <aside class="sidebar" aria-label="Navegación principal">
+          <div class="brand">
+            <div class="brand-logo" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="brand-title-wrap">
+              <span class="brand-name">Cassandra</span>
+              <span class="brand-sub">PERSONAL OS</span>
+            </div>
+          </div>
+
+          <nav class="nav-menu">
+            <a href="#" class="nav-item active" id="nav-item-tasks" aria-current="page" onclick="switchMainView('tasks')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Tareas & Proyectos</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-item-crm" onclick="switchMainView('crm')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>CRM & Personas</span>
+              <span class="badge-active-dot" title="3 compromisos pendientes"></span>
+            </a>
+            <a href="#" class="nav-item" id="nav-item-calendar" onclick="switchMainView('calendar')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Calendario</span>
+            </a>
+            <a href="#" class="nav-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Finanzas (Actual)</span>
+              <span class="badge-tag">Próximo</span>
+            </a>
+            <a href="#" class="nav-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Centro de Info</span>
+              <span class="badge-tag">Próximo</span>
+            </a>
+          </nav>
+
+          <div class="sidebar-footer">
+            <div class="user-pill">
+              <div class="avatar">S</div>
+              <div class="user-info">
+                <span class="user-name">Soteiro</span>
+                <span class="user-status">⚡ Enfoque TDAH</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="main-content" id="main-content-area">
+
+          <!-- VISTA TAREAS & PROYECTOS -->
+          <section class="main-view-section" id="view-section-tasks">
+            <header class="top-header">
+              <div class="header-titles">
+                <h1>Enfoque & Proyectos</h1>
+                <p class="subtitle">Espacio fluido para gestionar tu día sin ruido ni fricción</p>
+              </div>
+
+              <div class="header-actions">
+                <button class="btn-cmd-trigger" id="btn-cmd-trigger" aria-label="Abrir paleta de comandos (Ctrl+K)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span>Buscar o comando...</span>
+                  <kbd class="kbd-badge">Ctrl K</kbd>
+                </button>
+
+                <button class="btn-hyperfocus-trigger" id="btn-start-hyperfocus" title="Activar modo de una sola tarea">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>Hiperenfoque</span>
+                </button>
+
+                <button class="btn-primary" id="btn-new-task">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Nueva Tarea</span>
+                </button>
+              </div>
+            </header>
+
+          <!-- LISTA CONTINUA DE PROYECTOS Y TAREAS -->
+          <section class="tasks-stream-section" aria-label="Lista de tareas y proyectos">
+
+            <!-- Barra de Controles y Filtros -->
+            <div class="stream-controls">
+              <button class="btn-toggle-completed" id="btn-toggle-completed" aria-pressed="false">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span id="btn-completed-label">Mostrar completadas (3)</span>
+              </button>
+
+              <div class="project-selector-wrap">
+                <label for="project-select-filter" class="sr-only">Filtrar por proyecto</label>
+                <select id="project-select-filter" class="select-fluid">
+                  <option value="all">Todos los Proyectos</option>
+                  <option value="cassandra">Project Cassandra</option>
+                  <option value="aurora">Migración Aurora</option>
+                  <option value="personal">Finanzas & Casa</option>
+                </select>
+              </div>
+            </div>
+
+        <!-- Mensaje de Estado Vacío (Oculto por defecto) -->
+        <div class="empty-state" id="empty-state-msg" hidden>
+          <div class="empty-icon">✨</div>
+          <h3>No hay tareas en este filtro</h3>
+          <p>¡Todo limpio por aquí! Tómate un descanso o añade una nueva tarea.</p>
+        </div>
+
+        <!-- Flujo Continuo de Proyectos -->
+        <div class="stream-projects-list" id="main-task-list">
+
+          <!-- Grupo Proyecto: Cassandra -->
+          <div class="project-stream-group" data-project="cassandra">
+            <div class="project-stream-header">
+              <div class="project-title-meta">
+                <span class="project-color-indicator color-indigo" aria-hidden="true"></span>
+                <h2 class="project-stream-name">Project Cassandra</h2>
+                <span class="project-task-count">3 tareas</span>
+              </div>
+              <span class="status-chip chip-active">En Proceso</span>
+            </div>
+
+            <div class="stream-task-rows">
+
+              <div class="task-row" data-id="1" tabindex="0" role="button" aria-label="Tarea: Diseñar arquitectura del frontend en Angular. Completada.">
+                <label class="custom-checkbox">
+                  <input type="checkbox" checked data-task-id="1" aria-label="Marcar tarea como completada">
+                  <span class="checkmark"></span>
+                </label>
+                <div class="task-row-body" onclick="openDrawer(1)">
+                  <span class="task-title is-done">Diseñar arquitectura del frontend en Angular</span>
+                  <div class="task-tags-row">
+                    <span class="tag-subtasks">3/3 subtareas</span>
+                    <span class="tag-time">⏱️ 45m</span>
+                  </div>
+                </div>
+                <span class="priority-badge priority-high" title="Prioridad Alta">Alta</span>
+                <button class="btn-row-action" onclick="openDrawer(1)" title="Ver detalle de tarea" aria-label="Ver detalle de tarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+
+              <div class="task-row" data-id="2" tabindex="0" role="button" aria-label="Tarea: Conectar backend Go con base PostgreSQL en Hetzner. Completada.">
+                <label class="custom-checkbox">
+                  <input type="checkbox" checked data-task-id="2" aria-label="Marcar tarea como completada">
+                  <span class="checkmark"></span>
+                </label>
+                <div class="task-row-body" onclick="openDrawer(2)">
+                  <span class="task-title is-done">Conectar backend Go con base PostgreSQL en Hetzner</span>
+                  <div class="task-tags-row">
+                    <span class="tag-subtasks">2/2 subtareas</span>
+                    <span class="tag-time">⏱️ 60m</span>
+                  </div>
+                </div>
+                <span class="priority-badge priority-high" title="Prioridad Alta">Alta</span>
+                <button class="btn-row-action" onclick="openDrawer(2)" title="Ver detalle de tarea" aria-label="Ver detalle de tarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+
+              <div class="task-row" data-id="4" tabindex="0" role="button" aria-label="Tarea: Integración con TickTick y Google Calendar. Pendiente.">
+                <label class="custom-checkbox">
+                  <input type="checkbox" data-task-id="4" aria-label="Marcar tarea como completada">
+                  <span class="checkmark"></span>
+                </label>
+                <div class="task-row-body" onclick="openDrawer(4)">
+                  <span class="task-title">Integración con TickTick y Google Calendar</span>
+                  <div class="task-tags-row">
+                    <span class="tag-subtasks">0/4 subtareas</span>
+                    <span class="tag-time">⏱️ 90m</span>
+                  </div>
+                </div>
+                <span class="priority-badge priority-medium" title="Prioridad Media">Media</span>
+                <button class="btn-row-action" onclick="openDrawer(4)" title="Ver detalle de tarea" aria-label="Ver detalle de tarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Grupo Proyecto: Migración Aurora -->
+          <div class="project-stream-group" data-project="aurora">
+            <div class="project-stream-header">
+              <div class="project-title-meta">
+                <span class="project-color-indicator color-emerald" aria-hidden="true"></span>
+                <h2 class="project-stream-name">Migración de Correos (Aurora)</h2>
+                <span class="project-task-count">1 tarea</span>
+              </div>
+              <span class="status-chip chip-plan">Planificación</span>
+            </div>
+
+            <div class="stream-task-rows">
+              <div class="task-row" data-id="5" tabindex="0" role="button" aria-label="Tarea: Migrar ingesta de emails de Aurora hacia Cassandra. Pendiente.">
+                <label class="custom-checkbox">
+                  <input type="checkbox" data-task-id="5" aria-label="Marcar tarea como completada">
+                  <span class="checkmark"></span>
+                </label>
+                <div class="task-row-body" onclick="openDrawer(5)">
+                  <span class="task-title">Migrar ingesta de emails de Aurora hacia Cassandra</span>
+                  <div class="task-tags-row">
+                    <span class="tag-subtasks">1/3 subtareas</span>
+                    <span class="tag-time">⏱️ 120m</span>
+                  </div>
+                </div>
+                <span class="priority-badge priority-low" title="Prioridad Baja">Baja</span>
+                <button class="btn-row-action" onclick="openDrawer(5)" title="Ver detalle de tarea" aria-label="Ver detalle de tarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grupo Proyecto: Finanzas & Casa -->
+          <div class="project-stream-group" data-project="personal">
+            <div class="project-stream-header">
+              <div class="project-title-meta">
+                <span class="project-color-indicator color-amber" aria-hidden="true"></span>
+                <h2 class="project-stream-name">Finanzas Personales & Casa</h2>
+                <span class="project-task-count">2 tareas</span>
+              </div>
+              <span class="status-chip chip-active">En Proceso</span>
+            </div>
+
+            <div class="stream-task-rows">
+              
+              <div class="task-row" data-id="3" tabindex="0" role="button" aria-label="Tarea: Revisar sincronización con Actual Budget. Pendiente.">
+                <label class="custom-checkbox">
+                  <input type="checkbox" data-task-id="3" aria-label="Marcar tarea como completada">
+                  <span class="checkmark"></span>
+                </label>
+                <div class="task-row-body" onclick="openDrawer(3)">
+                  <span class="task-title">Revisar sincronización con Actual Budget</span>
+                  <div class="task-tags-row">
+                    <span class="tag-subtasks">1/2 subtareas</span>
+                    <span class="tag-time">⏱️ 30m</span>
+                  </div>
+                </div>
+                <span class="priority-badge priority-medium" title="Prioridad Media">Media</span>
+                <button class="btn-row-action" onclick="openDrawer(3)" title="Ver detalle de tarea" aria-label="Ver detalle de tarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+
+              <div class="task-row" data-id="6" tabindex="0" role="button" aria-label="Tarea: Configurar presupuesto mensual de servidores Hetzner. Completada.">
+                <label class="custom-checkbox">
+                  <input type="checkbox" checked data-task-id="6" aria-label="Marcar tarea como completada">
+                  <span class="checkmark"></span>
+                </label>
+                <div class="task-row-body" onclick="openDrawer(6)">
+                  <span class="task-title is-done">Configurar presupuesto mensual de servidores Hetzner</span>
+                  <div class="task-tags-row">
+                    <span class="tag-subtasks">2/2 subtareas</span>
+                    <span class="tag-time">⏱️ 15m</span>
+                  </div>
+                </div>
+                <span class="priority-badge priority-low" title="Prioridad Baja">Baja</span>
+                <button class="btn-row-action" onclick="openDrawer(6)" title="Ver detalle de tarea" aria-label="Ver detalle de tarea">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+      </section>
+    </section>
+
+    <!-- VISTA CRM & HISTORIAL DE NOTAS / CONVERSACIONES -->
+    <section class="main-view-section" id="view-section-crm" hidden>
+      <header class="top-header">
+        <div class="header-titles">
+          <h1>Log de Conversaciones & Notas</h1>
+          <p class="subtitle">Bitácora personal para registrar llamadas, acuerdos, notas de personas y fechas importantes</p>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-primary" onclick="focusQuickLogInput()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>+ Nuevo Registro</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- BARRA DE REGISTRO RÁPIDO (Quick Log Bar) -->
+      <section class="quick-log-section">
+        <div class="quick-log-box">
+          <div class="quick-log-top">
+            <select id="quick-log-type" class="select-fluid-sm">
+              <option value="chat">💬 Conversación</option>
+              <option value="note">📝 Nota Personal</option>
+              <option value="date">🎂 Fecha Importante</option>
+              <option value="agreement">🤝 Acuerdo / Promesa</option>
+            </select>
+            <select id="quick-log-contact" class="select-fluid-sm">
+              <option value="carlos">Carlos Méndez (Hetzner)</option>
+              <option value="mama">Mamá (Familia)</option>
+              <option value="elena">Elena Rivas (Aurora)</option>
+              <option value="arancibia">Dr. Arancibia (Salud)</option>
+            </select>
+          </div>
+          <div class="quick-log-input-row">
+            <input type="text" id="quick-log-input" placeholder="Escribe un resumen de llamada, acuerdo o nota a recordar..." aria-label="Escribir registro rápido">
+            <button class="btn-primary btn-sm" onclick="submitQuickLog()">Guardar Registro</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEED CRONOLÓGICO DE LOGS -->
+      <section class="crm-stream-section">
+        <div class="stream-controls">
+          <div class="filter-pills">
+            <button class="pill-btn active" onclick="filterCrmLogs('all')">Todos (4)</button>
+            <button class="pill-btn" onclick="filterCrmLogs('chat')">💬 Conversaciones</button>
+            <button class="pill-btn" onclick="filterCrmLogs('note')">📝 Notas</button>
+            <button class="pill-btn" onclick="filterCrmLogs('date')">🎂 Fechas Importantes</button>
+            <button class="pill-btn" onclick="filterCrmLogs('agreement')">🤝 Acuerdos</button>
+          </div>
+        </div>
+
+        <div class="log-timeline-stream" id="crm-logs-list">
+
+          <!-- Log Item 1: Conversación -->
+          <div class="log-item-row" data-type="chat">
+            <div class="log-left-col">
+              <div class="crm-avatar avatar-indigo">CM</div>
+              <span class="log-type-icon" title="Conversación">💬</span>
+            </div>
+            <div class="log-main-col">
+              <div class="log-header-line">
+                <span class="log-person-name">Carlos Méndez</span>
+                <span class="log-category-badge badge-chat">Conversación</span>
+                <span class="log-date-stamp">Hoy, 18:30</span>
+              </div>
+              <p class="log-body-text">"Llamada rápida por Telegram: me confirmó que ya creó el usuario de PostgreSQL en Hetzner. Quedamos en enviar las credenciales cifradas antes del viernes."</p>
+              <div class="log-tags-row">
+                <span class="log-tag">#Hetzner</span>
+                <span class="log-tag">#PostgreSQL</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log Item 2: Fecha Importante -->
+          <div class="log-item-row" data-type="date">
+            <div class="log-left-col">
+              <div class="crm-avatar avatar-amber">M</div>
+              <span class="log-type-icon" title="Fecha Importante">🎂</span>
+            </div>
+            <div class="log-main-col">
+              <div class="log-header-line">
+                <span class="log-person-name">Mamá</span>
+                <span class="log-category-badge badge-date">Fecha Importante</span>
+                <span class="log-date-stamp">Ayer</span>
+              </div>
+              <p class="log-body-text">"Cumpleaños este 29 de Julio. Le gustan las plantas de interior (mencionó una Monstera o Ficus de hoja grande)."</p>
+              <div class="log-tags-row">
+                <span class="log-tag">#Familia</span>
+                <span class="log-tag">#Cumpleaños</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log Item 3: Nota Personal -->
+          <div class="log-item-row" data-type="note">
+            <div class="log-left-col">
+              <div class="crm-avatar avatar-emerald">ER</div>
+              <span class="log-type-icon" title="Nota Contextual">📝</span>
+            </div>
+            <div class="log-main-col">
+              <div class="log-header-line">
+                <span class="log-person-name">Elena Rivas</span>
+                <span class="log-category-badge badge-note">Nota Contextual</span>
+                <span class="log-date-stamp">22 Jul</span>
+              </div>
+              <p class="log-body-text">"Prefiere que la contacte por correo por las mañanas antes de las 11:00. Evitar revisar temas técnicos de Aurora por mensaje directo."</p>
+              <div class="log-tags-row">
+                <span class="log-tag">#Aurora</span>
+                <span class="log-tag">#Preferencia</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log Item 4: Acuerdo / Compromiso -->
+          <div class="log-item-row" data-type="agreement">
+            <div class="log-left-col">
+              <div class="crm-avatar avatar-indigo">DA</div>
+              <span class="log-type-icon" title="Acuerdo">🤝</span>
+            </div>
+            <div class="log-main-col">
+              <div class="log-header-line">
+                <span class="log-person-name">Dr. Arancibia</span>
+                <span class="log-category-badge badge-agreement">Acuerdo / Seguimiento</span>
+                <span class="log-date-stamp">20 Jul</span>
+              </div>
+              <p class="log-body-text">"Control médico anual completado. Quedé de pedir la orden de exámenes de laboratorio para la segunda semana de Agosto."</p>
+              <div class="log-tags-row">
+                <span class="log-tag">#Salud</span>
+                <span class="log-tag">#Exámenes</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </section>
+
+    <!-- VISTA CALENDARIO -->
+    <section class="main-view-section" id="view-section-calendar" hidden>
+      <header class="top-header">
+        <div class="header-titles">
+          <h1>Calendario & Time-Blocking</h1>
+          <p class="subtitle">Sincronización bidireccional con Google Calendar y TickTick</p>
+        </div>
+
+        <div class="header-actions">
+          <div class="sync-status-group">
+            <span class="sync-chip chip-google">
+              <span class="sync-dot"></span> Google Calendar
+            </span>
+            <span class="sync-chip chip-ticktick">
+              <span class="sync-dot"></span> TickTick
+            </span>
+          </div>
+
+          <button class="btn-primary" onclick="openNewEventModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Nuevo Evento</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Barra de Navegación del Calendario -->
+      <div class="calendar-controls-bar">
+        <div class="cal-nav-group">
+          <button class="btn-cal-nav" onclick="changeCalPeriod(-1)" aria-label="Período anterior">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="btn-cal-today" onclick="goTodayCal()">Hoy</button>
+          <button class="btn-cal-nav" onclick="changeCalPeriod(1)" aria-label="Período siguiente">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <h2 class="cal-month-title" id="cal-date-title">Julio 2026</h2>
+        </div>
+
+        <div class="cal-view-pills">
+          <button class="pill-btn active" onclick="switchCalView('day')">Día</button>
+          <button class="pill-btn" onclick="switchCalView('week')">Semana</button>
+          <button class="pill-btn" onclick="switchCalView('month')">Mes</button>
+        </div>
+      </div>
+
+      <!-- Time-Blocking Schedule (Vista Día / Semana) -->
+      <div class="calendar-schedule-grid" id="calendar-schedule">
+
+        <!-- Fila de tiempo 08:30 -->
+        <div class="schedule-slot">
+          <span class="time-label">08:30</span>
+          <div class="slot-content">
+            <div class="event-card card-personal" style="top: 0px; height: 50px;">
+              <div class="event-header">
+                <span class="event-title">☕ Rutina de Mañana & Planificación</span>
+                <span class="event-time">08:30 - 09:15</span>
+              </div>
+              <span class="event-source">Personal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila de tiempo 09:30 -->
+        <div class="schedule-slot">
+          <span class="time-label">09:30</span>
+          <div class="slot-content">
+            <div class="event-card card-gcal" style="top: 0px; height: 65px;">
+              <div class="event-header">
+                <span class="event-title">🔵 Reunión de Sincronización Angular</span>
+                <span class="event-time">09:30 - 10:30</span>
+              </div>
+              <span class="event-source">Google Calendar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila de tiempo 10:45 (Bloque de Enfoque) -->
+        <div class="schedule-slot slot-focus">
+          <span class="time-label">10:45</span>
+          <div class="slot-content">
+            <!-- Indicador de Hora Actual -->
+            <div class="current-time-indicator" style="top: 15px;">
+              <span class="indicator-dot"></span>
+              <span class="indicator-line"></span>
+            </div>
+
+            <div class="event-card card-focus" style="top: 0px; height: 110px;">
+              <div class="event-header">
+                <span class="event-title">⚡ Bloque de Enfoque: Backend Go & Hetzner DB</span>
+                <span class="event-time">10:45 - 12:45</span>
+              </div>
+              <p class="event-desc">Validar migraciones SQL y endpoints de autenticación.</p>
+              <span class="event-source">Project Cassandra</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila de tiempo 13:00 -->
+        <div class="schedule-slot">
+          <span class="time-label">13:00</span>
+          <div class="slot-content">
+            <div class="event-card card-personal" style="top: 0px; height: 55px;">
+              <div class="event-header">
+                <span class="event-title">🟢 Almuerzo & Descanso</span>
+                <span class="event-time">13:00 - 14:00</span>
+              </div>
+              <span class="event-source">Personal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila de tiempo 14:30 -->
+        <div class="schedule-slot">
+          <span class="time-label">14:30</span>
+          <div class="slot-content">
+            <div class="event-card card-ticktick" style="top: 0px; height: 80px;">
+              <div class="event-header">
+                <span class="event-title">🟣 Revisar Emails Aurora & Migración IMAP</span>
+                <span class="event-time">14:30 - 16:00</span>
+              </div>
+              <span class="event-source">TickTick Import</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila de tiempo 16:30 -->
+        <div class="schedule-slot">
+          <span class="time-label">16:30</span>
+          <div class="slot-content">
+            <div class="event-card card-personal" style="top: 0px; height: 60px;">
+              <div class="event-header">
+                <span class="event-title">💳 Sincronizar Cuentas en Actual Budget</span>
+                <span class="event-time">16:30 - 17:30</span>
+              </div>
+              <span class="event-source">Finanzas Personales</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    </main>
+
+    <!-- SLIDE-OVER DRAWER (Accesible por teclado con trampa de foco y ARIA) -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()" aria-hidden="true"></div>
+    
+    <aside class="slide-drawer" id="slide-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title-heading" hidden>
+      <div class="drawer-header">
+        <span class="drawer-label" id="drawer-title-heading">Detalles de Tarea</span>
+        <button class="btn-close-drawer" id="btn-close-drawer" onclick="closeDrawer()" aria-label="Cerrar detalles de tarea">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        
+        <!-- Título Editable -->
+        <div class="drawer-field">
+          <label for="drawer-title" class="sr-only">Título de la tarea</label>
+          <input type="text" id="drawer-title" class="drawer-input-title" value="Integración con TickTick y Google Calendar" placeholder="Título de la tarea...">
+        </div>
+
+        <!-- Meta Selector Grid -->
+        <div class="meta-grid">
+          <div class="meta-item">
+            <label for="drawer-project" class="meta-label">Proyecto</label>
+            <select id="drawer-project" class="select-sm">
+              <option value="cassandra">Project Cassandra</option>
+              <option value="aurora">Migración Aurora</option>
+              <option value="personal">Finanzas & Casa</option>
+            </select>
+          </div>
+
+          <div class="meta-item">
+            <label for="drawer-priority" class="meta-label">Prioridad</label>
+            <select id="drawer-priority" class="select-sm">
+              <option value="high">Alta Prioridad</option>
+              <option value="medium" selected>Media Prioridad</option>
+              <option value="low">Baja Prioridad</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Descripción / Notas -->
+        <div class="drawer-field">
+          <label for="drawer-notes" class="meta-label">Notas Contextuales</label>
+          <textarea id="drawer-notes" class="drawer-textarea" rows="4" placeholder="Añade notas o context sobre esta tarea..."></textarea>
+        </div>
+
+        <!-- Checklist de Subtareas TDAH -->
+        <div class="drawer-field">
+          <div class="subtasks-header">
+            <span class="meta-label">Subtareas / Lista Paso a Paso</span>
+            <span class="subtasks-counter" id="subtasks-count">0 / 4</span>
+          </div>
+
+          <div class="subtasks-list" id="subtasks-container">
+            <!-- Filas dinámicas -->
+          </div>
+
+          <button class="btn-add-subtask" id="btn-add-subtask">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Añadir subtarea</span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="drawer-footer">
+        <button class="btn-secondary" onclick="closeDrawer()">Cancelar</button>
+        <button class="btn-primary" onclick="saveDrawerTask()">Guardar Cambios</button>
+      </div>
+    </aside>
+
+    <!-- Toast Notification (Deshacer / Mensajes) -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

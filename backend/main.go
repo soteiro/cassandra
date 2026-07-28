@@ -46,6 +46,8 @@ func main() {
 	proyectHandler := handlers.NewProyectHandler(projectRepo)
 	tareasRepo := repository.NewTareasRepository(dbPool)
 	tareasHandler := handlers.NewTareasHandler(tareasRepo)
+	logsRepo := repository.NewLogsRepository(dbPool)
+	logsHandler := handlers.NewLogsHandler(logsRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -117,6 +119,13 @@ func main() {
 		r.Get("/api/tareas/{id}", tareasHandler.GetTareaByID)
 		r.Put("/api/tareas/{id}", tareasHandler.UpdateTarea)
 		r.Delete("/api/tareas/{id}", tareasHandler.DeleteTarea)
+
+		// Rutas de Logs en Crudo de Proyectos
+		r.Post("/api/proyects/{proyect_id}/logs", logsHandler.CreateLog)
+		r.Get("/api/proyects/{proyect_id}/logs", logsHandler.GetLogsByProyecto)
+		r.Get("/api/logs/{id}", logsHandler.GetLogByID)
+		r.Put("/api/logs/{id}", logsHandler.UpdateLog)
+		r.Delete("/api/logs/{id}", logsHandler.DeleteLog)
 	})
 
 	r.Post("/api/auth/login", authHandler.Login)
