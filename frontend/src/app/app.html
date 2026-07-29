@@ -1,14 +1,4 @@
 <main class="bg-background w-screen h-screen p-4">
-<h1 class="font-bold text-3xl text-center">
-  {{ title() }}
-</h1>
-<div>
-  @if (isLoading()) {
-  <p>consultando go...</p>
-} @else if (error(); as e) {
-  <p class="font-bold">error en la conexion: <span class="font-bold text-red-500">{{ e.message }}</span></p>
-} @else if (health.value(); as h) {
-  <span class="font-bold text-emerald-500">{{ h.status }} </span>
-}
-</div>
+
+<router-outlet />
 </main>

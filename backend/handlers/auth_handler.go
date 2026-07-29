@@ -86,56 +86,119 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//enviar respuesta
-	w.Header().Set("Content-type", "application/json")
-	json.NewEncoder(w).Encode(models.TokenResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+	// accesstoken en cookie httponly (15 min)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(15 * time.Minute),
 	})
+
+	// refreshtoken en cookie httponly (7 dias)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  expiredAT,
+	})
+
+	//enviar respuesta (sin tokens en el body)
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "login exitoso"})
 
 }
 
 // refresh
 func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
-	var req RefreshRequest
-
-	//decodificar la peticion
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		log.Printf("json enviado desde front invalido: %v", err)
-		http.Error(w, "Json invalido", http.StatusBadRequest)
+	// leer el refresh token desde la cookie
+	cookie, err := r.Cookie("refresh_token")
+	if err != nil || cookie.Value == "" {
+		log.Printf("peticion de refresh sin cookie")
+		http.Error(w, "el refresh token es obligatorio", http.StatusUnauthorized)
 		return
 	}
 
-	//validar que se envio el refresh token
-	if req.RefreshToken == "" {
-		log.Printf("peticion de refresh sin token")
-		http.Error(w, "el refresh token es obligatorio", http.StatusBadRequest)
-		return
-	}
-
-	userID, err := h.AuthRepo.GetUserIDByRefreshToken(r.Context(), req.RefreshToken)
+	userID, err := h.AuthRepo.GetUserIDByRefreshToken(r.Context(), cookie.Value)
 	if err != nil {
 		log.Printf("error al validar el refresh token: %v", err)
-		http.Error(w, "sesion invalida: ", http.StatusUnauthorized)
+		http.Error(w, "sesion invalida", http.StatusUnauthorized)
 		return
 	}
 
-	// si el refreshtoken es valido, regenerar un nuevo token
+	// si el refreshtoken es valido, regenerar un nuevo access token
 	newAccessToken, err := utils.GenerateAccessToken(userID, h.jwtSecret)
 	if err != nil {
 		log.Printf("error al generar un nuevo token: %v", err)
-		http.Error(w, "error al generar un nuevo token:", http.StatusInternalServerError)
+		http.Error(w, "error al generar un nuevo token", http.StatusInternalServerError)
 		return
 	}
 
-	//responder con el nuevo token
-
-	w.Header().Set("Content-type", "application/json")
-	json.NewEncoder(w).Encode(models.TokenResponse{
-		AccessToken: newAccessToken,
-		RefreshToken: req.RefreshToken,
+	// accesstoken en cookie httponly (15 min)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    newAccessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // Cambiar a true en producción
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(15 * time.Minute),
 	})
 
+	log.Printf("Refresh exitoso %v", userID)
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "token renovado"})
+}
 
+//logout
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	// leer el refresh token desde la cookie
+	cookie, err := r.Cookie("refresh_token")
+	if err != nil || cookie.Value == "" {
+		log.Printf("peticion de logout sin cookie")
+		http.Error(w, "el refresh token es obligatorio", http.StatusUnauthorized)
+		return
+	}
+
+	
+
+	// eliminar el refresh token de la db
+	err = h.AuthRepo.DeleteRefreshToken(r.Context(), cookie.Value)
+	if err != nil {
+		log.Printf("error al eliminar el refresh token de la db: %v", err)
+		http.Error(w, "error al cerrar sesion", http.StatusInternalServerError)
+		return
+	}
+
+	// eliminar las cookies del cliente (MaxAge < 0 las borra)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+	})
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+	})
+
+	log.Printf("Logout exitoso")
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "logout exitoso"})
 }

@@ -1,0 +1,49 @@
+<h1 class="font-bold text-3xl text-center">
+  {{ title() }}
+</h1>
+<div>
+@if (isLoading()) {
+  <p>consultando go...</p>
+} @else if (error(); as e) {
+  <p>error: {{ e.message }}</p>
+} @else if (health.value(); as h) {
+  <p>{{ h.status }}</p>
+}
+
+<button type="button"
+        (click)="reload()"
+        class="mt-2 px-3 py-1 rounded border border-foreground/30 hover:bg-foreground/10">
+  Recargar
+</button>
+
+@if (unique.isLoading() && !unique.hasValue()) {
+  <p>consultando raíz...</p>
+} @else if (unique.error(); as e) {
+  <p>error raíz: {{ e.message }}</p>
+} @else if (unique.value(); as r) {
+  <p>{{ r.response }}</p>
+}
+
+@if (dbTime.isLoading() && !dbTime.hasValue()) {
+  <p>
+    consultando hora de la base de datos
+  </p>
+} @else if (dbTime.error(); as e ){
+  <p>ocurrio un error en la consulta: {{ e }}</p>
+} @else if (dbTime.value(); as r){
+  <p>mensaje de la base de datos: {{r.message }}</p>
+  <p>hora de la base de datos: {{ r.db_time }}</p>
+}
+
+@if (dbVersion.isLoading() && !dbVersion.hasValue()){
+  <p>
+    consultando la version de la base de datos
+  </p>
+} @else if (dbVersion.error(); as e){
+  <p>ocurrio un error llamando a la base de datos: {{ e }}</p>
+} @else if (dbVersion.value(); as r) {
+  <p>{{ r.message }}</p>
+  <p>{{ r.status }}</p>
+  <p> {{r.version_db}} </p>
+}
+</div>

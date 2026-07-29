@@ -57,6 +57,7 @@ func main() {
 		AllowedOrigins: []string{"http://localhost:4200"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
 	}))
 	r.Use(httprate.LimitByIP(100, time.Minute))
 	// Rutas de prueba
@@ -130,6 +131,7 @@ func main() {
 
 	r.Post("/api/auth/login", authHandler.Login)
 	r.Post("/api/auth/refresh", authHandler.Refresh)
+	r.Post("/api/auth/logout", authHandler.Logout)
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)

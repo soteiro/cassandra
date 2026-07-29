@@ -1,0 +1,43 @@
+    <div class="flex flex-col items-center justify-center min-h-[80vh]">                                                                                              
+      <form (submit)="onSubmit($event)" class="flex flex-col gap-4 w-full max-w-sm p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl">                   
+        <h2 class="text-2xl font-bold text-center text-white">Cassandra Auth</h2>                                                                                     
+                                                                                                                                                                      
+        @if (errorMessage()) {                                                                                                                                        
+          <div class="p-3 text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-lg">                                                                       
+            {{ errorMessage() }}                                                                                                                                      
+          </div>                                                                                                                                                      
+        }                                                                                                                                                             
+                                                                                                                                                                      
+        <div class="flex flex-col gap-1">                                                                                                                             
+          <label class="text-sm font-medium text-slate-300">Correo Electrónico</label>                                                                                
+          <input                                                                                                                                                      
+            type="email"                                                                                                                                              
+            [ngModel]="email()"                                                                                                                                       
+            (ngModelChange)="email.set($event)"                                                                                                                       
+            name="email"                                                                                                                                              
+            required                                                                                                                                                  
+            class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-emerald-500"                                  
+            placeholder="usuario@ejemplo.com"                                                                                                                         
+          />
+        </div>
+  
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium text-slate-300">Contraseña</label>
+          <input 
+            type="password" 
+            [ngModel]="password()" 
+            (ngModelChange)="password.set($event)"
+            name="password"
+            required 
+            class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+            placeholder="••••••••" 
+          />
+        </div>
+  
+        <button 
+          type="submit" 
+          class="mt-2 py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-colors">
+          Iniciar Sesión
+        </button>
+      </form>
+    </div>
