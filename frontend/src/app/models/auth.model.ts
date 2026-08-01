@@ -9,3 +9,7 @@ export interface AuthResponse {
   access_token: string;
   refresh_token: string;
 }
+
+export interface MeResponse {
+  user_id: number;
+}

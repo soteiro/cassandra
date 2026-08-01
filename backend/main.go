@@ -132,6 +132,7 @@ func main() {
 	r.Post("/api/auth/login", authHandler.Login)
 	r.Post("/api/auth/refresh", authHandler.Refresh)
 	r.Post("/api/auth/logout", authHandler.Logout)
+	r.Get("/api/auth/me", authHandler.Me)
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)

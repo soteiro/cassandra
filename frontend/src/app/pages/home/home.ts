@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject } from '@angular/core';
-import { StatusService } from '../../../services/status.service';
+import { StatusService } from '../../services/status.service';
 @Component({
   selector: 'app-home',
   imports: [],

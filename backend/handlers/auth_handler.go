@@ -92,7 +92,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    accessToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false, // TODO: true en produccion (HTTPS)
 		SameSite: http.SameSiteLaxMode,
 		Expires:  time.Now().Add(15 * time.Minute),
 	})
@@ -103,7 +103,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    refreshToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false, // TODO: true en produccion (HTTPS)
 		SameSite: http.SameSiteLaxMode,
 		Expires:  expiredAT,
 	})
@@ -183,7 +183,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false, // TODO: true en produccion (HTTPS)
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   -1,
 	})
@@ -192,7 +192,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false, // TODO: true en produccion (HTTPS)
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   -1,
 	})
@@ -201,4 +201,62 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "logout exitoso"})
+}
+
+// auth me
+func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
+	// intentar leer la cookie del access_token
+	accessCookie, err := r.Cookie("access_token")
+	if err == nil && accessCookie.Value != "" {
+		//validar el token
+		userID, err := utils.ValidateAccessToken(accessCookie.Value, h.jwtSecret)
+		if err == nil {
+			//acceso token valido,  sesion ok
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]int{"user_id":userID})
+			return
+		}
+		log.Printf("[ME] access token invalido o expirado: %v", err)
+	}
+
+	//intentar con refresh token, si se llega aqui, el token es invalido o expirado
+	refreshCookie, err := r.Cookie("refresh_token")
+	if err != nil || refreshCookie.Value == "" {
+		log.Printf("[ME] refresh token no encontrado o invalido: %v", err)
+		http.Error(w, "sesion invalida", http.StatusUnauthorized)
+		return
+	}
+
+	// verificar el refresh token contra la db
+	userID, err := h.AuthRepo.GetUserIDByRefreshToken(r.Context(), refreshCookie.Value)
+	if err != nil {
+		log.Printf("[ME] refresh token invalido o no encontrado en db: %v", err)
+		http.Error(w, "sesion invalida", http.StatusUnauthorized)
+		return
+	}
+
+	// si el refresh token es valido, generar un nuevo access token
+	newAccessToken, err := utils.GenerateAccessToken(userID, h.jwtSecret)
+	if err != nil {
+		log.Printf("[ME] error al generar un nuevo access token: %v", err)
+		http.Error(w, "error al generar un nuevo access token", http.StatusInternalServerError)
+		return
+	}
+
+	// enviar el nuevo access token en la cookie httponly (15 min)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access_token",
+		Value:    newAccessToken,
+		Path:	 "/",
+		HttpOnly: true,
+		Secure:   false, 
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Now().Add(15 * time.Minute),
+	})
+
+	//responder igual que el caso feliz
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]int{"user_id":userID})
 }

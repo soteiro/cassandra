@@ -4,9 +4,8 @@
 - [x] crear la estructura de tablas usando migraciones
 - [x] crear endpoints para crear usuarios contra la db  
 - [x] logica de autenticacion y autorizacion contra la db
+- [x] asegurar la auth con http only y cors (para mas tarde)
 - [ ] implementar las tablas diseñadas
 - [ ] revisar como vikunja implementa las tareas
 - [ ] empezar con front
-
-- [ ] asegurar la auth con http only y cors (para mas tarde)
 - [ ] solo permitir que un usuario se borre o edite a si mismo (mas tarde)
