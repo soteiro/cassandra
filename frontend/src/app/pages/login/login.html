@@ -15,7 +15,8 @@
             [ngModel]="email()"                                                                                                                                       
             (ngModelChange)="email.set($event)"                                                                                                                       
             name="email"                                                                                                                                              
-            required                                                                                                                                                  
+            required     
+            autofocus                                                                                                                                             
             class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-emerald-500"                                  
             placeholder="usuario@ejemplo.com"                                                                                                                         
           />

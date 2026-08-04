@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "nombre" : "cassandra 4",
+        "nombre" : "cassandra 10",
         "descripcion" : "centro de inteligencia",
         "comentario" : "fase inicial de este proyecto"
       }

@@ -1,0 +1,18 @@
+<div class="p-6">
+      <a routerLink="/proyectos" class="text-xs text-slate-400 hover:text-white mb-4 inline-block">
+        ← Volver a la lista de proyectos
+      </a>
+
+      @if (projectResource?.isLoading()) {
+        <p class="text-slate-400">Cargando detalles del proyecto...</p>
+      } @else if (projectResource?.value(); as project) {
+        <div class="p-6 bg-slate-900 border border-slate-800 rounded-xl">
+          <h1 class="text-3xl font-bold text-emerald-400">{{ project.nombre }}</h1>
+          <p class="text-slate-300 mt-2">{{ project.descripcion }}</p>
+          <p class="text-slate-400 text-sm mt-4">Comentarios: {{ project.comentario }}</p>
+          <span class="inline-block mt-4 px-2 py-1 text-xs bg-slate-800 rounded text-slate-300">
+            Estado: {{ project.estado }}
+          </span>
+        </div>
+      }
+    </div>

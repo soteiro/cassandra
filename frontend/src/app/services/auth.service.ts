@@ -33,4 +33,11 @@ export class AuthService {
       catchError(() => of(false)),
     );
   }
+
+  // Renueva el access_token usando el refresh_token de la cookie HttpOnly.
+  // El backend setea la nueva cookie access_token en la respuesta.
+  // Los errores los maneja el interceptor (no aqui) para decidir logout.
+  public refresh(): Observable<any> {
+    return this.http.post('http://localhost:8080/api/auth/refresh', {});
+  }
 }

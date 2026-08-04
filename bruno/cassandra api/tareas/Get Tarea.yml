@@ -5,9 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/tareas/1
-  body:
-    type: none
+  url: http://localhost:8080/api/tareas/7
   auth: inherit
 
 settings:

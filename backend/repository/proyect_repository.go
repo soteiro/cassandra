@@ -51,7 +51,13 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 
 func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.ProyectResponse, error){
 	query := `
-	SELECT p.id, p.nombre, p.descripcion, p.comentario, p.fecha_creacion 
+	SELECT 
+	p.id,
+	p.nombre,
+	p.descripcion,
+	p.comentario,
+	p.fecha_creacion,
+	p.estado 
 	from proyectos p
 	WHERE p.user_id = $1
 	AND p.eliminado is false
@@ -78,6 +84,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.Descripcion,
 			&p.Comentario,
 			&p.FechaCreacion,
+			&p.Estado,
 		)
 		if err != nil {
 			return nil, err

@@ -1,0 +1,33 @@
+<aside class="w-64 h-screen flex flex-col gap-2 justify-between py-6 px-1 border-r border-primary">
+  <section class="flex-0">
+    <h2 class="text-xl font-bold text-white mb-4">Cassandra</h2>
+  </section>
+  <!-- Botón Home -->
+  <section class="flex-2 flex flex-col">
+    <a
+      routerLink="/home"
+      routerLinkActive="bg-primary text-white"
+      class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+    >
+      🏠 Inicio
+    </a>
+
+    <a
+      routerLink="/proyectos"
+      routerLinkActive="bg-primary text-white"
+      class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+    >
+      Proyectos
+    </a>
+
+    <a routerLink="/test2"
+    routerLinkActive="bg-primary text-white"
+    class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+    >test 2 </a>
+  </section>
+
+  <section class="flex-0 m-2 justify-center align-center">
+    <button (click)="chau()" 
+    class="bg-red-700 w-[60%] h-full rounded-2xl">logout</button>
+  </section>
+</aside>

@@ -1,0 +1,29 @@
+<div class="p-6">
+    <button class="border border-primary rounded-2xl p-2 " (click)="reload()">
+        reload
+    </button>
+      <h2 class="text-2xl font-bold text-white mb-4">Mis Proyectos</h2>
+
+      @if (proyectsResource.isLoading()) {
+        <p class="text-slate-400">Cargando proyectos desde Go...</p>
+      } @else if (proyectsResource.error()) {
+        <p class="text-red-500 font-bold">Error al cargar proyectos</p>
+      } @else if (proyectsResource.value(); as proyectos) {
+        <div class="flex flex-col gap-4">
+          @for (p of proyectos; track p.id) {
+            <a [routerLink]="['/proyectos', p.id]">
+            <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl">
+              <h3 class="text-lg font-bold text-emerald-400">{{ p.nombre }}</h3>
+              <p class="text-slate-300 text-sm mt-1">{{ p.descripcion }}</p>
+              
+              <span class="inline-block mt-2 px-2 py-1 text-xs bg-slate-800 rounded text-slate-400">
+                Estado: {{ p.estado }} 
+              </span>
+            </div>
+            </a>
+          } @empty {
+            <p class="text-slate-400">No tienes proyectos creados aún.</p>
+          }
+        </div>
+      }
+    </div>

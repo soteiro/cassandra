@@ -19,9 +19,20 @@ runtime:
   scripts:
     - type: after-response
       code: |-
-        if (res.status == 200) {
-          bru.setEnvVar("accessToken", res.body.access_token);
-          bru.setEnvVar("refreshToken", res.body.refresh_token)
+        // Post Response Script (en la petición de Login)
+        const setCookieHeader = res.getHeader('set-cookie');
+
+        if (setCookieHeader) {
+          // setCookieHeader puede ser un string o un array de strings
+          const cookies = Array.isArray(setCookieHeader) ? setCookieHeader.join('; ') : setCookieHeader;
+          
+          // Extraer el valor de la cookie usando Regex
+          const match = cookies.match(/token=([^;]+)/); // Reemplaza 'token' por el nombre de tu cookie
+          
+          if (match && match[1]) {
+            bru.setEnvVar('access_token', match[1]);
+            console.log('Token guardado correctamente', );
+          }
         }
 
 settings:

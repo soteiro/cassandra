@@ -2,3 +2,7 @@ name: cassandra
 variables:
   - name: refreshToken
     value: "{{refreshToken}}"
+  - name: AUTH_TOKEN
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJleHAiOjE3ODU2MjE2NjAsImlhdCI6MTc4NTYyMDc2MH0.-0VVJ-9VBLA25Zk5eZHcWYQfKI1xpbazoqyZd9SzihM
+  - name: access_token
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJleHAiOjE3ODU4MDcxNjUsImlhdCI6MTc4NTgwNjI2NX0.1MeGJtSGgcaQVV2oUCi8DWYo9v74BJVCQS5jQwNQ6pE

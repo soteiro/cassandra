@@ -1,0 +1,9 @@
+<div class="flex h-screen bg-slate-950 text-white overflow-hidden">
+  <!-- 1. El Sidebar a la izquierda -->
+  <app-sidebar />
+
+  <!-- 2. El área de contenido principal donde se inyecta la pantalla activa (Home, Proyectos, etc.) -->
+  <main class="flex-1 overflow-y-auto p-6">
+    <router-outlet />
+  </main>
+</div>
