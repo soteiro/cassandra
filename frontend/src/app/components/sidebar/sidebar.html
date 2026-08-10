@@ -1,4 +1,6 @@
-<aside class="w-64 h-screen flex flex-col gap-2 justify-between py-6 px-1 border-r border-primary">
+
+<aside class="fixed bg-slate-900 inset-y-0 z-99 left-0 w-64 h-screen flex flex-col gap-2 justify-between py-6 px-1 border-r border-primary -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:z-auto" [class.translate-x-0]="sidebar.isOpen()">
+
   <section class="flex-0">
     <h2 class="text-xl text-center font-bold text-white mb-4">Cassandra</h2>
   </section>
@@ -27,16 +29,13 @@
   </section>
 
   <section class="flex-0 flex gap-4 m-auto">
-    
+
     <button (click)="chau()" 
     class="bg-red-700 p-2 rounded-2xl">
     logout
   </button>
-  
-<!-- TODO: cambiar por un icono y hacer las opciones de configuracion  -->
-  <button class="bg-primary rounded-2xl p-2 ">
-    config
-  </button>
+
 
   </section>
 </aside>
+

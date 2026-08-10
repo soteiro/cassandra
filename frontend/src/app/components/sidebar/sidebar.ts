@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
+import { useToggle } from '../../utils/use-toggle'
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive],
@@ -11,6 +11,8 @@ import { AuthService } from '../../services/auth.service';
 export class Sidebar {
   private readonly authservice = inject(AuthService);
   private readonly router = inject(Router);
+
+  @Input() sidebar = useToggle(false)
 
   protected chau() :void  {
     this.authservice.logout().subscribe({
@@ -22,5 +24,7 @@ export class Sidebar {
       }
     })
   }
+
+
 
 }
