@@ -7,6 +7,7 @@
   <!-- Botón Home -->
   <section class="flex-1 flex flex-col">
     <a
+      (click)="sidebar.close()"
       routerLink="/home"
       routerLinkActive="bg-primary text-white"
       class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
@@ -15,6 +16,7 @@
     </a>
 
     <a
+      (click)="sidebar.close()"
       routerLink="/proyectos"
       routerLinkActive="bg-primary text-white"
       class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
@@ -22,7 +24,9 @@
       Proyectos
     </a>
 
-    <a routerLink="/test2"
+    <a
+    (click)="sidebar.close()" 
+    routerLink="/test2"
     routerLinkActive="bg-primary text-white"
     class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
     >test 2 </a>

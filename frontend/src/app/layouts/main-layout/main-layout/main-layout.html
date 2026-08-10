@@ -4,7 +4,7 @@
   <div class="flex flex-1 min-h-0">
     @if (sidebar.isOpen()){
       <div (click)="sidebar.close()" 
-      class="bg-black/90 w-full h-full z-10 fixed md: hidden">   
+      class="bg-black/90 w-full h-full z-10 fixed md:hidden">   
       </div>
     }
     <app-sidebar [sidebar]="sidebar" />
