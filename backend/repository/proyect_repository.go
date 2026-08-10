@@ -14,18 +14,24 @@ type ProyectRepository struct {
 }
 
 // constructor del repo proyectos
-func NewProyectRepository(db *pgxpool.Pool) *ProyectRepository{
-	return &ProyectRepository{db : db}
+func NewProyectRepository(db *pgxpool.Pool) *ProyectRepository {
+	return &ProyectRepository{db: db}
 }
 
 // crear un proyecto
-func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectRequest) (*models.ProyectResponse, error){
+func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectRequest) (*models.ProyectResponse, error) {
 	var proyect models.ProyectResponse
 	query := `
-		INSERT INTO proyectos (nombre, descripcion, comentario, user_id)
-		VALUES ($1, $2,$3, $4)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion
+		INSERT INTO proyectos (
+			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite
 	`
+
+	if req.Prioridad == "" {
+		req.Prioridad = "Media"
+	}
 
 	err := r.db.QueryRow(
 		ctx,
@@ -34,12 +40,23 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		req.Descripcion,
 		req.Comentario,
 		req.UserID,
+		req.PorQue,
+		req.ParaQue,
+		req.CriterioFinalizacion,
+		req.Prioridad,
+		req.FechaLimite,
 	).Scan(
 		&proyect.ID,
 		&proyect.Nombre,
 		&proyect.Descripcion,
 		&proyect.Comentario,
 		&proyect.FechaCreacion,
+		&proyect.Estado,
+		&proyect.PorQue,
+		&proyect.ParaQue,
+		&proyect.CriterioFinalizacion,
+		&proyect.Prioridad,
+		&proyect.FechaLimite,
 	)
 
 	if err != nil {
@@ -49,30 +66,34 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 	return &proyect, nil
 }
 
-func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.ProyectResponse, error){
+func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.ProyectResponse, error) {
 	query := `
 	SELECT 
-	p.id,
-	p.nombre,
-	p.descripcion,
-	p.comentario,
-	p.fecha_creacion,
-	p.estado 
-	from proyectos p
+		p.id,
+		p.nombre,
+		p.descripcion,
+		p.comentario,
+		p.fecha_creacion,
+		p.estado,
+		p.por_que,
+		p.para_que,
+		p.criterio_finalizacion,
+		p.prioridad,
+		p.fecha_limite
+	FROM proyectos p
 	WHERE p.user_id = $1
-	AND p.eliminado is false
+	AND p.eliminado IS false
 	`
 
 	rows, err := r.db.Query(
 		ctx,
 		query,
-		UserID, 
-		)
+		UserID,
+	)
 
 	if err != nil {
-		return  nil, err
+		return nil, err
 	}
-	// terminar la conexion 
 	defer rows.Close()
 
 	var proyects []models.ProyectResponse
@@ -85,6 +106,11 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.Comentario,
 			&p.FechaCreacion,
 			&p.Estado,
+			&p.PorQue,
+			&p.ParaQue,
+			&p.CriterioFinalizacion,
+			&p.Prioridad,
+			&p.FechaLimite,
 		)
 		if err != nil {
 			return nil, err
@@ -106,32 +132,36 @@ func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*m
 	AND user_id = $2
 	`
 
-	res , err := r.db.Exec(ctx, query, id, user_id)
+	res, err := r.db.Exec(ctx, query, id, user_id)
 	if err != nil {
 		log.Printf("error al borrar el proyecto: %v", err)
 		return nil, err
 	}
-	if res.RowsAffected() == 0{
-		return nil, fmt.Errorf("no se encontro el proyecto con id: %d", id) 
+	if res.RowsAffected() == 0 {
+		return nil, fmt.Errorf("no se encontro el proyecto con id: %d", id)
 	}
 
 	return nil, nil
 }
 
-//
 func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*models.ProyectResponse, error) {
 	var p models.ProyectResponse
 	query := `
 	SELECT 
-	id, 
-	nombre, 
-	descripcion, 
-	comentario,
-	fecha_creacion,
-	estado
+		id, 
+		nombre, 
+		descripcion, 
+		comentario,
+		fecha_creacion,
+		estado,
+		por_que,
+		para_que,
+		criterio_finalizacion,
+		prioridad,
+		fecha_limite
 	FROM proyectos
 	WHERE id = $1
-	AND user_id  = $2
+	AND user_id = $2
 	AND eliminado IS false
 	`
 	err := r.db.QueryRow(
@@ -146,6 +176,11 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.Comentario,
 		&p.FechaCreacion,
 		&p.Estado,
+		&p.PorQue,
+		&p.ParaQue,
+		&p.CriterioFinalizacion,
+		&p.Prioridad,
+		&p.FechaLimite,
 	)
 
 	if err != nil {
@@ -155,7 +190,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 	return &p, nil
 }
 
-// Update con COALLECENCE
+// Update con COALESCE
 func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req *models.ProyectUpdateRequest) (*models.ProyectUpdateResponse, error) {
 	var p models.ProyectUpdateResponse
 
@@ -165,11 +200,16 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 			nombre = COALESCE($1, nombre),
 			descripcion = COALESCE($2, descripcion),
 			comentario = COALESCE($3, comentario),
-			estado = COALESCE($4, estado)
-		WHERE id = $5
-		AND user_id = $6
+			estado = COALESCE($4, estado),
+			por_que = COALESCE($5, por_que),
+			para_que = COALESCE($6, para_que),
+			criterio_finalizacion = COALESCE($7, criterio_finalizacion),
+			prioridad = COALESCE($8, prioridad),
+			fecha_limite = COALESCE($9, fecha_limite)
+		WHERE id = $10
+		AND user_id = $11
 		AND eliminado = false
-		RETURNING id, nombre, descripcion, comentario, estado
+		RETURNING id, nombre, descripcion, comentario, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite
 	`
 	err := r.db.QueryRow(
 		ctx,
@@ -178,6 +218,11 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		req.Descripcion,
 		req.Comentario,
 		req.Estado,
+		req.PorQue,
+		req.ParaQue,
+		req.CriterioFinalizacion,
+		req.Prioridad,
+		req.FechaLimite,
 		id,
 		userID,
 	).Scan(
@@ -186,6 +231,11 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		&p.Descripcion,
 		&p.Comentario,
 		&p.Estado,
+		&p.PorQue,
+		&p.ParaQue,
+		&p.CriterioFinalizacion,
+		&p.Prioridad,
+		&p.FechaLimite,
 	)
 
 	if err != nil {

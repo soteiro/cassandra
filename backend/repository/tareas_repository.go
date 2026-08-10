@@ -22,16 +22,17 @@ func NewTareasRepository(db *pgxpool.Pool) *TareasRepository {
 func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
 	query := `
-		INSERT INTO tareas (
+		INSERT INTO tareas_proyectos (
 			nombre, 
 			descripcion, 
 			comentario, 
 			user_id, 
 			estado,
-			proyecto_id
+			proyecto_id,
+			tarea_padre_id
 		)
-		VALUES ($1, $2, $3, $4, $5, $6)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
 	`
 
 	err := r.db.QueryRow(
@@ -43,6 +44,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		req.UserID,
 		req.Estado,
 		req.ProyectID,
+		req.TareaPadreID,
 	).Scan(
 		&tarea.ID,
 		&tarea.Nombre,
@@ -52,6 +54,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		&tarea.Estado,
 		&tarea.UserID,
 		&tarea.ProyectID,
+		&tarea.TareaPadreID,
 	)
 
 	if err != nil {
@@ -64,10 +67,11 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 // GetAll obtiene todas las tareas de un usuario específico
 func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.TareaResponse, error) {
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id
-		FROM tareas
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		FROM tareas_proyectos
 		WHERE user_id = $1
 		AND eliminado = false
+		ORDER BY id ASC
 	`
 
 	rows, err := r.db.Query(ctx, query, userID)
@@ -90,6 +94,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 			&tarea.Estado,
 			&tarea.UserID,
 			&tarea.ProyectID,
+			&tarea.TareaPadreID,
 		)
 		if err != nil {
 			log.Printf("error al escanear la tarea: %v", err)
@@ -105,12 +110,80 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 	return tareas, nil
 }
 
-// GetByID obtiene una tarea específica validando que le pertenezca al usuario
+// GetByProyectoID obtiene las tareas de un proyecto pertenecientes a un usuario agrupadas jerárquicamente con sus subtareas
+func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, userID int) ([]models.TareaResponse, error) {
+	query := `
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		FROM tareas_proyectos
+		WHERE proyecto_id = $1
+		AND user_id = $2
+		AND eliminado = false
+		ORDER BY id ASC
+	`
+
+	rows, err := r.db.Query(ctx, query, proyectoID, userID)
+	if err != nil {
+		log.Printf("error al obtener las tareas por proyecto: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var todas []models.TareaResponse
+
+	for rows.Next() {
+		var tarea models.TareaResponse
+		err := rows.Scan(
+			&tarea.ID,
+			&tarea.Nombre,
+			&tarea.Descripcion,
+			&tarea.Comentario,
+			&tarea.FechaCreacion,
+			&tarea.Estado,
+			&tarea.UserID,
+			&tarea.ProyectID,
+			&tarea.TareaPadreID,
+		)
+		if err != nil {
+			log.Printf("error al escanear la tarea por proyecto: %v", err)
+			return nil, err
+		}
+		todas = append(todas, tarea)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	// Construir jerarquía: separar tareas principales y asignar subtareas
+	tareaMap := make(map[int]*models.TareaResponse)
+	var principales []models.TareaResponse
+
+	for i := range todas {
+		todas[i].Subtareas = []models.TareaResponse{}
+		tareaMap[todas[i].ID] = &todas[i]
+	}
+
+	for _, t := range todas {
+		if t.TareaPadreID != nil {
+			if padre, ok := tareaMap[*t.TareaPadreID]; ok {
+				padre.Subtareas = append(padre.Subtareas, t)
+			} else {
+				principales = append(principales, t)
+			}
+		} else {
+			principales = append(principales, t)
+		}
+	}
+
+	return principales, nil
+}
+
+// GetByID obtiene una tarea específica validando que le pertenezca al usuario con sus subtareas
 func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id
-		FROM tareas
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		FROM tareas_proyectos
 		WHERE id = $1
 		AND user_id = $2
 		AND eliminado = false
@@ -125,11 +198,44 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 		&tarea.Estado,
 		&tarea.UserID,
 		&tarea.ProyectID,
+		&tarea.TareaPadreID,
 	)
 
 	if err != nil {
 		log.Printf("error al obtener la tarea por ID: %v", err)
 		return nil, err
+	}
+
+	// Buscar subtareas directas
+	subQuery := `
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		FROM tareas_proyectos
+		WHERE tarea_padre_id = $1
+		AND user_id = $2
+		AND eliminado = false
+		ORDER BY id ASC
+	`
+	rows, err := r.db.Query(ctx, subQuery, id, userID)
+	if err == nil {
+		defer rows.Close()
+		var subtareas []models.TareaResponse
+		for rows.Next() {
+			var sub models.TareaResponse
+			if err := rows.Scan(
+				&sub.ID,
+				&sub.Nombre,
+				&sub.Descripcion,
+				&sub.Comentario,
+				&sub.FechaCreacion,
+				&sub.Estado,
+				&sub.UserID,
+				&sub.ProyectID,
+				&sub.TareaPadreID,
+			); err == nil {
+				subtareas = append(subtareas, sub)
+			}
+		}
+		tarea.Subtareas = subtareas
 	}
 
 	return &tarea, nil
@@ -139,14 +245,15 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *models.TareaUpdateRequest) (*models.TareaUpdateResponse, error) {
 	var tarea models.TareaUpdateResponse
 	query := `
-		UPDATE tareas
+		UPDATE tareas_proyectos
 		SET nombre = COALESCE($1, nombre),
 			descripcion = COALESCE($2, descripcion),
 			comentario = COALESCE($3, comentario),
 			estado = COALESCE($4, estado),
-			eliminado = COALESCE($5, eliminado)
-		WHERE id = $6 AND user_id = $7
-		RETURNING id, nombre, descripcion, comentario, estado, eliminado
+			eliminado = COALESCE($5, eliminado),
+			tarea_padre_id = COALESCE($6, tarea_padre_id)
+		WHERE id = $7 AND user_id = $8
+		RETURNING id, nombre, descripcion, comentario, estado, eliminado, tarea_padre_id
 	`
 
 	err := r.db.QueryRow(
@@ -157,6 +264,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		req.Comentario,
 		req.Estado,
 		req.Eliminado,
+		req.TareaPadreID,
 		id,
 		userID,
 	).Scan(
@@ -166,6 +274,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		&tarea.Comentario,
 		&tarea.Estado,
 		&tarea.Eliminado,
+		&tarea.TareaPadreID,
 	)
 
 	if err != nil {
@@ -179,7 +288,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 // Delete realiza el borrado lógico de una tarea asegurando la pertenencia del usuario
 func (r *TareasRepository) Delete(ctx context.Context, id int, userID int) error {
 	query := `
-		UPDATE tareas
+		UPDATE tareas_proyectos
 		SET eliminado = true
 		WHERE id = $1 AND user_id = $2
 	`

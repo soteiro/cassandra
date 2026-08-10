@@ -11,9 +11,13 @@ http:
     data: |-
       {
         "nombre": "prueba de put con id 2",
-        "descripcion" : "descripcion del proyecto con id 2",
+        "descripcion": "descripcion del proyecto con id 2",
         "comentario": "comentario del proyecto con id 2",
-        "estado": "Pendiente"
+        "estado": "En Proceso",
+        "por_que": "Actualización de la justificación del proyecto",
+        "para_que": "Actualización del objetivo a alcanzar",
+        "criterio_finalizacion": "Completar la fase de pruebas integradas",
+        "prioridad": "Critica"
       }
   auth: inherit
 

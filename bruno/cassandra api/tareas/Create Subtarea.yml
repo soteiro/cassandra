@@ -1,0 +1,26 @@
+info:
+  name: Create Subtarea
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: http://localhost:8080/api/tareas
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Nueva Subtarea de Prueba",
+        "descripcion": "Descripción de la subtarea",
+        "comentario": "Comentario de la subtarea",
+        "estado": "En Curso",
+        "proyect_id": 3,
+        "tarea_padre_id": 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

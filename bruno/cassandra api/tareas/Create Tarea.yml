@@ -14,7 +14,7 @@ http:
         "descripcion": "Descripción detallada de la tarea",
         "comentario": "Comentario de la tarea",
         "estado": "Pendiente",
-        "proyect_id": 1
+        "proyect_id": 3
       }
   auth: inherit
 

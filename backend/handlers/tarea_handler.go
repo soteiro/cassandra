@@ -192,3 +192,38 @@ func (h *TareasHandler) DeleteTarea(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// GetTareasByProyecto obtiene todas las tareas pertenecientes a un proyecto específico del usuario
+func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Request) {
+	proyectIDStr := chi.URLParam(r, "proyect_id")
+	if proyectIDStr == "" {
+		proyectIDStr = chi.URLParam(r, "proyecto_id")
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
+		return
+	}
+
+	proyectID, err := strconv.Atoi(proyectIDStr)
+	if err != nil {
+		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
+		return
+	}
+
+	tareas, err := h.repo.GetByProyectoID(r.Context(), proyectID, userID)
+	if err != nil {
+		log.Printf("error al obtener tareas del proyecto %d: %v", proyectID, err)
+		http.Error(w, "Error al obtener tareas del proyecto: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if tareas == nil {
+		tareas = []models.TareaResponse{}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(tareas)
+}
+

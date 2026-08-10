@@ -45,11 +45,30 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 	req.Nombre = strings.TrimSpace(req.Nombre)
 	req.Descripcion = strings.TrimSpace(req.Descripcion)
 	req.Comentario = strings.TrimSpace(req.Comentario)
+	req.PorQue = strings.TrimSpace(req.PorQue)
+	req.ParaQue = strings.TrimSpace(req.ParaQue)
+	req.CriterioFinalizacion = strings.TrimSpace(req.CriterioFinalizacion)
+	req.Prioridad = strings.TrimSpace(req.Prioridad)
 
 	// validacion basica
 	if req.Nombre == "" {
 		log.Printf("error de validacion: nombre vacio")
-		http.Error(w, "El nombre no puede estar vacio: ", http.StatusBadRequest)
+		http.Error(w, "El nombre del proyecto no puede estar vacio", http.StatusBadRequest)
+		return
+	}
+	if req.PorQue == "" {
+		log.Printf("error de validacion: por_que vacio")
+		http.Error(w, "El campo 'por_que' (justificación) es obligatorio para crear un proyecto", http.StatusBadRequest)
+		return
+	}
+	if req.ParaQue == "" {
+		log.Printf("error de validacion: para_que vacio")
+		http.Error(w, "El campo 'para_que' (objetivo) es obligatorio para crear un proyecto", http.StatusBadRequest)
+		return
+	}
+	if req.CriterioFinalizacion == "" {
+		log.Printf("error de validacion: criterio_finalizacion vacio")
+		http.Error(w, "El campo 'criterio_finalizacion' es obligatorio para crear un proyecto", http.StatusBadRequest)
 		return
 	}
 
@@ -193,6 +212,18 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Estado != nil {
 		*req.Estado = strings.TrimSpace(*req.Estado)
+	}
+	if req.PorQue != nil {
+		*req.PorQue = strings.TrimSpace(*req.PorQue)
+	}
+	if req.ParaQue != nil {
+		*req.ParaQue = strings.TrimSpace(*req.ParaQue)
+	}
+	if req.CriterioFinalizacion != nil {
+		*req.CriterioFinalizacion = strings.TrimSpace(*req.CriterioFinalizacion)
+	}
+	if req.Prioridad != nil {
+		*req.Prioridad = strings.TrimSpace(*req.Prioridad)
 	}
 
 	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, &req)

@@ -1,18 +1,294 @@
-<div class="p-6">
-      <a routerLink="/proyectos" class="text-xs text-slate-400 hover:text-white mb-4 inline-block">
-        ← Volver a la lista de proyectos
-      </a>
+<div class="p-6 max-w-5xl mx-auto space-y-6">
+  <div>
+    <a routerLink="/proyectos" class="text-sm text-slate-400 hover:text-emerald-400 mb-4 inline-flex items-center gap-1.5 transition-colors">
+      ← Volver a la lista de proyectos
+    </a>
+  </div>
 
-      @if (projectResource?.isLoading()) {
-        <p class="text-slate-400">Cargando detalles del proyecto...</p>
-      } @else if (projectResource?.value(); as project) {
-        <div class="p-6 bg-slate-900 border border-slate-800 rounded-xl">
-          <h1 class="text-3xl font-bold text-emerald-400">{{ project.nombre }}</h1>
-          <p class="text-slate-300 mt-2">{{ project.descripcion }}</p>
-          <p class="text-slate-400 text-sm mt-4">Comentarios: {{ project.comentario }}</p>
-          <span class="inline-block mt-4 px-2 py-1 text-xs bg-slate-800 rounded text-slate-300">
+  @if (projectResource?.isLoading()) {
+    <div class="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+      <p class="text-slate-400 animate-pulse">Cargando detalles del proyecto...</p>
+    </div>
+  } @else if (projectResource?.error()) {
+    <div class="p-6 bg-red-950/40 border border-red-900/60 rounded-2xl">
+      <p class="text-red-400 font-medium">Error al cargar el proyecto.</p>
+    </div>
+  } @else if (projectResource?.value(); as project) {
+    <!-- TARJETA PRINCIPAL DEL PROYECTO -->
+    <div class="p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-6">
+      <div class="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <h1 class="text-3xl font-bold text-white tracking-tight">{{ project.nombre }}</h1>
+          <p class="text-xs text-slate-400 mt-1">Creado el: {{ project.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span [class]="'px-3 py-1 text-xs font-semibold rounded-lg ' + getPriorityClass(project.prioridad)">
+            Prioridad: {{ project.prioridad }}
+          </span>
+          <span class="px-3 py-1 text-xs bg-slate-800 text-slate-300 rounded-lg border border-slate-700">
             Estado: {{ project.estado }}
           </span>
         </div>
+      </div>
+
+      <!-- SECCIÓN DE JUSTIFICACIÓN Y PROPÓSITO -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl">
+          <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider block mb-1">
+            💡 ¿Por qué? (Motivación)
+          </span>
+          <p class="text-slate-200 text-sm leading-relaxed">{{ project.por_que || 'Sin especificar' }}</p>
+        </div>
+
+        <div class="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl">
+          <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider block mb-1">
+            🎯 ¿Para qué? (Objetivo)
+          </span>
+          <p class="text-slate-200 text-sm leading-relaxed">{{ project.para_que || 'Sin especificar' }}</p>
+        </div>
+
+        <div class="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl">
+          <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider block mb-1">
+            🏁 Criterio de Fin
+          </span>
+          <p class="text-slate-200 text-sm leading-relaxed">{{ project.criterio_finalizacion || 'Sin especificar' }}</p>
+        </div>
+      </div>
+
+      @if (project.descripcion || project.comentario) {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          @if (project.descripcion) {
+            <div>
+              <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Descripción</h4>
+              <p class="text-slate-300 text-sm bg-slate-950/30 p-3 rounded-lg border border-slate-800/50">{{ project.descripcion }}</p>
+            </div>
+          }
+          @if (project.comentario) {
+            <div>
+              <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Comentarios</h4>
+              <p class="text-slate-300 text-sm bg-slate-950/30 p-3 rounded-lg border border-slate-800/50">{{ project.comentario }}</p>
+            </div>
+          }
+        </div>
       }
     </div>
+
+    <!-- SECCIÓN DE TAREAS DEL PROYECTO -->
+    <div class="p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-5">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <span>📋 Tareas del Proyecto</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Sub-tareas para alcanzar el criterio de finalización.</p>
+        </div>
+        <button 
+          (click)="openTaskModal()"
+          class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl px-4 py-2 text-sm shadow-lg shadow-emerald-950/30 transition-all">
+          + Nueva Tarea
+        </button>
+      </div>
+
+      @if (tasksResource?.isLoading()) {
+        <p class="text-slate-400 text-sm animate-pulse">Cargando tareas del proyecto...</p>
+      } @else if (tasksResource?.value(); as tareas) {
+        <div class="space-y-3">
+          @for (t of tareas; track t.id) {
+            <div class="p-4 bg-slate-950/80 border border-slate-800/80 rounded-xl space-y-3 hover:border-slate-700 transition-colors">
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-3">
+                    <h4 
+                      (click)="openTaskDetail(t)"
+                      class="text-base font-semibold text-emerald-400 hover:text-emerald-300 hover:underline cursor-pointer transition-colors"
+                      title="Ver detalle y gestionar subtareas">
+                      {{ t.nombre }}
+                    </h4>
+                    <select 
+                      [ngModel]="t.estado || 'Abierto'"
+                      (ngModelChange)="changeTaskStatus(t, $event)"
+                      [class]="'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium ' + getTaskStatusClass(t.estado)">
+                      <option value="Abierto" class="bg-slate-900 text-slate-200">Abierto</option>
+                      <option value="En Curso" class="bg-slate-900 text-blue-300">En Curso</option>
+                      <option value="Terminado" class="bg-slate-900 text-emerald-300">Terminado</option>
+                      <option value="Bloqueado" class="bg-slate-900 text-red-300">Bloqueado</option>
+                    </select>
+                  </div>
+                  @if (t.descripcion) {
+                    <p class="text-slate-300 text-sm">{{ t.descripcion }}</p>
+                  }
+                  @if (t.comentario) {
+                    <p class="text-slate-500 text-xs">Nota: {{ t.comentario }}</p>
+                  }
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button 
+                    (click)="openTaskDetail(t)"
+                    class="text-xs bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-800/80 px-2.5 py-1 rounded-lg transition-all flex items-center gap-1"
+                    title="Ver detalle y gestionar subtareas">
+                    📊 Subtareas ({{ t.subtareas?.length || 0 }})
+                  </button>
+                  <button 
+                    (click)="openTaskModal(t)"
+                    class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg transition-all"
+                    title="Agregar subtarea">
+                    + Subtarea
+                  </button>
+                  <button 
+                    (click)="deleteTask(t.id)" 
+                    class="text-slate-500 hover:text-red-400 text-sm p-1 transition-colors"
+                    title="Eliminar tarea">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+
+              <!-- RENDERIZAR SUBTAREAS -->
+              @if (t.subtareas && t.subtareas.length > 0) {
+                <div class="pl-4 border-l-2 border-emerald-500/30 space-y-2 mt-2 pt-2">
+                  <h5 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Subtareas ({{ t.subtareas.length }})</h5>
+                  @for (sub of t.subtareas; track sub.id) {
+                    <div class="p-2.5 bg-slate-900/60 border border-slate-800/60 rounded-lg flex items-center justify-between gap-3">
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-xs text-slate-500">↳</span>
+                        <span class="text-sm text-slate-200 font-medium">{{ sub.nombre }}</span>
+                        <select 
+                          [ngModel]="sub.estado || 'Abierto'"
+                          (ngModelChange)="changeTaskStatus(sub, $event)"
+                          [class]="'text-xs px-2 py-0.5 rounded-md border outline-none cursor-pointer font-medium ' + getTaskStatusClass(sub.estado)">
+                          <option value="Abierto" class="bg-slate-900 text-slate-200">Abierto</option>
+                          <option value="En Curso" class="bg-slate-900 text-blue-300">En Curso</option>
+                          <option value="Terminado" class="bg-slate-900 text-emerald-300">Terminado</option>
+                          <option value="Bloqueado" class="bg-slate-900 text-red-300">Bloqueado</option>
+                        </select>
+                      </div>
+                      <button 
+                        (click)="deleteTask(sub.id)" 
+                        class="text-slate-500 hover:text-red-400 text-xs p-1 transition-colors"
+                        title="Eliminar subtarea">
+                        🗑️
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          } @empty {
+            <div class="p-8 text-center bg-slate-950/40 border border-slate-800/60 rounded-xl">
+              <p class="text-slate-400 text-sm">No hay tareas asociadas a este proyecto aún.</p>
+              <button 
+                (click)="openTaskModal()"
+                class="mt-3 text-xs text-emerald-400 hover:underline">
+                + Crear la primera tarea
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- MODAL DE CREACIÓN DE TAREA / SUBTAREA -->
+  @if (showTaskModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
+          <div>
+            <h3 class="text-xl font-bold text-white">
+              {{ tareaPadreId() ? 'Nueva Subtarea' : 'Nueva Tarea del Proyecto' }}
+            </h3>
+            @if (tareaPadreId()) {
+              <p class="text-xs text-emerald-400 font-medium mt-0.5">
+                Subtarea de: "{{ tareaPadreNombre() }}"
+              </p>
+            } @else {
+              <p class="text-xs text-slate-400 mt-0.5">Agrega una tarea orientada al objetivo.</p>
+            }
+          </div>
+          <button (click)="closeTaskModal()" class="text-slate-400 hover:text-white text-xl p-1">✕</button>
+        </div>
+
+        @if (taskErrorMessage()) {
+          <div class="mb-4 p-3 bg-red-950/50 border border-red-800 rounded-xl text-red-300 text-sm">
+            {{ taskErrorMessage() }}
+          </div>
+        }
+
+        <form (ngSubmit)="createTask()" class="space-y-4 text-sm">
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Nombre *</label>
+            <input 
+              type="text" 
+              [ngModel]="nombreTarea()" 
+              (ngModelChange)="nombreTarea.set($event)" 
+              name="nombreTarea" 
+              [placeholder]="tareaPadreId() ? 'Ej: Diseñar formulario' : 'Ej: Crear endpoints en Go'"
+              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors" />
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Estado Inicial</label>
+            <select 
+              [ngModel]="estadoTarea()" 
+              (ngModelChange)="estadoTarea.set($event)" 
+              name="estadoTarea"
+              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors">
+              <option value="Abierto">Abierto</option>
+              <option value="En Curso">En Curso</option>
+              <option value="Terminado">Terminado</option>
+              <option value="Bloqueado">Bloqueado</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Descripción</label>
+            <textarea 
+              rows="2"
+              [ngModel]="descripcionTarea()" 
+              (ngModelChange)="descripcionTarea.set($event)" 
+              name="descripcionTarea" 
+              placeholder="¿En qué consiste?"
+              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Comentario / Notas Opcionales</label>
+            <input 
+              type="text" 
+              [ngModel]="comentarioTarea()" 
+              (ngModelChange)="comentarioTarea.set($event)" 
+              name="comentarioTarea" 
+              placeholder="Notas o dependencias..."
+              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors" />
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+            <button 
+              type="button" 
+              (click)="closeTaskModal()" 
+              class="px-4 py-2 text-slate-400 hover:text-white rounded-xl transition-colors">
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              [disabled]="isSubmittingTask()"
+              class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium rounded-xl px-5 py-2 transition-all">
+              {{ isSubmittingTask() ? 'Guardando...' : (tareaPadreId() ? 'Crear Subtarea' : 'Crear Tarea') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE DETALLE Y GESTIÓN DE SUBTAREAS -->
+  @if (selectedTaskForDetail(); as selectedTask) {
+    <app-task-detail-modal 
+      [task]="selectedTask"
+      [proyectId]="projectIdNumber()"
+      (closeModal)="closeTaskDetail()"
+      (taskUpdated)="onTaskUpdated()">
+    </app-task-detail-modal>
+  }
+</div>

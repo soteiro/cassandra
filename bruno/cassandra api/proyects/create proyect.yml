@@ -10,9 +10,13 @@ http:
     type: json
     data: |-
       {
-        "nombre" : "cassandra 10",
-        "descripcion" : "centro de inteligencia",
-        "comentario" : "fase inicial de este proyecto"
+        "nombre": "cassandra 10",
+        "descripcion": "centro de inteligencia",
+        "comentario": "fase inicial de este proyecto",
+        "por_que": "Para organizar mejor mis ideas y tareas centralizadas sin saturarme de proyectos impulsivos",
+        "para_que": "Tener una plataforma personal de seguimiento de proyectos con propósitos claros",
+        "criterio_finalizacion": "Despliegue exitoso del MVP con autenticación y gestión de tareas por proyecto",
+        "prioridad": "Alta"
       }
   auth: inherit
 

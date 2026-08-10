@@ -7,10 +7,10 @@
 - [x] asegurar la auth con http only y cors (para mas tarde)
 - [x] implementar las tabla notas (tratar de ver alguna realacion con otras tablas o que sea flexible) 
 - [x] empezar con front
-- [ ] refactorizar los proyectos, incluir, porque, para que, se finaliza obligatoramente?, ( la idea es juntificar de buena forma y no llenarme de proyectos vacios), prioridad, etc.
-- [ ] refactorizar tabla tareas >> tareas_proyectos, para ordenar mejor  
-- [ ] crear servicios para cargar las tareas de los proyectos
-- [ ] crear endpoint para traer tareas por proyecto, la query debe tener un where que paree el user con el proyect id
-- [ ] crear los modales con formularios, para crear nuevos proyectos y tareas
+- [x] refactorizar los proyectos, incluir, porque, para que, se finaliza obligatoramente?, ( la idea es juntificar de buena forma y no llenarme de proyectos vacios), prioridad, etc.
+- [x] refactorizar tabla tareas >> tareas_proyectos, para ordenar mejor  
+- [x] crear servicios para cargar las tareas de los proyectos
+- [x] crear endpoint para traer tareas por proyecto, la query debe tener un where que paree el user con el proyect id
+- [x] crear los modales con formularios, para crear nuevos proyectos y tareas
 - [ ] revisar como vikunja implementa las tareas
 - [ ] solo permitir que un usuario se borre o edite a si mismo (mas tarde)

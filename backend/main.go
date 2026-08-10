@@ -1,10 +1,14 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/fs"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"cassandra/config"
@@ -17,6 +21,9 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
 )
+
+//go:embed dist/*
+var frontendFS embed.FS
 
 func main() {
 	// 1. Cargar configuración
@@ -52,14 +59,15 @@ func main() {
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
 
-	// CORS para desarrollo con Angular
+	// Middlewares (DEBEN definirse antes de registrar cualquier ruta)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://localhost:4200"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
-		AllowedHeaders: []string{"Content-Type", "Authorization"},
+		AllowedOrigins:   []string{"http://localhost:4200"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
 	r.Use(httprate.LimitByIP(100, time.Minute))
+
 	// Rutas de prueba
 	r.Get("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
@@ -94,12 +102,13 @@ func main() {
 		})
 	})
 
-	// 6. Rutas de la Entidad de Usuarios (usando nuestro Handler)
+	// 6. Rutas de la Entidad de Usuarios
 	r.Post("/api/users", userHandler.CreateUser)
 
 	r.Get("/api/", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"response": "One Golang To Rule Them All"})
 	})
+
 	// Grupo de rutas protegidas
 	r.Group(func(r chi.Router) {
 		// Aplicamos el middleware de autenticación a este grupo
@@ -120,6 +129,7 @@ func main() {
 		r.Get("/api/tareas/{id}", tareasHandler.GetTareaByID)
 		r.Put("/api/tareas/{id}", tareasHandler.UpdateTarea)
 		r.Delete("/api/tareas/{id}", tareasHandler.DeleteTarea)
+		r.Get("/api/proyects/{proyect_id}/tareas", tareasHandler.GetTareasByProyecto)
 
 		// Rutas de Logs en Crudo de Proyectos
 		r.Post("/api/proyects/{proyect_id}/logs", logsHandler.CreateLog)
@@ -133,6 +143,43 @@ func main() {
 	r.Post("/api/auth/refresh", authHandler.Refresh)
 	r.Post("/api/auth/logout", authHandler.Logout)
 	r.Get("/api/auth/me", authHandler.Me)
+
+	// 7. Servidor de Archivos Estáticos y Fallback SPA (DEBE ir al final de las rutas)
+	distFS, err := fs.Sub(frontendFS, "dist")
+	if err != nil {
+		log.Fatalf("error al cargar frontend embebido: %v", err)
+	}
+
+	fileServer := http.FileServer(http.FS(distFS))
+
+	r.Handle("/*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Si la petición es hacia la API y no coincidió con ninguna ruta anterior
+		if strings.HasPrefix(r.URL.Path, "/api") {
+			http.NotFound(w, r)
+			return
+		}
+
+		// Comprobar si el archivo solicitado existe (ej: favicon.ico, main.js, styles.css)
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		if path != "" {
+			if f, err := distFS.Open(path); err == nil {
+				_ = f.Close()
+				fileServer.ServeHTTP(w, r)
+				return
+			}
+		}
+
+		// Si no es un archivo estático, entregar index.html (SPA Fallback)
+		indexFile, err := distFS.Open("index.html")
+		if err != nil {
+			http.Error(w, "index.html no encontrado", http.StatusInternalServerError)
+			return
+		}
+		defer indexFile.Close()
+
+		stat, _ := indexFile.Stat()
+		http.ServeContent(w, r, "index.html", stat.ModTime(), indexFile.(io.ReadSeeker))
+	}))
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)

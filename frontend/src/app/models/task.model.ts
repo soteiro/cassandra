@@ -8,6 +8,8 @@ export interface Task {
   user_id: number;
   proyect_id: number;
   fecha_creacion: string;
+  tarea_padre_id?: number | null;
+  subtareas?: Task[];
 }
 
 export interface TaskRequest {
@@ -15,6 +17,7 @@ export interface TaskRequest {
   descripcion: string;
   comentario: string;
   estado?: string;
-  user_id: number;
+  user_id?: number;
   proyect_id: number;
+  tarea_padre_id?: number | null;
 }

@@ -1,0 +1,139 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    
+    <!-- HEADER -->
+    <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-800">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-md">
+            Tarea Principal #{{ task().id }}
+          </span>
+          <select 
+            [ngModel]="task().estado || 'Abierto'"
+            (ngModelChange)="changeParentStatus($event)"
+            [class]="'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium ' + getTaskStatusClass(task().estado)">
+            <option value="Abierto" class="bg-slate-900 text-slate-200">Abierto</option>
+            <option value="En Curso" class="bg-slate-900 text-blue-300">En Curso</option>
+            <option value="Terminado" class="bg-slate-900 text-emerald-300">Terminado</option>
+            <option value="Bloqueado" class="bg-slate-900 text-red-300">Bloqueado</option>
+          </select>
+        </div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">{{ task().nombre }}</h2>
+        @if (task().descripcion) {
+          <p class="text-slate-300 text-sm mt-1 leading-relaxed">{{ task().descripcion }}</p>
+        }
+      </div>
+
+      <button 
+        (click)="onClose()" 
+        class="text-slate-400 hover:text-white text-xl p-1 rounded-lg hover:bg-slate-800 transition-colors">
+        ✕
+      </button>
+    </div>
+
+    <!-- SECCIÓN DE BARRA DE PROGRESO DE SUBTAREAS -->
+    <div class="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-3">
+      <div class="flex justify-between items-center text-sm">
+        <span class="font-semibold text-slate-200 flex items-center gap-2">
+          <span>📊 Progreso de Subtareas</span>
+          <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">
+            {{ completadasCount() }} / {{ totalSubtareas() }} completadas
+          </span>
+        </span>
+        <span class="font-bold text-emerald-400 text-sm">{{ porcentajeProgreso() }}%</span>
+      </div>
+
+      <!-- BARRA VISUAL -->
+      <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+        <div 
+          class="bg-gradient-to-r from-emerald-600 to-teal-400 h-2.5 rounded-full transition-all duration-300"
+          [style.width.%]="porcentajeProgreso()">
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO RÁPIDO PARA AGREGAR SUBTAREA -->
+    <div class="space-y-2">
+      <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+        + Añadir Subtarea Rápida
+      </label>
+      <form (ngSubmit)="addSubtarea()" class="flex gap-2">
+        <input 
+          type="text"
+          [ngModel]="nuevaSubtareaNombre()"
+          (ngModelChange)="nuevaSubtareaNombre.set($event)"
+          name="nuevaSubtareaNombre"
+          placeholder="Escribe el nombre de la subtarea y presiona Enter..."
+          class="flex-1 bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl px-3.5 py-2 text-sm outline-none transition-colors" />
+        <button 
+          type="submit"
+          [disabled]="isSubmittingSubtarea() || !nuevaSubtareaNombre().trim()"
+          class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all shadow-md shadow-emerald-950/30">
+          Añadir
+        </button>
+      </form>
+    </div>
+
+    <!-- LISTA DE SUBTAREAS -->
+    <div class="space-y-3">
+      <h3 class="text-sm font-semibold text-slate-300 flex items-center justify-between">
+        <span>Lista de Subtareas</span>
+        <span class="text-xs text-slate-500 font-normal">Haz clic en el checkbox para marcar como terminada</span>
+      </h3>
+
+      <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+        @for (sub of subtareas(); track sub.id) {
+          <div [class]="'p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors ' + 
+            (sub.estado === 'Terminado' ? 'bg-emerald-950/20 border-emerald-900/40 text-slate-400' : 'bg-slate-950/80 border-slate-800 text-slate-200 hover:border-slate-700')">
+            
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <!-- Checkbox rápido -->
+              <input 
+                type="checkbox"
+                [checked]="sub.estado === 'Terminado'"
+                (change)="toggleSubtareaStatus(sub)"
+                class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-emerald-600 focus:ring-emerald-500 cursor-pointer accent-emerald-500" />
+
+              <span [class]="'text-sm font-medium truncate ' + (sub.estado === 'Terminado' ? 'line-through text-slate-500' : 'text-slate-200')">
+                {{ sub.nombre }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <select 
+                [ngModel]="sub.estado || 'Abierto'"
+                (ngModelChange)="changeSubtareaStatus(sub, $event)"
+                [class]="'text-xs px-2 py-1 rounded-lg border outline-none cursor-pointer font-medium ' + getTaskStatusClass(sub.estado)">
+                <option value="Abierto" class="bg-slate-900 text-slate-200">Abierto</option>
+                <option value="En Curso" class="bg-slate-900 text-blue-300">En Curso</option>
+                <option value="Terminado" class="bg-slate-900 text-emerald-300">Terminado</option>
+                <option value="Bloqueado" class="bg-slate-900 text-red-300">Bloqueado</option>
+              </select>
+
+              <button 
+                (click)="deleteSubtarea(sub.id)"
+                class="text-slate-500 hover:text-red-400 text-xs p-1 transition-colors"
+                title="Eliminar subtarea">
+                🗑️
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="p-6 text-center bg-slate-950/40 border border-slate-800/60 rounded-xl">
+            <p class="text-slate-400 text-xs">No hay subtareas creadas para esta tarea.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex justify-end pt-3 border-t border-slate-800">
+      <button 
+        (click)="onClose()"
+        class="bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-5 py-2 rounded-xl transition-colors">
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</div>
