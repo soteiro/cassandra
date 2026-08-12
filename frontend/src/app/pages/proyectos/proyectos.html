@@ -1,41 +1,43 @@
 <div class="p-6 max-w-6xl mx-auto">
+  <section>
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h2 class="text-3xl font-bold text-white tracking-tight">Mis Proyectos</h2>
-      <p class="text-slate-400 text-sm mt-1">Proyectos definidos con propósito y criterio claro de finalización.</p>
+      <h2 class="text-3xl font-bold text-white tracking-tight md:text-4xl">Proyectos</h2>
     </div>
     <div class="flex gap-3">
       <button 
-        class="border border-slate-700 hover:bg-slate-800 text-slate-300 rounded-xl px-4 py-2 text-sm transition-colors"
+        class="hover:bg-surface rounded-xl text-slate-300 px-4 py-2 text-sm transition-colors"
         (click)="reload()">
-        ↻ Recargar
+        <svg lucideRefreshCcw class="text-primary"/>
       </button>
       <button 
-        class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl px-4 py-2 text-sm shadow-lg shadow-emerald-900/30 transition-all"
+        class="text-white font-medium hover:bg-surface rounded-xl px-4 py-2 text-sm transition-all"
         (click)="openModal()">
-        + Nuevo Proyecto
+        <svg lucideFolderPlus class="text-accent"/>
       </button>
     </div>
   </div>
-
+</section>
   @if (proyectsResource.isLoading()) {
-    <div class="p-8 text-center bg-slate-900/50 border border-slate-800 rounded-2xl">
+    <div class="p-8 text-center bg-background border border-surface-border rounded-2xl">
       <p class="text-slate-400 animate-pulse">Cargando tus proyectos...</p>
     </div>
   } @else if (proyectsResource.error()) {
-    <div class="p-6 bg-red-950/40 border border-red-900/60 rounded-2xl">
+    <div class="p-6 bg-danger/40 border border-danger-900/60 rounded-2xl">
       <p class="text-red-400 font-medium">Error al cargar la lista de proyectos.</p>
     </div>
   } @else if (proyectsResource.value(); as proyectos) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       @for (p of proyectos; track p.id) {
         <a [routerLink]="['/proyectos', p.id]" class="group block">
-          <div class="h-full p-5 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl transition-all duration-200 hover:shadow-xl hover:shadow-emerald-950/20 flex flex-col justify-between">
-            <div>
-              <div class="flex items-start justify-between gap-3 mb-3">
-                <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">
+          <!-- ARTICULOOO  -->
+          <article class="h-full p-5 bg-surface border border-surface-border hover:border-primary/50 rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 flex flex-col gap-2 justify-between">
+                <div>
+                <h3 class="text-xl font-bold text-text-main group-hover:text-primary transition-colors md:text-3xl">
                   {{ p.nombre }}
                 </h3>
+                </div>
+                <!--  prioridad -->
                 <div class="flex items-center gap-2">
                   <span [class]="'px-2.5 py-1 text-xs font-semibold rounded-lg ' + getPriorityClass(p.prioridad)">
                     {{ p.prioridad }}
@@ -43,32 +45,15 @@
                   <span class="px-2.5 py-1 text-xs bg-slate-800 text-slate-300 rounded-lg border border-slate-700">
                     {{ p.estado }}
                   </span>
-                </div>
-              </div>
-
-              @if (p.descripcion) {
-                <p class="text-slate-300 text-sm mb-4 line-clamp-2">{{ p.descripcion }}</p>
-              }
-
-              <div class="space-y-2 mt-4 pt-4 border-t border-slate-800/80 text-xs">
-                <div>
-                  <span class="text-emerald-400/90 font-medium">🎯 ¿Para qué?:</span>
-                  <p class="text-slate-300 mt-0.5 line-clamp-2 font-light">{{ p.para_que }}</p>
-                </div>
-                <div>
-                  <span class="text-amber-400/90 font-medium">🏁 Criterio de fin:</span>
-                  <p class="text-slate-300 mt-0.5 line-clamp-2 font-light">{{ p.criterio_finalizacion }}</p>
-                </div>
-              </div>
+                
             </div>
 
             <div class="mt-4 pt-3 text-xs text-slate-500 flex justify-between items-center">
-              <span>Creado: {{ p.fecha_creacion | date:'dd/MM/yyyy' }}</span>
-              <span class="text-emerald-400 group-hover:translate-x-1 transition-transform">Ver detalles →</span>
+              <span class="text-primary text-md group-hover:translate-x-1 transition-transform md:text-lg">Ver detalles →</span>
             </div>
-          </div>
+          </article>
         </a>
-      } @empty {
+        } @empty {
         <div class="col-span-full p-12 text-center bg-slate-900/40 border border-slate-800/80 rounded-2xl">
           <p class="text-slate-300 text-lg font-medium">No tienes proyectos creados aún.</p>
           <p class="text-slate-500 text-sm mt-1 mb-6">Tómate un momento para definir tu primer proyecto con propósito.</p>

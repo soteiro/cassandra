@@ -2,8 +2,21 @@
 
 @import 'tailwindcss';
 
-@theme {
-    --color-primary: oklch(68.1% 0.162 75.834);
-    --color-background: oklch(21% 0.006 285.885);
-}
+    @theme {
+        /* Tu configuración actual */
+        --color-primary: oklch(68.1% 0.162 75.834);
+        --color-background: oklch(21% 0.006 285.885);
+
+        /* Complementos sugeridos */
+        --color-surface: oklch(26% 0.008 285);
+        --color-surface-border: oklch(32% 0.01 285);
+
+        --color-text-main: oklch(96% 0.003 285);
+        --color-text-muted: oklch(72% 0.01 285);
+
+        --color-accent: oklch(70% 0.12 200);
+
+        --color-success: oklch(72% 0.17 142);
+        --color-danger: oklch(65% 0.20 25);
+    }
 

@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { proyectService } from '../../services/proyect.service';
 import { RouterLink } from '@angular/router';
-
+import { LucideRefreshCcw, LucideFolderPlus } from '@lucide/angular'
+ 
 @Component({
   selector: 'app-proyectos',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LucideRefreshCcw, LucideFolderPlus],
   templateUrl: './proyectos.html',
   styleUrl: './proyectos.css',
 })

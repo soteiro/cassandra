@@ -12,7 +12,7 @@ export class Login {
   protected readonly email = signal('')
   protected readonly password = signal('')
   protected readonly errorMessage = signal<string | null>('')
-
+ 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -25,6 +25,7 @@ export class Login {
       password: this.password(),
     }).subscribe({
       next: () =>{
+        
         this.router.navigate(['/home']);
       },
       error : (err) =>{

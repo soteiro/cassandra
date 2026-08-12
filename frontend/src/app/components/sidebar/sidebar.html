@@ -1,41 +1,37 @@
 
-<aside class="fixed bg-slate-900 rounded-2xl inset-y-0 z-99 left-0 w-64 h-screen flex flex-col gap-2 justify-between py-6 px-1 border-r border-primary/70 -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:z-auto" [class.translate-x-0]="sidebar.isOpen()">
+<aside class="fixed bg-surface rounded-r-2xl inset-y-0 z-99 left-0 w-64 h-screen flex flex-col gap-2 justify-between py-6 px-1 border-r border-primary/70 -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:z-auto" [class.translate-x-0]="sidebar.isOpen()">
 
   <section class="flex-0">
     <h2 class="text-xl text-center font-bold text-white mb-4">Cassandra</h2>
   </section>
   <!-- Botón Home -->
-  <section class="flex-1 flex flex-col">
+  <section class="flex-1 flex flex-col gap-1">
     <a
       (click)="sidebar.close()"
       routerLink="/home"
-      routerLinkActive="bg-primary text-white"
-      class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+      routerLinkActive="bg-primary text-text-main"
+      class="flex gap-2 px-4 py-2 rounded-lg text-text-main hover:bg-surface-border transition-colors text-lg md:text-xl"
     >
-      🏠 Inicio
+    <svg lucideHouse class="text-primary"/>
+      Inicio
     </a>
 
     <a
       (click)="sidebar.close()"
       routerLink="/proyectos"
-      routerLinkActive="bg-primary text-white"
-      class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+      routerLinkActive="bg-primary text-text-main"
+      class="flex gap-2 px-4 py-2 rounded-lg text-text-main hover:bg-surface-border transition-colors text-lg md:text-xl"
     >
+    <svg lucideFolder class="text-primary" />
       Proyectos
     </a>
 
-    <a
-    (click)="sidebar.close()" 
-    routerLink="/test2"
-    routerLinkActive="bg-primary text-white"
-    class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
-    >test 2 </a>
   </section>
 
   <section class="flex-0 flex gap-4 m-auto">
 
     <button (click)="chau()" 
-    class="bg-red-700 p-2 rounded-2xl">
+    class="bg-danger/70  border border-danger/90 p-2 text-text-main rounded-lg">
     logout
   </button>
 
