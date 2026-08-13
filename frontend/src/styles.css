@@ -18,5 +18,8 @@
 
         --color-success: oklch(72% 0.17 142);
         --color-danger: oklch(65% 0.20 25);
+
+        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
     }
 
