@@ -1,28 +1,55 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
-import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
-interface Tab  {
-    id: string;
-    label: string;
-  } 
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import {
+  LucideChevronDown,
+  LucideChevronRight,
+  LucidePlus,
+  LucideTrash2,
+  LucideCheck,
+  LucideListTodo,
+  LucideCheckCheck,
+  LucideCornerDownRight,
+  LucideSparkles,
+} from '@lucide/angular';
+
+interface Tab {
+  id: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-proyect-details',
-  imports: [CommonModule, FormsModule, RouterLink, TaskDetailModal],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    ConfirmModal,
+    LucideChevronDown,
+    LucideChevronRight,
+    LucidePlus,
+    LucideTrash2,
+    LucideCheck,
+    LucideListTodo,
+    LucideCheckCheck,
+    LucideCornerDownRight,
+    LucideSparkles,
+  ],
   templateUrl: './proyect-details.html',
   styleUrl: './proyect-details.css',
 })
 export class ProyectDetails {
-  tabs: Tab[]= [
-    {id:"tareas", label: "Tareas"},
-    {id: "notas", label: "Notas"}
-  ]
+  tabs: Tab[] = [
+    { id: 'tareas', label: 'Tareas' },
+    { id: 'notas', label: 'Notas' },
+  ];
 
-  activeTab = signal<string>('tareas')
+  activeTab = signal<string>('tareas');
   private readonly route = inject(ActivatedRoute);
   private readonly ProyectService = inject(proyectService);
   private readonly taskService = inject(TaskService);
@@ -33,144 +60,240 @@ export class ProyectDetails {
   protected readonly projectResource = this.ProyectService.getProyectById(this.id);
   protected readonly tasksResource = this.taskService.getTasksByProyectoId(this.id);
 
-  // select tab
-  selectedTab(tabId: string):void {
-    this.activeTab.set(tabId)
+  // Tab switching
+  selectedTab(tabId: string): void {
+    this.activeTab.set(tabId);
   }
 
-  // Modal de detalle visual de Tarea y sus subtareas
-  selectedTaskForDetail = signal<Task | null>(null);
+  // Expanded parent tasks state (Set of task IDs)
+  expandedTasks = signal<Set<number>>(new Set());
 
-  // Modal y formulario de creación de Tareas
-  showTaskModal = signal(false);
-  tareaPadreId = signal<number | null>(null);
-  tareaPadreNombre = signal<string>('');
-  nombreTarea = signal('');
-  descripcionTarea = signal('');
-  comentarioTarea = signal('');
-  estadoTarea = signal('Abierto');
+  // Quick Task Creation (Top level)
+  quickTaskTitle = signal('');
+  isSubmittingQuickTask = signal(false);
 
-  isSubmittingTask = signal(false);
-  taskErrorMessage = signal('');
+  // Inline Subtask inputs map { [taskId: number]: string }
+  quickSubtaskInputs = signal<Record<number, string>>({});
+  isSubmittingSubtask = signal<Record<number, boolean>>({});
 
-  openTaskDetail(task: Task) {
-    this.selectedTaskForDetail.set(task);
-  }
+  // Filter state for tasks
+  taskFilter = signal<'all' | 'pending' | 'completed'>('all');
 
-  closeTaskDetail() {
-    this.selectedTaskForDetail.set(null);
-  }
+  // Confirmation Modal state for Deletion
+  taskToDelete = signal<{ id: number; nombre: string; isSubtask: boolean } | null>(null);
+  isDeletingTask = signal(false);
 
-  onTaskUpdated() {
-    this.tasksResource?.reload();
-    const currentSelected = this.selectedTaskForDetail();
-    if (currentSelected) {
-      this.taskService.getTaskById(currentSelected.id).subscribe({
-        next: (updatedTask) => this.selectedTaskForDetail.set(updatedTask),
-        error: (err) => console.error('Error al recargar tarea:', err),
-      });
-    }
-  }
-
-  openTaskModal(parentTask?: Task) {
-    this.taskErrorMessage.set('');
-    if (parentTask) {
-      this.tareaPadreId.set(parentTask.id);
-      this.tareaPadreNombre.set(parentTask.nombre);
+  toggleExpand(taskId: number) {
+    const next = new Set(this.expandedTasks());
+    if (next.has(taskId)) {
+      next.delete(taskId);
     } else {
-      this.tareaPadreId.set(null);
-      this.tareaPadreNombre.set('');
+      next.add(taskId);
     }
-    this.showTaskModal.set(true);
+    this.expandedTasks.set(next);
   }
 
-  closeTaskModal() {
-    this.showTaskModal.set(false);
-    this.tareaPadreId.set(null);
-    this.tareaPadreNombre.set('');
+  isExpanded(taskId: number): boolean {
+    return this.expandedTasks().has(taskId);
+  }
+
+  expandTask(taskId: number) {
+    if (!this.expandedTasks().has(taskId)) {
+      const next = new Set(this.expandedTasks());
+      next.add(taskId);
+      this.expandedTasks.set(next);
+    }
+  }
+
+  getSubtaskInput(taskId: number): string {
+    return this.quickSubtaskInputs()[taskId] || '';
+  }
+
+  setSubtaskInput(taskId: number, value: string) {
+    this.quickSubtaskInputs.update((prev) => ({ ...prev, [taskId]: value }));
+  }
+
+  // 1-Click Toggle completion on parent task (Optimistic update)
+  toggleTaskComplete(task: Task) {
+    const prev = task.estado;
+    const nextEstado = task.estado === 'Terminado' ? 'Abierto' : 'Terminado';
+    task.estado = nextEstado;
+
+    this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
+      next: () => this.tasksResource?.reload(),
+      error: (err) => {
+        task.estado = prev;
+        console.error('Error al cambiar estado de tarea:', err);
+      },
+    });
+  }
+
+  // 1-Click Toggle completion on subtask (Optimistic update)
+  toggleSubtaskComplete(subtask: Task) {
+    const prev = subtask.estado;
+    const nextEstado = subtask.estado === 'Terminado' ? 'Abierto' : 'Terminado';
+    subtask.estado = nextEstado;
+
+    this.taskService.updateTask(subtask.id, { estado: nextEstado }).subscribe({
+      next: () => this.tasksResource?.reload(),
+      error: (err) => {
+        subtask.estado = prev;
+        console.error('Error al cambiar estado de subtarea:', err);
+      },
+    });
+  }
+
+  changeTaskStatus(task: Task, nextEstado: string) {
+    const prev = task.estado;
+    task.estado = nextEstado;
+
+    this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
+      next: () => this.tasksResource?.reload(),
+      error: (err) => {
+        task.estado = prev;
+        console.error('Error al actualizar estado de tarea:', err);
+      },
+    });
+  }
+
+  // Create top-level task inline (Zero friction)
+  createQuickTask() {
+    const title = this.quickTaskTitle().trim();
+    const proyectId = this.projectIdNumber();
+    if (!title || !proyectId) return;
+
+    this.isSubmittingQuickTask.set(true);
+
+    this.taskService
+      .createTask({
+        nombre: title,
+        descripcion: '',
+        comentario: '',
+        estado: 'Abierto',
+        proyect_id: proyectId,
+      })
+      .subscribe({
+        next: () => {
+          this.quickTaskTitle.set('');
+          this.isSubmittingQuickTask.set(false);
+          this.tasksResource?.reload();
+        },
+        error: (err) => {
+          console.error('Error al crear tarea rápida:', err);
+          this.isSubmittingQuickTask.set(false);
+        },
+      });
+  }
+
+  // Create subtask inline (Zero friction)
+  createInlineSubtask(parentTaskId: number) {
+    const title = this.getSubtaskInput(parentTaskId).trim();
+    const proyectId = this.projectIdNumber();
+    if (!title || !proyectId) return;
+
+    this.isSubmittingSubtask.update((prev) => ({ ...prev, [parentTaskId]: true }));
+
+    this.taskService
+      .createTask({
+        nombre: title,
+        descripcion: '',
+        comentario: '',
+        estado: 'Abierto',
+        proyect_id: proyectId,
+        tarea_padre_id: parentTaskId,
+      })
+      .subscribe({
+        next: () => {
+          this.setSubtaskInput(parentTaskId, '');
+          this.isSubmittingSubtask.update((prev) => ({ ...prev, [parentTaskId]: false }));
+          this.expandTask(parentTaskId);
+          this.tasksResource?.reload();
+        },
+        error: (err) => {
+          console.error('Error al crear subtarea inline:', err);
+          this.isSubmittingSubtask.update((prev) => ({ ...prev, [parentTaskId]: false }));
+        },
+      });
+  }
+
+  // Modal Deletion Flow
+  requestDeleteTask(task: Task, isSubtask = false) {
+    this.taskToDelete.set({ id: task.id, nombre: task.nombre, isSubtask });
+  }
+
+  confirmDeleteTask() {
+    const target = this.taskToDelete();
+    if (!target) return;
+
+    this.isDeletingTask.set(true);
+    this.taskService.deleteTask(target.id).subscribe({
+      next: () => {
+        this.isDeletingTask.set(false);
+        this.taskToDelete.set(null);
+        this.tasksResource?.reload();
+      },
+      error: (err) => {
+        this.isDeletingTask.set(false);
+        console.error('Error al eliminar tarea:', err);
+      },
+    });
+  }
+
+  cancelDeleteTask() {
+    this.taskToDelete.set(null);
+  }
+
+  // Helper metrics
+  getSubtaskStats(task: Task) {
+    const subs = task.subtareas || [];
+    const total = subs.length;
+    const completed = subs.filter((s) => s.estado === 'Terminado').length;
+    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+    return { total, completed, percent };
+  }
+
+  getFilteredTasks(tareas: Task[]): Task[] {
+    const filter = this.taskFilter();
+    if (filter === 'pending') {
+      return tareas.filter((t) => t.estado !== 'Terminado');
+    }
+    if (filter === 'completed') {
+      return tareas.filter((t) => t.estado === 'Terminado');
+    }
+    return tareas;
+  }
+
+  getOverallStats(tareas: Task[]) {
+    if (!tareas || tareas.length === 0) return { total: 0, completed: 0, percent: 0 };
+    const total = tareas.length;
+    const completed = tareas.filter((t) => t.estado === 'Terminado').length;
+    const percent = Math.round((completed / total) * 100);
+    return { total, completed, percent };
   }
 
   getPriorityClass(priority?: string): string {
     switch (priority) {
       case 'Critica':
-        return 'bg-red-900/40 text-red-400 border border-red-800';
+        return 'bg-danger/20 text-danger border border-danger/40';
       case 'Alta':
-        return 'bg-orange-900/40 text-orange-400 border border-orange-800';
+        return 'bg-amber-900/40 text-amber-300 border border-amber-800/60';
       case 'Media':
-        return 'bg-amber-900/40 text-amber-400 border border-amber-800';
+        return 'bg-blue-900/40 text-blue-300 border border-blue-800/60';
       default:
-        return 'bg-slate-800 text-slate-400 border border-slate-700';
+        return 'bg-surface text-text-muted border border-surface-border';
     }
   }
 
   getTaskStatusClass(estado?: string): string {
     switch (estado) {
       case 'Terminado':
-        return 'bg-emerald-900/40 text-emerald-400 border border-emerald-800';
+        return 'bg-success/15 text-success border-success/30';
       case 'En Curso':
-        return 'bg-blue-900/40 text-blue-400 border border-blue-800';
+        return 'bg-accent/15 text-accent border-accent/30';
       case 'Bloqueado':
-        return 'bg-red-900/40 text-red-400 border border-red-800';
+        return 'bg-danger/15 text-danger border-danger/30';
       default:
-        return 'bg-slate-800 text-slate-300 border border-slate-700';
+        return 'bg-surface-border/50 text-text-muted border-surface-border';
     }
-  }
-
-  createTask() {
-    const proyectIdStr = this.id();
-    if (!proyectIdStr) return;
-
-    if (!this.nombreTarea().trim()) {
-      this.taskErrorMessage.set('El nombre de la tarea es obligatorio');
-      return;
-    }
-
-    this.isSubmittingTask.set(true);
-    this.taskErrorMessage.set('');
-
-    this.taskService.createTask({
-      nombre: this.nombreTarea().trim(),
-      descripcion: this.descripcionTarea().trim(),
-      comentario: this.comentarioTarea().trim(),
-      estado: this.estadoTarea(),
-      proyect_id: Number(proyectIdStr),
-      tarea_padre_id: this.tareaPadreId() ?? undefined
-    }).subscribe({
-      next: () => {
-        this.isSubmittingTask.set(false);
-        this.closeTaskModal();
-        // Reset form
-        this.nombreTarea.set('');
-        this.descripcionTarea.set('');
-        this.comentarioTarea.set('');
-        this.estadoTarea.set('Abierto');
-
-        this.tasksResource?.reload();
-      },
-      error: (err) => {
-        this.isSubmittingTask.set(false);
-        this.taskErrorMessage.set(err.error || 'Error al crear la tarea');
-      }
-    });
-  }
-
-  changeTaskStatus(task: Task, nextEstado: string) {
-    this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
-      next: () => {
-        this.tasksResource?.reload();
-      },
-      error: (err) => console.error('Error al actualizar estado de tarea:', err)
-    });
-  }
-
-  deleteTask(taskId: number) {
-    if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
-
-    this.taskService.deleteTask(taskId).subscribe({
-      next: () => {
-        this.tasksResource?.reload();
-      },
-      error: (err) => console.error('Error al eliminar tarea:', err)
-    });
   }
 }

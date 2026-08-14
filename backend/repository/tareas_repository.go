@@ -118,7 +118,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 		WHERE proyecto_id = $1
 		AND user_id = $2
 		AND eliminado = false
-		ORDER BY id ASC
+		ORDER BY id DESC
 	`
 
 	rows, err := r.db.Query(ctx, query, proyectoID, userID)
@@ -156,22 +156,28 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 
 	// Construir jerarquía: separar tareas principales y asignar subtareas
 	tareaMap := make(map[int]*models.TareaResponse)
-	var principales []models.TareaResponse
-
 	for i := range todas {
 		todas[i].Subtareas = []models.TareaResponse{}
 		tareaMap[todas[i].ID] = &todas[i]
 	}
 
+	// 1. Asignar cada subtarea a su respectivo padre en tareaMap
 	for _, t := range todas {
 		if t.TareaPadreID != nil {
 			if padre, ok := tareaMap[*t.TareaPadreID]; ok {
 				padre.Subtareas = append(padre.Subtareas, t)
-			} else {
-				principales = append(principales, t)
 			}
-		} else {
-			principales = append(principales, t)
+		}
+	}
+
+	// 2. Extraer tareas principales (con sus subtareas ya asignadas)
+	var principales []models.TareaResponse
+	for _, t := range todas {
+		if t.TareaPadreID == nil {
+			principales = append(principales, *tareaMap[t.ID])
+		} else if _, ok := tareaMap[*t.TareaPadreID]; !ok {
+			// Si es subtarea huérfana, incluirla como principal
+			principales = append(principales, *tareaMap[t.ID])
 		}
 	}
 

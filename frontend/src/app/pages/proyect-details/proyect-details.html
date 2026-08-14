@@ -1,30 +1,31 @@
 <div class="p-6 max-w-5xl mx-auto space-y-6">
+  <!-- VOLVER A PROYECTOS -->
   <div>
     <a
       routerLink="/proyectos"
-      class="text-sm text-text-muted hover:text-primary mb-4 inline-flex items-center gap-1.5 transition-colors"
+      class="text-sm text-text-muted hover:text-primary mb-2 inline-flex items-center gap-1.5 transition-colors"
     >
       ← Volver a la lista de proyectos
     </a>
   </div>
 
   @if (projectResource?.isLoading()) {
-    <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
+    <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl">
       <p class="text-text-muted animate-pulse">Cargando detalles del proyecto...</p>
     </div>
   } @else if (projectResource?.error()) {
-    <div class="p-6 bg-danger/40 border border-danger/60 rounded-2xl">
+    <div class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
       <p class="text-danger font-medium">Error al cargar el proyecto.</p>
     </div>
   } @else if (projectResource?.value(); as project) {
     <!-- TARJETA PRINCIPAL DEL PROYECTO -->
-    <div class="p-6 bg-surface border border-surface-border rounded-2xl shadow-xl space-y-6">
+    <div class="p-6 bg-surface border border-surface-border rounded-2xl shadow-xl space-y-5">
       <div
         class="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-surface-border"
       >
-        <div>
+        <div class="space-y-1">
           <h1 class="text-3xl font-bold text-primary tracking-tight">{{ project.nombre }}</h1>
-          <p class="text-xs text-text-muted mt-1">
+          <p class="text-xs text-text-muted">
             Creado el: {{ project.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}
           </p>
         </div>
@@ -45,14 +46,14 @@
       </div>
 
       @if (project.descripcion || project.comentario) {
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
           @if (project.descripcion) {
             <div>
-              <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">
                 Descripción
               </h4>
               <p
-                class="text-slate-300 text-sm bg-slate-950/30 p-3 rounded-lg border border-slate-800/50"
+                class="text-text-main text-sm bg-background/60 p-3 rounded-xl border border-surface-border"
               >
                 {{ project.descripcion }}
               </p>
@@ -60,11 +61,11 @@
           }
           @if (project.comentario) {
             <div>
-              <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">
                 Comentarios
               </h4>
               <p
-                class="text-slate-300 text-sm bg-slate-950/30 p-3 rounded-lg border border-slate-800/50"
+                class="text-text-main text-sm bg-background/60 p-3 rounded-xl border border-surface-border"
               >
                 {{ project.comentario }}
               </p>
@@ -73,312 +74,352 @@
         </div>
       }
     </div>
-    <section class="bg-primary/50 w-full flex justify-around rounded-xl text-center">
+
+    <!-- TABS BAR CON ARIA-SELECTED -->
+    <section class="flex border-b border-surface-border gap-2">
       @for (tab of tabs; track tab.id) {
         <button
           role="tab"
           type="button"
-          [class.active]="activeTab() === tab.id"
           [attr.aria-selected]="activeTab() === tab.id"
           (click)="selectedTab(tab.id)"
-          
-          class="w-full h-full text-text-muted  p-4 rounded-xl aria-selected:text-text-main aria-selected:bg-primary aria-selected:font-semibold"
+          class="px-5 py-2.5 text-sm font-medium transition-all cursor-pointer border-b-2 border-transparent text-text-muted hover:text-text-main
+                 aria-selected:text-primary aria-selected:border-primary aria-selected:font-semibold flex items-center gap-2"
         >
+          @if (tab.id === 'tareas') {
+            <svg lucideListTodo class="w-4 h-4" />
+          }
           {{ tab.label }}
+          @if (tab.id === 'tareas' && tasksResource?.value(); as tareas) {
+            <span
+              class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted"
+            >
+              {{ tareas.length }}
+            </span>
+          }
         </button>
       }
     </section>
-    <!-- SECCIÓN DE TAREAS DEL PROYECTO -->
-    @if (activeTab() === 'tareas') {
-      <section class="p-6 bg-surface border border-surface-border rounded-2xl shadow-xl space-y-5">
-        <div class="flex justify-between items-center pb-3 border-b border-surface">
-          <div>
-            <h3 class="text-xl font-bold text-text-main flex items-center gap-2">
-              <span>Tareas del Proyecto</span>
-            </h3>
-            <p class="text-xs text-text-muted mt-0.5">
-              Sub-tareas para alcanzar el criterio de finalización.
-            </p>
-          </div>
-          <button
-            (click)="openTaskModal()"
-            class="bg-primary/70 hover:bg-primary text-text-main font-medium rounded-xl px-4 py-2 text-sm shadow-lg shadow-emerald-950/30 transition-all"
-          >
-            + Nueva Tarea
-          </button>
-        </div>
 
-        @if (tasksResource?.isLoading()) {
-          <p class="text-texlaksndlkasmdlkasm asñldasñlmdt-muted text-sm animate-pulse">Cargando tareas del proyecto...</p>
+    <!-- SECCIÓN DE TAREAS (ÁRBOL JERÁRQUICO INLINE - CERO FRICCIÓN) -->
+    @if (activeTab() === 'tareas') {
+      <div class="space-y-6">
+        @if (tasksResource?.isLoading() && !tasksResource?.value()) {
+          <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
+            <p class="text-text-muted text-sm animate-pulse">Cargando tareas del proyecto...</p>
+          </div>
         } @else if (tasksResource?.value(); as tareas) {
+          <!-- HEADER DE TAREAS CON PROGRESO GENERAL Y FILTROS -->
+          <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-lg space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
+                  <svg lucideCheckCheck class="w-5 h-5 text-primary" />
+                  Tareas del Proyecto
+                </h3>
+                <p class="text-xs text-text-muted mt-0.5">
+                  Gestiona subtareas y avance directamente en un solo lugar.
+                </p>
+              </div>
+
+              <!-- FILTROS RÁPIDOS -->
+              <div class="flex items-center gap-1.5 bg-background p-1 rounded-xl border border-surface-border text-xs">
+                <button
+                  type="button"
+                  (click)="taskFilter.set('all')"
+                  [class]="taskFilter() === 'all' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  Todas ({{ tareas.length }})
+                </button>
+                <button
+                  type="button"
+                  (click)="taskFilter.set('pending')"
+                  [class]="taskFilter() === 'pending' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  Pendientes ({{ getOverallStats(tareas).total - getOverallStats(tareas).completed }})
+                </button>
+                <button
+                  type="button"
+                  (click)="taskFilter.set('completed')"
+                  [class]="taskFilter() === 'completed' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  Completadas ({{ getOverallStats(tareas).completed }})
+                </button>
+              </div>
+            </div>
+
+            <!-- BARRA DE PROGRESO GLOBAL DEL PROYECTO -->
+            @if (tareas.length > 0) {
+              <div class="space-y-1.5 pt-1">
+                <div class="flex justify-between items-center text-xs text-text-muted">
+                  <span>
+                    Progreso: <strong class="text-text-main">{{ getOverallStats(tareas).completed }}</strong> de {{ getOverallStats(tareas).total }} tareas completadas
+                  </span>
+                  <span class="font-bold text-primary">{{ getOverallStats(tareas).percent }}%</span>
+                </div>
+                <div class="w-full bg-background rounded-full h-2 overflow-hidden border border-surface-border">
+                  <div
+                    class="bg-linear-to-r from-primary/80 to-primary h-2 rounded-full transition-all duration-500 ease-out"
+                    [style.width.%]="getOverallStats(tareas).percent"
+                  ></div>
+                </div>
+              </div>
+            }
+
+            <!-- BARRA DE CREACIÓN RÁPIDA DE TAREA PRINCIPAL (ZERO FRICTION) -->
+            <form (ngSubmit)="createQuickTask()" class="pt-2">
+              <div class="relative flex items-center">
+                <span class="absolute left-3.5 text-text-muted flex items-center pointer-events-none">
+                  <svg lucidePlus class="w-4 h-4 text-primary" />
+                </span>
+                <input
+                  type="text"
+                  [ngModel]="quickTaskTitle()"
+                  (ngModelChange)="quickTaskTitle.set($event)"
+                  name="quickTaskTitle"
+                  placeholder="Escribe una nueva tarea y presiona Enter para crearla..."
+                  class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl pl-10 pr-24 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30"
+                />
+                <button
+                  type="submit"
+                  [disabled]="isSubmittingQuickTask() || !quickTaskTitle().trim()"
+                  class="absolute right-2 text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-3 py-1.5 rounded-lg transition-all disabled:opacity-30 cursor-pointer flex items-center gap-1"
+                >
+                  <span>↵ Enter</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- LISTA DE TAREAS Y SUBTAREAS INLINE -->
           <div class="space-y-3">
-            @for (t of tareas; track t.id) {
+            @for (t of getFilteredTasks(tareas); track t.id) {
               <div
-                class="p-4 bg-background border border-surface-border rounded-xl space-y-3 hover:border-primary transition-colors"
+                class="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-surface-border/80 transition-all space-y-3"
               >
-                <div class="flex items-start justify-between gap-4">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-3">
+                <!-- FILA DE TAREA PRINCIPAL -->
+                <div class="flex items-center justify-between gap-3">
+                  <!-- Lado izquierdo: Chevron, Checkbox, Título -->
+                  <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <!-- BOTÓN ACORDEÓN (EXPANDIR/COLAPSAR) -->
+                    <button
+                      type="button"
+                      (click)="toggleExpand(t.id)"
+                      class="p-1 rounded-lg hover:bg-background text-text-muted hover:text-text-main transition-colors cursor-pointer"
+                      [title]="isExpanded(t.id) ? 'Ocultar subtareas' : 'Mostrar subtareas'"
+                    >
+                      @if (isExpanded(t.id)) {
+                        <svg lucideChevronDown class="w-4 h-4 text-primary transition-transform" />
+                      } @else {
+                        <svg lucideChevronRight class="w-4 h-4 text-text-muted transition-transform" />
+                      }
+                    </button>
+
+                    <!-- CHECKBOX 1-CLICK -->
+                    <button
+                      type="button"
+                      (click)="toggleTaskComplete(t)"
+                      [class]="t.estado === 'Terminado' ? 'bg-success border-success text-background' : 'border-surface-border hover:border-primary text-transparent bg-background'"
+                      class="w-5 h-5 rounded-md border flex items-center justify-center transition-all cursor-pointer shrink-0"
+                      title="Marcar como terminada"
+                    >
+                      <svg lucideCheck class="w-3.5 h-3.5 stroke-[3]" />
+                    </button>
+
+                    <!-- TÍTULO DE LA TAREA -->
+                    <div class="flex-1 min-w-0 cursor-pointer" (click)="toggleExpand(t.id)">
                       <h4
-                        (click)="openTaskDetail(t)"
-                        class="text-base font-semibold text-primary hover:text-shadow-primary hover:underline cursor-pointer transition-colors"
-                        title="Ver detalle y gestionar subtareas"
+                        [class]="t.estado === 'Terminado' ? 'line-through text-text-muted/60 font-normal' : 'text-text-main font-semibold'"
+                        class="text-sm tracking-tight truncate hover:text-primary transition-colors"
                       >
                         {{ t.nombre }}
                       </h4>
-                      <select
-                        [ngModel]="t.estado || 'Abierto'"
-                        (ngModelChange)="changeTaskStatus(t, $event)"
-                        [class]="
-                          'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium ' +
-                          getTaskStatusClass(t.estado)
-                        "
-                      >
-                        <option value="Abierto" class="bg-slate-900 text-slate-200">Abierto</option>
-                        <option value="En Curso" class="bg-slate-900 text-blue-300">
-                          En Curso
-                        </option>
-                        <option value="Terminado" class="bg-slate-900 text-emerald-300">
-                          Terminado
-                        </option>
-                        <option value="Bloqueado" class="bg-slate-900 text-red-300">
-                          Bloqueado
-                        </option>
-                      </select>
+                      @if (t.descripcion) {
+                        <p class="text-xs text-text-muted truncate mt-0.5">{{ t.descripcion }}</p>
+                      }
                     </div>
-                    @if (t.descripcion) {
-                      <p class="text-text-muted text-sm">{{ t.descripcion }}</p>
-                    }
-                    @if (t.comentario) {
-                      <p class="text-text-muted text-xs">Nota: {{ t.comentario }}</p>
-                    }
                   </div>
 
-                  <div class="flex items-center gap-2">
-                    <button
-                      (click)="openTaskDetail(t)"
-                      class="text-xs hover:bg-surface text-primary/70 border border-surface-border px-2.5 py-1 rounded-lg transition-all flex items-center gap-1"
-                      title="Ver detalle y gestionar subtareas"
+                  <!-- Lado derecho: Estado, Contador de Subtareas, Acciones -->
+                  <div class="flex items-center gap-2.5 shrink-0">
+                    <!-- SELECTOR DE ESTADO -->
+                    <select
+                      [ngModel]="t.estado || 'Abierto'"
+                      (ngModelChange)="changeTaskStatus(t, $event)"
+                      [class]="'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium transition-colors ' + getTaskStatusClass(t.estado)"
                     >
-                      Subtareas ({{ t.subtareas?.length || 0 }})
-                    </button>
+                      <option value="Abierto" class="bg-surface text-text-main">Abierto</option>
+                      <option value="En Curso" class="bg-surface text-accent">En Curso</option>
+                      <option value="Terminado" class="bg-surface text-success">Terminado</option>
+                      <option value="Bloqueado" class="bg-surface text-danger">Bloqueado</option>
+                    </select>
+
+                    <!-- BADGE PÍLDORA DE SUBTAREAS -->
+                    @if (t.subtareas && t.subtareas.length > 0) {
+                      <button
+                        type="button"
+                        (click)="toggleExpand(t.id)"
+                        class="text-xs bg-background hover:bg-surface-border text-text-muted px-2 py-1 rounded-lg border border-surface-border transition-colors cursor-pointer flex items-center gap-1.5"
+                        [title]="'Subtareas: ' + getSubtaskStats(t).completed + ' de ' + getSubtaskStats(t).total + ' completadas'"
+                      >
+                        <span>{{ getSubtaskStats(t).completed }}/{{ getSubtaskStats(t).total }}</span>
+                        @if (getSubtaskStats(t).percent === 100) {
+                          <span class="text-success font-bold">✓</span>
+                        }
+                      </button>
+                    }
+
+                    <!-- BOTÓN + SUBTAREA RÁPIDA -->
                     <button
-                      (click)="openTaskModal(t)"
-                      class="text-xs hover:bg-surface text-text-muted border border-surface-border px-2.5 py-1 rounded-lg transition-all"
-                      title="Agregar subtarea"
+                      type="button"
+                      (click)="expandTask(t.id)"
+                      class="text-xs text-text-muted hover:text-primary hover:bg-background border border-surface-border px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1"
+                      title="Agregar subtarea inline"
                     >
-                      + Subtarea
+                      <svg lucidePlus class="w-3.5 h-3.5" />
+                      <span class="hidden sm:inline">Subtarea</span>
                     </button>
+
+                    <!-- BOTÓN ELIMINAR TAREA -->
                     <button
-                      (click)="deleteTask(t.id)"
-                      class="text-text-muted hover:text-danger/60 text-sm p-1 transition-colors"
+                      type="button"
+                      (click)="requestDeleteTask(t, false)"
+                      class="text-text-muted hover:text-danger p-1 rounded-lg hover:bg-danger/10 transition-colors cursor-pointer"
                       title="Eliminar tarea"
                     >
-                      Eliminar
+                      <svg lucideTrash2 class="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                <!-- RENDERIZAR SUBTAREAS -->
-                @if (t.subtareas && t.subtareas.length > 0) {
-                  <div class="pl-4 border-l-2 border-emerald-500/30 space-y-2 mt-2 pt-2">
-                    <h5 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Subtareas ({{ t.subtareas.length }})
-                    </h5>
-                    @for (sub of t.subtareas; track sub.id) {
+                <!-- RAMA DEL ÁRBOL DE SUBTAREAS (DESPLEGABLE INLINE) -->
+                @if (isExpanded(t.id)) {
+                  <div class="pl-6 ml-3 border-l-2 border-primary/25 space-y-2 pt-2 pb-1 transition-all">
+                    <!-- LISTA DE SUBTAREAS -->
+                    @for (sub of t.subtareas || []; track sub.id) {
                       <div
-                        class="p-2.5 bg-slate-900/60 border border-slate-800/60 rounded-lg flex items-center justify-between gap-3"
+                        class="p-2 bg-background/70 border border-surface-border/60 hover:border-surface-border rounded-xl flex items-center justify-between gap-3 transition-colors group"
                       >
-                        <div class="flex items-center gap-2.5">
-                          <span class="text-xs text-slate-500">↳</span>
-                          <span class="text-sm text-slate-200 font-medium">{{ sub.nombre }}</span>
+                        <!-- Checkbox y nombre de subtarea -->
+                        <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                          <button
+                            type="button"
+                            (click)="toggleSubtaskComplete(sub)"
+                            [class]="sub.estado === 'Terminado' ? 'bg-success border-success text-background' : 'border-surface-border hover:border-primary text-transparent bg-surface'"
+                            class="w-4 h-4 rounded border flex items-center justify-center transition-all cursor-pointer shrink-0"
+                            title="Completar subtarea"
+                          >
+                            <svg lucideCheck class="w-3 h-3 stroke-[3]" />
+                          </button>
+
+                          <span
+                            [class]="sub.estado === 'Terminado' ? 'line-through text-text-muted/60 font-normal' : 'text-text-main font-medium'"
+                            class="text-xs truncate"
+                          >
+                            {{ sub.nombre }}
+                          </span>
+                        </div>
+
+                        <!-- Estado y borrar subtarea -->
+                        <div class="flex items-center gap-2 shrink-0">
                           <select
                             [ngModel]="sub.estado || 'Abierto'"
                             (ngModelChange)="changeTaskStatus(sub, $event)"
-                            [class]="
-                              'text-xs px-2 py-0.5 rounded-md border outline-none cursor-pointer font-medium ' +
-                              getTaskStatusClass(sub.estado)
-                            "
+                            [class]="'text-[11px] px-2 py-0.5 rounded-md border outline-none cursor-pointer font-medium ' + getTaskStatusClass(sub.estado)"
                           >
-                            <option value="Abierto" class="bg-slate-900 text-slate-200">
-                              Abierto
-                            </option>
-                            <option value="En Curso" class="bg-slate-900 text-blue-300">
-                              En Curso
-                            </option>
-                            <option value="Terminado" class="bg-slate-900 text-emerald-300">
-                              Terminado
-                            </option>
-                            <option value="Bloqueado" class="bg-slate-900 text-red-300">
-                              Bloqueado
-                            </option>
+                            <option value="Abierto" class="bg-surface text-text-main">Abierto</option>
+                            <option value="En Curso" class="bg-surface text-accent">En Curso</option>
+                            <option value="Terminado" class="bg-surface text-success">Terminado</option>
+                            <option value="Bloqueado" class="bg-surface text-danger">Bloqueado</option>
                           </select>
+
+                          <button
+                            type="button"
+                            (click)="requestDeleteTask(sub, true)"
+                            class="text-text-muted hover:text-danger p-0.5 rounded-md opacity-70 group-hover:opacity-100 transition-all cursor-pointer"
+                            title="Eliminar subtarea"
+                          >
+                            <svg lucideTrash2 class="w-3.5 h-3.5" />
+                          </button>
                         </div>
-                        <button
-                          (click)="deleteTask(sub.id)"
-                          class="text-slate-500 hover:text-red-400 text-xs p-1 transition-colors"
-                          title="Eliminar subtarea"
-                        >
-                          🗑️
-                        </button>
                       </div>
                     }
+
+                    <!-- INPUT INLINE PARA AÑADIR SUBTAREA AL INSTANTE -->
+                    <form (ngSubmit)="createInlineSubtask(t.id)" class="pt-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-primary/70 text-xs">
+                          <svg lucideCornerDownRight class="w-3.5 h-3.5" />
+                        </span>
+                        <input
+                          type="text"
+                          [ngModel]="getSubtaskInput(t.id)"
+                          (ngModelChange)="setSubtaskInput(t.id, $event)"
+                          name="subtaskInput_{{ t.id }}"
+                          placeholder="Añadir subtarea... (pulsa Enter para guardar)"
+                          class="flex-1 bg-background/50 border border-dashed border-surface-border focus:border-primary text-text-main placeholder-text-muted/50 rounded-lg px-3 py-1.5 text-xs outline-none transition-colors"
+                        />
+                        <button
+                          type="submit"
+                          [disabled]="isSubmittingSubtask()[t.id] || !getSubtaskInput(t.id).trim()"
+                          class="text-xs bg-primary/20 hover:bg-primary/30 text-primary px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-20 cursor-pointer flex items-center gap-1 shrink-0 font-medium"
+                        >
+                          <svg lucidePlus class="w-3 h-3" />
+                          <span>Guardar</span>
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 }
               </div>
             } @empty {
-              <div class="p-8 text-center bg-slate-950/40 border border-slate-800/60 rounded-xl">
-                <p class="text-slate-400 text-sm">No hay tareas asociadas a este proyecto aún.</p>
-                <button
-                  (click)="openTaskModal()"
-                  class="mt-3 text-xs text-emerald-400 hover:underline"
-                >
-                  + Crear la primera tarea
-                </button>
+              <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-3">
+                <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <svg lucideListTodo class="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 class="text-base font-semibold text-text-main">No hay tareas creadas todavía</h4>
+                  <p class="text-xs text-text-muted mt-1">
+                    Usa la barra de arriba para añadir tu primera tarea directamente con la tecla Enter.
+                  </p>
+                </div>
               </div>
             }
           </div>
         }
-      </section>
+      </div>
     } @else if (activeTab() === 'notas') {
-      <section class="p-6 bg-surface border border-surface-border rounded-2xl shadow-xl space-y-5">
-        <h3 class="">
-          Notas
-        </h3>
-        <!-- render de notas, aun no implementado -->
-         <article>
-          <h4>
-            nombre de la nota, si 
-          </h4>
-          <p>
-            contenido de la nota, solo si tiene
+      <!-- SECCIÓN DE NOTAS -->
+      <section class="bg-surface border border-surface-border rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-surface-border">
+          <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
+            <svg lucideSparkles class="w-5 h-5 text-primary" />
+            Notas del Proyecto
+          </h3>
+          <span class="text-xs text-text-muted">Espacio para notas rápidas y documentación</span>
+        </div>
+        <div class="p-8 text-center bg-background rounded-xl border border-surface-border/60">
+          <p class="text-text-muted text-sm">
+            Aquí podrás gestionar notas y reflexiones asociadas a este proyecto.
           </p>
-          <span>en la tatjeta de nota tambien deben ir los elemetos de edicion, eliminacion , etc</span>
-         </article>
+        </div>
       </section>
     }
   }
-  <!-- MODAL DE CREACIÓN DE TAREA / SUBTAREA -->
-  @if (showTaskModal()) {
-    <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
-    >
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
-        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
-          <div>
-            <h3 class="text-xl font-bold text-white">
-              {{ tareaPadreId() ? 'Nueva Subtarea' : 'Nueva Tarea del Proyecto' }}
-            </h3>
-            @if (tareaPadreId()) {
-              <p class="text-xs text-emerald-400 font-medium mt-0.5">
-                Subtarea de: "{{ tareaPadreNombre() }}"
-              </p>
-            } @else {
-              <p class="text-xs text-slate-400 mt-0.5">Agrega una tarea orientada al objetivo.</p>
-            }
-          </div>
-          <button (click)="closeTaskModal()" class="text-slate-400 hover:text-white text-xl p-1">
-            ✕
-          </button>
-        </div>
 
-        @if (taskErrorMessage()) {
-          <div class="mb-4 p-3 bg-red-950/50 border border-red-800 rounded-xl text-red-300 text-sm">
-            {{ taskErrorMessage() }}
-          </div>
-        }
-
-        <form (ngSubmit)="createTask()" class="space-y-4 text-sm">
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Nombre *</label>
-            <input
-              type="text"
-              [ngModel]="nombreTarea()"
-              (ngModelChange)="nombreTarea.set($event)"
-              name="nombreTarea"
-              [placeholder]="
-                tareaPadreId() ? 'Ej: Diseñar formulario' : 'Ej: Crear endpoints en Go'
-              "
-              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors"
-            />
-          </div>
-
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Estado Inicial</label>
-            <select
-              [ngModel]="estadoTarea()"
-              (ngModelChange)="estadoTarea.set($event)"
-              name="estadoTarea"
-              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors"
-            >
-              <option value="Abierto">Abierto</option>
-              <option value="En Curso">En Curso</option>
-              <option value="Terminado">Terminado</option>
-              <option value="Bloqueado">Bloqueado</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Descripción</label>
-            <textarea
-              rows="2"
-              [ngModel]="descripcionTarea()"
-              (ngModelChange)="descripcionTarea.set($event)"
-              name="descripcionTarea"
-              placeholder="¿En qué consiste?"
-              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors"
-            ></textarea>
-          </div>
-
-          <div>
-            <label class="block text-slate-300 font-medium mb-1"
-              >Comentario / Notas Opcionales</label
-            >
-            <input
-              type="text"
-              [ngModel]="comentarioTarea()"
-              (ngModelChange)="comentarioTarea.set($event)"
-              name="comentarioTarea"
-              placeholder="Notas o dependencias..."
-              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-xl p-2.5 outline-none transition-colors"
-            />
-          </div>
-
-          <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
-            <button
-              type="button"
-              (click)="closeTaskModal()"
-              class="px-4 py-2 text-slate-400 hover:text-white rounded-xl transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              [disabled]="isSubmittingTask()"
-              class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium rounded-xl px-5 py-2 transition-all"
-            >
-              {{
-                isSubmittingTask()
-                  ? 'Guardando...'
-                  : tareaPadreId()
-                    ? 'Crear Subtarea'
-                    : 'Crear Tarea'
-              }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
-
-  <!-- MODAL DE DETALLE Y GESTIÓN DE SUBTAREAS -->
-  @if (selectedTaskForDetail(); as selectedTask) {
-    <app-task-detail-modal
-      [task]="selectedTask"
-      [proyectId]="projectIdNumber()"
-      (closeModal)="closeTaskDetail()"
-      (taskUpdated)="onTaskUpdated()"
-    >
-    </app-task-detail-modal>
-  }
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN REUTILIZABLE -->
+  <app-confirm-modal
+    [isOpen]="taskToDelete() !== null"
+    [title]="taskToDelete()?.isSubtask ? '¿Eliminar subtarea?' : '¿Eliminar tarea del proyecto?'"
+    [message]="'¿Estás seguro de que deseas eliminar &quot;' + (taskToDelete()?.nombre || '') + '&quot;? Esta acción no se puede deshacer.'"
+    [confirmText]="'Eliminar'"
+    [cancelText]="'Cancelar'"
+    [variant]="'danger'"
+    [isProcessing]="isDeletingTask()"
+    (confirm)="confirmDeleteTask()"
+    (cancel)="cancelDeleteTask()"
+  />
 </div>

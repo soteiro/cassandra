@@ -83,6 +83,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 	FROM proyectos p
 	WHERE p.user_id = $1
 	AND p.eliminado IS false
+	order by p.id desc
 	`
 
 	rows, err := r.db.Query(
