@@ -1,41 +1,85 @@
+<aside
+  class="fixed bg-surface inset-y-0 z-50 left-0 w-64 h-full flex flex-col justify-between p-4 border-r border-surface-border -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto"
+  [class.translate-x-0]="sidebar.isOpen()"
+>
+  <!-- HEADER / BRAND -->
+  <div class="space-y-6">
+    <div class="flex items-center justify-between px-2 pt-1">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-9 h-9 rounded-xl bg-linear-to-br from-primary/30 to-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-xs"
+        >
+          <svg lucideSparkles class="w-4 h-4" />
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-text-main tracking-tight leading-none">
+            Cassandra
+          </h2>
+          <span class="text-[10px] uppercase font-semibold tracking-wider text-primary/80 mt-0.5 block">
+            Personal HQ
+          </span>
+        </div>
+      </div>
 
-<aside class="fixed bg-surface rounded-r-2xl inset-y-0 z-99 left-0 w-64 h-screen flex flex-col gap-2 justify-between py-6 px-1 border-r border-primary/70 -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:z-auto" [class.translate-x-0]="sidebar.isOpen()">
+      <!-- BOTÓN CERRAR EN MÓVIL -->
+      <button
+        type="button"
+        (click)="sidebar.close()"
+        class="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-border md:hidden transition-colors cursor-pointer"
+        title="Cerrar menú"
+      >
+        <svg lucideX class="w-4 h-4" />
+      </button>
+    </div>
 
-  <section class="flex-0">
-    <h2 class="text-xl text-center font-bold text-white mb-4">Cassandra</h2>
-  </section>
-  <!-- Botón Home -->
-  <section class="flex-1 flex flex-col gap-2">
-    <a
-      (click)="sidebar.close()"
-      routerLink="/home"
-      routerLinkActive="bg-primary text-text-main"
-      class="flex gap-2 px-4 py-2 rounded-lg text-text-main hover:bg-surface-border transition-colors text-lg md:text-xl"
+    <!-- NAVEGACIÓN -->
+    <nav class="space-y-1">
+      <p class="text-[11px] font-semibold uppercase tracking-wider text-text-muted/60 px-3 pb-1">
+        Workspace
+      </p>
+
+      <a
+        (click)="sidebar.close()"
+        routerLink="/home"
+        routerLinkActive="bg-primary/15 text-primary font-semibold border-primary/30 shadow-xs"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-muted hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+      >
+        <svg lucideHouse class="w-4 h-4 group-hover:scale-105 transition-transform" />
+        <span>Inicio</span>
+      </a>
+
+      <a
+        (click)="sidebar.close()"
+        routerLink="/proyectos"
+        routerLinkActive="bg-primary/15 text-primary font-semibold border-primary/30 shadow-xs"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-muted hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+      >
+        <svg lucideFolder class="w-4 h-4 group-hover:scale-105 transition-transform" />
+        <span>Proyectos</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- FOOTER / USER & LOGOUT -->
+  <div class="border-t border-surface-border pt-4 mt-auto space-y-3">
+    <!-- AMBIENT STATUS -->
+    <div class="px-3 py-2 bg-background/50 rounded-xl border border-surface-border/60 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+        <span class="text-xs text-text-muted font-medium">Sistema Online</span>
+      </div>
+      <span class="text-[10px] text-text-muted/60 font-mono">v0.1</span>
+    </div>
+
+    <!-- LOGOUT BUTTON -->
+    <button
+      type="button"
+      (click)="chau()"
+      class="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-text-muted hover:text-danger hover:bg-danger/10 border border-surface-border hover:border-danger/30 transition-all cursor-pointer"
     >
-    <svg lucideHouse class="text-primary"/>
-      Inicio
-    </a>
-
-    <a
-      (click)="sidebar.close()"
-      routerLink="/proyectos"
-      routerLinkActive="bg-primary text-text-main"
-      class="flex gap-2 px-4 py-2 rounded-lg text-text-main hover:bg-surface-border transition-colors text-lg md:text-xl"
-    >
-    <svg lucideFolder class="text-primary" />
-      Proyectos
-    </a>
-
-  </section>
-
-  <section class="flex-0 flex gap-4 m-auto">
-
-    <button (click)="chau()" 
-    class="bg-danger/70  border border-danger/90 p-2 text-text-main rounded-lg">
-    logout
-  </button>
-
-
-  </section>
+      <svg lucideLogOut class="w-3.5 h-3.5" />
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
 </aside>
-

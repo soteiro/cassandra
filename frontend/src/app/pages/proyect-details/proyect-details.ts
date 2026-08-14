@@ -1,13 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
+import { ProjectResponse } from '../../models/proyect.model';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import {
   LucideChevronDown,
+  LucideChevronUp,
   LucideChevronRight,
   LucidePlus,
   LucideTrash2,
@@ -16,6 +18,14 @@ import {
   LucideCheckCheck,
   LucideCornerDownRight,
   LucideSparkles,
+  LucidePencil,
+  LucideCalendar,
+  LucideTarget,
+  LucideClock,
+  LucideLightbulb,
+  LucideCompass,
+  LucideInfo,
+  LucideX,
 } from '@lucide/angular';
 
 interface Tab {
@@ -31,6 +41,7 @@ interface Tab {
     RouterLink,
     ConfirmModal,
     LucideChevronDown,
+    LucideChevronUp,
     LucideChevronRight,
     LucidePlus,
     LucideTrash2,
@@ -39,6 +50,14 @@ interface Tab {
     LucideCheckCheck,
     LucideCornerDownRight,
     LucideSparkles,
+    LucidePencil,
+    LucideCalendar,
+    LucideTarget,
+    LucideClock,
+    LucideLightbulb,
+    LucideCompass,
+    LucideInfo,
+    LucideX,
   ],
   templateUrl: './proyect-details.html',
   styleUrl: './proyect-details.css',
@@ -50,7 +69,13 @@ export class ProyectDetails {
   ];
 
   activeTab = signal<string>('tareas');
+  showProjectContext = signal<boolean>(false);
+
+  toggleProjectContext() {
+    this.showProjectContext.update((v) => !v);
+  }
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly ProyectService = inject(proyectService);
   private readonly taskService = inject(TaskService);
 
@@ -65,21 +90,123 @@ export class ProyectDetails {
     this.activeTab.set(tabId);
   }
 
-  // Expanded parent tasks state (Set of task IDs)
-  expandedTasks = signal<Set<number>>(new Set());
+  // --- PROJECT EDIT & DELETE STATE ---
+  showEditProjectModal = signal(false);
+  editNombre = signal('');
+  editDescripcion = signal('');
+  editComentario = signal('');
+  editPorQue = signal('');
+  editParaQue = signal('');
+  editCriterioFinalizacion = signal('');
+  editPrioridad = signal('Media');
+  editEstado = signal('En Curso');
+  editFechaLimite = signal('');
+  isSubmittingEditProject = signal(false);
+  editProjectErrorMessage = signal('');
 
-  // Quick Task Creation (Top level)
+  projectToDelete = signal<ProjectResponse | null>(null);
+  isDeletingProject = signal(false);
+
+  openEditProjectModal(project: ProjectResponse) {
+    this.editNombre.set(project.nombre || '');
+    this.editDescripcion.set(project.descripcion || '');
+    this.editComentario.set(project.comentario || '');
+    this.editPorQue.set(project.por_que || '');
+    this.editParaQue.set(project.para_que || '');
+    this.editCriterioFinalizacion.set(project.criterio_finalizacion || '');
+    this.editPrioridad.set(project.prioridad || 'Media');
+    this.editEstado.set(project.estado || 'En Curso');
+    this.editFechaLimite.set(
+      project.fecha_limite ? project.fecha_limite.split('T')[0] : '',
+    );
+    this.editProjectErrorMessage.set('');
+    this.showEditProjectModal.set(true);
+  }
+
+  closeEditProjectModal() {
+    this.showEditProjectModal.set(false);
+  }
+
+  saveEditProject() {
+    if (!this.editNombre().trim()) {
+      this.editProjectErrorMessage.set('El nombre del proyecto es obligatorio');
+      return;
+    }
+    if (!this.editPorQue().trim()) {
+      this.editProjectErrorMessage.set('Debes responder: ¿Por qué nace este proyecto?');
+      return;
+    }
+    if (!this.editParaQue().trim()) {
+      this.editProjectErrorMessage.set('Debes responder: ¿Para qué sirve / objetivo?');
+      return;
+    }
+    if (!this.editCriterioFinalizacion().trim()) {
+      this.editProjectErrorMessage.set('Debes responder: ¿Cuándo se considera terminado?');
+      return;
+    }
+
+    this.isSubmittingEditProject.set(true);
+    this.editProjectErrorMessage.set('');
+
+    this.ProyectService.updateProyect(this.projectIdNumber(), {
+      nombre: this.editNombre().trim(),
+      descripcion: this.editDescripcion().trim(),
+      comentario: this.editComentario().trim(),
+      por_que: this.editPorQue().trim(),
+      para_que: this.editParaQue().trim(),
+      criterio_finalizacion: this.editCriterioFinalizacion().trim(),
+      prioridad: this.editPrioridad(),
+      estado: this.editEstado(),
+      fecha_limite: this.editFechaLimite()
+        ? new Date(this.editFechaLimite()).toISOString()
+        : undefined,
+    }).subscribe({
+      next: () => {
+        this.isSubmittingEditProject.set(false);
+        this.closeEditProjectModal();
+        this.projectResource?.reload();
+      },
+      error: (err) => {
+        this.isSubmittingEditProject.set(false);
+        this.editProjectErrorMessage.set(err.error || 'Error al actualizar el proyecto');
+      },
+    });
+  }
+
+  openDeleteProjectModal(project: ProjectResponse) {
+    this.projectToDelete.set(project);
+  }
+
+  confirmDeleteProject() {
+    const p = this.projectToDelete();
+    if (!p) return;
+
+    this.isDeletingProject.set(true);
+    this.ProyectService.deleteProyect(p.id).subscribe({
+      next: () => {
+        this.isDeletingProject.set(false);
+        this.projectToDelete.set(null);
+        this.router.navigate(['/proyectos']);
+      },
+      error: (err) => {
+        this.isDeletingProject.set(false);
+        console.error('Error al eliminar proyecto:', err);
+      },
+    });
+  }
+
+  cancelDeleteProject() {
+    this.projectToDelete.set(null);
+  }
+
+  // --- TASKS STATE ---
+  expandedTasks = signal<Set<number>>(new Set());
   quickTaskTitle = signal('');
   isSubmittingQuickTask = signal(false);
-
-  // Inline Subtask inputs map { [taskId: number]: string }
   quickSubtaskInputs = signal<Record<number, string>>({});
   isSubmittingSubtask = signal<Record<number, boolean>>({});
-
-  // Filter state for tasks
   taskFilter = signal<'all' | 'pending' | 'completed'>('all');
 
-  // Confirmation Modal state for Deletion
   taskToDelete = signal<{ id: number; nombre: string; isSubtask: boolean } | null>(null);
   isDeletingTask = signal(false);
 
@@ -216,7 +343,7 @@ export class ProyectDetails {
       });
   }
 
-  // Modal Deletion Flow
+  // Modal Deletion Flow for Tasks
   requestDeleteTask(task: Task, isSubtask = false) {
     this.taskToDelete.set({ id: task.id, nombre: task.nombre, isSubtask });
   }
@@ -292,6 +419,22 @@ export class ProyectDetails {
         return 'bg-accent/15 text-accent border-accent/30';
       case 'Bloqueado':
         return 'bg-danger/15 text-danger border-danger/30';
+      default:
+        return 'bg-surface-border/50 text-text-muted border-surface-border';
+    }
+  }
+
+  getProjectStatusClass(estado?: string): string {
+    switch (estado) {
+      case 'Terminado':
+      case 'Completado':
+        return 'bg-success/20 text-success border-success/40';
+      case 'En Curso':
+      case 'Activo':
+        return 'bg-accent/20 text-accent border-accent/40';
+      case 'Bloqueado':
+      case 'Pausado':
+        return 'bg-danger/20 text-danger border-danger/40';
       default:
         return 'bg-surface-border/50 text-text-muted border-surface-border';
     }

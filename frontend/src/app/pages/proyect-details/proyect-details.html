@@ -3,72 +3,162 @@
   <div>
     <a
       routerLink="/proyectos"
-      class="text-sm text-text-muted hover:text-primary mb-2 inline-flex items-center gap-1.5 transition-colors"
+      class="text-xs text-text-muted hover:text-primary mb-1 inline-flex items-center gap-1.5 transition-colors font-medium"
     >
       ← Volver a la lista de proyectos
     </a>
   </div>
 
-  @if (projectResource?.isLoading()) {
-    <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl">
-      <p class="text-text-muted animate-pulse">Cargando detalles del proyecto...</p>
+  @if (projectResource?.isLoading() && !projectResource?.value()) {
+    <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl animate-pulse">
+      <p class="text-text-muted text-sm">Cargando detalles del proyecto...</p>
     </div>
   } @else if (projectResource?.error()) {
-    <div class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
-      <p class="text-danger font-medium">Error al cargar el proyecto.</p>
+    <div class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between">
+      <div>
+        <h4 class="text-sm font-semibold text-danger">Error al cargar el proyecto</h4>
+        <p class="text-xs text-text-muted mt-0.5">No se pudo obtener la información solicitada.</p>
+      </div>
+      <a
+        routerLink="/proyectos"
+        class="text-xs bg-surface border border-surface-border hover:bg-surface-border px-3 py-1.5 rounded-lg text-text-main transition-colors"
+      >
+        Volver a proyectos
+      </a>
     </div>
   } @else if (projectResource?.value(); as project) {
-    <!-- TARJETA PRINCIPAL DEL PROYECTO -->
-    <div class="p-6 bg-surface border border-surface-border rounded-2xl shadow-xl space-y-5">
-      <div
-        class="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-surface-border"
-      >
-        <div class="space-y-1">
-          <h1 class="text-3xl font-bold text-primary tracking-tight">{{ project.nombre }}</h1>
-          <p class="text-xs text-text-muted">
-            Creado el: {{ project.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}
-          </p>
+    <!-- TARJETA PRINCIPAL DEL PROYECTO (COMPACTA Y DESPLEGABLE) -->
+    <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-lg space-y-4">
+      <!-- CABECERA PRINCIPAL: TÍTULO, BADGES Y ACCIONES -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="space-y-1.5 max-w-2xl">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span [class]="'px-2.5 py-0.5 text-xs font-semibold rounded-lg ' + getPriorityClass(project.prioridad)">
+              {{ project.prioridad }}
+            </span>
+            <span [class]="'px-2.5 py-0.5 text-xs font-medium rounded-lg border ' + getProjectStatusClass(project.estado)">
+              {{ project.estado }}
+            </span>
+            @if (project.fecha_limite) {
+              <span class="px-2.5 py-0.5 text-xs bg-amber-500/10 text-amber-300 border border-amber-500/25 rounded-lg flex items-center gap-1.5">
+                <svg lucideClock class="w-3.5 h-3.5" />
+                Límite: {{ project.fecha_limite | date: 'dd/MM/yyyy' }}
+              </span>
+            }
+          </div>
+
+          <h1 class="text-xl md:text-2xl font-bold text-text-main tracking-tight leading-snug">
+            {{ project.nombre }}
+          </h1>
+
+          <div class="flex items-center gap-3 text-xs text-text-muted">
+            <span class="flex items-center gap-1">
+              <svg lucideCalendar class="w-3.5 h-3.5 text-text-muted/70" />
+              {{ project.fecha_creacion | date: 'dd/MM/yyyy' }}
+            </span>
+            @if (!showProjectContext() && project.criterio_finalizacion) {
+              <span class="text-text-muted/40">·</span>
+              <span class="truncate max-w-md text-text-muted/90 flex items-center gap-1 text-[11px]">
+                <svg lucideTarget class="w-3 h-3 text-primary shrink-0" />
+                <span class="font-medium text-text-main/80">Meta:</span> {{ project.criterio_finalizacion }}
+              </span>
+            }
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span
-            [class]="
-              'px-3 py-1 text-xs font-semibold rounded-lg ' + getPriorityClass(project.prioridad)
-            "
+
+        <!-- BOTONES DE ACCIÓN: VER DETALLES, EDITAR Y ELIMINAR -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            (click)="toggleProjectContext()"
+            [class]="showProjectContext() ? 'bg-primary/20 text-primary border-primary/40 font-semibold' : 'bg-background text-text-muted hover:text-text-main border-surface-border'"
+            class="px-3 py-1.5 text-xs rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+            title="Mostrar u ocultar detalles estratégicos"
           >
-            Prioridad: {{ project.prioridad }}
-          </span>
-          <span
-            class="px-3 py-1 text-xs bg-surface text-text-muted rounded-lg border border-surface-border"
+            <svg lucideInfo class="w-3.5 h-3.5" />
+            <span>{{ showProjectContext() ? 'Ocultar contexto' : 'Ver contexto' }}</span>
+            @if (showProjectContext()) {
+              <svg lucideChevronUp class="w-3.5 h-3.5" />
+            } @else {
+              <svg lucideChevronDown class="w-3.5 h-3.5" />
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="openEditProjectModal(project)"
+            class="px-3 py-1.5 text-xs font-medium text-text-muted hover:text-text-main bg-background hover:bg-surface-border border border-surface-border rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+            title="Editar detalles del proyecto"
           >
-            Estado: {{ project.estado }}
-          </span>
+            <svg lucidePencil class="w-3.5 h-3.5 text-primary" />
+            <span>Editar</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="openDeleteProjectModal(project)"
+            class="px-3 py-1.5 text-xs font-medium text-text-muted hover:text-danger bg-background hover:bg-danger/10 border border-surface-border hover:border-danger/30 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+            title="Eliminar proyecto"
+          >
+            <svg lucideTrash2 class="w-3.5 h-3.5" />
+            <span>Eliminar</span>
+          </button>
         </div>
       </div>
 
-      @if (project.descripcion || project.comentario) {
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-          @if (project.descripcion) {
-            <div>
-              <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">
-                Descripción
+      <!-- SECCIÓN DESPLEGABLE DE CONTEXTO ESTRATÉGICO -->
+      @if (showProjectContext()) {
+        <div class="pt-4 border-t border-surface-border grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <!-- ¿POR QUÉ? -->
+          @if (project.por_que) {
+            <div class="p-3.5 bg-background/60 rounded-xl border border-surface-border/80 space-y-1">
+              <h4 class="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                <svg lucideLightbulb class="w-3.5 h-3.5" />
+                ¿Por qué nace? (Motivación)
               </h4>
-              <p
-                class="text-text-main text-sm bg-background/60 p-3 rounded-xl border border-surface-border"
-              >
-                {{ project.descripcion }}
+              <p class="text-xs text-text-muted leading-relaxed">
+                {{ project.por_que }}
               </p>
             </div>
           }
-          @if (project.comentario) {
-            <div>
-              <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">
-                Comentarios
+
+          <!-- ¿PARA QUÉ? -->
+          @if (project.para_que) {
+            <div class="p-3.5 bg-background/60 rounded-xl border border-surface-border/80 space-y-1">
+              <h4 class="text-xs font-semibold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                <svg lucideCompass class="w-3.5 h-3.5" />
+                ¿Para qué sirve? (Objetivo)
               </h4>
-              <p
-                class="text-text-main text-sm bg-background/60 p-3 rounded-xl border border-surface-border"
-              >
-                {{ project.comentario }}
+              <p class="text-xs text-text-muted leading-relaxed">
+                {{ project.para_que }}
               </p>
+            </div>
+          }
+
+          <!-- CRITERIO DE FINALIZACIÓN (DESTACADO) -->
+          @if (project.criterio_finalizacion) {
+            <div class="col-span-full p-3.5 bg-linear-to-r from-primary/10 via-background/60 to-background/60 rounded-xl border border-primary/25 space-y-1">
+              <h4 class="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                <svg lucideTarget class="w-4 h-4" />
+                Criterio de Finalización (Definición de Éxito)
+              </h4>
+              <p class="text-xs text-text-main/90 font-medium leading-relaxed">
+                {{ project.criterio_finalizacion }}
+              </p>
+            </div>
+          }
+
+          <!-- DESCRIPCIÓN Y COMENTARIOS ADICIONALES -->
+          @if (project.descripcion) {
+            <div class="p-3 bg-background/40 rounded-xl border border-surface-border/60 space-y-1">
+              <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider">Descripción</h4>
+              <p class="text-xs text-text-muted leading-relaxed">{{ project.descripcion }}</p>
+            </div>
+          }
+          @if (project.comentario) {
+            <div class="p-3 bg-background/40 rounded-xl border border-surface-border/60 space-y-1">
+              <h4 class="text-xs font-semibold text-text-muted uppercase tracking-wider">Notas / Comentarios</h4>
+              <p class="text-xs text-text-muted leading-relaxed">{{ project.comentario }}</p>
             </div>
           }
         </div>
@@ -312,7 +402,7 @@
                             class="w-4 h-4 rounded border flex items-center justify-center transition-all cursor-pointer shrink-0"
                             title="Completar subtarea"
                           >
-                            <svg lucideCheck class="w-3 h-3 stroke-[3]" />
+                            <svg lucideCheck class="w-3.5 h-3.5 stroke-[3]" />
                           </button>
 
                           <span
@@ -389,6 +479,10 @@
               </div>
             }
           </div>
+        } @else if (tasksResource?.error()) {
+          <div class="p-8 text-center bg-danger/20 border border-danger/40 rounded-2xl">
+            <p class="text-danger text-sm">Error al cargar las tareas del proyecto.</p>
+          </div>
         }
       </div>
     } @else if (activeTab() === 'notas') {
@@ -410,7 +504,202 @@
     }
   }
 
-  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN REUTILIZABLE -->
+  <!-- MODAL DE EDICIÓN DE PROYECTO -->
+  @if (showEditProjectModal()) {
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs transition-opacity"
+      (click)="closeEditProjectModal()"
+    >
+      <div
+        class="bg-surface border border-surface-border rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- HEADER MODAL EDICIÓN -->
+        <div class="flex justify-between items-start pb-4 border-b border-surface-border">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shrink-0">
+              <svg lucidePencil class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-text-main">Editar Proyecto</h3>
+              <p class="text-xs text-text-muted mt-0.5">Actualiza la definición estratégica o el estado del proyecto.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            (click)="closeEditProjectModal()"
+            class="text-text-muted hover:text-text-main p-1 rounded-lg hover:bg-background transition-colors cursor-pointer"
+          >
+            <svg lucideX class="w-4 h-4" />
+          </button>
+        </div>
+
+        @if (editProjectErrorMessage()) {
+          <div class="p-3 bg-danger/15 border border-danger/30 rounded-xl text-danger text-xs">
+            {{ editProjectErrorMessage() }}
+          </div>
+        }
+
+        <form (ngSubmit)="saveEditProject()" class="space-y-4 text-xs">
+          <!-- NOMBRE -->
+          <div>
+            <label class="block text-text-main font-medium mb-1">Nombre del Proyecto *</label>
+            <input
+              type="text"
+              [ngModel]="editNombre()"
+              (ngModelChange)="editNombre.set($event)"
+              name="editNombre"
+              placeholder="Ej: Sistema de Monitoreo Cassie"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors"
+            />
+          </div>
+
+          <!-- ESTADO Y PRIORIDAD -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-text-main font-medium mb-1">Estado</label>
+              <select
+                [ngModel]="editEstado()"
+                (ngModelChange)="editEstado.set($event)"
+                name="editEstado"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+              >
+                <option value="Abierto" class="bg-surface text-text-main">Abierto</option>
+                <option value="En Curso" class="bg-surface text-text-main">En Curso</option>
+                <option value="Terminado" class="bg-surface text-text-main">Terminado</option>
+                <option value="Bloqueado" class="bg-surface text-text-main">Bloqueado</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-text-main font-medium mb-1">Prioridad</label>
+              <select
+                [ngModel]="editPrioridad()"
+                (ngModelChange)="editPrioridad.set($event)"
+                name="editPrioridad"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+              >
+                <option value="Baja" class="bg-surface text-text-main">Baja</option>
+                <option value="Media" class="bg-surface text-text-main">Media</option>
+                <option value="Alta" class="bg-surface text-text-main">Alta</option>
+                <option value="Critica" class="bg-surface text-text-main">Crítica</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SECCIÓN REFLEXIVA (¿POR QUÉ? Y ¿PARA QUÉ?) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-text-main font-medium mb-1">
+                ¿Por qué nace? * <span class="text-text-muted font-normal">(Motivación)</span>
+              </label>
+              <textarea
+                rows="3"
+                [ngModel]="editPorQue()"
+                (ngModelChange)="editPorQue.set($event)"
+                name="editPorQue"
+                placeholder="¿Por qué este proyecto merece tu atención?"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors"
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="block text-text-main font-medium mb-1">
+                ¿Para qué sirve? * <span class="text-text-muted font-normal">(Objetivo final)</span>
+              </label>
+              <textarea
+                rows="3"
+                [ngModel]="editParaQue()"
+                (ngModelChange)="editParaQue.set($event)"
+                name="editParaQue"
+                placeholder="¿Cuál es el resultado concreto esperado?"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- CRITERIO DE FINALIZACIÓN -->
+          <div>
+            <label class="block text-text-main font-medium mb-1">
+              Criterio de Finalización * <span class="text-text-muted font-normal">(¿Cuándo está 100% terminado?)</span>
+            </label>
+            <input
+              type="text"
+              [ngModel]="editCriterioFinalizacion()"
+              (ngModelChange)="editCriterioFinalizacion.set($event)"
+              name="editCriterioFinalizacion"
+              placeholder="Ej: Cuando esté probado y desplegado en producción."
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors"
+            />
+          </div>
+
+          <!-- FECHA LÍMITE Y DESCRIPCIÓN -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-text-main font-medium mb-1">Fecha Límite (Opcional)</label>
+              <input
+                type="date"
+                [ngModel]="editFechaLimite()"
+                (ngModelChange)="editFechaLimite.set($event)"
+                name="editFechaLimite"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+              />
+            </div>
+
+            <div>
+              <label class="block text-text-main font-medium mb-1">Notas / Comentarios</label>
+              <input
+                type="text"
+                [ngModel]="editComentario()"
+                (ngModelChange)="editComentario.set($event)"
+                name="editComentario"
+                placeholder="Comentarios adicionales..."
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors"
+              />
+            </div>
+          </div>
+
+          <!-- DESCRIPCIÓN -->
+          <div>
+            <label class="block text-text-main font-medium mb-1">Descripción Opcional</label>
+            <textarea
+              rows="2"
+              [ngModel]="editDescripcion()"
+              (ngModelChange)="editDescripcion.set($event)"
+              name="editDescripcion"
+              placeholder="Detalles adicionales del proyecto..."
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors"
+            ></textarea>
+          </div>
+
+          <!-- BOTONES -->
+          <div class="flex justify-end gap-3 pt-4 border-t border-surface-border">
+            <button
+              type="button"
+              (click)="closeEditProjectModal()"
+              class="px-4 py-2 text-text-muted hover:text-text-main bg-background hover:bg-surface-border border border-surface-border rounded-xl transition-colors cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="isSubmittingEditProject()"
+              class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            >
+              @if (isSubmittingEditProject()) {
+                <span class="animate-spin text-xs">⠋</span>
+                <span>Guardando...</span>
+              } @else {
+                <span>Guardar Cambios</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE TAREA O SUBTAREA -->
   <app-confirm-modal
     [isOpen]="taskToDelete() !== null"
     [title]="taskToDelete()?.isSubtask ? '¿Eliminar subtarea?' : '¿Eliminar tarea del proyecto?'"
@@ -421,5 +710,18 @@
     [isProcessing]="isDeletingTask()"
     (confirm)="confirmDeleteTask()"
     (cancel)="cancelDeleteTask()"
+  />
+
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE PROYECTO COMPLETO -->
+  <app-confirm-modal
+    [isOpen]="projectToDelete() !== null"
+    [title]="'¿Eliminar el proyecto completo?'"
+    [message]="'¿Estás seguro de que deseas eliminar el proyecto &quot;' + (projectToDelete()?.nombre || '') + '&quot; y todas sus tareas asociadas? Esta acción no se puede deshacer.'"
+    [confirmText]="'Eliminar Proyecto'"
+    [cancelText]="'Cancelar'"
+    [variant]="'danger'"
+    [isProcessing]="isDeletingProject()"
+    (confirm)="confirmDeleteProject()"
+    (cancel)="cancelDeleteProject()"
   />
 </div>
