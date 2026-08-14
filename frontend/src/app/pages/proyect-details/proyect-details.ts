@@ -6,7 +6,10 @@ import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
-
+interface Tab  {
+    id: string;
+    label: string;
+  } 
 @Component({
   selector: 'app-proyect-details',
   imports: [CommonModule, FormsModule, RouterLink, TaskDetailModal],
@@ -14,6 +17,12 @@ import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-
   styleUrl: './proyect-details.css',
 })
 export class ProyectDetails {
+  tabs: Tab[]= [
+    {id:"tareas", label: "Tareas"},
+    {id: "notas", label: "Notas"}
+  ]
+
+  activeTab = signal<string>('tareas')
   private readonly route = inject(ActivatedRoute);
   private readonly ProyectService = inject(proyectService);
   private readonly taskService = inject(TaskService);
@@ -23,6 +32,11 @@ export class ProyectDetails {
 
   protected readonly projectResource = this.ProyectService.getProyectById(this.id);
   protected readonly tasksResource = this.taskService.getTasksByProyectoId(this.id);
+
+  // select tab
+  selectedTab(tabId: string):void {
+    this.activeTab.set(tabId)
+  }
 
   // Modal de detalle visual de Tarea y sus subtareas
   selectedTaskForDetail = signal<Task | null>(null);

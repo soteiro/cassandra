@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
-
+import { LucideCircleX } from '@lucide/angular'
 @Component({
   selector: 'app-task-detail-modal',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideCircleX],
   templateUrl: './task-detail-modal.html',
 })
 export class TaskDetailModal {
