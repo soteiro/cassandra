@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { Timestamp } from 'rxjs';
 
 export interface StatusResponse {
   status: string;
@@ -25,20 +24,24 @@ export interface DbVersionResponse {
   providedIn: 'root',
 })
 export class StatusService {
+  private readonly apiUrl = '/api';
+
   readonly health = httpResource<StatusResponse>(
-    () => 'http://localhost:8080/api/health',
+    () => `${this.apiUrl}/health`,
   );
 
   readonly unique = httpResource<Unique>(
-    () => 'http://localhost:8080/api/'
-  )
+    () => `${this.apiUrl}/`,
+  );
 
-  readonly dbTime = httpResource<DbTimeResponse> (
-    () => 'http://localhost:8080/api/db-time'
-  )
+  readonly dbTime = httpResource<DbTimeResponse>(
+    () => `${this.apiUrl}/db-time`,
+  );
+
   readonly dbVersion = httpResource<DbVersionResponse>(
-    ()=> 'http://localhost:8080/api/db-version'
-  )
+    () => `${this.apiUrl}/db-version`,
+  );
+
   reload() { 
     this.health.reload();
     this.unique.reload();

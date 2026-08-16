@@ -7,18 +7,19 @@ import { LoginRequest, MeResponse } from '../models/auth.model';
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly apiUrl = '/api';
   private readonly http = inject(HttpClient);
-  public readonly isLoggedIn = signal<Boolean>(false);
+  public readonly isLoggedIn = signal<boolean>(false);
 
   public login(credentials: LoginRequest): Observable<any> {
     return this.http
-      .post('http://localhost:8080/api/auth/login', credentials)
+      .post(`${this.apiUrl}/auth/login`, credentials)
       .pipe(tap(() => this.isLoggedIn.set(true)));
   }
 
-  public logout() {
+  public logout(): Observable<any> {
     return this.http
-      .post('http://localhost:8080/api/auth/logout', {})
+      .post(`${this.apiUrl}/auth/logout`, {})
       .pipe(tap(() => this.isLoggedIn.set(false)));
   }
 
@@ -27,7 +28,7 @@ export class AuthService {
   // NUNCA propaga el error: el initializer de la app lo espera y
   // necesitamos que la app arranque igual aunque no haya sesion.
   public me(): Observable<boolean> {
-    return this.http.get<MeResponse>('http://localhost:8080/api/auth/me').pipe(
+    return this.http.get<MeResponse>(`${this.apiUrl}/auth/me`).pipe(
       tap(() => this.isLoggedIn.set(true)),
       map(() => true),
       catchError(() => of(false)),
@@ -38,6 +39,6 @@ export class AuthService {
   // El backend setea la nueva cookie access_token en la respuesta.
   // Los errores los maneja el interceptor (no aqui) para decidir logout.
   public refresh(): Observable<any> {
-    return this.http.post('http://localhost:8080/api/auth/refresh', {});
+    return this.http.post(`${this.apiUrl}/auth/refresh`, {});
   }
 }

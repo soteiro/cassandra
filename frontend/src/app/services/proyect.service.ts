@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class proyectService {
+  private readonly apiUrl = '/api';
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
 
@@ -15,7 +16,7 @@ export class proyectService {
     if (!this.authService.isLoggedIn()) {
       return undefined;
     }
-    return 'http://localhost:8080/api/proyects';
+    return `${this.apiUrl}/proyects`;
   });
 
   public getProyectById(id: () => string | null) {
@@ -26,20 +27,20 @@ export class proyectService {
     return httpResource<ProjectResponse>(() => {
       const proyectId = id();
       if (!proyectId) return undefined;
-      return `http://localhost:8080/api/proyects/${proyectId}`;
+      return `${this.apiUrl}/proyects/${proyectId}`;
     });
   }
 
   createProyect(req: ProjectRequest): Observable<ProjectResponse> {
-    return this.http.post<ProjectResponse>('http://localhost:8080/api/proyects', req);
+    return this.http.post<ProjectResponse>(`${this.apiUrl}/proyects`, req);
   }
 
   updateProyect(id: number, req: ProjectUpdateRequest): Observable<ProjectResponse> {
-    return this.http.put<ProjectResponse>(`http://localhost:8080/api/proyects/${id}`, req);
+    return this.http.put<ProjectResponse>(`${this.apiUrl}/proyects/${id}`, req);
   }
 
   deleteProyect(id: number): Observable<void> {
-    return this.http.delete<void>(`http://localhost:8080/api/proyects/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/proyects/${id}`);
   }
 
   reload() {

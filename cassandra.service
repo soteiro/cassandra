@@ -1,0 +1,19 @@
+[Unit]
+Description=Cassandra App
+After=network.target
+
+[Service]
+Type=simple
+User=apps
+WorkingDirectory=/home/apps/cassandra
+ExecStart=/home/apps/cassandra/cassandra-app
+Restart=always
+RestartSec=5s
+
+# Limites y logs
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
