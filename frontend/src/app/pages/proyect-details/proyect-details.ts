@@ -6,6 +6,7 @@ import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
 import { ProjectResponse } from '../../models/proyect.model';
+import { ToastService } from '../../services/toast.service'
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import {
   LucideChevronDown,
@@ -66,6 +67,7 @@ export class ProyectDetails {
   private readonly router = inject(Router);
   private readonly ProyectService = inject(proyectService);
   private readonly taskService = inject(TaskService);
+  private readonly Toast = inject(ToastService);
 
   private readonly id = () => this.route.snapshot.paramMap.get('id');
   protected readonly projectIdNumber = () => Number(this.id());
@@ -150,11 +152,13 @@ export class ProyectDetails {
         : undefined,
     }).subscribe({
       next: () => {
+        this.Toast.success("Proyecto actualizado")
         this.isSubmittingEditProject.set(false);
         this.closeEditProjectModal();
         this.projectResource?.reload();
       },
       error: (err) => {
+        this.Toast.error("Error al editar el proyecto")
         this.isSubmittingEditProject.set(false);
         this.editProjectErrorMessage.set(err.error || 'Error al actualizar el proyecto');
       },
@@ -172,11 +176,13 @@ export class ProyectDetails {
     this.isDeletingProject.set(true);
     this.ProyectService.deleteProyect(p.id).subscribe({
       next: () => {
+        this.Toast.success("Proyecto eliminado")
         this.isDeletingProject.set(false);
         this.projectToDelete.set(null);
         this.router.navigate(['/proyectos']);
       },
       error: (err) => {
+        this.Toast.error("Error al borrar el proyecto")
         this.isDeletingProject.set(false);
         console.error('Error al eliminar proyecto:', err);
       },
@@ -236,8 +242,14 @@ export class ProyectDetails {
     task.estado = nextEstado;
 
     this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
-      next: () => this.tasksResource?.reload(),
+      next: () => {
+        if (prev === 'Abierto' || prev === 'En Curso' || prev === 'Bloqueado') {
+          this.Toast.success("Tarea Completada")
+        }
+        this.tasksResource?.reload()
+      },
       error: (err) => {
+        this.Toast.error("Ha ocurrido un error")
         task.estado = prev;
         console.error('Error al cambiar estado de tarea:', err);
       },
@@ -251,8 +263,14 @@ export class ProyectDetails {
     subtask.estado = nextEstado;
 
     this.taskService.updateTask(subtask.id, { estado: nextEstado }).subscribe({
-      next: () => this.tasksResource?.reload(),
+      next: () => {
+        if (prev === 'Abierto' || prev === 'En Curso' || prev === 'Bloqueado') {
+          this.Toast.success("Tarea Completada")
+        }
+        this.tasksResource?.reload()
+      },
       error: (err) => {
+        this.Toast.error("Ha ocurrido un error")
         subtask.estado = prev;
         console.error('Error al cambiar estado de subtarea:', err);
       },
@@ -291,12 +309,14 @@ export class ProyectDetails {
       })
       .subscribe({
         next: () => {
+          this.Toast.success("Tarea Creada")
           this.quickTaskTitle.set('');
           this.quickComment.set('');
           this.isSubmittingQuickTask.set(false);
           this.tasksResource?.reload();
         },
         error: (err) => {
+          this.Toast.error("Ocurrio un error")
           console.error('Error al crear tarea rápida:', err);
           this.isSubmittingQuickTask.set(false);
         },
@@ -325,9 +345,11 @@ export class ProyectDetails {
           this.setSubtaskInput(parentTaskId, '');
           this.isSubmittingSubtask.update((prev) => ({ ...prev, [parentTaskId]: false }));
           this.expandTask(parentTaskId);
+          this.Toast.success("Tarea Creada")
           this.tasksResource?.reload();
         },
         error: (err) => {
+          this.Toast.error("Ocurrio un error")
           console.error('Error al crear subtarea inline:', err);
           this.isSubmittingSubtask.update((prev) => ({ ...prev, [parentTaskId]: false }));
         },
@@ -348,10 +370,12 @@ export class ProyectDetails {
       next: () => {
         this.isDeletingTask.set(false);
         this.taskToDelete.set(null);
+        this.Toast.success("Tarea Eliminada")
         this.tasksResource?.reload();
       },
       error: (err) => {
         this.isDeletingTask.set(false);
+        this.Toast.error("Ocurrio un error")
         console.error('Error al eliminar tarea:', err);
       },
     });
