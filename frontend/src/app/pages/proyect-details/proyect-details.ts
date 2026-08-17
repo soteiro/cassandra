@@ -200,7 +200,7 @@ export class ProyectDetails {
   isSubmittingQuickTask = signal(false);
   quickSubtaskInputs = signal<Record<number, string>>({});
   isSubmittingSubtask = signal<Record<number, boolean>>({});
-  taskFilter = signal<'all' | 'pending' | 'completed'>('all');
+  taskFilter = signal<'all' | 'pending' | 'completed'>('pending');
 
   taskToDelete = signal<{ id: number; nombre: string; isSubtask: boolean } | null>(null);
   isDeletingTask = signal(false);
