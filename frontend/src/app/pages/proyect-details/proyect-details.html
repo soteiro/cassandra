@@ -250,9 +250,9 @@
                 class="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-surface-border/80 transition-all space-y-3"
               >
                 <!-- FILA DE TAREA PRINCIPAL -->
-                <div class="flex items-center justify-between gap-3">
+                <div class="flex flex-col items-left justify-center gap-4 md:flex-row">
                   <!-- Lado izquierdo: Chevron, Checkbox, Título -->
-                  <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <div class="flex items-center gap-3 flex-1 min-w-0 ">
                     <!-- BOTÓN ACORDEÓN (EXPANDIR/COLAPSAR) -->
                     <button
                       type="button"
@@ -286,7 +286,7 @@
                     </button>
 
                     <!-- TÍTULO DE LA TAREA -->
-                    <div class="flex-1 min-w-0 cursor-pointer" (click)="toggleExpand(t.id)">
+                    <div class="flex-1 min-w-0 cursor-pointer "  (click)="toggleExpand(t.id)">
                       <h4
                         [class]="
                           t.estado === 'Terminado'
@@ -310,7 +310,7 @@
                   </div>
 
                   <!-- Lado derecho: Estado, Contador de Subtareas, Acciones -->
-                  <div class="flex items-center gap-2.5 shrink-0">
+                  <div class="flex items-center justify-evenly gap-2.5 shrink-0 ">
                     <!-- BADGE PÍLDORA DE SUBTAREAS -->
                     @if (t.subtareas && t.subtareas.length > 0) {
                       <button
@@ -449,7 +449,7 @@
 
                     <!-- INPUT INLINE PARA AÑADIR SUBTAREA AL INSTANTE -->
                     <form (ngSubmit)="createInlineSubtask(t.id)" class="pt-1">
-                      <div class="flex items-center gap-2">
+                      <div class="flex flex-col items-left justify-around gap-4  md:flex-row md:gap-2">
                         <span class="text-primary/70 text-xs">
                           <svg lucideCornerDownRight class="w-3.5 h-3.5" />
                         </span>
