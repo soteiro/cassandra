@@ -140,18 +140,7 @@
               <div
                 class="flex items-center gap-1.5 bg-background p-1 rounded-xl border border-surface-border text-xs"
               >
-                <button
-                  type="button"
-                  (click)="taskFilter.set('all')"
-                  [class]="
-                    taskFilter() === 'all'
-                      ? 'bg-surface text-primary font-semibold shadow-xs'
-                      : 'text-text-muted hover:text-text-main'
-                  "
-                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
-                >
-                  Todas ({{ tareas.length }})
-                </button>
+                
                 <button
                   type="button"
                   (click)="taskFilter.set('pending')"
@@ -177,6 +166,19 @@
                   class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   Completadas ({{ getOverallStats(tareas).completed }})
+                </button>
+
+                <button
+                  type="button"
+                  (click)="taskFilter.set('all')"
+                  [class]="
+                    taskFilter() === 'all'
+                      ? 'bg-surface text-primary font-semibold shadow-xs'
+                      : 'text-text-muted hover:text-text-main'
+                  "
+                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  Todas ({{ tareas.length }})
                 </button>
               </div>
             </div>
