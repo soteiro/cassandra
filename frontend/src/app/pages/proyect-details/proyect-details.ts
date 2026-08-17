@@ -9,7 +9,6 @@ import { ProjectResponse } from '../../models/proyect.model';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import {
   LucideChevronDown,
-  LucideChevronUp,
   LucideChevronRight,
   LucidePlus,
   LucideTrash2,
@@ -19,13 +18,8 @@ import {
   LucideCornerDownRight,
   LucideSparkles,
   LucidePencil,
-  LucideCalendar,
-  LucideTarget,
-  LucideClock,
-  LucideLightbulb,
-  LucideCompass,
-  LucideInfo,
   LucideX,
+  LucideMessageCircleMore
 } from '@lucide/angular';
 
 interface Tab {
@@ -41,7 +35,6 @@ interface Tab {
     RouterLink,
     ConfirmModal,
     LucideChevronDown,
-    LucideChevronUp,
     LucideChevronRight,
     LucidePlus,
     LucideTrash2,
@@ -51,13 +44,8 @@ interface Tab {
     LucideCornerDownRight,
     LucideSparkles,
     LucidePencil,
-    LucideCalendar,
-    LucideTarget,
-    LucideClock,
-    LucideLightbulb,
-    LucideCompass,
-    LucideInfo,
     LucideX,
+    LucideMessageCircleMore
   ],
   templateUrl: './proyect-details.html',
   styleUrl: './proyect-details.css',
@@ -202,6 +190,7 @@ export class ProyectDetails {
   // --- TASKS STATE ---
   expandedTasks = signal<Set<number>>(new Set());
   quickTaskTitle = signal('');
+  quickComment = signal('');
   isSubmittingQuickTask = signal(false);
   quickSubtaskInputs = signal<Record<number, string>>({});
   isSubmittingSubtask = signal<Record<number, boolean>>({});
@@ -286,6 +275,7 @@ export class ProyectDetails {
   // Create top-level task inline (Zero friction)
   createQuickTask() {
     const title = this.quickTaskTitle().trim();
+    const comment = this.quickComment().trim();
     const proyectId = this.projectIdNumber();
     if (!title || !proyectId) return;
 
@@ -295,13 +285,14 @@ export class ProyectDetails {
       .createTask({
         nombre: title,
         descripcion: '',
-        comentario: '',
+        comentario: comment,
         estado: 'Abierto',
         proyect_id: proyectId,
       })
       .subscribe({
         next: () => {
           this.quickTaskTitle.set('');
+          this.quickComment.set('');
           this.isSubmittingQuickTask.set(false);
           this.tasksResource?.reload();
         },
