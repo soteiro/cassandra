@@ -1,0 +1,77 @@
+<aside
+  class="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 w-full max-w-sm pointer-events-none sm:top-6 sm:right-6"
+  aria-label="Notificaciones"
+  aria-live="polite"
+>
+  @for (toast of toasts(); track toast.id) {
+    <div
+      class="toast-item pointer-events-auto relative flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border shadow-2xl backdrop-blur-md overflow-hidden text-text-main transition-all duration-300"
+      [class]="getToastCardClass(toast.type)"
+      [attr.role]="toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'"
+    >
+      <!-- Icono contextual -->
+      <div
+        class="flex items-center justify-center p-1.5 rounded-lg border shrink-0"
+        [class]="getIconWrapperClass(toast.type)"
+      >
+        @switch (toast.type) {
+          @case ('success') {
+            <svg lucideCircleCheck class="w-5 h-5" />
+          }
+          @case ('error') {
+            <svg lucideCircleX class="w-5 h-5" />
+          }
+          @case ('warning') {
+            <svg lucideTriangleAlert class="w-5 h-5" />
+          }
+          @case ('info') {
+            <svg lucideInfo class="w-5 h-5" />
+          }
+        }
+      </div>
+
+      <!-- Contenido textual -->
+      <div class="flex-1 min-w-0 pr-1">
+        @if (toast.title) {
+          <h4 class="text-sm font-semibold text-text-main leading-tight mb-0.5">
+            {{ toast.title }}
+          </h4>
+        }
+        <p class="text-xs text-text-muted leading-relaxed break-words">
+          {{ toast.message }}
+        </p>
+
+        @if (toast.action) {
+          <button
+            type="button"
+            class="mt-2.5 inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md bg-surface-border/80 hover:bg-surface-border text-text-main transition-colors border border-surface-border focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+            (click)="handleAction(toast)"
+          >
+            {{ toast.action.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Botón para cerrar -->
+      <button
+        type="button"
+        class="text-text-muted hover:text-text-main p-1 rounded-lg hover:bg-surface-border/60 transition-colors shrink-0 -mr-1 -mt-1 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+        aria-label="Cerrar notificación"
+        (click)="removeToast(toast.id)"
+      >
+        <svg lucideX class="w-4 h-4" />
+      </button>
+
+      <!-- Barra de progreso de auto-cierre -->
+      @if (toast.duration > 0) {
+        <div class="absolute bottom-0 left-0 right-0 h-[2.5px] bg-surface-border/40 overflow-hidden">
+          <div
+            class="toast-progress h-full w-full"
+            [class]="getProgressBarClass(toast.type)"
+            [style.animationDuration.ms]="toast.duration"
+          ></div>
+        </div>
+      }
+    </div>
+  }
+</aside>

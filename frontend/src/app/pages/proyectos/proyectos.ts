@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { proyectService } from '../../services/proyect.service';
+import { ToastService } from '../../services/toast.service';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../models/proyect.model';
 import {
@@ -41,6 +42,7 @@ import {
 })
 export class Proyectos {
   protected readonly proyectService = inject(proyectService);
+  protected readonly toastService = inject(ToastService);
   protected readonly proyectsResource = this.proyectService.proyectResource;
 
   showModal = signal(false);
@@ -199,10 +201,13 @@ export class Proyectos {
           this.fecha_limite.set('');
 
           this.reload();
+          this.toastService.success('Proyecto creado correctamente');
         },
         error: (err) => {
           this.isSubmitting.set(false);
-          this.errorMessage.set(err.error || 'Error al crear el proyecto');
+          const errorMsg = err.error?.message || err.error || 'Error al crear el proyecto';
+          this.errorMessage.set(errorMsg);
+          this.toastService.error(errorMsg);
         },
       });
   }
