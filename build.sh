@@ -3,7 +3,7 @@
 
     echo "1. Compilando Frontend Angular..."
     cd frontend
-    pnpm build
+    ng build --configuration production
     cd ..
 
     echo "2. Copiando archivos de distribución a backend/dist..."
@@ -13,7 +13,7 @@
 
     echo "3. Compilando binario de Go..."
     cd backend
-    go build -o ../cassandra-app main.go
+    go build --ldflags="-s -w" -o ../cassandra-app main.go
     cd ..
 
     echo "✅ ¡Compilación exitosa! Binario generado: ./cassandra-app"
