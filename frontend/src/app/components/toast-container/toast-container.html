@@ -1,11 +1,11 @@
 <aside
-  class="fixed top-4 right-4 z-9999 flex flex-col gap-2.5 w-full max-w-sm pointer-events-none sm:top-6 sm:right-6"
+  class="fixed top-4  right-0 z-9999 flex flex-col gap-2.5 w-full max-w-sm pointer-events-none md:top-4 md:right-4"
   aria-label="Notificaciones"
   aria-live="polite"
 >
   @for (toast of toasts(); track toast.id) {
     <div
-      class="toast-item pointer-events-auto relative flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border shadow-2xl backdrop-blur-md overflow-hidden text-text-main transition-all duration-300"
+      class="toast-item mx-6 pointer-events-auto bg-transparent relative flex items-start gap-3 p-3.5 sm:p-4 rounded-lg border shadow-2xl backdrop-blur-lg overflow-hidden text-text-main transition-all duration-300"
       [class]="getToastCardClass(toast.type)"
       [attr.role]="toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'"
     >
