@@ -70,7 +70,6 @@ func extractAccessToken(r *http.Request) string {
 
 func GetUserIDFromContext(ctx context.Context) (int, bool) {
 	userID, ok := ctx.Value(UserIDKey).(int)
-	log.Print("userid: ", userID)
 	return userID, ok
 }
 
