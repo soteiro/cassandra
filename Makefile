@@ -39,7 +39,6 @@ dev-frontend: ## Ejecuta el servidor de desarrollo de Angular
 	@cd frontend && npm start
 
 upload-server: 
-	@sudo chown apps:apps ./cassandra-app
 	@scp ./cassandra-app cassandra:~/cassandra-app
 test: ## Ejecuta los tests de Go
 	@cd backend && go test ./...
