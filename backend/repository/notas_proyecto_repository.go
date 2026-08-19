@@ -45,7 +45,7 @@ func (r *NotasProyectoRepository) Create(ctx context.Context, req *models.NotasP
 	)
 
 	if err != nil {
-		log.Printf("Error al crear la nota de proyecto: %v", err)
+		log.Printf("[REPO:NotasProyecto.Create] Error en SQL INSERT: %v | user_id=%d proyecto_id=%d", err, req.UserID, req.ProyectoID)
 		return nil, fmt.Errorf("error al crear la nota de proyecto: %w", err)
 	}
 
@@ -68,7 +68,7 @@ func (r *NotasProyectoRepository) GetAll(ctx context.Context, userID int) ([]*mo
 
 	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
-		log.Printf("Error al obtener las notas de proyecto: %v", err)
+		log.Printf("[REPO:NotasProyecto.GetAll] Error en SQL SELECT: %v | user_id=%d", err, userID)
 		return nil, fmt.Errorf("error al obtener las notas de proyecto: %w", err)
 	}
 	defer rows.Close()
@@ -86,13 +86,13 @@ func (r *NotasProyectoRepository) GetAll(ctx context.Context, userID int) ([]*mo
 			&notaProyecto.Eliminado,
 		)
 		if err != nil {
-			log.Printf("Error al escanear la nota de proyecto: %v", err)
+			log.Printf("[REPO:NotasProyecto.GetAll] Error al escanear fila: %v | user_id=%d", err, userID)
 			return nil, fmt.Errorf("error al escanear la nota de proyecto: %w", err)
 		}
 		notasProyecto = append(notasProyecto, &notaProyecto)
 	}
 	if err = rows.Err(); err != nil {
-		log.Printf("Error al iterar sobre las filas de notas de proyecto: %v", err)
+		log.Printf("[REPO:NotasProyecto.GetAll] Error al iterar filas: %v | user_id=%d", err, userID)
 		return nil, err
 	}
 
@@ -108,15 +108,15 @@ func (r *NotasProyectoRepository) Delete(ctx context.Context, id int, userID int
 
 	res, err := r.db.Exec(ctx, query, id, userID)
 	if err != nil {
-		log.Printf("Error al eliminar la nota de proyecto: %v", err)
+		log.Printf("[REPO:NotasProyecto.Delete] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return fmt.Errorf("error al eliminar la nota de proyecto: %w", err)
 	}
 
 	if res.RowsAffected() == 0 {
+		log.Printf("[REPO:NotasProyecto.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
 		return fmt.Errorf("no se encontró la nota de proyecto con id %d o no tiene permisos", id)
 	}
 
-	log.Printf("Nota de proyecto con id %d y user_id %d eliminada correctamente", id, userID)
 	return nil
 }
 
@@ -146,6 +146,7 @@ func (r *NotasProyectoRepository) GetById(ctx context.Context, id int, userID in
 	)
 
 	if err != nil {
+		log.Printf("[REPO:NotasProyecto.GetById] Error en SQL SELECT: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -177,6 +178,7 @@ func (r *NotasProyectoRepository) Update(ctx context.Context, id int, userID int
 	)
 
 	if err != nil {
+		log.Printf("[REPO:NotasProyecto.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -195,7 +197,7 @@ func (r *NotasProyectoRepository) GetByProyectoID(ctx context.Context, proyectoI
 
 	rows, err := r.db.Query(ctx, query, proyectoID, userID)
 	if err != nil {
-		log.Printf("Error al obtener las notas de proyecto por proyecto_id: %v", err)
+		log.Printf("[REPO:NotasProyecto.GetByProyectoID] Error en SQL SELECT: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
 		return nil, fmt.Errorf("error al obtener las notas de proyecto por proyecto_id: %w", err)
 	}
 	defer rows.Close()
@@ -213,13 +215,13 @@ func (r *NotasProyectoRepository) GetByProyectoID(ctx context.Context, proyectoI
 			&notaProyecto.Eliminado,
 		)
 		if err != nil {
-			log.Printf("Error al escanear la nota de proyecto: %v", err)
+			log.Printf("[REPO:NotasProyecto.GetByProyectoID] Error al escanear fila: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
 			return nil, fmt.Errorf("error al escanear la nota de proyecto: %w", err)
 		}
 		notasProyecto = append(notasProyecto, &notaProyecto)
 	}
 	if err = rows.Err(); err != nil {
-		log.Printf("Error al iterar sobre las filas de notas de proyecto: %v", err)
+		log.Printf("[REPO:NotasProyecto.GetByProyectoID] Error al iterar filas: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
 		return nil, err
 	}
 

@@ -58,7 +58,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 	)
 
 	if err != nil {
-		log.Printf("error al crear la tarea: %v", err)
+		log.Printf("[REPO:Tareas.Create] Error en SQL INSERT: %v | user_id=%d proyect_id=%d", err, req.UserID, req.ProyectID)
 		return nil, err
 	}
 	return &tarea, nil
@@ -76,7 +76,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 
 	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
-		log.Printf("error al obtener las tareas: %v", err)
+		log.Printf("[REPO:Tareas.GetAll] Error en SQL SELECT: %v | user_id=%d", err, userID)
 		return nil, err
 	}
 	defer rows.Close()
@@ -97,13 +97,14 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 			&tarea.TareaPadreID,
 		)
 		if err != nil {
-			log.Printf("error al escanear la tarea: %v", err)
+			log.Printf("[REPO:Tareas.GetAll] Error al escanear fila: %v | user_id=%d", err, userID)
 			return nil, err
 		}
 		tareas = append(tareas, tarea)
 	}
 
 	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:Tareas.GetAll] Error al iterar filas: %v | user_id=%d", err, userID)
 		return nil, err
 	}
 
@@ -123,7 +124,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 
 	rows, err := r.db.Query(ctx, query, proyectoID, userID)
 	if err != nil {
-		log.Printf("error al obtener las tareas por proyecto: %v", err)
+		log.Printf("[REPO:Tareas.GetByProyectoID] Error en SQL SELECT: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
 		return nil, err
 	}
 	defer rows.Close()
@@ -144,13 +145,14 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 			&tarea.TareaPadreID,
 		)
 		if err != nil {
-			log.Printf("error al escanear la tarea por proyecto: %v", err)
+			log.Printf("[REPO:Tareas.GetByProyectoID] Error al escanear fila: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
 			return nil, err
 		}
 		todas = append(todas, tarea)
 	}
 
 	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:Tareas.GetByProyectoID] Error al iterar filas: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
 		return nil, err
 	}
 
@@ -208,7 +210,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 	)
 
 	if err != nil {
-		log.Printf("error al obtener la tarea por ID: %v", err)
+		log.Printf("[REPO:Tareas.GetByID] Error en SQL SELECT: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -284,7 +286,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 	)
 
 	if err != nil {
-		log.Printf("error al modificar la tarea: %v", err)
+		log.Printf("[REPO:Tareas.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -301,11 +303,12 @@ func (r *TareasRepository) Delete(ctx context.Context, id int, userID int) error
 
 	res, err := r.db.Exec(ctx, query, id, userID)
 	if err != nil {
-		log.Printf("error al eliminar la tarea: %v", err)
+		log.Printf("[REPO:Tareas.Delete] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return err
 	}
 
 	if res.RowsAffected() == 0 {
+		log.Printf("[REPO:Tareas.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
 		return fmt.Errorf("no se encontró la tarea o no tienes permisos para eliminarla")
 	}
 

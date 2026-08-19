@@ -18,6 +18,7 @@ import (
 	"cassandra/repository"
 
 	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
 )
@@ -63,7 +64,12 @@ func main() {
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
 
-	// Middlewares (DEBEN definirse antes de registrar cualquier ruta)
+	// Middlewares globales (DEBEN definirse antes de registrar cualquier ruta)
+	r.Use(chiMiddleware.RequestID)
+	r.Use(chiMiddleware.RealIP)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Recoverer)
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:4200"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},

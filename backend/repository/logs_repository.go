@@ -45,7 +45,7 @@ func (r *LogsRepository) Create(ctx context.Context, userID int, req *models.Cre
 	)
 
 	if err != nil {
-		log.Printf("error al crear log del proyecto: %v", err)
+		log.Printf("[REPO:Logs.Create] Error en SQL INSERT: %v | user_id=%d proyecto_id=%d", err, userID, req.ProyectoID)
 		return nil, err
 	}
 
@@ -65,7 +65,7 @@ func (r *LogsRepository) GetByProyectoID(ctx context.Context, userID int, proyec
 
 	rows, err := r.db.Query(ctx, query, proyectoID, userID)
 	if err != nil {
-		log.Printf("error al obtener logs por proyecto_id: %v", err)
+		log.Printf("[REPO:Logs.GetByProyectoID] Error en SQL SELECT: %v | user_id=%d proyecto_id=%d", err, userID, proyectoID)
 		return nil, err
 	}
 	defer rows.Close()
@@ -83,12 +83,14 @@ func (r *LogsRepository) GetByProyectoID(ctx context.Context, userID int, proyec
 			&l.Eliminado,
 		)
 		if err != nil {
+			log.Printf("[REPO:Logs.GetByProyectoID] Error al escanear fila: %v | user_id=%d proyecto_id=%d", err, userID, proyectoID)
 			return nil, err
 		}
 		logsList = append(logsList, l)
 	}
 
 	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:Logs.GetByProyectoID] Error al iterar filas: %v | user_id=%d proyecto_id=%d", err, userID, proyectoID)
 		return nil, err
 	}
 
@@ -121,6 +123,7 @@ func (r *LogsRepository) GetByID(ctx context.Context, userID int, id int) (*mode
 	)
 
 	if err != nil {
+		log.Printf("[REPO:Logs.GetByID] Error en SQL SELECT: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -159,7 +162,7 @@ func (r *LogsRepository) Update(ctx context.Context, userID int, id int, req *mo
 	)
 
 	if err != nil {
-		log.Printf("error al modificar log: %v", err)
+		log.Printf("[REPO:Logs.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -178,13 +181,15 @@ func (r *LogsRepository) Delete(ctx context.Context, userID int, id int) error {
 
 	res, err := r.db.Exec(ctx, query, id, userID)
 	if err != nil {
-		log.Printf("error al eliminar log: %v", err)
+		log.Printf("[REPO:Logs.Delete] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return err
 	}
 
 	if res.RowsAffected() == 0 {
+		log.Printf("[REPO:Logs.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
 		return fmt.Errorf("no se encontró el log con id: %d o no tiene permisos", id)
 	}
 
 	return nil
 }
+

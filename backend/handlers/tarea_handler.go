@@ -29,13 +29,14 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	var req models.TareaRequest
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
+		log.Printf("[HANDLER:Tareas.CreateTarea] Acceso no autorizado")
 		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		log.Printf("json enviado desde front inválido: %v", err)
+		log.Printf("[HANDLER:Tareas.CreateTarea] JSON inválido: %v | user_id=%d", err, userID)
 		http.Error(w, "JSON inválido: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -47,10 +48,12 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 
 	// Validación básica
 	if req.Nombre == "" {
+		log.Printf("[HANDLER:Tareas.CreateTarea] Validación fallida: nombre de tarea vacío | user_id=%d", userID)
 		http.Error(w, "El nombre de la tarea no puede estar vacío", http.StatusBadRequest)
 		return
 	}
 	if req.ProyectID == 0 {
+		log.Printf("[HANDLER:Tareas.CreateTarea] Validación fallida: proyect_id es obligatorio | user_id=%d", userID)
 		http.Error(w, "El ID del proyecto (proyect_id) es obligatorio", http.StatusBadRequest)
 		return
 	}
@@ -58,13 +61,14 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	req.UserID = userID
 	tarea, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
-		log.Printf("error al guardar la tarea: %v", err)
+		log.Printf("[HANDLER:Tareas.CreateTarea] Error en repositorio: %v | user_id=%d proyect_id=%d", err, userID, req.ProyectID)
 		http.Error(w, "error al crear la tarea: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	log.Printf("[HANDLER:Tareas.CreateTarea] Éxito: tarea creada | id=%d user_id=%d proyect_id=%d", tarea.ID, userID, req.ProyectID)
 	json.NewEncoder(w).Encode(tarea)
 }
 
@@ -72,13 +76,14 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
+		log.Printf("[HANDLER:Tareas.GetAllTareas] Acceso no autorizado")
 		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
 	tareas, err := h.repo.GetAll(r.Context(), userID)
 	if err != nil {
-		log.Printf("error al obtener las tareas: %v", err)
+		log.Printf("[HANDLER:Tareas.GetAllTareas] Error en repositorio: %v | user_id=%d", err, userID)
 		http.Error(w, "error al obtener las tareas: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -88,6 +93,7 @@ func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[HANDLER:Tareas.GetAllTareas] Éxito: %d tareas obtenidas | user_id=%d", len(tareas), userID)
 	json.NewEncoder(w).Encode(tareas)
 }
 
@@ -96,23 +102,27 @@ func (h *TareasHandler) GetTareaByID(w http.ResponseWriter, r *http.Request) {
 	tareaIDStr := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
+		log.Printf("[HANDLER:Tareas.GetTareaByID] Acceso no autorizado")
 		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
 	tareaID, err := strconv.Atoi(tareaIDStr)
-	if err != nil {
+	if err != nil || tareaID <= 0 {
+		log.Printf("[HANDLER:Tareas.GetTareaByID] ID inválido: %s", tareaIDStr)
 		http.Error(w, "ID inválido, debe ser un número entero", http.StatusBadRequest)
 		return
 	}
 
 	tarea, err := h.repo.GetByID(r.Context(), tareaID, userID)
 	if err != nil {
+		log.Printf("[HANDLER:Tareas.GetTareaByID] Error o no encontrada: %v | id=%d user_id=%d", err, tareaID, userID)
 		http.Error(w, "Tarea no encontrada o acceso denegado", http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[HANDLER:Tareas.GetTareaByID] Éxito: tarea obtenida | id=%d user_id=%d", tarea.ID, userID)
 	json.NewEncoder(w).Encode(tarea)
 }
 
@@ -121,12 +131,14 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 	tareaIDStr := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
+		log.Printf("[HANDLER:Tareas.UpdateTarea] Acceso no autorizado")
 		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
 	tareaID, err := strconv.Atoi(tareaIDStr)
-	if err != nil {
+	if err != nil || tareaID <= 0 {
+		log.Printf("[HANDLER:Tareas.UpdateTarea] ID inválido: %s", tareaIDStr)
 		http.Error(w, "ID inválido, debe ser un número entero", http.StatusBadRequest)
 		return
 	}
@@ -134,7 +146,7 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 	var req models.TareaUpdateRequest
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		log.Printf("json enviado desde front inválido: %v", err)
+		log.Printf("[HANDLER:Tareas.UpdateTarea] JSON inválido: %v | id=%d user_id=%d", err, tareaID, userID)
 		http.Error(w, "JSON inválido: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -143,6 +155,7 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 	if req.Nombre != nil {
 		*req.Nombre = strings.TrimSpace(*req.Nombre)
 		if *req.Nombre == "" {
+			log.Printf("[HANDLER:Tareas.UpdateTarea] Validación fallida: nombre vacío tras trim | id=%d user_id=%d", tareaID, userID)
 			http.Error(w, "El nombre de la tarea no puede quedar vacío tras eliminar espacios", http.StatusBadRequest)
 			return
 		}
@@ -159,12 +172,13 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)
 	if err != nil {
-		log.Printf("error al actualizar la tarea: %v", err)
+		log.Printf("[HANDLER:Tareas.UpdateTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)
 		http.Error(w, "error al actualizar la tarea: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[HANDLER:Tareas.UpdateTarea] Éxito: tarea actualizada | id=%d user_id=%d", tarea.ID, userID)
 	json.NewEncoder(w).Encode(tarea)
 }
 
@@ -173,23 +187,26 @@ func (h *TareasHandler) DeleteTarea(w http.ResponseWriter, r *http.Request) {
 	tareaIDStr := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
+		log.Printf("[HANDLER:Tareas.DeleteTarea] Acceso no autorizado")
 		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
 	tareaID, err := strconv.Atoi(tareaIDStr)
-	if err != nil {
+	if err != nil || tareaID <= 0 {
+		log.Printf("[HANDLER:Tareas.DeleteTarea] ID inválido: %s", tareaIDStr)
 		http.Error(w, "ID inválido, debe ser un número entero", http.StatusBadRequest)
 		return
 	}
 
 	err = h.repo.Delete(r.Context(), tareaID, userID)
 	if err != nil {
-		log.Printf("error al eliminar la tarea: %v", err)
+		log.Printf("[HANDLER:Tareas.DeleteTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)
 		http.Error(w, "Error al eliminar la tarea: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	log.Printf("[HANDLER:Tareas.DeleteTarea] Éxito: tarea eliminada | id=%d user_id=%d", tareaID, userID)
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -202,19 +219,21 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
+		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Acceso no autorizado")
 		http.Error(w, "Usuario no autenticado", http.StatusUnauthorized)
 		return
 	}
 
 	proyectID, err := strconv.Atoi(proyectIDStr)
-	if err != nil {
+	if err != nil || proyectID <= 0 {
+		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] ID de proyecto inválido: %s", proyectIDStr)
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
 		return
 	}
 
 	tareas, err := h.repo.GetByProyectoID(r.Context(), proyectID, userID)
 	if err != nil {
-		log.Printf("error al obtener tareas del proyecto %d: %v", proyectID, err)
+		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
 		http.Error(w, "Error al obtener tareas del proyecto: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -224,6 +243,8 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Éxito: %d tareas obtenidas | proyecto_id=%d user_id=%d", len(tareas), proyectID, userID)
 	json.NewEncoder(w).Encode(tareas)
 }
+
 

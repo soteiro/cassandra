@@ -4,6 +4,7 @@ import (
 	"cassandra/models"
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -28,7 +29,6 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
             RETURNING id, nombre, alias, email, fecha_creacion
         `
 
-	// Ejecutamos la consulta usando la conexión guardada en el struct (r.db)
 	err := r.db.QueryRow(
 		ctx,
 		query,
@@ -45,6 +45,7 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
 	)
 
 	if err != nil {
+		log.Printf("[REPO:User.Create] Error en SQL INSERT: %v | email=%s", err, req.Email)
 		return nil, err
 	}
 
@@ -53,30 +54,28 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
 
 // GetAll obtiene todos los usuarios de la base de datos
 func (r *UserRepository) GetAll(ctx context.Context) ([]models.UserResponse, error) {
-	// 1. Usamos Query (en lugar de QueryRow) porque esperamos más de una fila de resultados
 	query := "SELECT id, nombre, alias, email, fecha_creacion FROM users WHERE eliminado = false"
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
+		log.Printf("[REPO:User.GetAll] Error en SQL SELECT: %v", err)
 		return nil, err
 	}
-	// 2. Muy importante: nos aseguramos de cerrar las filas al terminar para devolver la conexión al pool
 	defer rows.Close()
 
 	var users []models.UserResponse
 
-	// 3. Iteramos por cada una de las filas que nos devolvió PostgreSQL
 	for rows.Next() {
 		var u models.UserResponse
 		err := rows.Scan(&u.ID, &u.Nombre, &u.Alias, &u.Email, &u.FechaCreacion)
 		if err != nil {
+			log.Printf("[REPO:User.GetAll] Error al escanear fila: %v", err)
 			return nil, err
 		}
-		// Agregamos el usuario al slice (lista)
 		users = append(users, u)
 	}
 
-	// 4. Verificamos si hubo algún error durante la iteración
 	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:User.GetAll] Error al iterar filas: %v", err)
 		return nil, err
 	}
 
@@ -95,6 +94,7 @@ func (r *UserRepository) GetById(ctx context.Context, id int) (*models.UserRespo
 		&user.FechaCreacion,
 	)
 	if err != nil {
+		log.Printf("[REPO:User.GetById] Error en SQL SELECT: %v | id=%d", err, id)
 		return nil, err
 	}
 
@@ -116,29 +116,30 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.
 	)
 
 	if err != nil {
+		log.Printf("[REPO:User.GetByEmail] Error en SQL SELECT: %v | email=%s", err, email)
 		return nil, err
 	}
 
 	return &user, nil
-
 }
 
 // eliminar user por id
-func (r *UserRepository) Delete(ctx context.Context, id int) (error){
+func (r *UserRepository) Delete(ctx context.Context, id int) error {
 	query := "UPDATE users SET eliminado = true WHERE id = $1"
 
 	result, err := r.db.Exec(ctx, query, id)
-	if err != nil{
+	if err != nil {
+		log.Printf("[REPO:User.Delete] Error en SQL UPDATE: %v | id=%d", err, id)
 		return err
 	}
 
 	if result.RowsAffected() == 0 {
+		log.Printf("[REPO:User.Delete] Registro no encontrado o sin permisos | id=%d", id)
 		return fmt.Errorf("no se encontro el usuario con el id %d", id)
 	}
 
 	return nil
 }
-
 
 // Update user
 func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpdateRequest) (*models.UserResponse, error) {
@@ -156,7 +157,8 @@ func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpd
 		query,
 		req.Nombre,
 		req.Alias,
-		req.Email,id,
+		req.Email,
+		id,
 	).Scan(
 		&user.ID,
 		&user.Nombre,
@@ -166,8 +168,10 @@ func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpd
 	)
 
 	if err != nil {
+		log.Printf("[REPO:User.Update] Error en SQL UPDATE: %v | id=%d", err, id)
 		return nil, err
 	}
 
 	return &user, nil
 }
+

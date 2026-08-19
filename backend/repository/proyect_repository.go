@@ -60,7 +60,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 	)
 
 	if err != nil {
-		log.Printf("error al crear el proyecto: %v", err)
+		log.Printf("[REPO:Proyect.Create] Error en SQL INSERT: %v | user_id=%d", err, req.UserID)
 		return nil, err
 	}
 	return &proyect, nil
@@ -93,6 +93,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 	)
 
 	if err != nil {
+		log.Printf("[REPO:Proyect.GetAll] Error en SQL SELECT: %v | user_id=%d", err, UserID)
 		return nil, err
 	}
 	defer rows.Close()
@@ -114,12 +115,14 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.FechaLimite,
 		)
 		if err != nil {
+			log.Printf("[REPO:Proyect.GetAll] Error al escanear fila: %v | user_id=%d", err, UserID)
 			return nil, err
 		}
 
 		proyects = append(proyects, p)
 	}
 	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:Proyect.GetAll] Error al iterar filas: %v | user_id=%d", err, UserID)
 		return nil, err
 	}
 	return proyects, nil
@@ -135,10 +138,11 @@ func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*m
 
 	res, err := r.db.Exec(ctx, query, id, user_id)
 	if err != nil {
-		log.Printf("error al borrar el proyecto: %v", err)
+		log.Printf("[REPO:Proyect.Delete] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, user_id)
 		return nil, err
 	}
 	if res.RowsAffected() == 0 {
+		log.Printf("[REPO:Proyect.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, user_id)
 		return nil, fmt.Errorf("no se encontro el proyecto con id: %d", id)
 	}
 
@@ -185,6 +189,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 	)
 
 	if err != nil {
+		log.Printf("[REPO:Proyect.GetById] Error en SQL SELECT: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -240,7 +245,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 	)
 
 	if err != nil {
-		log.Printf("error al modificar el proyecto: %v", err)
+		log.Printf("[REPO:Proyect.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 

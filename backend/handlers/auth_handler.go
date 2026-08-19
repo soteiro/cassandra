@@ -2,10 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"time"
-	"log"
 
 	"cassandra/models"
 	"cassandra/repository"
@@ -36,11 +35,11 @@ func NewAuthHandler(userRepo *repository.UserRepository, authRepo *repository.Au
 // login
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req models.LoginRequest
-	log.Printf("peticion de login recibida")
-	//decodificar el json enviado desde angular
+
+	// decodificar el json enviado desde angular
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		log.Printf("json enviado desde front invalido: %v", err)
+		log.Printf("[HANDLER:Auth.Login] JSON inválido: %v", err)
 		http.Error(w, "json invalido", http.StatusBadRequest)
 		return
 	}
@@ -48,15 +47,15 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// buscar el user en la db
 	user, err := h.UserRepo.GetByEmail(r.Context(), req.Email)
 	if err != nil {
-		log.Printf("error al buscar el usuario por email: %v", err)
+		log.Printf("[HANDLER:Auth.Login] Credenciales inválidas (email no encontrado): %s", req.Email)
 		http.Error(w, "Credenciales Invalidas", http.StatusUnauthorized)
 		return
 	}
 
-	// comparar al usuario por correo en la db
+	// comparar la password con el hash en db
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		log.Printf("error al comparar la password: %v", err)
+		log.Printf("[HANDLER:Auth.Login] Credenciales inválidas (password errónea): %s", req.Email)
 		http.Error(w, "Credenciales Invalidas", http.StatusUnauthorized)
 		return
 	}
@@ -64,15 +63,15 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// generar el accesstoken
 	accessToken, err := utils.GenerateAccessToken(user.ID, h.jwtSecret)
 	if err != nil {
-		log.Printf("error al generar el jwt: %v", err)
+		log.Printf("[HANDLER:Auth.Login] Error al generar JWT access token: %v | user_id=%d", err, user.ID)
 		http.Error(w, "Error al crear el jwt", http.StatusInternalServerError)
 		return
 	}
 
-	//generar el refreshToken
+	// generar el refreshToken
 	refreshToken, err := utils.GenerateRefreshToken()
 	if err != nil {
-		log.Printf("error al generar el refreshToken: %v", err)
+		log.Printf("[HANDLER:Auth.Login] Error al generar refresh token: %v | user_id=%d", err, user.ID)
 		http.Error(w, "Error al generar el refreshToken", http.StatusInternalServerError)
 		return
 	}
@@ -81,8 +80,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	expiredAT := time.Now().Add(7 * 24 * time.Hour)
 	err = h.AuthRepo.SaveRefreshToken(r.Context(), user.ID, refreshToken, expiredAT)
 	if err != nil {
+		log.Printf("[HANDLER:Auth.Login] Error al guardar refresh token en DB: %v | user_id=%d", err, user.ID)
 		http.Error(w, "error al guardar el token en la base de datos", http.StatusInternalServerError)
-		fmt.Println(err)
 		return
 	}
 
@@ -108,11 +107,11 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Expires:  expiredAT,
 	})
 
-	//enviar respuesta (sin tokens en el body)
+	// enviar respuesta
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	log.Printf("[HANDLER:Auth.Login] Éxito: login completado | user_id=%d email=%s", user.ID, user.Email)
 	json.NewEncoder(w).Encode(map[string]string{"message": "login exitoso"})
-
 }
 
 // refresh
@@ -120,14 +119,14 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	// leer el refresh token desde la cookie
 	cookie, err := r.Cookie("refresh_token")
 	if err != nil || cookie.Value == "" {
-		log.Printf("peticion de refresh sin cookie")
+		log.Printf("[HANDLER:Auth.Refresh] Petición sin cookie refresh_token")
 		http.Error(w, "el refresh token es obligatorio", http.StatusUnauthorized)
 		return
 	}
 
 	userID, err := h.AuthRepo.GetUserIDByRefreshToken(r.Context(), cookie.Value)
 	if err != nil {
-		log.Printf("error al validar el refresh token: %v", err)
+		log.Printf("[HANDLER:Auth.Refresh] Refresh token inválido o expirado: %v", err)
 		http.Error(w, "sesion invalida", http.StatusUnauthorized)
 		return
 	}
@@ -135,7 +134,7 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	// si el refreshtoken es valido, regenerar un nuevo access token
 	newAccessToken, err := utils.GenerateAccessToken(userID, h.jwtSecret)
 	if err != nil {
-		log.Printf("error al generar un nuevo token: %v", err)
+		log.Printf("[HANDLER:Auth.Refresh] Error al generar nuevo access token: %v | user_id=%d", err, userID)
 		http.Error(w, "error al generar un nuevo token", http.StatusInternalServerError)
 		return
 	}
@@ -151,9 +150,9 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(15 * time.Minute),
 	})
 
-	log.Printf("Refresh exitoso %v", userID)
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	log.Printf("[HANDLER:Auth.Refresh] Éxito: access token renovado | user_id=%d", userID)
 	json.NewEncoder(w).Encode(map[string]string{"message": "token renovado"})
 }
 
@@ -162,17 +161,15 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	// leer el refresh token desde la cookie
 	cookie, err := r.Cookie("refresh_token")
 	if err != nil || cookie.Value == "" {
-		log.Printf("peticion de logout sin cookie")
+		log.Printf("[HANDLER:Auth.Logout] Petición sin cookie refresh_token")
 		http.Error(w, "el refresh token es obligatorio", http.StatusUnauthorized)
 		return
 	}
 
-	
-
 	// eliminar el refresh token de la db
 	err = h.AuthRepo.DeleteRefreshToken(r.Context(), cookie.Value)
 	if err != nil {
-		log.Printf("error al eliminar el refresh token de la db: %v", err)
+		log.Printf("[HANDLER:Auth.Logout] Error al eliminar refresh token de la DB: %v", err)
 		http.Error(w, "error al cerrar sesion", http.StatusInternalServerError)
 		return
 	}
@@ -197,9 +194,9 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   -1,
 	})
 
-	log.Printf("Logout exitoso")
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	log.Printf("[HANDLER:Auth.Logout] Éxito: sesión cerrada")
 	json.NewEncoder(w).Encode(map[string]string{"message": "logout exitoso"})
 }
 
@@ -208,22 +205,22 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	// intentar leer la cookie del access_token
 	accessCookie, err := r.Cookie("access_token")
 	if err == nil && accessCookie.Value != "" {
-		//validar el token
+		// validar el token
 		userID, err := utils.ValidateAccessToken(accessCookie.Value, h.jwtSecret)
 		if err == nil {
-			//acceso token valido,  sesion ok
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]int{"user_id":userID})
+			log.Printf("[HANDLER:Auth.Me] Éxito vía access_token | user_id=%d", userID)
+			json.NewEncoder(w).Encode(map[string]int{"user_id": userID})
 			return
 		}
-		log.Printf("[ME] access token invalido o expirado: %v", err)
+		log.Printf("[HANDLER:Auth.Me] Access token inválido o expirado: %v", err)
 	}
 
-	//intentar con refresh token, si se llega aqui, el token es invalido o expirado
+	// intentar con refresh token
 	refreshCookie, err := r.Cookie("refresh_token")
 	if err != nil || refreshCookie.Value == "" {
-		log.Printf("[ME] refresh token no encontrado o invalido: %v", err)
+		log.Printf("[HANDLER:Auth.Me] No hay refresh token disponible")
 		http.Error(w, "sesion invalida", http.StatusUnauthorized)
 		return
 	}
@@ -231,7 +228,7 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	// verificar el refresh token contra la db
 	userID, err := h.AuthRepo.GetUserIDByRefreshToken(r.Context(), refreshCookie.Value)
 	if err != nil {
-		log.Printf("[ME] refresh token invalido o no encontrado en db: %v", err)
+		log.Printf("[HANDLER:Auth.Me] Refresh token no encontrado o inválido: %v", err)
 		http.Error(w, "sesion invalida", http.StatusUnauthorized)
 		return
 	}
@@ -239,7 +236,7 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	// si el refresh token es valido, generar un nuevo access token
 	newAccessToken, err := utils.GenerateAccessToken(userID, h.jwtSecret)
 	if err != nil {
-		log.Printf("[ME] error al generar un nuevo access token: %v", err)
+		log.Printf("[HANDLER:Auth.Me] Error al generar nuevo access token: %v | user_id=%d", err, userID)
 		http.Error(w, "error al generar un nuevo access token", http.StatusInternalServerError)
 		return
 	}
@@ -248,15 +245,15 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    newAccessToken,
-		Path:	 "/",
+		Path:     "/",
 		HttpOnly: true,
 		Secure:   false, 
 		SameSite: http.SameSiteLaxMode,
 		Expires:  time.Now().Add(15 * time.Minute),
 	})
 
-	//responder igual que el caso feliz
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]int{"user_id":userID})
+	log.Printf("[HANDLER:Auth.Me] Éxito vía refresh_token (token renovado) | user_id=%d", userID)
+	json.NewEncoder(w).Encode(map[string]int{"user_id": userID})
 }

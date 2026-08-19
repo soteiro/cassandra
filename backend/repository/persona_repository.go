@@ -47,7 +47,7 @@ func (r *PersonaRepository) Create(ctx context.Context, req *models.PersonaReque
 	)
 
 	if err != nil {
-		log.Printf("error al crear persona: %v", err)
+		log.Printf("[REPO:Persona.Create] Error en SQL INSERT: %v | user_id=%d", err, req.UserID)
 		return nil, fmt.Errorf("error al crear persona: %w", err)
 	}
 
@@ -66,7 +66,7 @@ func (r *PersonaRepository) GetAll(ctx context.Context, userID int) ([]*models.P
 
 	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
-		log.Printf("error al obtener personas: %v", err)
+		log.Printf("[REPO:Persona.GetAll] Error en SQL SELECT: %v | user_id=%d", err, userID)
 		return nil, fmt.Errorf("error al obtener personas: %w", err)
 	}
 	defer rows.Close()
@@ -86,13 +86,14 @@ func (r *PersonaRepository) GetAll(ctx context.Context, userID int) ([]*models.P
 			&p.Eliminado,
 		)
 		if err != nil {
-			log.Printf("error al escanear persona: %v", err)
+			log.Printf("[REPO:Persona.GetAll] Error al escanear fila: %v | user_id=%d", err, userID)
 			return nil, fmt.Errorf("error al escanear persona: %w", err)
 		}
 		personas = append(personas, &p)
 	}
 
 	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:Persona.GetAll] Error al iterar filas: %v | user_id=%d", err, userID)
 		return nil, err
 	}
 
@@ -122,6 +123,7 @@ func (r *PersonaRepository) GetById(ctx context.Context, id int, userID int) (*m
 	)
 
 	if err != nil {
+		log.Printf("[REPO:Persona.GetById] Error en SQL SELECT: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -167,6 +169,7 @@ func (r *PersonaRepository) Update(ctx context.Context, id int, userID int, req 
 	)
 
 	if err != nil {
+		log.Printf("[REPO:Persona.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
 
@@ -185,13 +188,15 @@ func (r *PersonaRepository) Delete(ctx context.Context, id int, userID int) erro
 
 	res, err := r.db.Exec(ctx, query, id, userID)
 	if err != nil {
-		log.Printf("error al eliminar persona: %v", err)
+		log.Printf("[REPO:Persona.Delete] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return fmt.Errorf("error al eliminar persona: %w", err)
 	}
 
 	if res.RowsAffected() == 0 {
+		log.Printf("[REPO:Persona.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
 		return fmt.Errorf("no se encontró la persona con id %d o no tiene permisos", id)
 	}
 
 	return nil
 }
+
