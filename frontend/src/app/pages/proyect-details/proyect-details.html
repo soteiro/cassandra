@@ -104,11 +104,17 @@
         >
           @if (tab.id === 'tareas') {
             <svg lucideListTodo class="w-4 h-4" />
+          } @else if (tab.id === 'notas') {
+            <svg lucideFileText class="w-4 h-4" />
           }
           {{ tab.label }}
           @if (tab.id === 'tareas' && tasksResource?.value(); as tareas) {
             <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
               {{ tareas.length }}
+            </span>
+          } @else if (tab.id === 'notas' && notasResource?.value(); as notas) {
+            <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
+              {{ notas.length }}
             </span>
           }
         </button>
@@ -501,22 +507,218 @@
       </div>
     } @else if (activeTab() === 'notas') {
       <!-- SECCIÓN DE NOTAS -->
-      <section class="bg-surface border border-surface-border rounded-2xl p-6 shadow-xl space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-surface-border">
-          <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-            <svg lucideSparkles class="w-5 h-5 text-primary" />
-            Notas del Proyecto
-          </h3>
-          <span class="text-xs text-text-muted">Espacio para notas rápidas y documentación</span>
+      <div class="space-y-6">
+        <!-- CREAR NUEVA NOTA / HEADER DE NOTAS -->
+        <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-lg space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
+                <svg lucideFileText class="w-5 h-5 text-primary" />
+                Notas del Proyecto
+              </h3>
+              <p class="text-xs text-text-muted mt-0.5">
+                Espacio para notas rápidas, decisiones técnicas, bitácora y documentación.
+              </p>
+            </div>
+
+            @if (notasResource?.value(); as notas) {
+              @if (notas.length > 0) {
+                <!-- BUSCADOR DE NOTAS -->
+                <div class="relative w-full sm:w-64">
+                  <span
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted flex items-center pointer-events-none"
+                  >
+                    <svg lucideSearch class="w-3.5 h-3.5" />
+                  </span>
+                  <input
+                    type="text"
+                    [ngModel]="notaSearchQuery()"
+                    (ngModelChange)="notaSearchQuery.set($event)"
+                    placeholder="Buscar en notas..."
+                    class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl pl-9 pr-3 py-1.5 text-xs outline-none transition-colors"
+                  />
+                  @if (notaSearchQuery()) {
+                    <button
+                      type="button"
+                      (click)="notaSearchQuery.set('')"
+                      class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main cursor-pointer"
+                    >
+                      <svg lucideX class="w-3 h-3" />
+                    </button>
+                  }
+                </div>
+              }
+            }
+          </div>
+
+          <!-- FORMULARIO CREAR NOTA -->
+          <form (ngSubmit)="createNota()" class="space-y-3 pt-2">
+            <div class="relative">
+              <textarea
+                [ngModel]="newNotaText()"
+                (ngModelChange)="newNotaText.set($event)"
+                name="newNotaText"
+                rows="3"
+                placeholder="Escribe una nueva nota o apunte para este proyecto..."
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-3.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30 resize-y min-h-[85px]"
+              ></textarea>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs text-text-muted">
+                {{ newNotaText().trim().length }} caracteres
+              </span>
+              <button
+                type="submit"
+                [disabled]="isSubmittingNota() || !newNotaText().trim()"
+                class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                @if (isSubmittingNota()) {
+                  <span class="animate-spin text-xs">⏳</span>
+                  <span>Guardando...</span>
+                } @else {
+                  <svg lucidePlus class="w-3.5 h-3.5" />
+                  <span>Añadir Nota</span>
+                }
+              </button>
+            </div>
+          </form>
         </div>
-        <div class="p-8 text-center bg-background rounded-xl border border-surface-border/60">
-          <p class="text-text-muted text-sm">
-            Aquí podrás gestionar notas y reflexiones asociadas a este proyecto.
-          </p>
-        </div>
-      </section>
+
+        <!-- LISTA DE NOTAS -->
+        @if (notasResource?.isLoading() && !notasResource?.value()) {
+          <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
+            <p class="text-text-muted text-sm animate-pulse">Cargando notas del proyecto...</p>
+          </div>
+        } @else if (notasResource?.error()) {
+          <div class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
+            <p class="text-danger font-medium text-sm">Error al cargar las notas del proyecto.</p>
+          </div>
+        } @else if (notasResource?.value(); as notas) {
+          @if (notas.length === 0) {
+            <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-3">
+              <div
+                class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto"
+              >
+                <svg lucideFileText class="w-6 h-6" />
+              </div>
+              <h4 class="text-sm font-semibold text-text-main">No hay notas registradas</h4>
+              <p class="text-xs text-text-muted max-w-sm mx-auto">
+                Utiliza el formulario superior para añadir notas, reflexiones o detalles sobre este proyecto.
+              </p>
+            </div>
+          } @else {
+            @if (getFilteredNotas(notas).length === 0) {
+              <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
+                <p class="text-text-muted text-xs">
+                  No se encontraron notas que coincidan con "{{ notaSearchQuery() }}".
+                </p>
+              </div>
+            } @else {
+              <div class="grid grid-cols-1 gap-3.5">
+                @for (n of getFilteredNotas(notas); track n.id) {
+                  <div
+                    class="bg-surface border border-surface-border rounded-2xl p-4.5 shadow-md hover:border-surface-border/90 transition-all space-y-3"
+                  >
+                    <!-- HEADER DE LA TARJETA DE NOTA -->
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2 text-xs text-text-muted">
+                        <svg lucideClock class="w-3.5 h-3.5 text-primary/70" />
+                        <span>{{ n.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <!-- COPIAR -->
+                        <button
+                          type="button"
+                          (click)="copyNotaContent(n)"
+                          class="p-1.5 text-text-muted hover:text-text-main hover:bg-background border border-surface-border rounded-lg transition-colors cursor-pointer"
+                          [title]="copiedNotaId() === n.id ? '¡Copiado!' : 'Copiar nota'"
+                        >
+                          @if (copiedNotaId() === n.id) {
+                            <svg lucideCheck class="w-3.5 h-3.5 text-success" />
+                          } @else {
+                            <svg lucideCopy class="w-3.5 h-3.5" />
+                          }
+                        </button>
+                        <!-- EDITAR -->
+                        <button
+                          type="button"
+                          (click)="startEditNota(n)"
+                          class="p-1.5 text-text-muted hover:text-primary hover:bg-background border border-surface-border rounded-lg transition-colors cursor-pointer"
+                          title="Editar nota"
+                        >
+                          <svg lucidePencil class="w-3.5 h-3.5" />
+                        </button>
+                        <!-- ELIMINAR -->
+                        <button
+                          type="button"
+                          (click)="openDeleteNotaModal(n)"
+                          class="p-1.5 text-text-muted hover:text-danger hover:bg-danger/10 border border-surface-border rounded-lg transition-colors cursor-pointer"
+                          title="Eliminar nota"
+                        >
+                          <svg lucideTrash2 class="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- CONTENIDO DE LA NOTA / MODO EDICIÓN -->
+                    @if (editingNotaId() === n.id) {
+                      <div class="space-y-2.5 pt-1">
+                        <textarea
+                          [ngModel]="editingNotaText()"
+                          (ngModelChange)="editingNotaText.set($event)"
+                          rows="3"
+                          class="w-full bg-background border border-primary/50 text-text-main rounded-xl p-3 text-sm outline-none transition-colors resize-y"
+                        ></textarea>
+                        <div class="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            (click)="cancelEditNota()"
+                            class="px-3 py-1.5 text-xs text-text-muted hover:text-text-main border border-surface-border hover:bg-background rounded-xl transition-colors cursor-pointer"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            (click)="saveEditNota(n)"
+                            [disabled]="isUpdatingNota() || !editingNotaText().trim()"
+                            class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-background font-semibold text-xs px-4 py-1.5 rounded-xl transition-all shadow-md cursor-pointer inline-flex items-center gap-1"
+                          >
+                            @if (isUpdatingNota()) {
+                              <span class="animate-spin text-xs">⏳</span>
+                              <span>Guardando...</span>
+                            } @else {
+                              <span>Guardar</span>
+                            }
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <p class="text-text-main text-sm whitespace-pre-wrap leading-relaxed">
+                        {{ n.nota }}
+                      </p>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        }
+      </div>
     }
   }
+
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE NOTA -->
+  <app-confirm-modal
+    [isOpen]="notaToDelete() !== null"
+    [title]="'¿Eliminar nota del proyecto?'"
+    [message]="'¿Estás seguro de que deseas eliminar esta nota? Esta acción no se puede deshacer.'"
+    [confirmText]="'Eliminar'"
+    [cancelText]="'Cancelar'"
+    [variant]="'danger'"
+    [isProcessing]="isDeletingNota()"
+    (confirm)="confirmDeleteNota()"
+    (cancel)="cancelDeleteNota()"
+  />
 
   <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE TAREA -->
   <app-confirm-modal

@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
+import { NotaService } from '../../services/nota.service';
 import { Task } from '../../models/task.model';
 import { ProjectResponse } from '../../models/proyect.model';
+import { NotaProyecto } from '../../models/nota.model';
 import { ToastService } from '../../services/toast.service'
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import {
@@ -17,10 +19,13 @@ import {
   LucideListTodo,
   LucideCheckCheck,
   LucideCornerDownRight,
-  LucideSparkles,
   LucidePencil,
   LucideX,
-  LucideMessageCircleMore
+  LucideMessageCircleMore,
+  LucideFileText,
+  LucideCopy,
+  LucideSearch,
+  LucideClock
 } from '@lucide/angular';
 
 interface Tab {
@@ -43,10 +48,13 @@ interface Tab {
     LucideListTodo,
     LucideCheckCheck,
     LucideCornerDownRight,
-    LucideSparkles,
     LucidePencil,
     LucideX,
-    LucideMessageCircleMore
+    LucideMessageCircleMore,
+    LucideFileText,
+    LucideCopy,
+    LucideSearch,
+    LucideClock
   ],
   templateUrl: './proyect-details.html',
   styleUrl: './proyect-details.css',
@@ -67,6 +75,7 @@ export class ProyectDetails {
   private readonly router = inject(Router);
   private readonly ProyectService = inject(proyectService);
   private readonly taskService = inject(TaskService);
+  private readonly notaService = inject(NotaService);
   private readonly Toast = inject(ToastService);
 
   private readonly id = () => this.route.snapshot.paramMap.get('id');
@@ -74,6 +83,7 @@ export class ProyectDetails {
 
   protected readonly projectResource = this.ProyectService.getProyectById(this.id);
   protected readonly tasksResource = this.taskService.getTasksByProyectoId(this.id);
+  protected readonly notasResource = this.notaService.getNotasByProyectoId(this.id);
 
   // Tab switching
   selectedTab(tabId: string): void {
@@ -454,4 +464,120 @@ export class ProyectDetails {
         return 'bg-surface-border/50 text-text-muted border-surface-border';
     }
   }
+
+  // --- NOTAS STATE & METHODS ---
+  newNotaText = signal('');
+  isSubmittingNota = signal(false);
+
+  editingNotaId = signal<number | null>(null);
+  editingNotaText = signal('');
+  isUpdatingNota = signal(false);
+
+  notaToDelete = signal<NotaProyecto | null>(null);
+  isDeletingNota = signal(false);
+
+  notaSearchQuery = signal('');
+  copiedNotaId = signal<number | null>(null);
+
+  createNota() {
+    const text = this.newNotaText().trim();
+    const proyectoId = this.projectIdNumber();
+    if (!text || !proyectoId) return;
+
+    this.isSubmittingNota.set(true);
+    this.notaService.createNota(proyectoId, { nota: text }).subscribe({
+      next: () => {
+        this.Toast.success('Nota guardada');
+        this.newNotaText.set('');
+        this.isSubmittingNota.set(false);
+        this.notasResource?.reload();
+      },
+      error: (err) => {
+        this.Toast.error('Error al guardar la nota');
+        console.error('Error al crear nota:', err);
+        this.isSubmittingNota.set(false);
+      },
+    });
+  }
+
+  startEditNota(nota: NotaProyecto) {
+    this.editingNotaId.set(nota.id);
+    this.editingNotaText.set(nota.nota);
+  }
+
+  cancelEditNota() {
+    this.editingNotaId.set(null);
+    this.editingNotaText.set('');
+  }
+
+  saveEditNota(nota: NotaProyecto) {
+    const text = this.editingNotaText().trim();
+    if (!text) {
+      this.Toast.error('La nota no puede estar vacía');
+      return;
+    }
+
+    this.isUpdatingNota.set(true);
+    this.notaService.updateNota(nota.id, { nota: text }).subscribe({
+      next: () => {
+        this.Toast.success('Nota actualizada');
+        this.cancelEditNota();
+        this.isUpdatingNota.set(false);
+        this.notasResource?.reload();
+      },
+      error: (err) => {
+        this.Toast.error('Error al actualizar la nota');
+        console.error('Error al actualizar nota:', err);
+        this.isUpdatingNota.set(false);
+      },
+    });
+  }
+
+  openDeleteNotaModal(nota: NotaProyecto) {
+    this.notaToDelete.set(nota);
+  }
+
+  confirmDeleteNota() {
+    const nota = this.notaToDelete();
+    if (!nota) return;
+
+    this.isDeletingNota.set(true);
+    this.notaService.deleteNota(nota.id).subscribe({
+      next: () => {
+        this.Toast.success('Nota eliminada');
+        this.isDeletingNota.set(false);
+        this.notaToDelete.set(null);
+        this.notasResource?.reload();
+      },
+      error: (err) => {
+        this.Toast.error('Error al eliminar la nota');
+        console.error('Error al eliminar nota:', err);
+        this.isDeletingNota.set(false);
+      },
+    });
+  }
+
+  cancelDeleteNota() {
+    this.notaToDelete.set(null);
+  }
+
+  getFilteredNotas(notas: NotaProyecto[]): NotaProyecto[] {
+    const query = this.notaSearchQuery().toLowerCase().trim();
+    if (!query) return notas;
+    return notas.filter((n) => n.nota.toLowerCase().includes(query));
+  }
+
+  copyNotaContent(nota: NotaProyecto) {
+    if (!navigator?.clipboard) return;
+    navigator.clipboard.writeText(nota.nota).then(() => {
+      this.copiedNotaId.set(nota.id);
+      this.Toast.success('Nota copiada al portapapeles');
+      setTimeout(() => {
+        if (this.copiedNotaId() === nota.id) {
+          this.copiedNotaId.set(null);
+        }
+      }, 2000);
+    });
+  }
 }
+
