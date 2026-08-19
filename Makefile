@@ -11,7 +11,7 @@ help: ## Muestra la lista de comandos disponibles
 	@echo "  make dev-backend            -> Ejecuta el backend en modo desarrollo"
 	@echo "  make dev-frontend           -> Ejecuta el frontend con ng serve"
 	@echo "  make test                   -> Ejecuta los tests del backend"
-
+	@echo "  make upload-server"		 -> sube al server configurado en config ssh	
 migration: ## Crea una nueva migración secuencial (ej: make migration name=crear_tabla_x)
 	@if [ -z "$(name)" ]; then \
 		echo "❌ Error: Especifica el nombre. Ejemplo: make migration name=mi_migracion"; \
@@ -38,5 +38,8 @@ dev-backend: ## Ejecuta el backend en Go directamente
 dev-frontend: ## Ejecuta el servidor de desarrollo de Angular
 	@cd frontend && npm start
 
+upload-server: 
+	@sudo chown apps:apps ./cassandra-app
+	@scp ./cassandra-app cassandra:~/cassandra-app
 test: ## Ejecuta los tests de Go
 	@cd backend && go test ./...

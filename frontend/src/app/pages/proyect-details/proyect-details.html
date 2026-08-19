@@ -144,9 +144,8 @@
 
               <!-- FILTROS RÁPIDOS -->
               <div
-                class="flex items-center gap-1.5 bg-background p-1 rounded-xl border border-surface-border text-xs"
+                class="flex flex-wrap items-center gap-1.5 bg-background p-1 rounded-xl border border-surface-border text-xs"
               >
-                
                 <button
                   type="button"
                   (click)="taskFilter.set('pending')"
@@ -155,7 +154,7 @@
                       ? 'bg-surface text-primary font-semibold shadow-xs'
                       : 'text-text-muted hover:text-text-main'
                   "
-                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                  class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   Pendientes ({{
                     getOverallStats(tareas).total - getOverallStats(tareas).completed
@@ -163,13 +162,49 @@
                 </button>
                 <button
                   type="button"
+                  (click)="taskFilter.set('en_curso')"
+                  [class]="
+                    taskFilter() === 'en_curso'
+                      ? 'bg-surface text-accent font-semibold shadow-xs'
+                      : 'text-text-muted hover:text-text-main'
+                  "
+                  class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  En Curso ({{ getTaskCountByStatus(tareas, 'En Curso') }})
+                </button>
+                <button
+                  type="button"
+                  (click)="taskFilter.set('bloqueado')"
+                  [class]="
+                    taskFilter() === 'bloqueado'
+                      ? 'bg-surface text-danger font-semibold shadow-xs'
+                      : 'text-text-muted hover:text-text-main'
+                  "
+                  class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  Bloqueadas ({{ getTaskCountByStatus(tareas, 'Bloqueado') }})
+                </button>
+                <button
+                  type="button"
+                  (click)="taskFilter.set('abierto')"
+                  [class]="
+                    taskFilter() === 'abierto'
+                      ? 'bg-surface text-text-main font-semibold shadow-xs'
+                      : 'text-text-muted hover:text-text-main'
+                  "
+                  class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  Abiertas ({{ getTaskCountByStatus(tareas, 'Abierto') }})
+                </button>
+                <button
+                  type="button"
                   (click)="taskFilter.set('completed')"
                   [class]="
                     taskFilter() === 'completed'
-                      ? 'bg-surface text-primary font-semibold shadow-xs'
+                      ? 'bg-surface text-success font-semibold shadow-xs'
                       : 'text-text-muted hover:text-text-main'
                   "
-                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                  class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   Completadas ({{ getOverallStats(tareas).completed }})
                 </button>
@@ -182,7 +217,7 @@
                       ? 'bg-surface text-primary font-semibold shadow-xs'
                       : 'text-text-muted hover:text-text-main'
                   "
-                  class="px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                  class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   Todas ({{ tareas.length }})
                 </button>
@@ -387,12 +422,12 @@
                     class="pl-6 ml-3 border-l-2 border-primary/25 space-y-2 pt-2 pb-1 transition-all"
                   >
                     <!-- LISTA DE SUBTAREAS -->
-                    @for (sub of t.subtareas || []; track sub.id) {
+                    @for (sub of getSortedSubtasks(t.subtareas); track sub.id) {
                       <div
-                        class="p-4 bg-background/70 border border-surface-border hover:border-surface-border rounded-xl flex flex-col items-start justify-center gap-3 transition-colors group md:flex-row md:items-center md:justify-between"
+                        class="p-4 bg-surface/70 border border-surface-border hover:border-surface-border rounded-xl flex flex-col items-start justify-center gap-3 transition-colors group md:flex-row"
                       >
                         <!-- Checkbox y nombre de subtarea -->
-                        <div class="flex justify-around items-center gap-3 flex-1 min-w-0">
+                        <div class="flex justify-start items-center gap-3 flex-1 min-w-0">
                           <button
                             type="button"
                             (click)="toggleSubtaskComplete(sub)"

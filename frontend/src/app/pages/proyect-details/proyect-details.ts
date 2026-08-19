@@ -210,7 +210,7 @@ export class ProyectDetails {
   isSubmittingQuickTask = signal(false);
   quickSubtaskInputs = signal<Record<number, string>>({});
   isSubmittingSubtask = signal<Record<number, boolean>>({});
-  taskFilter = signal<'all' | 'pending' | 'completed'>('pending');
+  taskFilter = signal<'all' | 'pending' | 'completed' | 'en_curso' | 'bloqueado' | 'abierto'>('pending');
 
   taskToDelete = signal<{ id: number; nombre: string; isSubtask: boolean } | null>(null);
   isDeletingTask = signal(false);
@@ -404,21 +404,77 @@ export class ProyectDetails {
     return { total, completed, percent };
   }
 
+  getTaskCountByStatus(tareas: Task[], status: string): number {
+    if (!tareas) return 0;
+    return tareas.filter((t) => (t.estado || 'Abierto').toLowerCase() === status.toLowerCase()).length;
+  }
+
+  private getTaskStatusWeight(estado?: string): number {
+    switch (estado?.trim()) {
+      case 'En Curso':
+      case 'en curso':
+      case 'En curso':
+        return 1;
+      case 'Bloqueado':
+      case 'bloqueado':
+      case 'Bloqueada':
+        return 2;
+      case 'Abierto':
+      case 'abierto':
+      case 'Abierta':
+        return 3;
+      case 'Terminado':
+      case 'terminado':
+      case 'Terminada':
+      case 'Completado':
+        return 4;
+      default:
+        return 5;
+    }
+  }
+
   getFilteredTasks(tareas: Task[]): Task[] {
     const filter = this.taskFilter();
+    let filtered = tareas;
+
     if (filter === 'pending') {
-      return tareas.filter((t) => t.estado !== 'Terminado');
+      filtered = tareas.filter((t) => t.estado !== 'Terminado' && t.estado !== 'Completado');
+    } else if (filter === 'completed') {
+      filtered = tareas.filter((t) => t.estado === 'Terminado' || t.estado === 'Completado');
+    } else if (filter === 'en_curso') {
+      filtered = tareas.filter((t) => (t.estado || '').toLowerCase() === 'en curso');
+    } else if (filter === 'bloqueado') {
+      filtered = tareas.filter((t) => (t.estado || '').toLowerCase() === 'bloqueado');
+    } else if (filter === 'abierto') {
+      filtered = tareas.filter((t) => (t.estado || 'Abierto').toLowerCase() === 'abierto');
     }
-    if (filter === 'completed') {
-      return tareas.filter((t) => t.estado === 'Terminado');
-    }
-    return tareas;
+
+    return [...filtered].sort((a, b) => {
+      const weightA = this.getTaskStatusWeight(a.estado);
+      const weightB = this.getTaskStatusWeight(b.estado);
+      if (weightA !== weightB) {
+        return weightA - weightB;
+      }
+      return a.id - b.id;
+    });
+  }
+
+  getSortedSubtasks(subtareas?: Task[]): Task[] {
+    if (!subtareas || subtareas.length === 0) return [];
+    return [...subtareas].sort((a, b) => {
+      const weightA = this.getTaskStatusWeight(a.estado);
+      const weightB = this.getTaskStatusWeight(b.estado);
+      if (weightA !== weightB) {
+        return weightA - weightB;
+      }
+      return a.id - b.id;
+    });
   }
 
   getOverallStats(tareas: Task[]) {
     if (!tareas || tareas.length === 0) return { total: 0, completed: 0, percent: 0 };
     const total = tareas.length;
-    const completed = tareas.filter((t) => t.estado === 'Terminado').length;
+    const completed = tareas.filter((t) => t.estado === 'Terminado' || t.estado === 'Completado').length;
     const percent = Math.round((completed / total) * 100);
     return { total, completed, percent };
   }
