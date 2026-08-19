@@ -1,0 +1,23 @@
+info:
+  name: create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/proyects/1/notas
+  body:
+    type: json
+    data: |-
+      {
+        "user_id": 8,
+        "proyecto_id":1,
+        "nota": "esta 4 es una nota de proyecto"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,24 @@
+info:
+  name: update nota
+  type: http
+  seq: 8
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/notas/3
+  body:
+    type: json
+    data: |-
+      {
+        "user_id":8 ,
+        "proyecto_id":1 ,
+        "nota": "editado desde bruno 1",
+        "eliminado": false
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
