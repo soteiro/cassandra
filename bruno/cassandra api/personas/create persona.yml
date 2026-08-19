@@ -1,0 +1,24 @@
+info:
+  name: create persona
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/personas
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Juan Pérez",
+        "alias": "Juancito",
+        "entorno": "Trabajo / Tech",
+        "informacion": "Desarrollador backend especializado en Go y PostgreSQL"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

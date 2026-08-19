@@ -57,6 +57,8 @@ func main() {
 	logsHandler := handlers.NewLogsHandler(logsRepo)
 	notasProyectoRepo := repository.NewNotasProyectoRepository(dbPool)
 	notasProyectoHandler := handlers.NewNotasProyectoHandler(notasProyectoRepo)
+	personaRepo := repository.NewPersonaRepository(dbPool)
+	personaHandler := handlers.NewPersonaHandler(personaRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -147,8 +149,16 @@ func main() {
 		r.Get("/api/notas", notasProyectoHandler.GetAll)
 		r.Get("/api/notas/{id}", notasProyectoHandler.GetByID)
 		r.Put("/api/notas/{id}", notasProyectoHandler.Update)
-		r.Delete("/api/notas/{id}", notasProyectoHandler.Delete)	
+		r.Delete("/api/notas/{id}", notasProyectoHandler.Delete)
+		
+		// Rutas de Personas
+		r.Post("/api/personas", personaHandler.Create)
+		r.Get("/api/personas", personaHandler.GetAll)
+		r.Get("/api/personas/{id}", personaHandler.GetByID)
+		r.Put("/api/personas/{id}", personaHandler.Update)
+		r.Delete("/api/personas/{id}", personaHandler.Delete)
 	})
+
 
 	r.Post("/api/auth/login", authHandler.Login)
 	r.Post("/api/auth/refresh", authHandler.Refresh)
