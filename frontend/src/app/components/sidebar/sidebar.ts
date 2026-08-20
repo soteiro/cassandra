@@ -7,8 +7,8 @@ import {
   LucideFolder,
   LucideLogOut,
   LucideSparkles,
-  LucideLayers,
   LucideX,
+  LucideUser
 } from '@lucide/angular';
 
 @Component({
@@ -19,8 +19,8 @@ import {
     LucideHouse,
     LucideFolder,
     LucideLogOut,
-    LucideSparkles,
     LucideX,
+    LucideUser,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',

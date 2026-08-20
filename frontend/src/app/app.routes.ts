@@ -27,6 +27,10 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/proyect-details/proyect-details').then((m) => m.ProyectDetails),
       }, // ruta dinamica de proyectos
+      {
+        path: 'crm',
+        loadComponent: () => import('./pages/crm/crm').then((m)=> m.Crm)
+      }
     ],
   },
   {
