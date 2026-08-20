@@ -171,6 +171,37 @@ func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// listar subproyectos de un proyecto padre
+func (h *ProyectHandler) GetSubproyectos(w http.ResponseWriter, r *http.Request) {
+	proyectID := chi.URLParam(r, "id")
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		log.Printf("[HANDLER:Proyect.GetSubproyectos] Acceso no autorizado")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	strProyectID, err := strconv.Atoi(proyectID)
+	if err != nil || strProyectID <= 0 {
+		log.Printf("[HANDLER:Proyect.GetSubproyectos] ID inválido: %s | user_id=%d", proyectID, userID)
+		http.Error(w, "ID invalido", http.StatusBadRequest)
+		return
+	}
+
+	subproyectos, err := h.repo.GetSubproyectos(r.Context(), strProyectID, userID)
+	if err != nil {
+		log.Printf("[HANDLER:Proyect.GetSubproyectos] Error en repositorio: %v | parent_id=%d user_id=%d", err, strProyectID, userID)
+		http.Error(w, "error al obtener subproyectos", http.StatusInternalServerError)
+		return
+	}
+	if subproyectos == nil {
+		subproyectos = []models.ProyectResponse{}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	log.Printf("[HANDLER:Proyect.GetSubproyectos] Éxito: %d subproyectos obtenidos | parent_id=%d user_id=%d", len(subproyectos), strProyectID, userID)
+	json.NewEncoder(w).Encode(subproyectos)
+}
+
 // update
 func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	proyectID := chi.URLParam(r, "id")

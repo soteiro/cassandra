@@ -1,0 +1,226 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs transition-opacity"
+    (click)="onClose()"
+  >
+    <div
+      class="bg-surface border border-surface-border rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- HEADER DEL MODAL -->
+      <div class="flex justify-between items-start pb-4 border-b border-surface-border">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shrink-0">
+            @if (mode() === 'edit') {
+              <svg lucidePencil class="w-5 h-5" />
+            } @else if (mode() === 'create-subproject') {
+              <svg lucideLayers class="w-5 h-5" />
+            } @else {
+              <svg lucideSparkles class="w-5 h-5" />
+            }
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-text-main">
+              @if (mode() === 'edit') {
+                Editar Proyecto
+              } @else if (mode() === 'create-subproject') {
+                Nuevo Subproyecto
+              } @else {
+                Nuevo Proyecto Intencional
+              }
+            </h3>
+            <p class="text-xs text-text-muted mt-0.5">
+              @if (mode() === 'create-subproject' && parentProject()) {
+                Vinculado al proyecto padre: <strong class="text-primary">{{ parentProject()?.nombre }}</strong>
+              } @else if (mode() === 'edit') {
+                Ajusta objetivos, prioridades o estado de finalización.
+              } @else {
+                Reflexiona y define el criterio de éxito antes de comprometerte.
+              }
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="onClose()"
+          class="text-text-muted hover:text-text-main p-1 rounded-lg hover:bg-background transition-colors cursor-pointer"
+        >
+          <svg lucideX class="w-4 h-4" />
+        </button>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="p-3 bg-danger/15 border border-danger/30 rounded-xl text-danger text-xs">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="space-y-4 text-xs">
+        <!-- NOMBRE -->
+        <div>
+          <label class="block text-text-main font-medium mb-1">
+            {{ mode() === 'create-subproject' ? 'Nombre del Subproyecto *' : 'Nombre del Proyecto *' }}
+          </label>
+          <input
+            type="text"
+            [ngModel]="nombre()"
+            (ngModelChange)="nombre.set($event)"
+            name="nombre"
+            [placeholder]="mode() === 'create-subproject' ? 'Ej: Portafolio Web / Linktree' : 'Ej: Sistema de Monitoreo Cassie'"
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+          />
+        </div>
+
+        <!-- SECCIÓN REFLEXIVA (¿POR QUÉ? Y ¿PARA QUÉ?) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-text-main font-medium mb-1">
+              ¿Por qué nace? * <span class="text-text-muted font-normal">(Motivación)</span>
+            </label>
+            <textarea
+              rows="3"
+              [ngModel]="por_que()"
+              (ngModelChange)="por_que.set($event)"
+              name="por_que"
+              placeholder="¿Qué problema resuelve o por qué merece tu atención?"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-text-main font-medium mb-1">
+              ¿Para qué sirve? * <span class="text-text-muted font-normal">(Objetivo final)</span>
+            </label>
+            <textarea
+              rows="3"
+              [ngModel]="para_que()"
+              (ngModelChange)="para_que.set($event)"
+              name="para_que"
+              placeholder="¿Cuál es el resultado concreto que esperas alcanzar?"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- VINCULACIÓN OPCIONAL A PROYECTO PADRE (SOLO EN MODO CREAR GENERAL) -->
+        @if (mode() === 'create' && potentialParents().length > 0) {
+          <div>
+            <label class="block text-text-main font-medium mb-1">
+              ¿Es un Subproyecto? <span class="text-text-muted font-normal">(Opcional: agrupar bajo un proyecto paraguas)</span>
+            </label>
+            <select
+              [ngModel]="proyecto_padre_id()"
+              (ngModelChange)="proyecto_padre_id.set($event ? +$event : null)"
+              name="proyecto_padre_id"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+            >
+              <option [ngValue]="null" class="bg-surface text-text-main">Ninguno — Es un Proyecto Principal</option>
+              @for (parent of potentialParents(); track parent.id) {
+                <option [ngValue]="parent.id" class="bg-surface text-text-main">
+                  ↳ Subproyecto de: {{ parent.nombre }}
+                </option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- CRITERIO DE FINALIZACIÓN -->
+        <div>
+          <label class="block text-text-main font-medium mb-1">
+            Criterio de Finalización * <span class="text-text-muted font-normal">(¿Cuándo se considera 100% terminado?)</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="criterio_finalizacion()"
+            (ngModelChange)="criterio_finalizacion.set($event)"
+            name="criterio_finalizacion"
+            placeholder="Ej: Cuando los endpoints estén desplegados y testeados en producción."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+          />
+        </div>
+
+        <!-- PRIORIDAD, ESTADO Y FECHA LÍMITE -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-text-main font-medium mb-1">Prioridad</label>
+            <select
+              [ngModel]="prioridad()"
+              (ngModelChange)="prioridad.set($event)"
+              name="prioridad"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+            >
+              <option value="Baja" class="bg-surface text-text-main">Baja</option>
+              <option value="Media" class="bg-surface text-text-main">Media</option>
+              <option value="Alta" class="bg-surface text-text-main">Alta</option>
+              <option value="Critica" class="bg-surface text-text-main">Crítica</option>
+            </select>
+          </div>
+
+          @if (mode() === 'edit') {
+            <div>
+              <label class="block text-text-main font-medium mb-1">Estado</label>
+              <select
+                [ngModel]="estado()"
+                (ngModelChange)="estado.set($event)"
+                name="estado"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+              >
+                <option value="En Curso" class="bg-surface text-text-main">En Curso</option>
+                <option value="Terminado" class="bg-surface text-text-main">Terminado</option>
+                <option value="Bloqueado" class="bg-surface text-text-main">Bloqueado</option>
+                <option value="Pausado" class="bg-surface text-text-main">Pausado</option>
+              </select>
+            </div>
+          }
+
+          <div [class.col-span-2]="mode() !== 'edit'">
+            <label class="block text-text-main font-medium mb-1">Fecha Límite (Opcional)</label>
+            <input
+              type="date"
+              [ngModel]="fecha_limite()"
+              (ngModelChange)="fecha_limite.set($event)"
+              name="fecha_limite"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <!-- DESCRIPCIÓN ADICIONAL -->
+        <div>
+          <label class="block text-text-main font-medium mb-1">Descripción o Notas Adicionales (Opcional)</label>
+          <textarea
+            rows="2"
+            [ngModel]="descripcion()"
+            (ngModelChange)="descripcion.set($event)"
+            name="descripcion"
+            placeholder="Detalles adicionales, referencias o dependencias..."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+          ></textarea>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex justify-end gap-3 pt-4 border-t border-surface-border">
+          <button
+            type="button"
+            (click)="onClose()"
+            class="px-4 py-2 text-text-muted hover:text-text-main bg-background hover:bg-surface-border border border-surface-border rounded-xl transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="isSubmitting()"
+            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+          >
+            @if (isSubmitting()) {
+              <span class="animate-spin text-xs">⠋</span>
+              <span>Guardando...</span>
+            } @else {
+              <span>{{ mode() === 'edit' ? 'Guardar Cambios' : (mode() === 'create-subproject' ? 'Crear Subproyecto' : 'Crear Proyecto') }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

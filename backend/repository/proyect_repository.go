@@ -23,10 +23,10 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 	var proyect models.ProyectResponse
 	query := `
 		INSERT INTO proyectos (
-			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite
+			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 	`
 
 	if req.Prioridad == "" {
@@ -45,6 +45,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		req.CriterioFinalizacion,
 		req.Prioridad,
 		req.FechaLimite,
+		req.ProyectoPadreID,
 	).Scan(
 		&proyect.ID,
 		&proyect.Nombre,
@@ -57,6 +58,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		&proyect.CriterioFinalizacion,
 		&proyect.Prioridad,
 		&proyect.FechaLimite,
+		&proyect.ProyectoPadreID,
 	)
 
 	if err != nil {
@@ -79,11 +81,15 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		p.para_que,
 		p.criterio_finalizacion,
 		p.prioridad,
-		p.fecha_limite
+		p.fecha_limite,
+		p.proyecto_padre_id,
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count,
+		padre.nombre as nombre_padre
 	FROM proyectos p
+	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
 	WHERE p.user_id = $1
 	AND p.eliminado IS false
-	order by p.id desc
+	ORDER BY p.id DESC
 	`
 
 	rows, err := r.db.Query(
@@ -113,6 +119,9 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.CriterioFinalizacion,
 			&p.Prioridad,
 			&p.FechaLimite,
+			&p.ProyectoPadreID,
+			&p.SubproyectosCount,
+			&p.NombrePadre,
 		)
 		if err != nil {
 			log.Printf("[REPO:Proyect.GetAll] Error al escanear fila: %v | user_id=%d", err, UserID)
@@ -123,6 +132,77 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("[REPO:Proyect.GetAll] Error al iterar filas: %v | user_id=%d", err, UserID)
+		return nil, err
+	}
+	return proyects, nil
+}
+
+func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, userID int) ([]models.ProyectResponse, error) {
+	query := `
+	SELECT 
+		p.id,
+		p.nombre,
+		p.descripcion,
+		p.comentario,
+		p.fecha_creacion,
+		p.estado,
+		p.por_que,
+		p.para_que,
+		p.criterio_finalizacion,
+		p.prioridad,
+		p.fecha_limite,
+		p.proyecto_padre_id,
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count,
+		padre.nombre as nombre_padre
+	FROM proyectos p
+	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
+	WHERE p.proyecto_padre_id = $1
+	AND p.user_id = $2
+	AND p.eliminado IS false
+	ORDER BY p.id ASC
+	`
+
+	rows, err := r.db.Query(
+		ctx,
+		query,
+		parentID,
+		userID,
+	)
+
+	if err != nil {
+		log.Printf("[REPO:Proyect.GetSubproyectos] Error en SQL SELECT: %v | parent_id=%d user_id=%d", err, parentID, userID)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var proyects []models.ProyectResponse
+	for rows.Next() {
+		var p models.ProyectResponse
+		err := rows.Scan(
+			&p.ID,
+			&p.Nombre,
+			&p.Descripcion,
+			&p.Comentario,
+			&p.FechaCreacion,
+			&p.Estado,
+			&p.PorQue,
+			&p.ParaQue,
+			&p.CriterioFinalizacion,
+			&p.Prioridad,
+			&p.FechaLimite,
+			&p.ProyectoPadreID,
+			&p.SubproyectosCount,
+			&p.NombrePadre,
+		)
+		if err != nil {
+			log.Printf("[REPO:Proyect.GetSubproyectos] Error al escanear fila: %v | parent_id=%d user_id=%d", err, parentID, userID)
+			return nil, err
+		}
+
+		proyects = append(proyects, p)
+	}
+	if err = rows.Err(); err != nil {
+		log.Printf("[REPO:Proyect.GetSubproyectos] Error al iterar filas: %v | parent_id=%d user_id=%d", err, parentID, userID)
 		return nil, err
 	}
 	return proyects, nil
@@ -153,21 +233,25 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 	var p models.ProyectResponse
 	query := `
 	SELECT 
-		id, 
-		nombre, 
-		descripcion, 
-		comentario,
-		fecha_creacion,
-		estado,
-		por_que,
-		para_que,
-		criterio_finalizacion,
-		prioridad,
-		fecha_limite
-	FROM proyectos
-	WHERE id = $1
-	AND user_id = $2
-	AND eliminado IS false
+		p.id, 
+		p.nombre, 
+		p.descripcion, 
+		p.comentario,
+		p.fecha_creacion,
+		p.estado,
+		p.por_que,
+		p.para_que,
+		p.criterio_finalizacion,
+		p.prioridad,
+		p.fecha_limite,
+		p.proyecto_padre_id,
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count,
+		padre.nombre as nombre_padre
+	FROM proyectos p
+	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
+	WHERE p.id = $1
+	AND p.user_id = $2
+	AND p.eliminado IS false
 	`
 	err := r.db.QueryRow(
 		ctx,
@@ -186,6 +270,9 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.CriterioFinalizacion,
 		&p.Prioridad,
 		&p.FechaLimite,
+		&p.ProyectoPadreID,
+		&p.SubproyectosCount,
+		&p.NombrePadre,
 	)
 
 	if err != nil {
@@ -211,11 +298,12 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 			para_que = COALESCE($6, para_que),
 			criterio_finalizacion = COALESCE($7, criterio_finalizacion),
 			prioridad = COALESCE($8, prioridad),
-			fecha_limite = COALESCE($9, fecha_limite)
-		WHERE id = $10
-		AND user_id = $11
+			fecha_limite = COALESCE($9, fecha_limite),
+			proyecto_padre_id = COALESCE($10, proyecto_padre_id)
+		WHERE id = $11
+		AND user_id = $12
 		AND eliminado = false
-		RETURNING id, nombre, descripcion, comentario, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite
+		RETURNING id, nombre, descripcion, comentario, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 	`
 	err := r.db.QueryRow(
 		ctx,
@@ -229,6 +317,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		req.CriterioFinalizacion,
 		req.Prioridad,
 		req.FechaLimite,
+		req.ProyectoPadreID,
 		id,
 		userID,
 	).Scan(
@@ -242,6 +331,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		&p.CriterioFinalizacion,
 		&p.Prioridad,
 		&p.FechaLimite,
+		&p.ProyectoPadreID,
 	)
 
 	if err != nil {

@@ -11,6 +11,9 @@ export interface Project {
   fecha_limite?: string;
   user_id: number;
   fecha_creacion: string;
+  proyecto_padre_id?: number | null;
+  subproyectos_count?: number;
+  nombre_padre?: string;
 }
 
 export interface ProjectRequest {
@@ -23,6 +26,7 @@ export interface ProjectRequest {
   prioridad: string;
   fecha_limite?: string;
   user_id?: number;
+  proyecto_padre_id?: number | null;
 }
 
 export interface ProjectResponse {
@@ -37,6 +41,9 @@ export interface ProjectResponse {
   criterio_finalizacion: string;
   prioridad: string;
   fecha_limite?: string;
+  proyecto_padre_id?: number | null;
+  subproyectos_count?: number;
+  nombre_padre?: string;
 }
 
 export interface ProjectUpdateRequest {
@@ -49,4 +56,6 @@ export interface ProjectUpdateRequest {
   criterio_finalizacion?: string;
   prioridad?: string;
   fecha_limite?: string;
+  proyecto_padre_id?: number | null;
 }
+

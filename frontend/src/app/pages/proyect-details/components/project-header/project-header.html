@@ -1,0 +1,133 @@
+<div class="space-y-4">
+  <!-- BREADCRUMB -->
+  <div class="flex items-center gap-2 text-xs md:text-sm text-text-muted mb-2 flex-wrap">
+    <a
+      routerLink="/proyectos"
+      class="hover:text-primary transition-colors inline-flex items-center gap-1"
+    >
+      <span>← Proyectos</span>
+    </a>
+    @if (project().proyecto_padre_id) {
+      <span>/</span>
+      <a
+        [routerLink]="['/proyectos', project().proyecto_padre_id]"
+        class="hover:text-primary transition-colors inline-flex items-center gap-1 font-medium text-primary"
+        title="Ir al proyecto padre"
+      >
+        <svg lucideCornerDownRight class="w-3.5 h-3.5" />
+        <span>{{ project().nombre_padre || 'Proyecto Padre' }}</span>
+      </a>
+    }
+  </div>
+
+  <!-- TARJETA PRINCIPAL DEL PROYECTO -->
+  <div class="p-6 bg-surface border border-surface-border rounded-2xl shadow-xl space-y-5">
+    <div class="flex flex-wrap items-start justify-between gap-4 pb-4 border-b border-surface-border">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <h1 class="text-2xl font-bold text-primary tracking-tight md:text-3xl">{{ project().nombre }}</h1>
+          @if (project().subproyectos_count && project().subproyectos_count! > 0) {
+            <span class="px-2.5 py-0.5 text-xs font-semibold bg-primary/15 text-primary border border-primary/30 rounded-lg inline-flex items-center gap-1">
+              <svg lucideLayers class="w-3.5 h-3.5" />
+              {{ project().subproyectos_count }} subproyecto{{ project().subproyectos_count === 1 ? '' : 's' }}
+            </span>
+          }
+        </div>
+        @if (project().nombre_padre) {
+          <p class="text-xs text-text-muted inline-flex items-center gap-1">
+            <svg lucideCornerDownRight class="w-3.5 h-3.5 text-primary/70" />
+            <span>Subproyecto de: </span>
+            <a [routerLink]="['/proyectos', project().proyecto_padre_id]" class="text-primary hover:underline font-medium">
+              {{ project().nombre_padre }}
+            </a>
+          </p>
+        }
+        <p class="text-xs text-text-muted">
+          Creado el: {{ project().fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <span [class]="'px-3 py-1 text-xs font-semibold rounded-lg ' + getPriorityClass(project().prioridad)">
+          Prioridad: {{ project().prioridad }}
+        </span>
+        <span class="px-3 py-1 text-xs bg-surface text-text-muted rounded-lg border border-surface-border">
+          Estado: {{ project().estado }}
+        </span>
+        <button
+          type="button"
+          (click)="edit.emit()"
+          class="px-2.5 py-1 text-xs text-text-muted hover:text-primary hover:bg-background border border-surface-border rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1"
+          title="Editar proyecto"
+        >
+          <svg lucidePencil class="w-3.5 h-3.5" />
+          <span>Editar</span>
+        </button>
+        <button
+          type="button"
+          (click)="delete.emit()"
+          class="p-1 text-text-muted hover:text-danger hover:bg-danger/10 border border-surface-border rounded-lg transition-colors cursor-pointer"
+          title="Eliminar proyecto"
+        >
+          <svg lucideTrash2 class="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+
+    <!-- META / CRITERIO DE ÉXITO -->
+    @if (project().criterio_finalizacion) {
+      <div class="p-3 bg-background/60 rounded-xl border border-surface-border/60 flex items-start gap-2 text-xs">
+        <svg lucideTarget class="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <p class="text-text-muted leading-relaxed">
+          <strong class="text-text-main font-medium">Criterio de Finalización:</strong> {{ project().criterio_finalizacion }}
+        </p>
+      </div>
+    }
+
+    <!-- DESCRIPCIÓN Y COMENTARIOS -->
+    @if (project().descripcion || project().comentario || project().por_que || project().para_que) {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 text-xs">
+        @if (project().por_que) {
+          <div>
+            <h4 class="font-semibold text-text-muted uppercase tracking-wider mb-1">
+              ¿Por qué nace?
+            </h4>
+            <p class="text-text-main bg-background/60 p-3 rounded-xl border border-surface-border leading-relaxed">
+              {{ project().por_que }}
+            </p>
+          </div>
+        }
+        @if (project().para_que) {
+          <div>
+            <h4 class="font-semibold text-text-muted uppercase tracking-wider mb-1">
+              ¿Para qué sirve? (Objetivo)
+            </h4>
+            <p class="text-text-main bg-background/60 p-3 rounded-xl border border-surface-border leading-relaxed">
+              {{ project().para_que }}
+            </p>
+          </div>
+        }
+        @if (project().descripcion) {
+          <div>
+            <h4 class="font-semibold text-text-muted uppercase tracking-wider mb-1">
+              Descripción adicional
+            </h4>
+            <p class="text-text-main bg-background/60 p-3 rounded-xl border border-surface-border leading-relaxed">
+              {{ project().descripcion }}
+            </p>
+          </div>
+        }
+        @if (project().comentario) {
+          <div>
+            <h4 class="font-semibold text-text-muted uppercase tracking-wider mb-1">
+              Comentarios / Notas
+            </h4>
+            <p class="text-text-main bg-background/60 p-3 rounded-xl border border-surface-border leading-relaxed">
+              {{ project().comentario }}
+            </p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

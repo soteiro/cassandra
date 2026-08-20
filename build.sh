@@ -3,7 +3,7 @@
 
     echo "1. Compilando Frontend Angular..."
     cd frontend
-    ng build --configuration production
+    npm run build
     cd ..
 
     echo "2. Copiando archivos de distribución a backend/dist..."

@@ -132,6 +132,7 @@ func main() {
 
 		r.Delete("/api/proyects/{id}", proyectHandler.DeleteByID)
 		r.Get("/api/proyects/{id}", proyectHandler.GetByID)
+		r.Get("/api/proyects/{id}/subproyectos", proyectHandler.GetSubproyectos)
 		r.Put("/api/proyects/{id}", proyectHandler.Update)
 
 		// Rutas de Tareas Protegidas

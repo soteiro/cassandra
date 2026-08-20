@@ -17,6 +17,7 @@ type Proyects struct {
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
 
 // definir los datos que se espera recibir la creacion de un proyecto
@@ -30,6 +31,7 @@ type ProyectRequest struct {
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
 
 // datos que devuelva la creacion de un proyecto
@@ -45,6 +47,9 @@ type ProyectResponse struct {
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
+	SubproyectosCount    int        `json:"subproyectos_count"`
+	NombrePadre          *string    `json:"nombre_padre,omitempty"`
 }
 
 // el * hace opcional el parametro
@@ -58,6 +63,7 @@ type ProyectUpdateRequest struct {
 	CriterioFinalizacion *string    `json:"criterio_finalizacion"`
 	Prioridad            *string    `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
 
 type ProyectUpdateResponse struct {
@@ -71,6 +77,8 @@ type ProyectUpdateResponse struct {
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
+
 
 

@@ -31,6 +31,18 @@ export class proyectService {
     });
   }
 
+  public getSubproyectos(id: () => string | null) {
+    if (!this.authService.isLoggedIn()) {
+      return undefined;
+    }
+
+    return httpResource<ProjectResponse[]>(() => {
+      const proyectId = id();
+      if (!proyectId) return undefined;
+      return `${this.apiUrl}/proyects/${proyectId}/subproyectos`;
+    });
+  }
+
   createProyect(req: ProjectRequest): Observable<ProjectResponse> {
     return this.http.post<ProjectResponse>(`${this.apiUrl}/proyects`, req);
   }
