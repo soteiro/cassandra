@@ -28,7 +28,7 @@
 
     <!-- GRID DE SUBPROYECTOS REUTILIZANDO PROJECT-CARD -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      @for (sub of subproyectos(); track sub.id) {
+      @for (sub of getSortedSubprojects(); track sub.id) {
         <app-project-card [project]="sub" [isSubproject]="true" />
       } @empty {
         <div class="col-span-full p-10 text-center bg-surface border border-surface-border rounded-2xl space-y-3">
