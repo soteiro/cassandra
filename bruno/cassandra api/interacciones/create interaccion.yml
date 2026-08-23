@@ -1,0 +1,22 @@
+info:
+  name: create interaccion
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8080/api/interacciones
+  body:
+    type: json
+    data: |-
+      {
+        "persona_id": 1,
+        "interaccion": "Llamada telefónica para coordinar fecha de entrega"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
