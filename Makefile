@@ -1,15 +1,16 @@
 # Directorio de migraciones
 MIGRATIONS_DIR = backend/database/migrations
 
-.PHONY: help migration build run dev-backend dev-frontend test
+.PHONY: help migration build run dev-backend dev-frontend test docs
 
 help: ## Muestra la lista de comandos disponibles
 	@echo "Comandos disponibles:"
 	@echo "  make migration name=nombre  -> Crea un nuevo par de archivos de migración (.up y .down)"
-	@echo "  make build                  -> Compila Angular y Go en el binario ./cassandra-app"
+	@echo "  make docs                   -> Regenera la documentación OpenAPI desde las colecciones de Bruno"
+	@echo "  make build                  -> Compila Docs, Angular y Go en el binario ./cassandra-app"
 	@echo "  make run                    -> Compila y ejecuta la aplicación completa"
 	@echo "  make dev-backend            -> Ejecuta el backend en modo desarrollo"
-	@echo "  make dev-frontend           -> Ejecuta el frontend con ng serve"
+	@echo "  make dev-frontend           -> Regenera docs y ejecuta el servidor de desarrollo de Angular"
 	@echo "  make test                   -> Ejecuta los tests del backend"
 	@echo "  make upload-server"		 -> sube al server configurado en config ssh	
 migration: ## Crea una nueva migración secuencial (ej: make migration name=crear_tabla_x)
@@ -26,6 +27,9 @@ migration: ## Crea una nueva migración secuencial (ej: make migration name=crea
 	@migrate create -ext sql -dir $(MIGRATIONS_DIR) -seq $(name)
 	@echo "✅ Archivos de migración creados en $(MIGRATIONS_DIR)/"
 
+docs: ## Regenera la documentación OpenAPI a partir de Bruno
+	@node scripts/generate-docs.js
+
 build: ## Compila Frontend y Backend usando build.sh
 	@bash build.sh
 
@@ -35,7 +39,7 @@ run: build ## Compila todo y corre el binario ./cassandra-app
 dev-backend: ## Ejecuta el backend en Go directamente
 	@cd backend && air
 
-dev-frontend: ## Ejecuta el servidor de desarrollo de Angular
+dev-frontend: docs ## Ejecuta el servidor de desarrollo de Angular (con docs actualizadas)
 	@cd frontend && npm start
 
 upload-server: 

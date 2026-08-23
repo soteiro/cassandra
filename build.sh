@@ -1,6 +1,9 @@
 #!/bin/bash
     set -e
 
+    echo "0. Regenerando Documentación OpenAPI desde Bruno..."
+    node scripts/generate-docs.js
+
     echo "1. Compilando Frontend Angular..."
     cd frontend
     npm run build

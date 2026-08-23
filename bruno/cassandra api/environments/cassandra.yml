@@ -5,4 +5,4 @@ variables:
   - name: AUTH_TOKEN
     value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJleHAiOjE3ODU2MjE2NjAsImlhdCI6MTc4NTYyMDc2MH0.-0VVJ-9VBLA25Zk5eZHcWYQfKI1xpbazoqyZd9SzihM
   - name: access_token
-    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJleHAiOjE3ODcxNzAzODEsImlhdCI6MTc4NzE2OTQ4MX0.yqlvOz46-mRBjAbMw94_q4dxEFNP4MAVmytTi7_y5NA
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJleHAiOjE3ODczNDEyODMsImlhdCI6MTc4NzM0MDM4M30.t1p8OQ2rPsrf_KqznkW0ZhQ8uzdJAAnVVrNL90nZdKs

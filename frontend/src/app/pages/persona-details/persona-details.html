@@ -1,0 +1,288 @@
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- BREADCRUMB / VOLVER -->
+  <div>
+    <a
+      routerLink="/crm"
+      class="inline-flex items-center gap-2 text-xs font-medium text-text-muted hover:text-text-main transition-colors cursor-pointer group"
+    >
+      <svg lucideArrowLeft class="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+      <span>Volver a CRM & Contactos</span>
+    </a>
+  </div>
+
+  @if (personaResource?.isLoading() && !personaResource?.value()) {
+    <!-- SKELETON CARGA -->
+    <div class="p-6 bg-surface border border-surface-border rounded-2xl animate-pulse space-y-6">
+      <div class="flex items-center gap-5">
+        <div class="w-20 h-20 bg-background rounded-2xl"></div>
+        <div class="space-y-3 flex-1">
+          <div class="w-48 h-6 bg-background rounded-lg"></div>
+          <div class="w-32 h-4 bg-background rounded-lg"></div>
+        </div>
+      </div>
+      <div class="w-full h-24 bg-background rounded-xl"></div>
+    </div>
+  } @else if (personaResource?.error()) {
+    <!-- ERROR -->
+    <div class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between">
+      <div>
+        <h4 class="text-sm font-semibold text-danger">Error al cargar la información del contacto</h4>
+        <p class="text-xs text-text-muted mt-0.5">No se pudo obtener el perfil desde el servidor o no existe.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="personaResource?.reload()"
+          class="text-xs bg-danger/20 hover:bg-danger/30 text-danger border border-danger/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+        >
+          Reintentar
+        </button>
+        <a
+          routerLink="/crm"
+          class="text-xs bg-background hover:bg-surface-border text-text-main border border-surface-border px-3 py-1.5 rounded-lg transition-colors"
+        >
+          Ir al CRM
+        </a>
+      </div>
+    </div>
+  } @else if (personaResource?.value(); as persona) {
+    <!-- TARJETA PRINCIPAL DE PERFIL -->
+    <div class="p-6 bg-surface border border-surface-border rounded-2xl space-y-6 shadow-sm">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <!-- AVATAR ROBOHASH + DATOS BÁSICOS -->
+        <div class="flex items-center gap-4 sm:gap-5 min-w-0">
+          <div
+            class="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl bg-surface-border/40 border border-surface-border p-1.5 flex items-center justify-center overflow-hidden shadow-inner"
+          >
+            <img
+              [src]="avatarUrl"
+              [alt]="'Avatar de ' + persona.nombre"
+              class="w-full h-full object-contain filter drop-shadow-md"
+            />
+          </div>
+
+          <div class="min-w-0 space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-xl sm:text-2xl font-bold text-text-main tracking-tight truncate">
+                {{ persona.nombre }}
+              </h1>
+              <span class="text-xs font-mono text-text-muted/70 bg-background/90 px-2 py-0.5 rounded-md border border-surface-border">
+                #{{ persona.id }}
+              </span>
+            </div>
+
+            @if (persona.alias) {
+              <p class="text-sm font-medium text-primary">
+                {{ '@' + persona.alias }}
+              </p>
+            }
+
+            <div class="flex items-center gap-2 pt-1 flex-wrap">
+              @if (persona.entorno) {
+                <span
+                  [class]="'px-2.5 py-0.5 text-xs font-semibold rounded-lg border inline-flex items-center gap-1.5 ' + getEntornoBadgeClass(persona.entorno)"
+                >
+                  <svg lucideTag class="w-3 h-3" />
+                  <span>{{ persona.entorno }}</span>
+                </span>
+              }
+
+              <span class="text-xs text-text-muted inline-flex items-center gap-1">
+                <svg lucideCalendar class="w-3.5 h-3.5 text-text-muted/70" />
+                <span>Registrado el {{ persona.fecha_creacion | date: 'dd/MM/yyyy' }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN: EDITAR Y ELIMINAR -->
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="openEditModal()"
+            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <svg lucidePencil class="w-3.5 h-3.5" />
+            <span>Editar Perfil</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="openDeleteModal()"
+            class="p-2 bg-background hover:bg-danger/10 text-text-muted hover:text-danger border border-surface-border hover:border-danger/30 rounded-xl transition-all cursor-pointer"
+            title="Eliminar contacto"
+          >
+            <svg lucideTrash2 class="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE NOTAS Y CONTEXTO DEL PERFIL -->
+      <div class="p-4 bg-background/60 rounded-xl border border-surface-border/60 space-y-2">
+        <div class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-muted/80">
+          <svg lucideInfo class="w-3.5 h-3.5 text-primary" />
+          <span>Información de Contexto & Notas</span>
+        </div>
+        @if (persona.informacion) {
+          <p class="text-xs sm:text-sm text-text-main/90 leading-relaxed whitespace-pre-line">
+            {{ persona.informacion }}
+          </p>
+        } @else {
+          <p class="text-xs text-text-muted/60 italic">
+            Sin información adicional registrada. Haz clic en "Editar Perfil" para agregar detalles o notas contextuales.
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- SECCIÓN / TABLA DE REGISTRO DE INTERACCIONES Y COMENTARIOS -->
+    <div class="p-6 bg-surface border border-surface-border rounded-2xl space-y-5">
+      <div class="flex items-center justify-between gap-4 pb-3 border-b border-surface-border flex-wrap">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
+            <svg lucideMessageSquare class="w-4 h-4" />
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-text-main">
+              Registro de Interacciones & Comentarios
+            </h3>
+            <p class="text-xs text-text-muted">
+              Historial de reuniones, llamadas, acuerdos o notas sobre este contacto.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="showAddInteraccion.set(!showAddInteraccion())"
+          class="bg-background hover:bg-surface-border text-text-main border border-surface-border font-medium rounded-xl px-3 py-1.5 text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+        >
+          <svg lucidePlus class="w-3.5 h-3.5" />
+          <span>{{ showAddInteraccion() ? 'Ocultar Formulario' : 'Nueva Interacción' }}</span>
+        </button>
+      </div>
+
+      <!-- FORMULARIO PARA REGISTRAR NUEVA INTERACCIÓN -->
+      @if (showAddInteraccion()) {
+        <div class="p-4 bg-background/80 rounded-xl border border-surface-border space-y-3 animate-in fade-in duration-150">
+          <h4 class="text-xs font-semibold text-text-main">Registrar nueva interacción</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+            <div>
+              <label class="block text-text-muted mb-1">Tipo de Interacción</label>
+              <select
+                [ngModel]="nuevaInteraccionTipo()"
+                (ngModelChange)="nuevaInteraccionTipo.set($event)"
+                class="w-full bg-surface border border-surface-border text-text-main rounded-xl p-2 outline-none cursor-pointer"
+              >
+                <option value="Nota">Nota</option>
+                <option value="Reunión">Reunión</option>
+                <option value="Llamada">Llamada</option>
+                <option value="Mensaje">Mensaje</option>
+                <option value="Email">Email</option>
+              </select>
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block text-text-muted mb-1">Resumen o Comentario</label>
+              <input
+                type="text"
+                [ngModel]="nuevaInteraccionResumen()"
+                (ngModelChange)="nuevaInteraccionResumen.set($event)"
+                (keyup.enter)="addInteraccion()"
+                placeholder="Ej: Acordamos revisar la propuesta el próximo martes..."
+                class="w-full bg-surface border border-surface-border text-text-main placeholder-text-muted/60 rounded-xl p-2 outline-none"
+              />
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              (click)="showAddInteraccion.set(false)"
+              class="px-3 py-1.5 text-xs text-text-muted hover:text-text-main rounded-lg cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              (click)="addInteraccion()"
+              class="bg-primary hover:bg-primary/90 text-background font-semibold px-4 py-1.5 rounded-xl text-xs transition-colors cursor-pointer"
+            >
+              Guardar Interacción
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- TABLA DE INTERACCIONES -->
+      @if (interacciones().length > 0) {
+        <div class="overflow-x-auto rounded-xl border border-surface-border">
+          <table class="w-full text-left text-xs text-text-main">
+            <thead class="bg-background/80 text-text-muted border-b border-surface-border font-semibold">
+              <tr>
+                <th class="p-3">Canal / Tipo</th>
+                <th class="p-3">Fecha</th>
+                <th class="p-3">Detalle / Resumen</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-border/50">
+              @for (item of interacciones(); track item.id) {
+                <tr class="hover:bg-background/40 transition-colors">
+                  <td class="p-3 whitespace-nowrap">
+                    <span
+                      [class]="'px-2 py-0.5 rounded-md border text-[11px] font-medium ' + getTipoClass(item.tipo)"
+                    >
+                      {{ item.tipo }}
+                    </span>
+                  </td>
+                  <td class="p-3 text-text-muted whitespace-nowrap">
+                    {{ item.fecha | date: 'dd/MM/yyyy HH:mm' }}
+                  </td>
+                  <td class="p-3 text-text-main">
+                    {{ item.resumen }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <!-- ESTADO VACÍO DE LA TABLA -->
+        <div class="p-8 text-center bg-background/40 border border-dashed border-surface-border/60 rounded-xl space-y-2">
+          <p class="text-xs text-text-muted">
+            No hay registros de interacciones o comentarios recientes para este contacto.
+          </p>
+          <button
+            type="button"
+            (click)="showAddInteraccion.set(true)"
+            class="text-xs text-primary font-semibold hover:underline cursor-pointer inline-flex items-center gap-1"
+          >
+            <svg lucidePlus class="w-3.5 h-3.5" />
+            <span>Registrar primera interacción</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- MODAL DE EDICIÓN DE PERFIL -->
+    <app-persona-modal
+      [isOpen]="showEditModal()"
+      mode="edit"
+      [initialData]="persona"
+      [isSubmitting]="isSubmittingEdit()"
+      (save)="saveEditPersona($event)"
+      (close)="closeEditModal()"
+    />
+
+    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR -->
+    <app-confirm-modal
+      [isOpen]="showDeleteModal()"
+      title="¿Eliminar contacto?"
+      [message]="'¿Estás seguro de que deseas eliminar permanentemente a ' + persona.nombre + '? Esta acción no se puede deshacer.'"
+      confirmText="Eliminar Persona"
+      cancelText="Cancelar"
+      variant="danger"
+      [isProcessing]="isDeleting()"
+      (confirm)="confirmDeletePersona()"
+      (cancel)="closeDeleteModal()"
+    />
+  }
+</div>

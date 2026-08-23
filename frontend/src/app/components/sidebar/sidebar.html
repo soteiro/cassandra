@@ -68,6 +68,16 @@
         <svg lucideUser class="w-4 h-4 group-hover:scale-105 transition-transform" />
         <span>Crm</span>
       </a>
+      <a
+        (click)="sidebar.close()"
+        routerLink="/docs"
+        routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+      >
+        <svg lucideBookOpen class="w-4 h-4 group-hover:scale-105 transition-transform" />
+        <span>API Docs</span>
+      </a>
     </nav>
   </div>
 

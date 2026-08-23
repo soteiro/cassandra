@@ -4,7 +4,7 @@
 
 ## Platform
 
-web
+web, mobile (Android APK via Capacitor)
 
 ## Users
 Soteiro and family members with ADHD / neurodivergent focus needs. They require a low-friction, high-clarity personal OS to organize daily tasks, projects, schedules, personal finances, and knowledge without feeling overwhelmed.
@@ -36,6 +36,7 @@ A self-hosted, single-binary personal OS tailored specifically for neurodivergen
 
 ## Evidence on Hand
 - Architecture and vision in `memoria.md`.
+- Mobile architecture, environments & CORS in `docs/ARQUITECTURA_Y_APK.md`.
 - Initial database and backend roadmap in `tareas.md`.
 - Codebase in `frontend/` (Angular 22) and `backend/` (Go).
 

@@ -1,0 +1,176 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs transition-opacity"
+    (click)="onClose()"
+  >
+    <div
+      class="bg-surface border border-surface-border rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- HEADER DEL MODAL -->
+      <div class="flex justify-between items-start pb-4 border-b border-surface-border">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shrink-0"
+          >
+            @if (mode() === 'edit') {
+              <svg lucidePencil class="w-5 h-5" />
+            } @else {
+              <svg lucideUserPlus class="w-5 h-5" />
+            }
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-text-main">
+              {{ mode() === 'edit' ? 'Editar Persona' : 'Nueva Persona en CRM' }}
+            </h3>
+            <p class="text-xs text-text-muted mt-0.5">
+              {{ mode() === 'edit' ? 'Actualiza los datos, notas o entorno del contacto.' : 'Registra un contacto clave y asígnale su entorno relacional.' }}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="onClose()"
+          class="text-text-muted hover:text-text-main p-1 rounded-lg hover:bg-background transition-colors cursor-pointer"
+        >
+          <svg lucideX class="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- ERROR MESSAGE -->
+      @if (errorMessage()) {
+        <div class="p-3 bg-danger/15 border border-danger/30 rounded-xl text-danger text-xs">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- AVATAR PREVIEW CARD (ROBOHASH) -->
+      <div class="p-3.5 bg-background/70 rounded-2xl border border-surface-border flex items-center gap-4">
+        <div
+          class="w-16 h-16 rounded-2xl bg-surface-border/40 border border-primary/30 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-inner"
+        >
+          <img
+            [src]="previewAvatarUrl"
+            [alt]="nombre() || 'Nueva Persona'"
+            class="w-full h-full object-contain filter drop-shadow-xs"
+          />
+        </div>
+        <div class="min-w-0 flex-1">
+          <span class="text-[10px] uppercase font-semibold tracking-wider text-primary/80 block">
+            Avatar RoboHash
+          </span>
+          <p class="text-sm font-bold text-text-main truncate">
+            {{ nombre() || 'Nombre de la Persona' }}
+          </p>
+          <p class="text-xs text-text-muted/70 truncate">
+            {{ alias() ? '@' + alias() : (entorno() ? 'Entorno: ' + entorno() : 'Identificador asignado por sistema') }}
+          </p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="space-y-4 text-xs">
+        <!-- NOMBRE Y ALIAS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-text-main font-medium mb-1">
+              Nombre Completo *
+            </label>
+            <input
+              type="text"
+              [ngModel]="nombre()"
+              (ngModelChange)="nombre.set($event)"
+              name="nombre"
+              placeholder="Ej: Ada Lovelace"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label class="block text-text-main font-medium mb-1">
+              Alias / Apodo / Cargo <span class="text-text-muted font-normal">(Opcional)</span>
+            </label>
+            <input
+              type="text"
+              [ngModel]="alias()"
+              (ngModelChange)="alias.set($event)"
+              name="alias"
+              placeholder="Ej: Directora Técnica / Cassie"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- ENTORNO Y SUGERENCIAS -->
+        <div>
+          <label class="block text-text-main font-medium mb-1">
+            Entorno / Categoría <span class="text-text-muted font-normal">(Ámbito de relación)</span>
+          </label>
+          <input
+            type="text"
+            [ngModel]="entorno()"
+            (ngModelChange)="entorno.set($event)"
+            name="entorno"
+            placeholder="Ej: Trabajo, Cliente, Amigos, Universidad..."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors mb-2"
+          />
+
+          <!-- CHIPS DE SUGERENCIAS -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-[11px] text-text-muted/70 mr-1 flex items-center gap-1">
+              <svg lucideTag class="w-3 h-3" />
+              Sugerencias:
+            </span>
+            @for (sug of entornoSuggestions; track sug) {
+              <button
+                type="button"
+                (click)="selectEntorno(sug)"
+                [class]="entorno() === sug ? 'bg-primary text-background font-semibold' : 'bg-background hover:bg-surface-border text-text-muted hover:text-text-main'"
+                class="px-2 py-0.5 rounded-lg border border-surface-border text-[11px] transition-colors cursor-pointer"
+              >
+                {{ sug }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN / NOTAS -->
+        <div>
+          <label class="block text-text-main font-medium mb-1">
+            Información, Notas y Contexto <span class="text-text-muted font-normal">(Opcional)</span>
+          </label>
+          <textarea
+            rows="4"
+            [ngModel]="informacion()"
+            (ngModelChange)="informacion.set($event)"
+            name="informacion"
+            placeholder="¿Cómo se conocieron? Proyectos compartidos, temas de interés, acuerdos o detalles importantes..."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors resize-y leading-relaxed"
+          ></textarea>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex justify-end gap-3 pt-4 border-t border-surface-border">
+          <button
+            type="button"
+            (click)="onClose()"
+            class="px-4 py-2 text-text-muted hover:text-text-main bg-background hover:bg-surface-border border border-surface-border rounded-xl transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="isSubmitting()"
+            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+          >
+            @if (isSubmitting()) {
+              <span class="animate-spin text-xs">⠋</span>
+              <span>Guardando...</span>
+            } @else {
+              <span>{{ mode() === 'edit' ? 'Guardar Cambios' : 'Registrar Persona' }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

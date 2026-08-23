@@ -26,7 +26,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 	`
 
 	if req.Prioridad == "" {
@@ -52,6 +52,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		&proyect.Descripcion,
 		&proyect.Comentario,
 		&proyect.FechaCreacion,
+		&proyect.FechaTerminado,
 		&proyect.Estado,
 		&proyect.PorQue,
 		&proyect.ParaQue,
@@ -76,6 +77,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		p.descripcion,
 		p.comentario,
 		p.fecha_creacion,
+		p.fecha_terminado,
 		p.estado,
 		p.por_que,
 		p.para_que,
@@ -113,6 +115,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.Descripcion,
 			&p.Comentario,
 			&p.FechaCreacion,
+			&p.FechaTerminado,
 			&p.Estado,
 			&p.PorQue,
 			&p.ParaQue,
@@ -145,6 +148,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 		p.descripcion,
 		p.comentario,
 		p.fecha_creacion,
+		p.fecha_terminado,
 		p.estado,
 		p.por_que,
 		p.para_que,
@@ -184,6 +188,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 			&p.Descripcion,
 			&p.Comentario,
 			&p.FechaCreacion,
+			&p.FechaTerminado,
 			&p.Estado,
 			&p.PorQue,
 			&p.ParaQue,
@@ -236,16 +241,17 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		p.id, 
 		p.nombre, 
 		p.descripcion, 
-		p.comentario,
-		p.fecha_creacion,
-		p.estado,
-		p.por_que,
-		p.para_que,
-		p.criterio_finalizacion,
-		p.prioridad,
-		p.fecha_limite,
-		p.proyecto_padre_id,
-		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count,
+		p.comentario, 
+		p.fecha_creacion, 
+		p.fecha_terminado,
+		p.estado, 
+		p.por_que, 
+		p.para_que, 
+		p.criterio_finalizacion, 
+		p.prioridad, 
+		p.fecha_limite, 
+		p.proyecto_padre_id, 
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count, 
 		padre.nombre as nombre_padre
 	FROM proyectos p
 	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
@@ -264,6 +270,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.Descripcion,
 		&p.Comentario,
 		&p.FechaCreacion,
+		&p.FechaTerminado,
 		&p.Estado,
 		&p.PorQue,
 		&p.ParaQue,
@@ -286,6 +293,14 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 // Update con COALESCE
 func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req *models.ProyectUpdateRequest) (*models.ProyectUpdateResponse, error) {
 	var p models.ProyectUpdateResponse
+	var modoFechaTerminado int // 0 = no change, 1 = completado (NOW si null), 2 = reabierto (NULL)
+	if req.Estado != nil {
+		if *req.Estado == "Completado" || *req.Estado == "Terminado" {
+			modoFechaTerminado = 1
+		} else {
+			modoFechaTerminado = 2
+		}
+	}
 
 	query := `
 		UPDATE proyectos
@@ -299,11 +314,16 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 			criterio_finalizacion = COALESCE($7, criterio_finalizacion),
 			prioridad = COALESCE($8, prioridad),
 			fecha_limite = COALESCE($9, fecha_limite),
-			proyecto_padre_id = COALESCE($10, proyecto_padre_id)
-		WHERE id = $11
-		AND user_id = $12
+			proyecto_padre_id = COALESCE($10, proyecto_padre_id),
+			fecha_terminado = CASE
+				WHEN $11 = 1 THEN COALESCE(fecha_terminado, NOW())
+				WHEN $11 = 2 THEN NULL
+				ELSE fecha_terminado
+			END
+		WHERE id = $12
+		AND user_id = $13
 		AND eliminado = false
-		RETURNING id, nombre, descripcion, comentario, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
+		RETURNING id, nombre, descripcion, comentario, estado, fecha_terminado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 	`
 	err := r.db.QueryRow(
 		ctx,
@@ -318,6 +338,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		req.Prioridad,
 		req.FechaLimite,
 		req.ProyectoPadreID,
+		modoFechaTerminado,
 		id,
 		userID,
 	).Scan(
@@ -326,6 +347,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		&p.Descripcion,
 		&p.Comentario,
 		&p.Estado,
+		&p.FechaTerminado,
 		&p.PorQue,
 		&p.ParaQue,
 		&p.CriterioFinalizacion,

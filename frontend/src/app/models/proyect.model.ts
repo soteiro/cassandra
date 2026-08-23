@@ -11,6 +11,7 @@ export interface Project {
   fecha_limite?: string;
   user_id: number;
   fecha_creacion: string;
+  fecha_terminado?: string | null;
   proyecto_padre_id?: number | null;
   subproyectos_count?: number;
   nombre_padre?: string;
@@ -35,6 +36,7 @@ export interface ProjectResponse {
   descripcion: string;
   comentario: string;
   fecha_creacion: string;
+  fecha_terminado?: string | null;
   estado: string;
   por_que: string;
   para_que: string;

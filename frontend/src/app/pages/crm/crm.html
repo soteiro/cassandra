@@ -1,1 +1,135 @@
-<p>crm works!</p>
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- ENCABEZADO Y ACCIONES PRINCIPALES -->
+  <div class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-surface-border">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
+          <svg lucideUsers class="w-4 h-4" />
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold text-text-main tracking-tight">
+          CRM & Contactos
+        </h1>
+      </div>
+      <p class="text-xs text-text-muted">
+        Directorio relacional de personas. Haz clic en cualquier contacto para ver o editar su perfil e historial de interacciones.
+      </p>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="flex items-center gap-2.5">
+      <button
+        type="button"
+        (click)="reload()"
+        [class.animate-spin]="isRotating()"
+        class="p-2.5 bg-surface hover:bg-surface-border text-text-muted hover:text-primary border border-surface-border rounded-xl transition-all cursor-pointer shadow-xs"
+        title="Recargar personas"
+      >
+        <svg lucideRefreshCcw class="w-4 h-4" />
+      </button>
+
+      <button
+        type="button"
+        (click)="openCreateModal()"
+        class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2.5 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
+      >
+        <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
+        <span>Nueva Persona</span>
+      </button>
+    </div>
+  </div>
+
+  @if (personasResource.isLoading() && !personasResource.value()) {
+    <!-- SKELETON / CARGA INICIAL EN FILAS -->
+    <div class="flex flex-col gap-3">
+      @for (item of [1, 2, 3, 4, 5]; track item) {
+        <div class="p-3.5 sm:p-4 bg-surface border border-surface-border rounded-2xl animate-pulse flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5 sm:gap-4">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-background rounded-2xl"></div>
+            <div class="space-y-2">
+              <div class="w-36 sm:w-48 h-4 bg-background rounded-lg"></div>
+              <div class="w-24 h-3 bg-background rounded-lg"></div>
+            </div>
+          </div>
+          <div class="w-16 h-3 bg-background rounded-lg hidden sm:block"></div>
+        </div>
+      }
+    </div>
+  } @else if (personasResource.error()) {
+    <!-- ERROR -->
+    <div class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between">
+      <div>
+        <h4 class="text-sm font-semibold text-danger">Error al cargar personas</h4>
+        <p class="text-xs text-text-muted mt-0.5">No se pudo sincronizar el directorio con el servidor.</p>
+      </div>
+      <button
+        type="button"
+        (click)="reload()"
+        class="text-xs bg-danger/20 hover:bg-danger/30 text-danger border border-danger/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+      >
+        Reintentar
+      </button>
+    </div>
+  } @else if (personasResource.value(); as personas) {
+    <!-- BARRA DE BÚSQUEDA Y CONTADOR -->
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-surface border border-surface-border rounded-2xl p-3 shadow-sm">
+      <!-- INPUT DE BÚSQUEDA -->
+      <div class="relative flex-1 min-w-55">
+        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+          <svg lucideSearch class="w-4 h-4" />
+        </span>
+        <input
+          type="text"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          placeholder="Buscar persona por nombre o alias..."
+          class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl pl-10 pr-4 py-2 text-xs outline-none transition-all"
+        />
+      </div>
+
+      <!-- CONTADOR TOTAL -->
+      <div class="px-3 py-1.5 bg-background rounded-xl border border-surface-border text-xs text-text-muted">
+        Total: <strong class="text-text-main">{{ getStats(personas).total }}</strong> contactos
+      </div>
+    </div>
+
+    <!-- LISTA DE PERSONAS EN FORMATO ROW -->
+    <div class="flex flex-col gap-3">
+      @for (persona of getFilteredPersonas(personas); track persona.id) {
+        <app-persona-card [persona]="persona" />
+      } @empty {
+        <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-4">
+          <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+            <svg lucideUserPlus class="w-6 h-6" />
+          </div>
+          <div>
+            <h4 class="text-base font-semibold text-text-main">
+              {{ searchQuery() ? 'No se encontraron personas con ese criterio' : 'Tu CRM aún no tiene personas registradas' }}
+            </h4>
+            <p class="text-xs text-text-muted mt-1 max-w-md mx-auto">
+              {{ searchQuery() ? 'Prueba ajustando los términos de búsqueda.' : 'Comienza registrando tus contactos clave para asignarles un perfil y notas de interacción.' }}
+            </p>
+          </div>
+          @if (!searchQuery()) {
+            <button
+              type="button"
+              class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2.5 text-xs shadow-lg transition-all cursor-pointer inline-flex items-center gap-1.5"
+              (click)="openCreateModal()"
+            >
+              <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
+              <span>Registrar Primera Persona</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- MODAL DE CREACIÓN DE PERSONA -->
+  <app-persona-modal
+    [isOpen]="showModal()"
+    mode="create"
+    [isSubmitting]="isSubmitting()"
+    (save)="handleCreatePersona($event)"
+    (close)="closeModal()"
+  />
+</div>

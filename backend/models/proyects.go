@@ -7,6 +7,7 @@ type Proyects struct {
 	ID                   int        `json:"id"`
 	Nombre               string     `json:"nombre"`
 	FechaCreacion        time.Time  `json:"fecha_creacion"`
+	FechaTerminado       *time.Time `json:"fecha_terminado,omitempty"`
 	Eliminado            bool       `json:"eliminado"`
 	Descripcion          string     `json:"descripcion"`
 	Comentario           string     `json:"comentario"`
@@ -41,6 +42,7 @@ type ProyectResponse struct {
 	Descripcion          string     `json:"descripcion"`
 	Comentario           string     `json:"comentario"`
 	FechaCreacion        time.Time  `json:"fecha_creacion"`
+	FechaTerminado       *time.Time `json:"fecha_terminado,omitempty"`
 	Estado               string     `json:"estado"`
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
@@ -72,6 +74,7 @@ type ProyectUpdateResponse struct {
 	Descripcion          string     `json:"descripcion"`
 	Comentario           string     `json:"comentario"`
 	Estado               string     `json:"estado"`
+	FechaTerminado       *time.Time `json:"fecha_terminado,omitempty"`
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`

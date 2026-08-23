@@ -1,0 +1,196 @@
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { PersonaService } from '../../services/persona.service';
+import { ToastService } from '../../services/toast.service';
+import { PersonaResponse, PersonaUpdateRequest } from '../../models/persona.model';
+import { PersonaModal } from '../../components/persona-modal/persona-modal';
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import {
+  LucideArrowLeft,
+  LucidePencil,
+  LucideTrash2,
+  LucideCalendar,
+  LucideTag,
+  LucideInfo,
+  LucideMessageSquare,
+  LucidePlus,
+} from '@lucide/angular';
+
+interface InteraccionItem {
+  id: string;
+  tipo: 'Reunión' | 'Llamada' | 'Mensaje' | 'Email' | 'Nota';
+  fecha: string;
+  resumen: string;
+}
+
+@Component({
+  selector: 'app-persona-details',
+  imports: [
+    CommonModule,
+    RouterLink,
+    FormsModule,
+    PersonaModal,
+    ConfirmModal,
+    LucideArrowLeft,
+    LucidePencil,
+    LucideTrash2,
+    LucideCalendar,
+    LucideTag,
+    LucideInfo,
+    LucideMessageSquare,
+    LucidePlus,
+  ],
+  templateUrl: './persona-details.html',
+  styleUrl: './persona-details.css',
+})
+export class PersonaDetails {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly personaService = inject(PersonaService);
+  private readonly toast = inject(ToastService);
+
+  private readonly paramMap = toSignal(this.route.paramMap);
+  protected readonly id = () => this.paramMap()?.get('id') ?? null;
+  protected readonly personaIdNumber = () => Number(this.id());
+
+  // Persona Resource
+  protected readonly personaResource = this.personaService.getPersonaById(this.id);
+
+  // Edit Persona Modal signals
+  showEditModal = signal(false);
+  isSubmittingEdit = signal(false);
+
+  // Delete Persona Modal signals
+  showDeleteModal = signal(false);
+  isDeleting = signal(false);
+
+  // Interacciones locales / registro en memoria
+  interacciones = signal<InteraccionItem[]>([]);
+  nuevaInteraccionTipo = signal<'Reunión' | 'Llamada' | 'Mensaje' | 'Email' | 'Nota'>('Nota');
+  nuevaInteraccionResumen = signal('');
+  showAddInteraccion = signal(false);
+
+  get avatarUrl(): string {
+    const idVal = this.id();
+    return idVal ? `https://robohash.org/${idVal}?size=200x200` : 'https://robohash.org/1?size=200x200';
+  }
+
+  getEntornoBadgeClass(entorno?: string): string {
+    if (!entorno) {
+      return 'bg-surface-border/50 text-text-muted border-surface-border';
+    }
+
+    const val = entorno.toLowerCase().trim();
+    if (val.includes('trabajo') || val.includes('work') || val.includes('laboral') || val.includes('oficina')) {
+      return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
+    }
+    if (val.includes('cliente') || val.includes('empresa') || val.includes('negocio') || val.includes('b2b')) {
+      return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
+    }
+    if (val.includes('familia') || val.includes('pareja') || val.includes('hogar')) {
+      return 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+    }
+    if (val.includes('amigo') || val.includes('amistad') || val.includes('social')) {
+      return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+    }
+    if (val.includes('inver') || val.includes('finanza') || val.includes('socio') || val.includes('partner')) {
+      return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+    }
+    if (val.includes('universidad') || val.includes('estudio') || val.includes('mentor') || val.includes('profe')) {
+      return 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30';
+    }
+
+    return 'bg-primary/15 text-primary border-primary/30';
+  }
+
+  openEditModal() {
+    this.showEditModal.set(true);
+  }
+
+  closeEditModal() {
+    this.showEditModal.set(false);
+  }
+
+  saveEditPersona(payload: any) {
+    this.isSubmittingEdit.set(true);
+
+    this.personaService
+      .updatePersona(this.personaIdNumber(), payload as PersonaUpdateRequest)
+      .subscribe({
+        next: () => {
+          this.toast.success('Perfil actualizado correctamente');
+          this.isSubmittingEdit.set(false);
+          this.closeEditModal();
+          this.personaResource?.reload();
+        },
+        error: (err) => {
+          this.isSubmittingEdit.set(false);
+          const errorMsg =
+            err.error?.message || err.error || 'Error al actualizar el perfil';
+          this.toast.error(errorMsg);
+        },
+      });
+  }
+
+  openDeleteModal() {
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDeletePersona() {
+    this.isDeleting.set(true);
+
+    this.personaService.deletePersona(this.personaIdNumber()).subscribe({
+      next: () => {
+        this.toast.success('Persona eliminada del CRM');
+        this.isDeleting.set(false);
+        this.closeDeleteModal();
+        this.router.navigate(['/crm']);
+      },
+      error: (err) => {
+        this.isDeleting.set(false);
+        const errorMsg =
+          err.error?.message || err.error || 'Error al eliminar la persona';
+        this.toast.error(errorMsg);
+      },
+    });
+  }
+
+  addInteraccion() {
+    const resumen = this.nuevaInteraccionResumen().trim();
+    if (!resumen) return;
+
+    const item: InteraccionItem = {
+      id: Date.now().toString(),
+      tipo: this.nuevaInteraccionTipo(),
+      fecha: new Date().toISOString(),
+      resumen,
+    };
+
+    this.interacciones.update((prev) => [item, ...prev]);
+    this.nuevaInteraccionResumen.set('');
+    this.showAddInteraccion.set(false);
+    this.toast.success('Interacción registrada');
+  }
+
+  getTipoClass(tipo: string): string {
+    switch (tipo) {
+      case 'Reunión':
+        return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
+      case 'Llamada':
+        return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
+      case 'Mensaje':
+        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+      case 'Email':
+        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+      default:
+        return 'bg-primary/15 text-primary border-primary/30';
+    }
+  }
+}

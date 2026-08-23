@@ -8,7 +8,8 @@ import {
   LucideLogOut,
   LucideSparkles,
   LucideX,
-  LucideUser
+  LucideUser,
+  LucideBookOpen,
 } from '@lucide/angular';
 
 @Component({
@@ -21,6 +22,7 @@ import {
     LucideLogOut,
     LucideX,
     LucideUser,
+    LucideBookOpen,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',

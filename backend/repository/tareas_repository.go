@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -21,6 +22,12 @@ func NewTareasRepository(db *pgxpool.Pool) *TareasRepository {
 // crear una tarea
 func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
+	var fechaTerminado *time.Time
+	if req.Estado != nil && (*req.Estado == "Terminado" || *req.Estado == "Completado") {
+		now := time.Now()
+		fechaTerminado = &now
+	}
+
 	query := `
 		INSERT INTO tareas_proyectos (
 			nombre, 
@@ -29,10 +36,11 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 			user_id, 
 			estado,
 			proyecto_id,
-			tarea_padre_id
+			tarea_padre_id,
+			fecha_terminado
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, user_id, proyecto_id, tarea_padre_id
 	`
 
 	err := r.db.QueryRow(
@@ -45,12 +53,14 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		req.Estado,
 		req.ProyectID,
 		req.TareaPadreID,
+		fechaTerminado,
 	).Scan(
 		&tarea.ID,
 		&tarea.Nombre,
 		&tarea.Descripcion,
 		&tarea.Comentario,
 		&tarea.FechaCreacion,
+		&tarea.FechaTerminado,
 		&tarea.Estado,
 		&tarea.UserID,
 		&tarea.ProyectID,
@@ -67,7 +77,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 // GetAll obtiene todas las tareas de un usuario específico
 func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.TareaResponse, error) {
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE user_id = $1
 		AND eliminado = false
@@ -91,6 +101,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 			&tarea.Descripcion,
 			&tarea.Comentario,
 			&tarea.FechaCreacion,
+			&tarea.FechaTerminado,
 			&tarea.Estado,
 			&tarea.UserID,
 			&tarea.ProyectID,
@@ -114,7 +125,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 // GetByProyectoID obtiene las tareas de un proyecto pertenecientes a un usuario agrupadas jerárquicamente con sus subtareas
 func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, userID int) ([]models.TareaResponse, error) {
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE proyecto_id = $1
 		AND user_id = $2
@@ -139,6 +150,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 			&tarea.Descripcion,
 			&tarea.Comentario,
 			&tarea.FechaCreacion,
+			&tarea.FechaTerminado,
 			&tarea.Estado,
 			&tarea.UserID,
 			&tarea.ProyectID,
@@ -190,7 +202,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE id = $1
 		AND user_id = $2
@@ -203,6 +215,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 		&tarea.Descripcion,
 		&tarea.Comentario,
 		&tarea.FechaCreacion,
+		&tarea.FechaTerminado,
 		&tarea.Estado,
 		&tarea.UserID,
 		&tarea.ProyectID,
@@ -216,7 +229,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 
 	// Buscar subtareas directas
 	subQuery := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, estado, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE tarea_padre_id = $1
 		AND user_id = $2
@@ -235,6 +248,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 				&sub.Descripcion,
 				&sub.Comentario,
 				&sub.FechaCreacion,
+				&sub.FechaTerminado,
 				&sub.Estado,
 				&sub.UserID,
 				&sub.ProyectID,
@@ -252,6 +266,15 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 // Update actualiza una tarea usando COALESCE y asegurando la pertenencia del usuario
 func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *models.TareaUpdateRequest) (*models.TareaUpdateResponse, error) {
 	var tarea models.TareaUpdateResponse
+	var modoFechaTerminado int // 0 = no change, 1 = completado (NOW si null), 2 = reabierto (NULL)
+	if req.Estado != nil {
+		if *req.Estado == "Terminado" || *req.Estado == "Completado" {
+			modoFechaTerminado = 1
+		} else {
+			modoFechaTerminado = 2
+		}
+	}
+
 	query := `
 		UPDATE tareas_proyectos
 		SET nombre = COALESCE($1, nombre),
@@ -259,9 +282,14 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 			comentario = COALESCE($3, comentario),
 			estado = COALESCE($4, estado),
 			eliminado = COALESCE($5, eliminado),
-			tarea_padre_id = COALESCE($6, tarea_padre_id)
-		WHERE id = $7 AND user_id = $8
-		RETURNING id, nombre, descripcion, comentario, estado, eliminado, tarea_padre_id
+			tarea_padre_id = COALESCE($6, tarea_padre_id),
+			fecha_terminado = CASE 
+				WHEN $7 = 1 THEN COALESCE(fecha_terminado, NOW())
+				WHEN $7 = 2 THEN NULL
+				ELSE fecha_terminado
+			END
+		WHERE id = $8 AND user_id = $9
+		RETURNING id, nombre, descripcion, comentario, estado, fecha_terminado, eliminado, tarea_padre_id
 	`
 
 	err := r.db.QueryRow(
@@ -273,6 +301,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		req.Estado,
 		req.Eliminado,
 		req.TareaPadreID,
+		modoFechaTerminado,
 		id,
 		userID,
 	).Scan(
@@ -281,6 +310,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		&tarea.Descripcion,
 		&tarea.Comentario,
 		&tarea.Estado,
+		&tarea.FechaTerminado,
 		&tarea.Eliminado,
 		&tarea.TareaPadreID,
 	)
