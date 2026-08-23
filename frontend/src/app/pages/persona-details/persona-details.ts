@@ -4,10 +4,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { PersonaService } from '../../services/persona.service';
+import { InteraccionService } from '../../services/interaccion.service';
 import { ToastService } from '../../services/toast.service';
 import { PersonaResponse, PersonaUpdateRequest } from '../../models/persona.model';
+import { InteraccionResponse } from '../../models/interaccion.model';
 import { PersonaModal } from '../../components/persona-modal/persona-modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { InteraccionModal } from '../../components/interaccion-modal/interaccion-modal';
 import {
   LucideArrowLeft,
   LucidePencil,
@@ -17,14 +20,9 @@ import {
   LucideInfo,
   LucideMessageSquare,
   LucidePlus,
+  LucideArrowRight,
+  LucideClock,
 } from '@lucide/angular';
-
-interface InteraccionItem {
-  id: string;
-  tipo: 'Reunión' | 'Llamada' | 'Mensaje' | 'Email' | 'Nota';
-  fecha: string;
-  resumen: string;
-}
 
 @Component({
   selector: 'app-persona-details',
@@ -34,6 +32,7 @@ interface InteraccionItem {
     FormsModule,
     PersonaModal,
     ConfirmModal,
+    InteraccionModal,
     LucideArrowLeft,
     LucidePencil,
     LucideTrash2,
@@ -42,6 +41,8 @@ interface InteraccionItem {
     LucideInfo,
     LucideMessageSquare,
     LucidePlus,
+    LucideArrowRight,
+    LucideClock,
   ],
   templateUrl: './persona-details.html',
   styleUrl: './persona-details.css',
@@ -50,14 +51,17 @@ export class PersonaDetails {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly personaService = inject(PersonaService);
+  private readonly interaccionService = inject(InteraccionService);
   private readonly toast = inject(ToastService);
 
   private readonly paramMap = toSignal(this.route.paramMap);
   protected readonly id = () => this.paramMap()?.get('id') ?? null;
   protected readonly personaIdNumber = () => Number(this.id());
 
-  // Persona Resource
+  // Resources
   protected readonly personaResource = this.personaService.getPersonaById(this.id);
+  protected readonly interaccionesResource =
+    this.interaccionService.getInteraccionesByPersonaId(this.id);
 
   // Edit Persona Modal signals
   showEditModal = signal(false);
@@ -67,15 +71,20 @@ export class PersonaDetails {
   showDeleteModal = signal(false);
   isDeleting = signal(false);
 
-  // Interacciones locales / registro en memoria
-  interacciones = signal<InteraccionItem[]>([]);
-  nuevaInteraccionTipo = signal<'Reunión' | 'Llamada' | 'Mensaje' | 'Email' | 'Nota'>('Nota');
-  nuevaInteraccionResumen = signal('');
+  // Add Interaction signals
   showAddInteraccion = signal(false);
+  nuevaInteraccionTexto = signal('');
+  isSubmittingInteraccion = signal(false);
+
+  // Right-hand Side Drawer Detail Modal signals
+  selectedInteraccion = signal<InteraccionResponse | null>(null);
+  showDetailDrawer = signal(false);
 
   get avatarUrl(): string {
     const idVal = this.id();
-    return idVal ? `https://robohash.org/${idVal}?size=200x200` : 'https://robohash.org/1?size=200x200';
+    return idVal
+      ? `https://robohash.org/${idVal}?size=200x200`
+      : 'https://robohash.org/1?size=200x200';
   }
 
   getEntornoBadgeClass(entorno?: string): string {
@@ -84,28 +93,57 @@ export class PersonaDetails {
     }
 
     const val = entorno.toLowerCase().trim();
-    if (val.includes('trabajo') || val.includes('work') || val.includes('laboral') || val.includes('oficina')) {
+    if (
+      val.includes('trabajo') ||
+      val.includes('work') ||
+      val.includes('laboral') ||
+      val.includes('oficina')
+    ) {
       return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
     }
-    if (val.includes('cliente') || val.includes('empresa') || val.includes('negocio') || val.includes('b2b')) {
+    if (
+      val.includes('cliente') ||
+      val.includes('empresa') ||
+      val.includes('negocio') ||
+      val.includes('b2b')
+    ) {
       return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
     }
-    if (val.includes('familia') || val.includes('pareja') || val.includes('hogar')) {
+    if (
+      val.includes('familia') ||
+      val.includes('pareja') ||
+      val.includes('hogar')
+    ) {
       return 'bg-rose-500/15 text-rose-400 border-rose-500/30';
     }
-    if (val.includes('amigo') || val.includes('amistad') || val.includes('social')) {
+    if (
+      val.includes('amigo') ||
+      val.includes('amistad') ||
+      val.includes('social')
+    ) {
       return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
     }
-    if (val.includes('inver') || val.includes('finanza') || val.includes('socio') || val.includes('partner')) {
+    if (
+      val.includes('inver') ||
+      val.includes('finanza') ||
+      val.includes('socio') ||
+      val.includes('partner')
+    ) {
       return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
     }
-    if (val.includes('universidad') || val.includes('estudio') || val.includes('mentor') || val.includes('profe')) {
+    if (
+      val.includes('universidad') ||
+      val.includes('estudio') ||
+      val.includes('mentor') ||
+      val.includes('profe')
+    ) {
       return 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30';
     }
 
     return 'bg-primary/15 text-primary border-primary/30';
   }
 
+  // --- EDIT PERSONA ---
   openEditModal() {
     this.showEditModal.set(true);
   }
@@ -135,6 +173,7 @@ export class PersonaDetails {
       });
   }
 
+  // --- DELETE PERSONA ---
   openDeleteModal() {
     this.showDeleteModal.set(true);
   }
@@ -162,35 +201,44 @@ export class PersonaDetails {
     });
   }
 
-  addInteraccion() {
-    const resumen = this.nuevaInteraccionResumen().trim();
-    if (!resumen) return;
+  // --- ADD INTERACCIÓN ---
+  createInteraccion() {
+    const text = this.nuevaInteraccionTexto().trim();
+    const pId = this.personaIdNumber();
+    if (!text || !pId) return;
 
-    const item: InteraccionItem = {
-      id: Date.now().toString(),
-      tipo: this.nuevaInteraccionTipo(),
-      fecha: new Date().toISOString(),
-      resumen,
-    };
-
-    this.interacciones.update((prev) => [item, ...prev]);
-    this.nuevaInteraccionResumen.set('');
-    this.showAddInteraccion.set(false);
-    this.toast.success('Interacción registrada');
+    this.isSubmittingInteraccion.set(true);
+    this.interaccionService
+      .createInteraccion(pId, { interaccion: text })
+      .subscribe({
+        next: () => {
+          this.toast.success('Interacción registrada');
+          this.nuevaInteraccionTexto.set('');
+          this.isSubmittingInteraccion.set(false);
+          this.showAddInteraccion.set(false);
+          this.interaccionesResource?.reload();
+        },
+        error: (err) => {
+          this.isSubmittingInteraccion.set(false);
+          const errorMsg =
+            err.error?.message || err.error || 'Error al registrar interacción';
+          this.toast.error(errorMsg);
+        },
+      });
   }
 
-  getTipoClass(tipo: string): string {
-    switch (tipo) {
-      case 'Reunión':
-        return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
-      case 'Llamada':
-        return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
-      case 'Mensaje':
-        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
-      case 'Email':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-      default:
-        return 'bg-primary/15 text-primary border-primary/30';
-    }
+  // --- RIGHT DRAWER MODAL ---
+  openInteraccionDetail(item: InteraccionResponse) {
+    this.selectedInteraccion.set(item);
+    this.showDetailDrawer.set(true);
+  }
+
+  closeInteraccionDetail() {
+    this.showDetailDrawer.set(false);
+    this.selectedInteraccion.set(null);
+  }
+
+  onInteraccionChanged() {
+    this.interaccionesResource?.reload();
   }
 }
