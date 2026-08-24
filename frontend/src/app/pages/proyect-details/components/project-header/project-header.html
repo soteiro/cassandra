@@ -51,7 +51,7 @@
         <span [class]="'px-3 py-1 text-xs font-semibold rounded-lg ' + getPriorityClass(project().prioridad)">
           Prioridad: {{ project().prioridad }}
         </span>
-        <span class="px-3 py-1 text-xs bg-surface text-text-muted rounded-lg border border-surface-border">
+        <span [class]="'px-3 py-1 text-xs font-medium rounded-lg border ' + getStatusClass(project().estado)">
           Estado: {{ project().estado }}
         </span>
         <button

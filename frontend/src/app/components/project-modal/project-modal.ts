@@ -40,7 +40,7 @@ export class ProjectModal {
   para_que = signal('');
   criterio_finalizacion = signal('');
   prioridad = signal('Media');
-  estado = signal('En Curso');
+  estado = signal('No Listado');
   fecha_limite = signal('');
   proyecto_padre_id = signal<number | null>(null);
 
@@ -62,7 +62,7 @@ export class ProjectModal {
           this.para_que.set(data.para_que || '');
           this.criterio_finalizacion.set(data.criterio_finalizacion || '');
           this.prioridad.set(data.prioridad || 'Media');
-          this.estado.set(data.estado || 'En Curso');
+          this.estado.set(data.estado || 'No Listado');
           this.fecha_limite.set(data.fecha_limite ? data.fecha_limite.split('T')[0] : '');
           this.proyecto_padre_id.set(data.proyecto_padre_id || null);
         } else if (m === 'create-subproject' && parent) {
@@ -73,7 +73,7 @@ export class ProjectModal {
           this.para_que.set('');
           this.criterio_finalizacion.set('');
           this.prioridad.set('Media');
-          this.estado.set('En Curso');
+          this.estado.set('No Listado');
           this.fecha_limite.set('');
           this.proyecto_padre_id.set(parent.id);
         } else {
@@ -85,7 +85,7 @@ export class ProjectModal {
           this.para_que.set('');
           this.criterio_finalizacion.set('');
           this.prioridad.set('Media');
-          this.estado.set('En Curso');
+          this.estado.set('No Listado');
           this.fecha_limite.set('');
           this.proyecto_padre_id.set(null);
         }

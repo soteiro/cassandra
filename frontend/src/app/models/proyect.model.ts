@@ -1,13 +1,24 @@
+export type ProjectEstado =
+  | 'Idea'
+  | 'No Listado'
+  | 'Pendiente'
+  | 'En Proceso'
+  | 'Pausado'
+  | 'Completado'
+  | 'Cancelado';
+
+export type ProjectPrioridad = 'Baja' | 'Media' | 'Alta' | 'Critica';
+
 export interface Project {
   id: number;
   nombre: string;
   descripcion: string;
   comentario: string;
-  estado: string;
+  estado: ProjectEstado | string;
   por_que: string;
   para_que: string;
   criterio_finalizacion: string;
-  prioridad: string;
+  prioridad: ProjectPrioridad | string;
   fecha_limite?: string;
   user_id: number;
   fecha_creacion: string;

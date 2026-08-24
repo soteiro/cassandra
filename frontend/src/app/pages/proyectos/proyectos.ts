@@ -84,7 +84,7 @@ export class Proyectos {
 
     // 3. Filtro por estado / prioridad
     if (status === 'active') {
-      list = list.filter((p) => p.estado !== 'Terminado' && p.estado !== 'Completado');
+      list = list.filter((p) => p.estado !== 'Terminado' && p.estado !== 'Completado' && p.estado !== 'Cancelado');
     } else if (status === 'completed') {
       list = list.filter((p) => p.estado === 'Terminado' || p.estado === 'Completado');
     } else if (status === 'critical') {
