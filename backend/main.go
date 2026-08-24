@@ -33,7 +33,8 @@ func main() {
 		log.Fatalln("error al cargar las env")
 	}
 
-	// 2. Conectar a PostgreSQL
+	// 2. Conectar a PostgreSQL	"github.com/go-chi/cors"
+	
 	dbPool, err := database.Connect(cfg.DatabaseUrl)
 	if err != nil {
 		log.Fatalf("error al conectar el pool: %v", err)
@@ -91,13 +92,15 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]string{"response": "One Golang To Rule Them All"})
 	})
 
+	// Registro público de usuarios
+	
 	// Grupo de rutas protegidas
 	r.Group(func(r chi.Router) {
-		// obtenter un token de auth para poder crear un nuevo usuario, ya que la ruta de creación de usuarios está protegida
-	    r.Post("/api/users", userHandler.CreateUser)
-
-		// Aplicamos el middleware de autenticación a este grupo
+		// Aplicamos el middleware de autenticación a este grupo (debe ir antes de cualquier ruta del grupo)
+		
 		r.Use(middleware.AuthMiddleware(cfg.JwtSecret))
+		
+		r.Post("/api/users", userHandler.CreateUser)
 		r.Get("/api/users", userHandler.ListUsers)
 		r.Get("/api/users/{id}", userHandler.GetUser)
 		r.Put("/api/users/{id}", userHandler.UpdateUser)
