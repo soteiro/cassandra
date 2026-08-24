@@ -1,11 +1,16 @@
-<header class="h-15 bg-background w-full justify-between align-center p-2 flex md:hidden">
-    <div>
-      icono
-    </div>
+<header class="h-16 bg-background w-full justify-between align-center p-2 flex md:hidden">
+  <a 
+  routerLink="/home"
+  class="flex items-center gap-3 cursor-pointer">
+    <img
+      src="cassandra.svg"
+      alt="logo"
+      class="w-10 h-10 flex items-center justify-center text-primary shadow-xs"
+    />
+  </a>
   <div>
-    <button (click)="sidebar.toggle()" 
-    class="p-2" >
-    <svg lucideMenu class="text-primary"> </svg>
+    <button (click)="sidebar.toggle()" class="p-2">
+      <svg lucideMenu class="text-primary w-8 h-8"></svg>
     </button>
   </div>
- </header>
+</header>
