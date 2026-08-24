@@ -9,13 +9,13 @@
         <div
           class="w-9 h-9 rounded-xl flex border border-primary/50 items-center justify-center text-primary shadow-xs"
         >
-          <img src="cassandra.svg" class="w-full h-full" alt="logo">
+          <img src="cassandra.svg" class="w-full h-full" alt="logo" />
         </div>
         <div>
-          <h2 class="text-base font-bold text-text-main tracking-tight leading-none">
-            Cassandra
-          </h2>
-          <span class="text-[10px] uppercase font-semibold tracking-wider text-primary/80 mt-0.5 block">
+          <h2 class="text-base font-bold text-text-main tracking-tight leading-none">Cassandra</h2>
+          <span
+            class="text-[10px] uppercase font-semibold tracking-wider text-primary/80 mt-0.5 block"
+          >
             Personal HQ
           </span>
         </div>
@@ -68,30 +68,21 @@
         <svg lucideUser class="w-4 h-4 group-hover:scale-105 transition-transform" />
         <span>Crm</span>
       </a>
-      <a
-        (click)="sidebar.close()"
-        routerLink="/docs"
-        routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
-      >
-        <svg lucideBookOpen class="w-4 h-4 group-hover:scale-105 transition-transform" />
-        <span>API Docs</span>
-      </a>
     </nav>
   </div>
 
   <!-- FOOTER / USER & LOGOUT -->
   <div class="border-t border-surface-border pt-4 mt-auto space-y-3">
-    <!-- AMBIENT STATUS -->
-    <div class="px-3 py-2 bg-background/50 rounded-xl border border-surface-border/60 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-        <span class="text-xs text-text-muted font-medium">Sistema Online</span>
-      </div>
-      <span class="text-[10px] text-text-muted/60 font-mono">v0.1</span>
-    </div>
-
+    <a
+      (click)="sidebar.close()"
+      routerLink="/docs"
+      routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+    >
+      <svg lucideBookOpen class="w-4 h-4 group-hover:scale-105 transition-transform" />
+      <span>API Docs</span>
+    </a>
     <!-- LOGOUT BUTTON -->
     <button
       type="button"

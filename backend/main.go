@@ -85,37 +85,7 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
 
-	r.Get("/api/db-time", func(w http.ResponseWriter, r *http.Request) {
-		var currentTime time.Time
-		err := database.DB.QueryRow(r.Context(), "select now()").Scan(&currentTime)
-		if err != nil {
-			http.Error(w, "error al consultar la base de datos: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "hola desde la base de datos",
-			"db_time": currentTime,
-		})
-	})
-
-	r.Get("/api/db-version", func(w http.ResponseWriter, r *http.Request) {
-		var version string
-		err := database.DB.QueryRow(r.Context(), "SELECT version()").Scan(&version)
-		if err != nil {
-			http.Error(w, "Error al obtener la version de la base de datos: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message":    "holaaa",
-			"status":     "ok",
-			"version_db": version,
-		})
-	})
-
-	// 6. Rutas de la Entidad de Usuarios
-	r.Post("/api/users", userHandler.CreateUser)
+	
 
 	r.Get("/api/", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"response": "One Golang To Rule Them All"})
@@ -123,6 +93,9 @@ func main() {
 
 	// Grupo de rutas protegidas
 	r.Group(func(r chi.Router) {
+		// obtenter un token de auth para poder crear un nuevo usuario, ya que la ruta de creación de usuarios está protegida
+	    r.Post("/api/users", userHandler.CreateUser)
+
 		// Aplicamos el middleware de autenticación a este grupo
 		r.Use(middleware.AuthMiddleware(cfg.JwtSecret))
 		r.Get("/api/users", userHandler.ListUsers)
