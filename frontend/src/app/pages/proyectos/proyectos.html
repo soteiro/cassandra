@@ -83,6 +83,7 @@
         </span>
         <input
           type="text"
+          autofocus
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
           placeholder="Buscar proyecto por nombre, objetivo o meta..."
