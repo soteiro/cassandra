@@ -12,6 +12,7 @@ type Persona struct {
 	Informacion   string    `json:"informacion"`
 	FechaCreacion time.Time `json:"fecha_creacion"`
 	Eliminado     bool      `json:"eliminado"`
+	EsYo          bool      `json:"es_yo"`
 }
 
 // Request para crear una persona
@@ -21,6 +22,7 @@ type PersonaRequest struct {
 	Entorno     string `json:"entorno"`
 	Informacion string `json:"informacion"`
 	UserID      int    `json:"user_id"`
+	EsYo        bool   `json:"es_yo"`
 }
 
 // Response para persona
@@ -33,6 +35,7 @@ type PersonaResponse struct {
 	Informacion   string    `json:"informacion"`
 	FechaCreacion time.Time `json:"fecha_creacion"`
 	Eliminado     bool      `json:"eliminado"`
+	EsYo          bool      `json:"es_yo"`
 }
 
 // Request para actualizar una persona
@@ -42,4 +45,5 @@ type PersonaUpdateRequest struct {
 	Entorno     *string `json:"entorno"`
 	Informacion *string `json:"informacion"`
 	Eliminado   *bool   `json:"eliminado"`
+	EsYo        *bool   `json:"es_yo"`
 }

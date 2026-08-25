@@ -19,19 +19,26 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-// Create inserta un nuevo usuario en la base de datos
+// Create inserta un nuevo usuario en la base de datos y crea automáticamente su perfil en persona con es_yo = true
 func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*models.UserResponse, error) {
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		log.Printf("[REPO:User.Create] Error al iniciar transacción: %v", err)
+		return nil, fmt.Errorf("error al iniciar transacción: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
 	var user models.UserResponse
 
-	query := `
-            INSERT INTO users (nombre, alias, email, password)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id, nombre, alias, email, fecha_creacion
-        `
+	queryUser := `
+		INSERT INTO users (nombre, alias, email, password)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, nombre, alias, email, fecha_creacion
+	`
 
-	err := r.db.QueryRow(
+	err = tx.QueryRow(
 		ctx,
-		query,
+		queryUser,
 		req.Nombre,
 		req.Alias,
 		req.Email,
@@ -45,8 +52,23 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
 	)
 
 	if err != nil {
-		log.Printf("[REPO:User.Create] Error en SQL INSERT: %v | email=%s", err, req.Email)
+		log.Printf("[REPO:User.Create] Error en SQL INSERT user: %v | email=%s", err, req.Email)
 		return nil, err
+	}
+
+	queryPersona := `
+		INSERT INTO persona (user_id, nombre, alias, entorno, informacion, es_yo)
+		VALUES ($1, $2, $3, 'Personal', 'Mi espacio de reflexiones y notas personales', true)
+	`
+	_, err = tx.Exec(ctx, queryPersona, user.ID, user.Nombre, user.Alias)
+	if err != nil {
+		log.Printf("[REPO:User.Create] Error en SQL INSERT persona para usuario: %v | user_id=%d", err, user.ID)
+		return nil, fmt.Errorf("error al crear perfil personal para el usuario: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Printf("[REPO:User.Create] Error al confirmar transacción: %v | user_id=%d", err, user.ID)
+		return nil, fmt.Errorf("error al confirmar creación de usuario: %w", err)
 	}
 
 	return &user, nil

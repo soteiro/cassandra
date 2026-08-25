@@ -63,6 +63,8 @@ func main() {
 	personaHandler := handlers.NewPersonaHandler(personaRepo)
 	interaccionesRepo := repository.NewInteraccionesRepository(dbPool)
 	interaccionesHandler := handlers.NewInteraccionesHandler(interaccionesRepo)
+	reflexionesRepo := repository.NewReflexionesRepository(dbPool)
+	reflexionesHandler := handlers.NewReflexionesHandler(reflexionesRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -151,6 +153,13 @@ func main() {
 		r.Get("/api/interacciones/{id}", interaccionesHandler.GetByID)
 		r.Put("/api/interacciones/{id}", interaccionesHandler.Update)
 		r.Delete("/api/interacciones/{id}", interaccionesHandler.Delete)
+
+		// Rutas de Reflexiones
+		r.Post("/api/reflexiones", reflexionesHandler.Create)
+		r.Get("/api/reflexiones", reflexionesHandler.GetAll)
+		r.Get("/api/reflexiones/{id}", reflexionesHandler.GetByID)
+		r.Put("/api/reflexiones/{id}", reflexionesHandler.Update)
+		r.Delete("/api/reflexiones/{id}", reflexionesHandler.Delete)
 	})
 
 

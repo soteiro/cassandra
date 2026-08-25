@@ -1,0 +1,22 @@
+info:
+  name: create reflexion
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/reflexiones
+  body:
+    type: json
+    data: |-
+      {
+        "reflexion": "Hoy logré enfocarme 2 horas seguidas aplicando la técnica Pomodoro. Noto que tener pocas tareas visuales reduce mi dispersión.",
+        "tipo": "reflexion"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

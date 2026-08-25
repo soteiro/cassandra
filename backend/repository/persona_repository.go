@@ -22,9 +22,9 @@ func NewPersonaRepository(db *pgxpool.Pool) *PersonaRepository {
 func (r *PersonaRepository) Create(ctx context.Context, req *models.PersonaRequest) (*models.PersonaResponse, error) {
 	var p models.PersonaResponse
 	query := `
-	INSERT INTO persona (user_id, nombre, alias, entorno, informacion)
-	VALUES ($1, $2, $3, $4, $5)
-	RETURNING id, user_id, nombre, alias, entorno, informacion, fecha_creacion, eliminado
+	INSERT INTO persona (user_id, nombre, alias, entorno, informacion, es_yo)
+	VALUES ($1, $2, $3, $4, $5, $6)
+	RETURNING id, user_id, nombre, alias, entorno, informacion, fecha_creacion, eliminado, es_yo
 	`
 
 	err := r.db.QueryRow(
@@ -35,6 +35,7 @@ func (r *PersonaRepository) Create(ctx context.Context, req *models.PersonaReque
 		req.Alias,
 		req.Entorno,
 		req.Informacion,
+		req.EsYo,
 	).Scan(
 		&p.ID,
 		&p.UserID,
@@ -44,6 +45,7 @@ func (r *PersonaRepository) Create(ctx context.Context, req *models.PersonaReque
 		&p.Informacion,
 		&p.FechaCreacion,
 		&p.Eliminado,
+		&p.EsYo,
 	)
 
 	if err != nil {
@@ -57,11 +59,11 @@ func (r *PersonaRepository) Create(ctx context.Context, req *models.PersonaReque
 // GetAll obtiene todas las personas activas de un usuario
 func (r *PersonaRepository) GetAll(ctx context.Context, userID int) ([]*models.PersonaResponse, error) {
 	query := `
-	SELECT id, user_id, nombre, COALESCE(alias, ''), COALESCE(entorno, ''), COALESCE(informacion, ''), fecha_creacion, eliminado
+	SELECT id, user_id, nombre, COALESCE(alias, ''), COALESCE(entorno, ''), COALESCE(informacion, ''), fecha_creacion, eliminado, es_yo
 	FROM persona
 	WHERE user_id = $1
 	  AND eliminado = false
-	ORDER BY id DESC
+	ORDER BY es_yo DESC, id DESC
 	`
 
 	rows, err := r.db.Query(ctx, query, userID)
@@ -84,6 +86,7 @@ func (r *PersonaRepository) GetAll(ctx context.Context, userID int) ([]*models.P
 			&p.Informacion,
 			&p.FechaCreacion,
 			&p.Eliminado,
+			&p.EsYo,
 		)
 		if err != nil {
 			log.Printf("[REPO:Persona.GetAll] Error al escanear fila: %v | user_id=%d", err, userID)
@@ -104,7 +107,7 @@ func (r *PersonaRepository) GetAll(ctx context.Context, userID int) ([]*models.P
 func (r *PersonaRepository) GetById(ctx context.Context, id int, userID int) (*models.PersonaResponse, error) {
 	var p models.PersonaResponse
 	query := `
-	SELECT id, user_id, nombre, COALESCE(alias, ''), COALESCE(entorno, ''), COALESCE(informacion, ''), fecha_creacion, eliminado
+	SELECT id, user_id, nombre, COALESCE(alias, ''), COALESCE(entorno, ''), COALESCE(informacion, ''), fecha_creacion, eliminado, es_yo
 	FROM persona
 	WHERE id = $1
 	  AND user_id = $2
@@ -120,6 +123,7 @@ func (r *PersonaRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.Informacion,
 		&p.FechaCreacion,
 		&p.Eliminado,
+		&p.EsYo,
 	)
 
 	if err != nil {
@@ -140,11 +144,12 @@ func (r *PersonaRepository) Update(ctx context.Context, id int, userID int, req 
 		alias = COALESCE($2, alias),
 		entorno = COALESCE($3, entorno),
 		informacion = COALESCE($4, informacion),
-		eliminado = COALESCE($5, eliminado)
-	WHERE id = $6
-	  AND user_id = $7
+		eliminado = COALESCE($5, eliminado),
+		es_yo = COALESCE($6, es_yo)
+	WHERE id = $7
+	  AND user_id = $8
 	  AND eliminado = false
-	RETURNING id, user_id, nombre, COALESCE(alias, ''), COALESCE(entorno, ''), COALESCE(informacion, ''), fecha_creacion, eliminado
+	RETURNING id, user_id, nombre, COALESCE(alias, ''), COALESCE(entorno, ''), COALESCE(informacion, ''), fecha_creacion, eliminado, es_yo
 	`
 
 	err := r.db.QueryRow(
@@ -155,6 +160,7 @@ func (r *PersonaRepository) Update(ctx context.Context, id int, userID int, req 
 		req.Entorno,
 		req.Informacion,
 		req.Eliminado,
+		req.EsYo,
 		id,
 		userID,
 	).Scan(
@@ -166,6 +172,7 @@ func (r *PersonaRepository) Update(ctx context.Context, id int, userID int, req 
 		&p.Informacion,
 		&p.FechaCreacion,
 		&p.Eliminado,
+		&p.EsYo,
 	)
 
 	if err != nil {

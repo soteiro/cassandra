@@ -1,0 +1,22 @@
+info:
+  name: update reflexion by id
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/reflexiones/1
+  body:
+    type: json
+    data: |-
+      {
+        "reflexion": "Actualización: Logré sostener la rutina por 3 días seguidos.",
+        "tipo": "reflexion"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
