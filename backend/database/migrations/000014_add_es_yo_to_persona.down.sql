@@ -1,0 +1,2 @@
+ALTER TABLE persona 
+    DROP COLUMN IF EXISTS es_yo;
