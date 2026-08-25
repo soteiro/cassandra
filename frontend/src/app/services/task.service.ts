@@ -24,6 +24,20 @@ export class TaskService {
     });
   }
 
+  public getAllTasks(estado?: () => string | null) {
+    if (!this.authService.isLoggedIn()) {
+      return undefined;
+    }
+
+    return httpResource<Task[]>(() => {
+      const est = estado ? estado() : null;
+      if (!est || est === 'all' || est === 'todas') {
+        return `${this.apiUrl}/tareas`;
+      }
+      return `${this.apiUrl}/tareas?estado=${encodeURIComponent(est)}`;
+    });
+  }
+
   getTaskById(id: number): Observable<Task> {
     return this.http.get<Task>(`${this.apiUrl}/tareas/${id}`);
   }

@@ -72,7 +72,7 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tarea)
 }
 
-// GetAllTareas maneja la ruta GET /api/tareas (lista todas las tareas del usuario)
+// GetAllTareas maneja la ruta GET /api/tareas (lista tareas con filtro opcional por ?estado=...)
 func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
@@ -81,7 +81,9 @@ func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tareas, err := h.repo.GetAll(r.Context(), userID)
+	estadoFilter := strings.TrimSpace(r.URL.Query().Get("estado"))
+
+	tareas, err := h.repo.GetAll(r.Context(), userID, estadoFilter)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.GetAllTareas] Error en repositorio: %v | user_id=%d", err, userID)
 		http.Error(w, "error al obtener las tareas: "+err.Error(), http.StatusInternalServerError)
@@ -93,7 +95,7 @@ func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	log.Printf("[HANDLER:Tareas.GetAllTareas] Éxito: %d tareas obtenidas | user_id=%d", len(tareas), userID)
+	log.Printf("[HANDLER:Tareas.GetAllTareas] Éxito: %d tareas obtenidas | user_id=%d estado=%q", len(tareas), userID, estadoFilter)
 	json.NewEncoder(w).Encode(tareas)
 }
 

@@ -38,6 +38,7 @@ type TareaResponse struct {
 	Estado         *string         `json:"estado"`
 	UserID         int             `json:"user_id"`
 	ProyectID      int             `json:"proyect_id"`
+	ProyectoNombre *string         `json:"proyecto_nombre,omitempty"`
 	TareaPadreID   *int            `json:"tarea_padre_id,omitempty"`
 	Subtareas      []TareaResponse `json:"subtareas,omitempty"`
 }

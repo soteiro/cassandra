@@ -74,17 +74,39 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 	return &tarea, nil
 }
 
-// GetAll obtiene todas las tareas de un usuario específico
-func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.TareaResponse, error) {
-	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, user_id, proyecto_id, tarea_padre_id
-		FROM tareas_proyectos
-		WHERE user_id = $1
-		AND eliminado = false
-		ORDER BY id ASC
-	`
+// GetAll obtiene todas las tareas de un usuario específico con filtro opcional por estado
+func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter string) ([]models.TareaResponse, error) {
+	var query string
+	var args []interface{}
 
-	rows, err := r.db.Query(ctx, query, userID)
+	if estadoFilter != "" {
+		query = `
+			SELECT 
+				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.estado, t.user_id, t.proyecto_id, t.tarea_padre_id,
+				COALESCE(p.nombre, '') AS proyecto_nombre
+			FROM tareas_proyectos t
+			LEFT JOIN proyectos p ON p.id = t.proyecto_id
+			WHERE t.user_id = $1
+			  AND t.eliminado = false
+			  AND t.estado ILIKE $2
+			ORDER BY t.id ASC
+		`
+		args = []interface{}{userID, estadoFilter}
+	} else {
+		query = `
+			SELECT 
+				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.estado, t.user_id, t.proyecto_id, t.tarea_padre_id,
+				COALESCE(p.nombre, '') AS proyecto_nombre
+			FROM tareas_proyectos t
+			LEFT JOIN proyectos p ON p.id = t.proyecto_id
+			WHERE t.user_id = $1
+			  AND t.eliminado = false
+			ORDER BY t.id ASC
+		`
+		args = []interface{}{userID}
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		log.Printf("[REPO:Tareas.GetAll] Error en SQL SELECT: %v | user_id=%d", err, userID)
 		return nil, err
@@ -106,6 +128,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int) ([]models.Tar
 			&tarea.UserID,
 			&tarea.ProyectID,
 			&tarea.TareaPadreID,
+			&tarea.ProyectoNombre,
 		)
 		if err != nil {
 			log.Printf("[REPO:Tareas.GetAll] Error al escanear fila: %v | user_id=%d", err, userID)

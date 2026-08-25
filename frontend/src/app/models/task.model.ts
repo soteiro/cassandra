@@ -7,6 +7,7 @@ export interface Task {
   eliminado: boolean;
   user_id: number;
   proyect_id: number;
+  proyecto_nombre?: string;
   fecha_creacion: string;
   fecha_terminado?: string | null;
   tarea_padre_id?: number | null;
