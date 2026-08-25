@@ -7,6 +7,7 @@ export interface Persona {
   informacion?: string;
   fecha_creacion: string;
   eliminado: boolean;
+  es_yo?: boolean;
 }
 
 export interface PersonaRequest {
@@ -15,6 +16,7 @@ export interface PersonaRequest {
   entorno?: string;
   informacion?: string;
   user_id?: number;
+  es_yo?: boolean;
 }
 
 export interface PersonaResponse {
@@ -26,6 +28,7 @@ export interface PersonaResponse {
   informacion?: string;
   fecha_creacion: string;
   eliminado: boolean;
+  es_yo?: boolean;
 }
 
 export interface PersonaUpdateRequest {
@@ -34,4 +37,6 @@ export interface PersonaUpdateRequest {
   entorno?: string;
   informacion?: string;
   eliminado?: boolean;
+  es_yo?: boolean;
 }
+

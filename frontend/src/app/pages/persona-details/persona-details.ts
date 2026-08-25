@@ -11,6 +11,7 @@ import { InteraccionResponse } from '../../models/interaccion.model';
 import { PersonaModal } from '../../components/persona-modal/persona-modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import { InteraccionModal } from '../../components/interaccion-modal/interaccion-modal';
+import { ReflexionesView } from '../../components/reflexiones-view/reflexiones-view';
 import {
   LucideArrowLeft,
   LucidePencil,
@@ -33,6 +34,7 @@ import {
     PersonaModal,
     ConfirmModal,
     InteraccionModal,
+    ReflexionesView,
     LucideArrowLeft,
     LucidePencil,
     LucideTrash2,

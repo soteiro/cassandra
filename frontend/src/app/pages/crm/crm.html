@@ -70,6 +70,59 @@
       </button>
     </div>
   } @else if (personasResource.value(); as personas) {
+    <!-- SECCIÓN DESTACADA: MI ESPACIO / REFLEXIONES -->
+    @if (getMyProfile(personas); as myProfile) {
+      <div
+        class="p-5 sm:p-6 bg-gradient-to-r from-surface via-surface to-primary/10 border border-primary/40 hover:border-primary rounded-2xl transition-all shadow-md space-y-4 group"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div
+              class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl bg-primary/15 border border-primary/30 p-1 flex items-center justify-center overflow-hidden shadow-inner group-hover:scale-105 transition-transform"
+            >
+              <img
+                [src]="'https://robohash.org/' + myProfile.id + '?size=160x160'"
+                [alt]="myProfile.nombre"
+                class="w-full h-full object-contain filter drop-shadow-sm"
+              />
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-base sm:text-lg font-bold text-text-main group-hover:text-primary transition-colors">
+                  {{ myProfile.nombre }}
+                </h2>
+                <span class="text-[10px] uppercase font-bold tracking-wider bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-md flex items-center gap-1">
+                  <svg lucideBrain class="w-3 h-3" />
+                  <span>Mi Bitácora & Reflexiones</span>
+                </span>
+              </div>
+              <p class="text-xs text-text-muted mt-0.5">
+                {{ myProfile.alias ? '@' + myProfile.alias : 'Mi perfil' }} • Espacio personal para escribir, registrar eventos y memorias
+              </p>
+            </div>
+          </div>
+
+          <a
+            [routerLink]="['/crm/persona', myProfile.id]"
+            class="bg-primary hover:bg-primary/90 text-background font-semibold text-xs rounded-xl px-4 py-2.5 shadow-md flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer"
+          >
+            <svg lucideFeather class="w-4 h-4 stroke-[2.5]" />
+            <span>Abrir Bitácora</span>
+            <svg lucideArrowRight class="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- DIVISOR & ENCABEZADO DE CONTACTOS -->
+    <div class="pt-2 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <h3 class="text-sm font-bold text-text-main uppercase tracking-wider text-text-muted">
+          Contactos & Relaciones
+        </h3>
+      </div>
+    </div>
+
     <!-- BARRA DE BÚSQUEDA Y CONTADOR -->
     <div class="flex flex-wrap items-center justify-between gap-3 bg-surface border border-surface-border rounded-2xl p-3 shadow-sm">
       <!-- INPUT DE BÚSQUEDA -->
@@ -81,20 +134,20 @@
           type="text"
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
-          placeholder="Buscar persona por nombre o alias..."
+          placeholder="Buscar contacto por nombre o alias..."
           class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl pl-10 pr-4 py-2 text-xs outline-none transition-all"
         />
       </div>
 
       <!-- CONTADOR TOTAL -->
       <div class="px-3 py-1.5 bg-background rounded-xl border border-surface-border text-xs text-text-muted">
-        Total: <strong class="text-text-main">{{ getStats(personas).total }}</strong> contactos
+        Total: <strong class="text-text-main">{{ getStats(personas).contactos }}</strong> contactos
       </div>
     </div>
 
     <!-- LISTA DE PERSONAS EN FORMATO ROW -->
     <div class="flex flex-col gap-3">
-      @for (persona of getFilteredPersonas(personas); track persona.id) {
+      @for (persona of getFilteredContacts(personas); track persona.id) {
         <app-persona-card [persona]="persona" />
       } @empty {
         <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-4">
@@ -103,7 +156,7 @@
           </div>
           <div>
             <h4 class="text-base font-semibold text-text-main">
-              {{ searchQuery() ? 'No se encontraron personas con ese criterio' : 'Tu CRM aún no tiene personas registradas' }}
+              {{ searchQuery() ? 'No se encontraron contactos con ese criterio' : 'Tu CRM aún no tiene contactos registrados' }}
             </h4>
             <p class="text-xs text-text-muted mt-1 max-w-md mx-auto">
               {{ searchQuery() ? 'Prueba ajustando los términos de búsqueda.' : 'Comienza registrando tus contactos clave para asignarles un perfil y notas de interacción.' }}
@@ -116,7 +169,7 @@
               (click)="openCreateModal()"
             >
               <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
-              <span>Registrar Primera Persona</span>
+              <span>Registrar Primer Contacto</span>
             </button>
           }
         </div>

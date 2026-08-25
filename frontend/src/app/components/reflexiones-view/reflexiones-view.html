@@ -1,0 +1,328 @@
+<div class="space-y-6">
+  <!-- CABECERA DE PERFIL PERSONAL & ESTADÍSTICAS -->
+  <div class="p-6 bg-linear-to-br from-surface via-surface to-primary/5 border border-primary/25 rounded-2xl shadow-sm space-y-5">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <!-- AVATAR + NOMBRE -->
+      <div class="flex items-center gap-4 sm:gap-5 min-w-0">
+        <div
+          class="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-primary/10 border-2 border-primary/30 p-1 flex items-center justify-center overflow-hidden shadow-inner"
+        >
+          <img
+            [src]="avatarUrl"
+            [alt]="persona()?.nombre || 'Mi Perfil'"
+            class="w-full h-full object-contain filter drop-shadow-md"
+          />
+        </div>
+
+        <div class="space-y-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-xl sm:text-2xl font-bold text-text-main tracking-tight truncate">
+              {{ persona()?.nombre || 'Mi Espacio' }}
+            </h1>
+            <span class="text-[11px] font-semibold uppercase tracking-wider bg-primary/15 text-primary border border-primary/30 px-2.5 py-0.5 rounded-lg">
+              Bitácora Personal
+            </span>
+          </div>
+
+          <p class="text-xs text-text-muted">
+            {{ persona()?.alias ? '@' + persona()?.alias : 'Espacio de introspección, práctica de escritura y registro de memorias' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- CONTADORES RÁPIDOS -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <div class="px-3.5 py-2 bg-background/80 border border-surface-border rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-text-muted uppercase tracking-wider text-[10px]">Total</span>
+          <span class="text-base font-bold text-text-main">{{ stats().total }}</span>
+        </div>
+        <div class="px-3.5 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-purple-300 uppercase tracking-wider text-[10px]">Reflexiones</span>
+          <span class="text-base font-bold text-purple-300">{{ stats().reflexiones }}</span>
+        </div>
+        <div class="px-3.5 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-amber-300 uppercase tracking-wider text-[10px]">Memorias</span>
+          <span class="text-base font-bold text-amber-300">{{ stats().memorias }}</span>
+        </div>
+        <div class="px-3.5 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-blue-300 uppercase tracking-wider text-[10px]">Eventos</span>
+          <span class="text-base font-bold text-blue-300">{{ stats().eventos }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAJA DE ESCRITURA RÁPIDA / FOCUS WRITER (ADHD-FRIENDLY) -->
+  <div class="p-5 sm:p-6 bg-surface border border-surface-border rounded-2xl shadow-sm space-y-4">
+    <div class="flex items-center justify-between gap-3 pb-3 border-b border-surface-border flex-wrap">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
+          <svg lucideFeather class="w-4 h-4" />
+        </div>
+        <h2 class="text-sm sm:text-base font-bold text-text-main">
+          Escribir en la Bitácora
+        </h2>
+      </div>
+
+      <!-- SELECTOR DE TIPO EN PESTAÑAS -->
+      <div class="flex items-center gap-1.5 p-1 bg-background rounded-xl border border-surface-border">
+        <button
+          type="button"
+          (click)="setNuevoTipo('reflexion')"
+          [class]="
+            'px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1 ' +
+            (nuevoTipo() === 'reflexion'
+              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-xs'
+              : 'text-text-muted hover:text-text-main')
+          "
+        >
+          <span>🧠</span>
+          <span class="hidden sm:inline">Reflexión</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="setNuevoTipo('memoria')"
+          [class]="
+            'px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1 ' +
+            (nuevoTipo() === 'memoria'
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-xs'
+              : 'text-text-muted hover:text-text-main')
+          "
+        >
+          <span>💭</span>
+          <span class="hidden sm:inline">Memoria</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="setNuevoTipo('evento')"
+          [class]="
+            'px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1 ' +
+            (nuevoTipo() === 'evento'
+              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-xs'
+              : 'text-text-muted hover:text-text-main')
+          "
+        >
+          <span>📅</span>
+          <span class="hidden sm:inline">Evento</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ÁREA DE ESCRITURA -->
+    <div class="space-y-2">
+      <textarea
+        rows="4"
+        [ngModel]="nuevoTexto()"
+        (ngModelChange)="nuevoTexto.set($event)"
+        [placeholder]="
+          nuevoTipo() === 'reflexion'
+            ? '¿Qué descubriste hoy? ¿Cómo te sientes con tus avances o bloqueos?...'
+            : nuevoTipo() === 'memoria'
+            ? 'Un recuerdo, una anécdota del pasado o un detalle que no quieres olvidar...'
+            : 'Un hecho o suceso relevante que ocurrió recientemente...'
+        "
+        class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/50 rounded-xl p-3.5 text-xs sm:text-sm outline-none transition-colors leading-relaxed resize-y min-h-25"
+      ></textarea>
+
+      <!-- BARRA INFERIOR DEL EDITOR -->
+      <div class="flex items-center justify-between gap-3 pt-1">
+        <div class="text-[11px] text-text-muted flex items-center gap-2">
+          <span>{{ wordCount() }} palabras</span>
+          @if (nuevoTexto().trim()) {
+            <span class="text-primary font-medium">• Escritura activa</span>
+          }
+        </div>
+
+        <button
+          type="button"
+          [disabled]="isSubmittingNuevo() || !nuevoTexto().trim()"
+          (click)="createReflexion()"
+          class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+        >
+          @if (isSubmittingNuevo()) {
+            <span class="animate-spin text-xs">⠋</span>
+            <span>Guardando...</span>
+          } @else {
+            <svg lucidePlus class="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Guardar Entrada</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTROS Y TIMELINE DE ENTRADAS -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-surface border border-surface-border text-text-muted flex items-center justify-center">
+          <svg lucideBookOpen class="w-3.5 h-3.5" />
+        </div>
+        <h3 class="text-sm font-bold text-text-main">
+          Historial de Entradas
+        </h3>
+      </div>
+
+      <!-- BOTONES DE FILTRO -->
+      <div class="flex items-center gap-1 bg-surface border border-surface-border p-1 rounded-xl text-xs">
+        <button
+          type="button"
+          (click)="setFilter('todas')"
+          [class]="
+            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            (activeFilter() === 'todas' ? 'bg-primary text-background font-semibold' : 'text-text-muted hover:text-text-main')
+          "
+        >
+          Todas
+        </button>
+        <button
+          type="button"
+          (click)="setFilter('reflexion')"
+          [class]="
+            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            (activeFilter() === 'reflexion' ? 'bg-purple-500/20 text-purple-300 font-semibold' : 'text-text-muted hover:text-text-main')
+          "
+        >
+          Reflexiones
+        </button>
+        <button
+          type="button"
+          (click)="setFilter('memoria')"
+          [class]="
+            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            (activeFilter() === 'memoria' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-text-muted hover:text-text-main')
+          "
+        >
+          Memorias
+        </button>
+        <button
+          type="button"
+          (click)="setFilter('evento')"
+          [class]="
+            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            (activeFilter() === 'evento' ? 'bg-blue-500/20 text-blue-300 font-semibold' : 'text-text-muted hover:text-text-main')
+          "
+        >
+          Eventos
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENIDO DEL TIMELINE -->
+    @if (reflexionesResource?.isLoading() && !reflexionesResource.value()) {
+      <!-- SKELETON -->
+      <div class="space-y-3">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="p-5 bg-surface border border-surface-border rounded-2xl animate-pulse space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="w-24 h-4 bg-background rounded-lg"></div>
+              <div class="w-28 h-3 bg-background rounded-lg"></div>
+            </div>
+            <div class="w-full h-12 bg-background rounded-lg"></div>
+          </div>
+        }
+      </div>
+    } @else if (reflexionesResource?.value(); as items) {
+      <div class="space-y-3">
+        @for (item of items; track item.id) {
+          <article
+            class="p-5 bg-surface border border-surface-border hover:border-primary/30 rounded-2xl shadow-xs transition-all space-y-3 group"
+          >
+            <!-- HEADER DE LA TARJETA: TIPO + FECHA + ACCIONES -->
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2">
+                <span
+                  [class]="'px-2.5 py-0.5 text-xs font-semibold rounded-lg border inline-flex items-center gap-1 ' + getBadgeClass(item.tipo)"
+                >
+                  <span>{{ getTipoIcon(item.tipo) }}</span>
+                  <span class="capitalize">{{ item.tipo }}</span>
+                </span>
+
+                <div class="flex items-center gap-1 text-[11px] text-text-muted">
+                  <svg lucideClock class="w-3 h-3 text-text-muted/60" />
+                  <span>{{ item.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+
+              <!-- BOTONES DE ACCIÓN: COPIAR, EDITAR, ELIMINAR -->
+              <div class="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                <button
+                  type="button"
+                  (click)="copyContent(item)"
+                  class="p-1.5 rounded-lg text-text-muted hover:text-text-main hover:bg-surface-border/60 transition-colors cursor-pointer"
+                  title="Copiar texto"
+                >
+                  <svg lucideCopy class="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  (click)="openEdit(item)"
+                  class="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                  title="Editar entrada"
+                >
+                  <svg lucidePencil class="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  (click)="openDelete(item)"
+                  class="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer"
+                  title="Eliminar entrada"
+                >
+                  <svg lucideTrash2 class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <!-- CONTENIDO DE LA REFLEXIÓN -->
+            <div class="p-3.5 bg-background/60 rounded-xl border border-surface-border/50">
+              <p class="text-xs sm:text-sm text-text-main/90 leading-relaxed whitespace-pre-line font-sans select-text">
+                {{ item.reflexion }}
+              </p>
+            </div>
+          </article>
+        } @empty {
+          <!-- ESTADO VACÍO -->
+          <div class="p-12 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-3">
+            <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-xl">
+              ✍️
+            </div>
+            <div>
+              <h4 class="text-base font-bold text-text-main">
+                Tu bitácora está lista
+              </h4>
+              <p class="text-xs text-text-muted mt-1 max-w-sm mx-auto">
+                {{ activeFilter() !== 'todas' ? 'No hay entradas registradas bajo esta categoría.' : 'Escribe tu primera reflexión, memoria o evento en el recuadro superior para comenzar.' }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- MODAL DE EDICIÓN -->
+  <app-reflexion-modal
+    [isOpen]="showEditModal()"
+    [initialData]="selectedReflexion()"
+    [isSubmitting]="isSubmittingEdit()"
+    (save)="saveEdit($event)"
+    (close)="closeEdit()"
+  />
+
+  <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
+  <app-confirm-modal
+    [isOpen]="showDeleteModal()"
+    title="¿Eliminar entrada?"
+    message="¿Estás seguro de que deseas eliminar esta entrada de tu bitácora? Esta acción no se puede deshacer."
+    confirmText="Eliminar Entrada"
+    cancelText="Cancelar"
+    variant="danger"
+    [isProcessing]="isDeleting()"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDelete()"
+  />
+</div>

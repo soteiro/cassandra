@@ -183,13 +183,14 @@ func (r *PersonaRepository) Update(ctx context.Context, id int, userID int, req 
 	return &p, nil
 }
 
-// Delete realiza el borrado lógico (soft delete)
+// Delete realiza el borrado lógico (soft delete) protegiendo el perfil propio
 func (r *PersonaRepository) Delete(ctx context.Context, id int, userID int) error {
 	query := `
 	UPDATE persona
 	SET eliminado = true
 	WHERE id = $1
 	  AND user_id = $2
+	  AND es_yo = false
 	  AND eliminado = false
 	`
 
@@ -200,8 +201,8 @@ func (r *PersonaRepository) Delete(ctx context.Context, id int, userID int) erro
 	}
 
 	if res.RowsAffected() == 0 {
-		log.Printf("[REPO:Persona.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró la persona con id %d o no tiene permisos", id)
+		log.Printf("[REPO:Persona.Delete] Registro no encontrado, sin permisos o es el perfil personal | id=%d user_id=%d", id, userID)
+		return fmt.Errorf("no se encontró la persona con id %d, no tiene permisos o no se puede eliminar el perfil personal", id)
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PersonaService } from '../../services/persona.service';
 import { ToastService } from '../../services/toast.service';
 import { PersonaRequest, PersonaResponse } from '../../models/persona.model';
@@ -12,6 +13,9 @@ import {
   LucidePlus,
   LucideRefreshCcw,
   LucideSearch,
+  LucideFeather,
+  LucideBrain,
+  LucideArrowRight,
 } from '@lucide/angular';
 
 @Component({
@@ -19,6 +23,7 @@ import {
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     PersonaCard,
     PersonaModal,
     LucideUsers,
@@ -26,6 +31,9 @@ import {
     LucidePlus,
     LucideRefreshCcw,
     LucideSearch,
+    LucideFeather,
+    LucideBrain,
+    LucideArrowRight,
   ],
   templateUrl: './crm.html',
   styleUrl: './crm.css',
@@ -78,10 +86,15 @@ export class Crm {
     });
   }
 
-  getFilteredPersonas(personas: PersonaResponse[]): PersonaResponse[] {
+  getMyProfile(personas: PersonaResponse[]): PersonaResponse | undefined {
+    if (!personas) return undefined;
+    return personas.find((p) => !p.eliminado && p.es_yo);
+  }
+
+  getFilteredContacts(personas: PersonaResponse[]): PersonaResponse[] {
     if (!personas) return [];
 
-    let list = personas.filter((p) => !p.eliminado);
+    let list = personas.filter((p) => !p.eliminado && !p.es_yo);
     const query = this.searchQuery().trim().toLowerCase();
 
     if (query) {
@@ -102,9 +115,11 @@ export class Crm {
 
   getStats(personas: PersonaResponse[]) {
     if (!personas || personas.length === 0) {
-      return { total: 0 };
+      return { total: 0, contactos: 0 };
     }
     const active = personas.filter((p) => !p.eliminado);
-    return { total: active.length };
+    const contactos = active.filter((p) => !p.es_yo);
+    return { total: active.length, contactos: contactos.length };
   }
 }
+
