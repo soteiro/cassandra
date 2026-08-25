@@ -1,5 +1,5 @@
 <div class="max-w-5xl mx-auto space-y-6">
-  @if (projectResource?.isLoading() && !projectResource.value()) {
+  @if (projectResource?.isLoading() && !projectResource?.value()) {
     <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl">
       <p class="text-text-muted animate-pulse">Cargando detalles del proyecto...</p>
     </div>

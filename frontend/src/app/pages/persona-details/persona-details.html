@@ -10,7 +10,7 @@
     </a>
   </div>
 
-  @if (personaResource?.isLoading() && !personaResource.value()) {
+  @if (personaResource?.isLoading() && !personaResource?.value()) {
     <!-- SKELETON CARGA PERFIL -->
     <div class="p-6 bg-surface border border-surface-border rounded-2xl animate-pulse space-y-6">
       <div class="flex items-center gap-5">
@@ -32,7 +32,7 @@
       <div class="flex items-center gap-2">
         <button
           type="button"
-          (click)="personaResource.reload()"
+          (click)="personaResource?.reload()"
           class="text-xs bg-danger/20 hover:bg-danger/30 text-danger border border-danger/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
         >
           Reintentar
@@ -207,7 +207,7 @@
         }
 
         <!-- CARGA DE INTERACCIONES -->
-        @if (interaccionesResource?.isLoading() && !interaccionesResource.value()) {
+        @if (interaccionesResource?.isLoading() && !interaccionesResource?.value()) {
           <div class="space-y-2.5">
             @for (item of [1, 2, 3]; track item) {
               <div class="p-4 bg-background/60 border border-surface-border rounded-xl animate-pulse flex items-center justify-between">
