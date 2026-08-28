@@ -3,12 +3,13 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { PersonaRequest, PersonaResponse, PersonaUpdateRequest } from '../models/persona.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PersonaService {
-  private readonly apiUrl = '/api';
+  private readonly apiUrl = environment.apiUrl;
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
 

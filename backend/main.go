@@ -76,10 +76,20 @@ func main() {
 	r.Use(chiMiddleware.Recoverer)
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:4200"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowedOrigins: []string{
+			"http://localhost:4200",
+			"http://localhost",
+			"https://localhost",
+			"capacitor://localhost",
+			"http://localhost:8080",
+			"https://cassandra.soteiro.dev",
+			"http://cassandra.soteiro.dev",
+		},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"},
+		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
+		MaxAge:           300,
 	}))
 	r.Use(httprate.LimitByIP(100, time.Minute))
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { httpResource } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export interface StatusResponse {
   status: string;
@@ -24,7 +25,7 @@ export interface DbVersionResponse {
   providedIn: 'root',
 })
 export class StatusService {
-  private readonly apiUrl = '/api';
+  private readonly apiUrl = environment.apiUrl;
 
   readonly health = httpResource<StatusResponse>(
     () => `${this.apiUrl}/health`,

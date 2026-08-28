@@ -8,10 +8,15 @@
     "prebuild": "node ../scripts/generate-docs.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:mobile": "ng build --configuration mobile",
+      "cap:sync": "cap sync android",
+      "cap:open": "cap open android",
+      "mobile:sync": "ng build --configuration mobile && cap sync android",
+      "mobile:run": "ng build --configuration mobile && cap run android"
   },
   "private": true,
-  "packageManager": "pnpm@10.33.3",
+  "packageManager": "pnpm@11.24.0+sha512.bd27e345e976dcb0be0b7a1228217b049a817e21b1f355c90dbe7dc46671895a8bc1e6d06c24554505ea93ea0b45f489a27ec1bfbc8de6a9659fca0f16fa0000",
   "dependencies": {
     "@angular/common": "^22.0.0",
     "@angular/compiler": "^22.0.0",
@@ -19,6 +24,8 @@
     "@angular/forms": "^22.0.0",
     "@angular/platform-browser": "^22.0.0",
     "@angular/router": "^22.0.0",
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@lucide/angular": "^1.31.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -27,6 +34,7 @@
     "@angular/build": "^22.0.1",
     "@angular/cli": "^22.0.1",
     "@angular/compiler-cli": "^22.0.0",
+    "@capacitor/cli": "^8.5.0",
     "@tailwindcss/postcss": "^4.1.12",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.3",

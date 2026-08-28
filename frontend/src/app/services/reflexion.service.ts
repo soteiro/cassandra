@@ -7,12 +7,13 @@ import {
   ReflexionUpdateRequest,
 } from '../models/reflexion.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReflexionService {
-  private readonly apiUrl = '/api';
+  private readonly apiUrl = environment.apiUrl;
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
 

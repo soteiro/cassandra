@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"cassandra/models"
@@ -85,14 +86,16 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	secure, sameSite := getCookieSettings(r)
+
 	// accesstoken en cookie httponly (15 min)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    accessToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // TODO: true en produccion (HTTPS)
-		SameSite: http.SameSiteLaxMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		Expires:  time.Now().Add(15 * time.Minute),
 	})
 
@@ -102,8 +105,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Value:    refreshToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // TODO: true en produccion (HTTPS)
-		SameSite: http.SameSiteLaxMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		Expires:  expiredAT,
 	})
 
@@ -139,14 +142,16 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	secure, sameSite := getCookieSettings(r)
+
 	// accesstoken en cookie httponly (15 min)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    newAccessToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // Cambiar a true en producción
-		SameSite: http.SameSiteLaxMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		Expires:  time.Now().Add(15 * time.Minute),
 	})
 
@@ -174,14 +179,16 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	secure, sameSite := getCookieSettings(r)
+
 	// eliminar las cookies del cliente (MaxAge < 0 las borra)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // TODO: true en produccion (HTTPS)
-		SameSite: http.SameSiteLaxMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		MaxAge:   -1,
 	})
 	http.SetCookie(w, &http.Cookie{
@@ -189,8 +196,8 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // TODO: true en produccion (HTTPS)
-		SameSite: http.SameSiteLaxMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		MaxAge:   -1,
 	})
 
@@ -241,14 +248,16 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	secure, sameSite := getCookieSettings(r)
+
 	// enviar el nuevo access token en la cookie httponly (15 min)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    newAccessToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, 
-		SameSite: http.SameSiteLaxMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		Expires:  time.Now().Add(15 * time.Minute),
 	})
 
@@ -256,4 +265,18 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	log.Printf("[HANDLER:Auth.Me] Éxito vía refresh_token (token renovado) | user_id=%d", userID)
 	json.NewEncoder(w).Encode(map[string]int{"user_id": userID})
+}
+
+func getCookieSettings(r *http.Request) (bool, http.SameSite) {
+	origin := r.Header.Get("Origin")
+	isHttps := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
+	isCrossOrMobile := strings.HasPrefix(origin, "http://localhost") ||
+		strings.HasPrefix(origin, "capacitor://") ||
+		strings.HasPrefix(origin, "https://") ||
+		strings.Contains(origin, "soteiro.dev")
+
+	if isHttps || isCrossOrMobile {
+		return true, http.SameSiteNoneMode
+	}
+	return false, http.SameSiteLaxMode
 }
