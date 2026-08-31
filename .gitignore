@@ -1,7 +1,32 @@
+# Environment & Secrets
 .env
-**/tmp/
-*.log
-.vscode
-dist/
-docs/
+.env.*
+!.env.example
+
+# Compiled binaries
 cassandra-app
+*.exe
+
+# Dependencies
+node_modules/
+
+# Build & temporary outputs
+dist/
+**/tmp/
+tmp/
+docs/
+
+# Logs
+*.log
+pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs and Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
