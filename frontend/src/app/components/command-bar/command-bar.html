@@ -1,0 +1,52 @@
+@if (commandBarService.state.isOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-start justify-center p-4 pt-24 bg-black/70 backdrop-blur-xs backdrop-layer transition-opacity"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Buscar proyecto o subproyecto"
+      class="bg-surface border border-surface-border rounded-2xl max-w-lg w-full shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-surface-border">
+        <svg lucideSearch class="w-4 h-4 text-text-muted shrink-0" />
+        <input
+          #inputRef
+          type="text"
+          [value]="query()"
+          (input)="query.set($any($event.target).value)"
+          (keydown)="onInputKeydown($event)"
+          placeholder="Buscar proyecto o subproyecto..."
+          aria-label="Buscar proyecto o subproyecto"
+          class="flex-1 bg-transparent text-sm text-text-main placeholder:text-text-muted focus:outline-none"
+        />
+      </div>
+
+      <div class="max-h-80 overflow-y-auto">
+        @if (matches().length === 0) {
+          <p class="px-4 py-6 text-center text-xs text-text-muted">
+            No se encontraron proyectos.
+          </p>
+        } @else {
+          @for (match of matches(); track match.project.id; let i = $index) {
+            <button
+              type="button"
+              (click)="select(match.project.id)"
+              (mouseenter)="selectedIndex.set(i)"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer"
+              [class.bg-primary]="selectedIndex() === i"
+              [class.text-black]="selectedIndex() === i"
+              [class.text-text-main]="selectedIndex() !== i"
+              [class.hover:bg-surface-border]="selectedIndex() !== i"
+            >
+              <svg lucideFolder class="w-4 h-4 shrink-0" />
+              <span class="truncate">{{ match.path }}</span>
+            </button>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

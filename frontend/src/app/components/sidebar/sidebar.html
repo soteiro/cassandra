@@ -32,6 +32,19 @@
       </button>
     </div>
 
+    <!-- BUSCAR PROYECTO -->
+    <button
+      type="button"
+      (click)="commandBarService.state.open(); sidebar.close()"
+      class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-text-muted hover:text-text-main bg-background hover:bg-surface-border/60 border border-surface-border transition-colors cursor-pointer text-sm"
+    >
+      <span class="flex items-center gap-3">
+        <svg lucideSearch class="w-4 h-4" />
+        <span>Buscar proyecto</span>
+      </span>
+      <span class="text-[10px] font-semibold text-text-muted/70 border border-surface-border rounded px-1.5 py-0.5">⌘K</span>
+    </button>
+
     <!-- NAVEGACIÓN -->
     <nav class="space-y-1">
       <p class="text-[11px] font-semibold uppercase tracking-wider text-text-muted/60 px-3 pb-1">

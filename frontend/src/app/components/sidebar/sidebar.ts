@@ -1,11 +1,13 @@
 import { Component, Input, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommandBarService } from '../../services/command-bar.service';
 import { useToggle } from '../../utils/use-toggle';
 import {
   LucideHouse,
   LucideFolder,
   LucideLogOut,
+  LucideSearch,
   LucideSparkles,
   LucideX,
   LucideUser,
@@ -20,6 +22,7 @@ import {
     LucideHouse,
     LucideFolder,
     LucideLogOut,
+    LucideSearch,
     LucideX,
     LucideUser,
     LucideBookOpen,
@@ -30,6 +33,7 @@ import {
 export class Sidebar {
   private readonly authservice = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly commandBarService = inject(CommandBarService);
 
   @Input() sidebar = useToggle(false);
 
