@@ -11,6 +11,7 @@ type Tareas struct {
 	FechaTerminado *time.Time `json:"fecha_terminado,omitempty"`
 	Eliminado      bool       `json:"eliminado"`
 	Estado         *string    `json:"estado"`
+	Prioridad      string     `json:"prioridad"`
 	UserID         int        `json:"user_id"`
 	ProyectID      int        `json:"proyect_id"`
 	TareaPadreID   *int       `json:"tarea_padre_id,omitempty"`
@@ -22,6 +23,7 @@ type TareaRequest struct {
 	Descripcion  string  `json:"descripcion"`
 	Comentario   string  `json:"comentario"`
 	Estado       *string `json:"estado"`
+	Prioridad    *string `json:"prioridad,omitempty"`
 	UserID       int     `json:"user_id"`
 	ProyectID    int     `json:"proyect_id"`
 	TareaPadreID *int    `json:"tarea_padre_id,omitempty"`
@@ -36,6 +38,7 @@ type TareaResponse struct {
 	FechaCreacion  time.Time       `json:"fecha_creacion"`
 	FechaTerminado *time.Time      `json:"fecha_terminado,omitempty"`
 	Estado         *string         `json:"estado"`
+	Prioridad      string          `json:"prioridad"`
 	UserID         int             `json:"user_id"`
 	ProyectID      int             `json:"proyect_id"`
 	ProyectoNombre *string         `json:"proyecto_nombre,omitempty"`
@@ -48,6 +51,7 @@ type TareaUpdateRequest struct {
 	Descripcion  *string `json:"descripcion"`
 	Comentario   *string `json:"comentario"`
 	Estado       *string `json:"estado"`
+	Prioridad    *string `json:"prioridad,omitempty"`
 	Eliminado    *bool   `json:"eliminado"`
 	TareaPadreID *int    `json:"tarea_padre_id,omitempty"`
 }
@@ -58,6 +62,7 @@ type TareaUpdateResponse struct {
 	Descripcion    string     `json:"descripcion"`
 	Comentario     string     `json:"comentario"`
 	Estado         *string    `json:"estado"`
+	Prioridad      string     `json:"prioridad"`
 	FechaTerminado *time.Time `json:"fecha_terminado,omitempty"`
 	Eliminado      bool       `json:"eliminado"`
 	TareaPadreID   *int       `json:"tarea_padre_id,omitempty"`

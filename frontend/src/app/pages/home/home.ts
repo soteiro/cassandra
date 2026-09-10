@@ -97,4 +97,32 @@ export class Home {
         return 'bg-surface-border/50 text-text-muted border-surface-border';
     }
   }
+
+  getPriorityBorderClass(prioridad?: string): string {
+    switch (prioridad?.toLowerCase()) {
+      case 'urgente':
+        return 'border-l-4 border-l-danger';
+      case 'alta':
+        return 'border-l-4 border-l-amber-500';
+      case 'baja':
+        return 'border-l-4 border-l-slate-400';
+      case 'normal':
+      default:
+        return 'border-l-4 border-l-accent';
+    }
+  }
+
+  getPriorityBadgeClass(prioridad?: string): string {
+    switch (prioridad?.toLowerCase()) {
+      case 'urgente':
+        return 'bg-danger/15 text-danger border-danger/30';
+      case 'alta':
+        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+      case 'baja':
+        return 'bg-surface-border/50 text-text-muted border-surface-border';
+      case 'normal':
+      default:
+        return 'bg-accent/15 text-accent border-accent/30';
+    }
+  }
 }

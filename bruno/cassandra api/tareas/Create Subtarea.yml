@@ -14,6 +14,7 @@ http:
         "descripcion": "Descripción de la subtarea",
         "comentario": "Comentario de la subtarea",
         "estado": "En Curso",
+        "prioridad": "normal",
         "proyect_id": 3,
         "tarea_padre_id": 1
       }

@@ -11,7 +11,8 @@ http:
     data: |-
       {
         "nombre": "Tarea Modificada con Bruno",
-        "estado": "En Curso"
+        "estado": "En Curso",
+        "prioridad": "urgente"
       }
   auth: inherit
 

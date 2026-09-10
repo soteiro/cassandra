@@ -139,7 +139,7 @@
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl pl-10 pr-3 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30"
             />
           </div>
-          <div class="relative sm:w-64">
+          <div class="relative sm:w-56">
             <input
               type="text"
               [ngModel]="quickComment()"
@@ -148,6 +148,20 @@
               placeholder="Comentario / Nota rápida..."
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl px-3.5 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30"
             />
+          </div>
+          <div class="relative sm:w-32">
+            <select
+              [ngModel]="quickPriority()"
+              (ngModelChange)="quickPriority.set($event)"
+              name="quickPriority"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2.5 text-xs outline-none transition-all cursor-pointer font-medium"
+              title="Prioridad de la tarea"
+            >
+              <option value="baja" class="bg-surface text-text-muted">Baja</option>
+              <option value="normal" class="bg-surface text-accent">Normal</option>
+              <option value="alta" class="bg-surface text-amber-400">Alta</option>
+              <option value="urgente" class="bg-surface text-danger">Urgente</option>
+            </select>
           </div>
           <button
             type="submit"
@@ -165,7 +179,10 @@
     <div class="space-y-3">
       @for (t of getFilteredTasks(tareas()); track t.id) {
         <div
-          class="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-surface-border/80 transition-all space-y-3"
+          [class]="
+            'bg-surface border border-surface-border rounded-2xl p-4 shadow-sm hover:border-surface-border/80 transition-all space-y-3 ' +
+            getPriorityBorderClass(t.prioridad)
+          "
         >
           <!-- FILA DE TAREA PRINCIPAL -->
           <div class="flex flex-col items-left justify-center gap-4 md:flex-row">
@@ -250,6 +267,22 @@
                 </button>
               }
 
+              <!-- SELECTOR DE PRIORIDAD -->
+              <select
+                [ngModel]="t.prioridad || 'normal'"
+                (ngModelChange)="changeTaskPriority(t, $event)"
+                [class]="
+                  'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium transition-colors ' +
+                  getPriorityBadgeClass(t.prioridad)
+                "
+                title="Prioridad de la tarea"
+              >
+                <option value="baja" class="bg-surface text-text-muted">Baja</option>
+                <option value="normal" class="bg-surface text-accent">Normal</option>
+                <option value="alta" class="bg-surface text-amber-400">Alta</option>
+                <option value="urgente" class="bg-surface text-danger">Urgente</option>
+              </select>
+
               <!-- SELECTOR DE ESTADO -->
               <select
                 [ngModel]="t.estado || 'Abierto'"
@@ -296,7 +329,10 @@
               <!-- LISTA DE SUBTAREAS -->
               @for (sub of getSortedSubtasks(t.subtareas); track sub.id) {
                 <div
-                  class="p-4 bg-surface/70 border border-surface-border hover:border-surface-border rounded-xl flex flex-col items-start justify-center gap-3 transition-colors group md:flex-row"
+                  [class]="
+                    'p-4 bg-surface/70 border border-surface-border hover:border-surface-border rounded-xl flex flex-col items-start justify-center gap-3 transition-colors group md:flex-row ' +
+                    getPriorityBorderClass(sub.prioridad, true)
+                  "
                 >
                   <!-- Checkbox y nombre de subtarea -->
                   <div class="flex justify-start items-center gap-3 flex-1 min-w-0">
@@ -326,8 +362,23 @@
                     </span>
                   </div>
 
-                  <!-- Estado y borrar subtarea -->
+                  <!-- Estado, prioridad y borrar subtarea -->
                   <div class="flex items-center gap-2 shrink-0">
+                    <select
+                      [ngModel]="sub.prioridad || 'normal'"
+                      (ngModelChange)="changeTaskPriority(sub, $event)"
+                      [class]="
+                        'text-[11px] px-2 py-0.5 rounded-md border outline-none cursor-pointer font-medium transition-colors ' +
+                        getPriorityBadgeClass(sub.prioridad)
+                      "
+                      title="Prioridad de subtarea"
+                    >
+                      <option value="baja" class="bg-surface text-text-muted">Baja</option>
+                      <option value="normal" class="bg-surface text-accent">Normal</option>
+                      <option value="alta" class="bg-surface text-amber-400">Alta</option>
+                      <option value="urgente" class="bg-surface text-danger">Urgente</option>
+                    </select>
+
                     <select
                       [ngModel]="sub.estado || 'Abierto'"
                       (ngModelChange)="changeTaskStatus(sub, $event)"

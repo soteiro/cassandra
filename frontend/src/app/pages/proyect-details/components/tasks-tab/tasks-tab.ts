@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../../../services/task.service';
 import { ToastService } from '../../../../services/toast.service';
-import { Task } from '../../../../models/task.model';
+import { Task, TaskPrioridad } from '../../../../models/task.model';
 import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
 import {
   LucideChevronDown,
@@ -49,6 +49,7 @@ export class TasksTab {
   expandedTasks = signal<Set<number>>(new Set());
   quickTaskTitle = signal('');
   quickComment = signal('');
+  quickPriority = signal<TaskPrioridad>('normal');
   isSubmittingQuickTask = signal(false);
   quickSubtaskInputs = signal<Record<number, string>>({});
   isSubmittingSubtask = signal<Record<number, boolean>>({});
@@ -157,6 +158,7 @@ export class TasksTab {
         descripcion: '',
         comentario: comment,
         estado: 'Abierto',
+        prioridad: this.quickPriority(),
         proyect_id: pId,
       })
       .subscribe({
@@ -164,6 +166,7 @@ export class TasksTab {
           this.toastService.success('Tarea Creada');
           this.quickTaskTitle.set('');
           this.quickComment.set('');
+          this.quickPriority.set('normal');
           this.isSubmittingQuickTask.set(false);
           this.reload.emit();
         },
@@ -331,6 +334,52 @@ export class TasksTab {
         return 'bg-danger/15 text-danger border-danger/30';
       default:
         return 'bg-surface-border/50 text-text-muted border-surface-border';
+    }
+  }
+
+  changeTaskPriority(task: Task, nextPrioridad: string) {
+    const prev = task.prioridad;
+    task.prioridad = nextPrioridad;
+
+    this.taskService.updateTask(task.id, { prioridad: nextPrioridad }).subscribe({
+      next: () => {
+        this.toastService.success('Prioridad actualizada');
+        this.reload.emit();
+      },
+      error: (err) => {
+        task.prioridad = prev;
+        this.toastService.error('Error al actualizar prioridad');
+        console.error('Error al actualizar prioridad:', err);
+      },
+    });
+  }
+
+  getPriorityBorderClass(prioridad?: string, isSubtask = false): string {
+    const width = isSubtask ? 'border-l-[3px]' : 'border-l-4';
+    switch (prioridad?.toLowerCase()) {
+      case 'urgente':
+        return `${width} border-l-danger`;
+      case 'alta':
+        return `${width} border-l-amber-500`;
+      case 'baja':
+        return `${width} border-l-slate-400`;
+      case 'normal':
+      default:
+        return `${width} border-l-accent`;
+    }
+  }
+
+  getPriorityBadgeClass(prioridad?: string): string {
+    switch (prioridad?.toLowerCase()) {
+      case 'urgente':
+        return 'bg-danger/15 text-danger border-danger/30';
+      case 'alta':
+        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+      case 'baja':
+        return 'bg-surface-border/50 text-text-muted border-surface-border';
+      case 'normal':
+      default:
+        return 'bg-accent/15 text-accent border-accent/30';
     }
   }
 }

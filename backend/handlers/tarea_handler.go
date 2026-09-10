@@ -58,6 +58,27 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validación de prioridad (baja, normal, alta, urgente)
+	if req.Prioridad != nil {
+		p := strings.ToLower(strings.TrimSpace(*req.Prioridad))
+		if p != "" {
+			switch p {
+			case "baja", "normal", "alta", "urgente":
+				req.Prioridad = &p
+			default:
+				log.Printf("[HANDLER:Tareas.CreateTarea] Prioridad inválida: %q | user_id=%d", *req.Prioridad, userID)
+				http.Error(w, "Prioridad inválida. Debe ser: baja, normal, alta o urgente", http.StatusBadRequest)
+				return
+			}
+		} else {
+			defaultPrioridad := "normal"
+			req.Prioridad = &defaultPrioridad
+		}
+	} else {
+		defaultPrioridad := "normal"
+		req.Prioridad = &defaultPrioridad
+	}
+
 	req.UserID = userID
 	tarea, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
@@ -170,6 +191,17 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Estado != nil {
 		*req.Estado = strings.TrimSpace(*req.Estado)
+	}
+	if req.Prioridad != nil {
+		p := strings.ToLower(strings.TrimSpace(*req.Prioridad))
+		switch p {
+		case "baja", "normal", "alta", "urgente":
+			req.Prioridad = &p
+		default:
+			log.Printf("[HANDLER:Tareas.UpdateTarea] Prioridad inválida: %q | id=%d user_id=%d", *req.Prioridad, tareaID, userID)
+			http.Error(w, "Prioridad inválida. Debe ser: baja, normal, alta o urgente", http.StatusBadRequest)
+			return
+		}
 	}
 
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)

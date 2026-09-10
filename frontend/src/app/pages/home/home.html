@@ -70,7 +70,10 @@
         } @else if (tasksResource?.value(); as tareas) {
           @for (tarea of tareas; track tarea.id) {
             <div
-              class="p-2.5 bg-background/60 hover:bg-background border border-surface-border/60 hover:border-primary/40 rounded-xl transition-all flex items-center justify-between gap-2.5 group shadow-2xs"
+              [class]="
+                'p-2.5 bg-background/60 hover:bg-background border border-surface-border/60 hover:border-primary/40 rounded-xl transition-all flex items-center justify-between gap-2.5 group shadow-2xs ' +
+                getPriorityBorderClass(tarea.prioridad)
+              "
             >
               <!-- CHECKBOX + TÍTULO Y PROYECTO -->
               <div class="flex items-center gap-2.5 min-w-0 flex-1">
@@ -95,6 +98,11 @@
                       [class]="tarea.estado === 'Terminado' ? 'line-through text-text-muted/50' : 'text-text-main group-hover:text-primary'"
                     >
                       {{ tarea.nombre }}
+                    </span>
+                    <span
+                      [class]="'text-[9px] font-semibold px-1.5 py-0.5 rounded-md border shrink-0 uppercase ' + getPriorityBadgeClass(tarea.prioridad)"
+                    >
+                      {{ tarea.prioridad || 'normal' }}
                     </span>
                   </div>
 
