@@ -21,12 +21,46 @@ export class Docs {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <base href="/" />
     <style>
-      body {
+      html, body {
         margin: 0;
         padding: 0;
-        height: 100vh;
-        overflow: hidden;
+        min-height: 100%;
         background-color: #0b0f19;
+        overflow-x: clip;
+      }
+      @media (min-width: 768px) {
+        aside,
+        .sidebar,
+        .scalar-sidebar,
+        [data-scalar-sidebar],
+        .t-doc__sidebar {
+          position: -webkit-sticky !important;
+          position: sticky !important;
+          top: 0 !important;
+          height: 100vh !important;
+          max-height: 100vh !important;
+          align-self: flex-start !important;
+          overflow-y: auto !important;
+          z-index: 10 !important;
+        }
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 9999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.4);
       }
     </style>
   </head>
@@ -39,7 +73,8 @@ export class Docs {
         "theme": "purple",
         "darkMode": true,
         "showSidebar": true,
-        "layout": "modern"
+        "layout": "modern",
+        "customCss": "@media (min-width: 768px) { aside, .sidebar, .scalar-sidebar, [data-scalar-sidebar], .t-doc__sidebar { position: -webkit-sticky !important; position: sticky !important; top: 0 !important; height: 100vh !important; max-height: 100vh !important; align-self: flex-start !important; overflow-y: auto !important; z-index: 10 !important; } }"
       }'
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
