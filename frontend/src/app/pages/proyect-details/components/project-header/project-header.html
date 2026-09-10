@@ -3,7 +3,7 @@
   <div class="flex items-center gap-2 text-xs md:text-sm text-text-muted mb-2 flex-wrap">
     <a
       routerLink="/proyectos"
-      class="hover:text-primary transition-colors inline-flex items-center gap-1"
+      class="hover:text-primary transition-colors inline-flex items-center gap-2 mb-2"
     >
       <span>← Proyectos</span>
     </a>
@@ -85,7 +85,7 @@
     }
 
     <!-- DESCRIPCIÓN Y COMENTARIOS -->
-    @if (project().descripcion || project().comentario || project().por_que || project().para_que) {
+   <!--  @if (project().descripcion || project().comentario || project().por_que || project().para_que) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 text-xs">
         @if (project().por_que) {
           <div>
@@ -128,6 +128,6 @@
           </div>
         }
       </div>
-    }
+   } -->
   </div>
 </div>
