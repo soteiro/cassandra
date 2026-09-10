@@ -5,6 +5,7 @@ import { TaskService } from '../../../../services/task.service';
 import { ToastService } from '../../../../services/toast.service';
 import { Task, TaskPrioridad } from '../../../../models/task.model';
 import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
+import { TaskDetailModal } from '../../../../components/task-detail-modal/task-detail-modal';
 import {
   LucideChevronDown,
   LucideChevronRight,
@@ -23,6 +24,7 @@ import {
     CommonModule,
     FormsModule,
     ConfirmModal,
+    TaskDetailModal,
     LucideChevronDown,
     LucideChevronRight,
     LucidePlus,
@@ -46,6 +48,7 @@ export class TasksTab {
   private readonly toastService = inject(ToastService);
 
   // State
+  selectedTask = signal<Task | null>(null);
   expandedTasks = signal<Set<number>>(new Set());
   quickTaskTitle = signal('');
   quickComment = signal('');
@@ -381,5 +384,17 @@ export class TasksTab {
       default:
         return 'bg-accent/15 text-accent border-accent/30';
     }
+  }
+
+  openEditTask(task: Task) {
+    this.selectedTask.set(task);
+  }
+
+  closeEditTask() {
+    this.selectedTask.set(null);
+  }
+
+  onTaskUpdatedFromModal() {
+    this.reload.emit();
   }
 }

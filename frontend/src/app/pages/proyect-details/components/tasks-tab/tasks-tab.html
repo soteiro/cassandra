@@ -221,14 +221,16 @@
               </button>
 
               <!-- TÍTULO DE LA TAREA -->
-              <div class="flex-1 min-w-0 cursor-pointer" (click)="toggleExpand(t.id)">
+              <div class="flex-1 min-w-0">
                 <h4
+                  (click)="openEditTask(t); $event.stopPropagation()"
                   [class]="
                     t.estado === 'Terminado'
                       ? 'line-through text-text-muted/60 font-normal'
                       : 'text-text-main font-semibold'
                   "
-                  class="text-sm tracking-tight truncate hover:text-primary transition-colors"
+                  class="text-sm tracking-tight truncate hover:text-primary transition-colors cursor-pointer"
+                  title="Haz clic para editar la tarea"
                 >
                   {{ t.nombre }}
                 </h4>
@@ -351,12 +353,14 @@
                     </button>
 
                     <span
+                      (click)="openEditTask(sub); $event.stopPropagation()"
                       [class]="
                         sub.estado === 'Terminado'
                           ? 'line-through text-text-muted/60 font-normal'
                           : 'text-text-main font-medium'
                       "
-                      class="text-xs truncate"
+                      class="text-xs truncate cursor-pointer hover:text-primary transition-colors"
+                      title="Haz clic para editar la subtarea"
                     >
                       {{ sub.nombre }}
                     </span>
@@ -479,5 +483,14 @@
     [isProcessing]="isDeletingTask()"
     (confirm)="confirmDeleteTask()"
     (cancel)="cancelDeleteTask()"
+  />
+
+  <!-- MODAL DRAWER LATERAL DERECHO PARA EDITAR TAREA -->
+  <app-task-detail-modal
+    [isOpen]="!!selectedTask()"
+    [task]="selectedTask()"
+    [proyectId]="projectId()"
+    (closeModal)="closeEditTask()"
+    (taskUpdated)="onTaskUpdatedFromModal()"
   />
 </div>

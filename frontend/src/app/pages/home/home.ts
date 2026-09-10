@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { TaskService } from '../../services/task.service';
 import { ToastService } from '../../services/toast.service';
 import { Task } from '../../models/task.model';
+import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
 import {
   LucideListTodo,
   LucideRefreshCcw,
@@ -17,6 +18,7 @@ import {
     CommonModule,
     FormsModule,
     RouterLink,
+    TaskDetailModal,
     LucideListTodo,
     LucideRefreshCcw,
     LucideCheck,
@@ -27,6 +29,9 @@ import {
 export class Home {
   private readonly taskService = inject(TaskService);
   private readonly toastService = inject(ToastService);
+
+  // Selected task for right-drawer modal
+  selectedTask = signal<Task | null>(null);
 
   // Filter state: 'En Curso' by default
   selectedEstado = signal<string>('En Curso');

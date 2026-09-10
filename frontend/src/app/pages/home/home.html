@@ -94,8 +94,10 @@
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2">
                     <span
-                      class="text-xs font-medium tracking-tight truncate transition-colors"
+                      (click)="selectedTask.set(tarea)"
+                      class="text-xs font-medium tracking-tight truncate transition-colors cursor-pointer hover:text-primary"
                       [class]="tarea.estado === 'Terminado' ? 'line-through text-text-muted/50' : 'text-text-main group-hover:text-primary'"
+                      title="Editar tarea"
                     >
                       {{ tarea.nombre }}
                     </span>
@@ -143,4 +145,13 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL DRAWER LATERAL DERECHO PARA EDITAR TAREA -->
+  <app-task-detail-modal
+    [isOpen]="!!selectedTask()"
+    [task]="selectedTask()"
+    [proyectId]="selectedTask()?.proyect_id || 0"
+    (closeModal)="selectedTask.set(null)"
+    (taskUpdated)="tasksResource?.reload()"
+  />
 </div>
