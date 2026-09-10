@@ -1,0 +1,1792 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cassandra API Reference",
+    "version": "1.0.0",
+    "description": "Documentación viva de la API autogenerada a partir de las colecciones de Bruno."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor Local"
+    },
+    {
+      "url": "/",
+      "description": "Servidor Actual"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Operaciones de Auth"
+    },
+    {
+      "name": "Interacciones",
+      "description": "Operaciones de Interacciones"
+    },
+    {
+      "name": "Notas proyectos",
+      "description": "Operaciones de Notas proyectos"
+    },
+    {
+      "name": "Personas",
+      "description": "Operaciones de Personas"
+    },
+    {
+      "name": "Proyects",
+      "description": "Operaciones de Proyects"
+    },
+    {
+      "name": "Reflexiones",
+      "description": "Operaciones de Reflexiones"
+    },
+    {
+      "name": "Tareas",
+      "description": "Operaciones de Tareas"
+    },
+    {
+      "name": "Users",
+      "description": "Operaciones de Users"
+    }
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "login",
+        "operationId": "post__api_auth_login",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "logout",
+        "operationId": "post__api_auth_logout",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "refresh",
+        "operationId": "post__api_auth_refresh",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/api/personas/{persona_id}/interacciones": {
+      "post": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "create interaccion by persona",
+        "operationId": "post__api_personas__persona_id__interacciones",
+        "parameters": [
+          {
+            "name": "persona_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de persona"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "list interacciones by persona",
+        "operationId": "get__api_personas__persona_id__interacciones",
+        "parameters": [
+          {
+            "name": "persona_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de persona"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/interacciones": {
+      "post": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "create interaccion",
+        "operationId": "post__api_interacciones",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "list interacciones",
+        "operationId": "get__api_interacciones",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/interacciones/{interaccione_id}": {
+      "delete": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "delete interaccion by id",
+        "operationId": "delete__api_interacciones__interaccione_id_",
+        "parameters": [
+          {
+            "name": "interaccione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de interaccione"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "get interaccion by id",
+        "operationId": "get__api_interacciones__interaccione_id_",
+        "parameters": [
+          {
+            "name": "interaccione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de interaccione"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Interacciones"
+        ],
+        "summary": "update interaccion by id",
+        "operationId": "put__api_interacciones__interaccione_id_",
+        "parameters": [
+          {
+            "name": "interaccione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de interaccione"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notas/{nota_id}": {
+      "delete": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "Delete",
+        "operationId": "delete__api_notas__nota_id_",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 13
+            },
+            "description": "ID numérico de nota"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "Get by ID",
+        "operationId": "get__api_notas__nota_id_",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 3
+            },
+            "description": "ID numérico de nota"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "update nota",
+        "operationId": "put__api_notas__nota_id_",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 3
+            },
+            "description": "ID numérico de nota"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/proyects/{proyect_id}/notas": {
+      "get": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "Get all by proyect",
+        "operationId": "get__api_proyects__proyect_id__notas",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "create",
+        "operationId": "post__api_proyects__proyect_id__notas",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/notas": {
+      "get": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "get all",
+        "operationId": "get__api_notas",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/personas": {
+      "post": {
+        "tags": [
+          "Personas"
+        ],
+        "summary": "create persona",
+        "operationId": "post__api_personas",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Personas"
+        ],
+        "summary": "list personas",
+        "operationId": "get__api_personas",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/personas/{persona_id}": {
+      "delete": {
+        "tags": [
+          "Personas"
+        ],
+        "summary": "delete persona by id",
+        "operationId": "delete__api_personas__persona_id_",
+        "parameters": [
+          {
+            "name": "persona_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de persona"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Personas"
+        ],
+        "summary": "get persona by id",
+        "operationId": "get__api_personas__persona_id_",
+        "parameters": [
+          {
+            "name": "persona_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de persona"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Personas"
+        ],
+        "summary": "update persona by id",
+        "operationId": "put__api_personas__persona_id_",
+        "parameters": [
+          {
+            "name": "persona_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de persona"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/proyects/{proyect_id}": {
+      "delete": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "Delete by id",
+        "operationId": "delete__api_proyects__proyect_id_",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 6
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "Edit proyect by id",
+        "operationId": "put__api_proyects__proyect_id_",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 2
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "Get Proyect by ID",
+        "operationId": "get__api_proyects__proyect_id_",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 3
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/proyects": {
+      "post": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "create proyect",
+        "operationId": "post__api_proyects",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "list proyect by user loged",
+        "operationId": "get__api_proyects",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/reflexiones": {
+      "post": {
+        "tags": [
+          "Reflexiones"
+        ],
+        "summary": "create reflexion",
+        "operationId": "post__api_reflexiones",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Reflexiones"
+        ],
+        "summary": "list reflexiones",
+        "operationId": "get__api_reflexiones",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/reflexiones/{reflexione_id}": {
+      "delete": {
+        "tags": [
+          "Reflexiones"
+        ],
+        "summary": "delete reflexion by id",
+        "operationId": "delete__api_reflexiones__reflexione_id_",
+        "parameters": [
+          {
+            "name": "reflexione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de reflexione"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Reflexiones"
+        ],
+        "summary": "get reflexion by id",
+        "operationId": "get__api_reflexiones__reflexione_id_",
+        "parameters": [
+          {
+            "name": "reflexione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de reflexione"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Reflexiones"
+        ],
+        "summary": "update reflexion by id",
+        "operationId": "put__api_reflexiones__reflexione_id_",
+        "parameters": [
+          {
+            "name": "reflexione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de reflexione"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/tareas": {
+      "post": {
+        "tags": [
+          "Tareas"
+        ],
+        "summary": "Create Tarea",
+        "operationId": "post__api_tareas",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tareas"
+        ],
+        "summary": "List Tareas",
+        "operationId": "get__api_tareas",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/tareas/{tarea_id}": {
+      "delete": {
+        "tags": [
+          "Tareas"
+        ],
+        "summary": "Delete Tarea",
+        "operationId": "delete__api_tareas__tarea_id_",
+        "parameters": [
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de tarea"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tareas"
+        ],
+        "summary": "Get Tarea",
+        "operationId": "get__api_tareas__tarea_id_",
+        "parameters": [
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 7
+            },
+            "description": "ID numérico de tarea"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tareas"
+        ],
+        "summary": "Update Tarea",
+        "operationId": "put__api_tareas__tarea_id_",
+        "parameters": [
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de tarea"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/proyects/{proyect_id}/tareas": {
+      "get": {
+        "tags": [
+          "Tareas"
+        ],
+        "summary": "List Tareas por Proyecto",
+        "operationId": "get__api_proyects__proyect_id__tareas",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 3
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/users/{user_id}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User",
+        "operationId": "put__api_users__user_id_",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 8
+            },
+            "description": "ID numérico de user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "delete user by id",
+        "operationId": "delete__api_users__user_id_",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 3
+            },
+            "description": "ID numérico de user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "get user by id",
+        "operationId": "get__api_users__user_id_",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 8
+            },
+            "description": "ID numérico de user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "create user",
+        "operationId": "post__api_users",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "list users",
+        "operationId": "get__api_users",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT de autenticación"
+      }
+    }
+  }
+}

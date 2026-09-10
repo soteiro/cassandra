@@ -197,9 +197,12 @@ func main() {
 		path := strings.TrimPrefix(r.URL.Path, "/")
 		if path != "" {
 			if f, err := distFS.Open(path); err == nil {
+				stat, statErr := f.Stat()
 				_ = f.Close()
-				fileServer.ServeHTTP(w, r)
-				return
+				if statErr == nil && !stat.IsDir() {
+					fileServer.ServeHTTP(w, r)
+					return
+				}
 			}
 		}
 
