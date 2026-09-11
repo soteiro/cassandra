@@ -6,6 +6,11 @@ import { TaskService } from '../../services/task.service';
 import { ToastService } from '../../services/toast.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
+import { TaskStatusSelect } from '../../components/task-status-select/task-status-select';
+import {
+  getTaskPriorityBadgeClass,
+  getTaskPriorityBorderClass,
+} from '../../utils/task-styles.util';
 import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
 
 @Component({
@@ -15,6 +20,7 @@ import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
     FormsModule,
     RouterLink,
     TaskDetailModal,
+    TaskStatusSelect,
     LucideListTodo,
     LucideRefreshCcw,
     LucideCheck,
@@ -93,47 +99,11 @@ export class Home {
     });
   }
 
-  getStatusBadgeClass(estado?: string): string {
-    switch (estado) {
-      case 'Terminado':
-      case 'Completado':
-        return 'bg-success/15 text-success border-success/30';
-      case 'En Curso':
-      case 'En Proceso':
-        return 'bg-accent/15 text-accent border-accent/30';
-      case 'Bloqueado':
-      case 'Pausado':
-        return 'bg-danger/15 text-danger border-danger/30';
-      default:
-        return 'bg-surface-border/50 text-text-muted border-surface-border';
-    }
-  }
-
   getPriorityBorderClass(prioridad?: string): string {
-    switch (prioridad?.toLowerCase()) {
-      case 'urgente':
-        return 'border-l-4 border-l-danger';
-      case 'alta':
-        return 'border-l-4 border-l-amber-500';
-      case 'baja':
-        return 'border-l-4 border-l-slate-400';
-      case 'normal':
-      default:
-        return 'border-l-4 border-l-accent';
-    }
+    return getTaskPriorityBorderClass(prioridad);
   }
 
   getPriorityBadgeClass(prioridad?: string): string {
-    switch (prioridad?.toLowerCase()) {
-      case 'urgente':
-        return 'bg-danger/15 text-danger border-danger/30';
-      case 'alta':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-      case 'baja':
-        return 'bg-surface-border/50 text-text-muted border-surface-border';
-      case 'normal':
-      default:
-        return 'bg-accent/15 text-accent border-accent/30';
-    }
+    return getTaskPriorityBadgeClass(prioridad);
   }
 }

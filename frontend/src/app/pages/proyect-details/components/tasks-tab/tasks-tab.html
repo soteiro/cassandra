@@ -150,18 +150,11 @@
             />
           </div>
           <div class="relative sm:w-32">
-            <select
-              [ngModel]="quickPriority()"
-              (ngModelChange)="quickPriority.set($event)"
-              name="quickPriority"
-              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2.5 text-xs outline-none transition-all cursor-pointer font-medium"
+            <app-task-priority-select
+              [(value)]="quickPriority"
+              variant="input"
               title="Prioridad de la tarea"
-            >
-              <option value="baja" class="bg-surface text-text-muted">Baja</option>
-              <option value="normal" class="bg-surface text-accent">Normal</option>
-              <option value="alta" class="bg-surface text-amber-400">Alta</option>
-              <option value="urgente" class="bg-surface text-danger">Urgente</option>
-            </select>
+            />
           </div>
           <button
             type="submit"
@@ -270,35 +263,20 @@
               }
 
               <!-- SELECTOR DE PRIORIDAD -->
-              <select
-                [ngModel]="t.prioridad || 'normal'"
-                (ngModelChange)="changeTaskPriority(t, $event)"
-                [class]="
-                  'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium transition-colors ' +
-                  getPriorityBadgeClass(t.prioridad)
-                "
+              <app-task-priority-select
+                [value]="t.prioridad || 'normal'"
+                (valueChange)="changeTaskPriority(t, $event)"
+                size="sm"
                 title="Prioridad de la tarea"
-              >
-                <option value="baja" class="bg-surface text-text-muted">Baja</option>
-                <option value="normal" class="bg-surface text-accent">Normal</option>
-                <option value="alta" class="bg-surface text-amber-400">Alta</option>
-                <option value="urgente" class="bg-surface text-danger">Urgente</option>
-              </select>
+              />
 
               <!-- SELECTOR DE ESTADO -->
-              <select
-                [ngModel]="t.estado || 'Abierto'"
-                (ngModelChange)="changeTaskStatus(t, $event)"
-                [class]="
-                  'text-xs px-2.5 py-1 rounded-lg border outline-none cursor-pointer font-medium transition-colors ' +
-                  getTaskStatusClass(t.estado)
-                "
-              >
-                <option value="Abierto" class="bg-surface text-text-main">Abierto</option>
-                <option value="En Curso" class="bg-surface text-accent">En Curso</option>
-                <option value="Terminado" class="bg-surface text-success">Terminado</option>
-                <option value="Bloqueado" class="bg-surface text-danger">Bloqueado</option>
-              </select>
+              <app-task-status-select
+                [value]="t.estado || 'Abierto'"
+                (valueChange)="changeTaskStatus(t, $event)"
+                size="sm"
+                title="Estado de la tarea"
+              />
 
               <!-- BOTÓN + SUBTAREA RÁPIDA -->
               <button
@@ -368,42 +346,19 @@
 
                   <!-- Estado, prioridad y borrar subtarea -->
                   <div class="flex items-center gap-2 shrink-0">
-                    <select
-                      [ngModel]="sub.prioridad || 'normal'"
-                      (ngModelChange)="changeTaskPriority(sub, $event)"
-                      [class]="
-                        'text-[11px] px-2 py-0.5 rounded-md border outline-none cursor-pointer font-medium transition-colors ' +
-                        getPriorityBadgeClass(sub.prioridad)
-                      "
+                    <app-task-priority-select
+                      [value]="sub.prioridad || 'normal'"
+                      (valueChange)="changeTaskPriority(sub, $event)"
+                      size="xs"
                       title="Prioridad de subtarea"
-                    >
-                      <option value="baja" class="bg-surface text-text-muted">Baja</option>
-                      <option value="normal" class="bg-surface text-accent">Normal</option>
-                      <option value="alta" class="bg-surface text-amber-400">Alta</option>
-                      <option value="urgente" class="bg-surface text-danger">Urgente</option>
-                    </select>
+                    />
 
-                    <select
-                      [ngModel]="sub.estado || 'Abierto'"
-                      (ngModelChange)="changeTaskStatus(sub, $event)"
-                      [class]="
-                        'text-[11px] px-2 py-0.5 rounded-md border outline-none cursor-pointer font-medium ' +
-                        getTaskStatusClass(sub.estado)
-                      "
-                    >
-                      <option value="Abierto" class="bg-surface text-text-main">
-                        Abierto
-                      </option>
-                      <option value="En Curso" class="bg-surface text-accent">
-                        En Curso
-                      </option>
-                      <option value="Terminado" class="bg-surface text-success">
-                        Terminado
-                      </option>
-                      <option value="Bloqueado" class="bg-surface text-danger">
-                        Bloqueado
-                      </option>
-                    </select>
+                    <app-task-status-select
+                      [value]="sub.estado || 'Abierto'"
+                      (valueChange)="changeTaskStatus(sub, $event)"
+                      size="xs"
+                      title="Estado de subtarea"
+                    />
 
                     <button
                       type="button"

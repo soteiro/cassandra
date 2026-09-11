@@ -17,6 +17,9 @@ import {
   LucideCornerDownRight,
   LucideMessageCircleMore,
 } from '@lucide/angular';
+import { TaskStatusSelect } from '../../../../components/task-status-select/task-status-select';
+import { TaskPrioritySelect } from '../../../../components/task-priority-select/task-priority-select';
+import { getTaskPriorityBorderClass } from '../../../../utils/task-styles.util';
 
 @Component({
   selector: 'app-tasks-tab',
@@ -25,6 +28,8 @@ import {
     FormsModule,
     ConfirmModal,
     TaskDetailModal,
+    TaskStatusSelect,
+    TaskPrioritySelect,
     LucideChevronDown,
     LucideChevronRight,
     LucidePlus,
@@ -327,19 +332,6 @@ export class TasksTab {
     return { total, completed, percent };
   }
 
-  getTaskStatusClass(estado?: string): string {
-    switch (estado) {
-      case 'Terminado':
-        return 'bg-success/15 text-success border-success/30';
-      case 'En Curso':
-        return 'bg-accent/15 text-accent border-accent/30';
-      case 'Bloqueado':
-        return 'bg-danger/15 text-danger border-danger/30';
-      default:
-        return 'bg-surface-border/50 text-text-muted border-surface-border';
-    }
-  }
-
   changeTaskPriority(task: Task, nextPrioridad: string) {
     const prev = task.prioridad;
     task.prioridad = nextPrioridad;
@@ -358,32 +350,7 @@ export class TasksTab {
   }
 
   getPriorityBorderClass(prioridad?: string, isSubtask = false): string {
-    const width = isSubtask ? 'border-l-[3px]' : 'border-l-4';
-    switch (prioridad?.toLowerCase()) {
-      case 'urgente':
-        return `${width} border-l-danger`;
-      case 'alta':
-        return `${width} border-l-amber-500`;
-      case 'baja':
-        return `${width} border-l-slate-400`;
-      case 'normal':
-      default:
-        return `${width} border-l-accent`;
-    }
-  }
-
-  getPriorityBadgeClass(prioridad?: string): string {
-    switch (prioridad?.toLowerCase()) {
-      case 'urgente':
-        return 'bg-danger/15 text-danger border-danger/30';
-      case 'alta':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-      case 'baja':
-        return 'bg-surface-border/50 text-text-muted border-surface-border';
-      case 'normal':
-      default:
-        return 'bg-accent/15 text-accent border-accent/30';
-    }
+    return getTaskPriorityBorderClass(prioridad, isSubtask);
   }
 
   openEditTask(task: Task) {

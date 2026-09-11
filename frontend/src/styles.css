@@ -23,6 +23,12 @@
         --font-mono: 'JetBrains Mono', monospace;
     }
 
+/* Opciones de select con fondo bg-background por defecto */
+select option {
+  background-color: var(--color-background);
+  color: var(--color-text-main);
+}
+
 /* Scrollbar moderno, fino y minimalista para desktop */
 * {
   scrollbar-width: thin;

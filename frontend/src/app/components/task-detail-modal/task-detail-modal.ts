@@ -12,6 +12,9 @@ import {
   LucideSave,
   LucideCornerDownRight,
 } from '@lucide/angular';
+import { TaskStatusSelect } from '../task-status-select/task-status-select';
+import { TaskPrioritySelect } from '../task-priority-select/task-priority-select';
+import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
 
 @Component({
   selector: 'app-task-detail-modal',
@@ -24,6 +27,8 @@ import {
     LucideTrash2,
     LucideSave,
     LucideCornerDownRight,
+    TaskStatusSelect,
+    TaskPrioritySelect,
   ],
   templateUrl: './task-detail-modal.html',
 })
@@ -252,45 +257,9 @@ export class TaskDetailModal {
   }
 
   getPriorityBorderClass(prioridad?: string): string {
-    switch (prioridad?.toLowerCase()) {
-      case 'urgente':
-        return 'border-l-4 border-l-danger';
-      case 'alta':
-        return 'border-l-4 border-l-amber-500';
-      case 'baja':
-        return 'border-l-4 border-l-slate-400';
-      case 'normal':
-      default:
-        return 'border-l-4 border-l-accent';
-    }
+    return getTaskPriorityBorderClass(prioridad);
   }
 
-  getPriorityBadgeClass(prioridad?: string): string {
-    switch (prioridad?.toLowerCase()) {
-      case 'urgente':
-        return 'bg-danger/15 text-danger border-danger/30';
-      case 'alta':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-      case 'baja':
-        return 'bg-surface-border/50 text-text-muted border-surface-border';
-      case 'normal':
-      default:
-        return 'bg-accent/15 text-accent border-accent/30';
-    }
-  }
-
-  getStatusBadgeClass(estado?: string): string {
-    switch (estado) {
-      case 'Terminado':
-        return 'bg-success/15 text-success border-success/30';
-      case 'En Curso':
-        return 'bg-accent/15 text-accent border-accent/30';
-      case 'Bloqueado':
-        return 'bg-danger/15 text-danger border-danger/30';
-      default:
-        return 'bg-surface-border/50 text-text-muted border-surface-border';
-    }
-  }
 
   onClose() {
     this.isVisible.set(false);

@@ -63,17 +63,7 @@
             <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider">
               Prioridad
             </label>
-            <select
-              [ngModel]="prioridad()"
-              (ngModelChange)="prioridad.set($event)"
-              name="taskPrioridad"
-              [class]="'w-full bg-background border border-surface-border rounded-xl px-3 py-2.5 text-xs outline-none cursor-pointer font-semibold transition-all ' + getPriorityBadgeClass(prioridad())"
-            >
-              <option value="baja" class="bg-surface text-text-muted">Baja</option>
-              <option value="normal" class="bg-surface text-accent">Normal</option>
-              <option value="alta" class="bg-surface text-amber-400">Alta</option>
-              <option value="urgente" class="bg-surface text-danger">Urgente</option>
-            </select>
+            <app-task-priority-select [(value)]="prioridad" size="md" />
           </div>
 
           <!-- ESTADO -->
@@ -81,17 +71,7 @@
             <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider">
               Estado
             </label>
-            <select
-              [ngModel]="estado()"
-              (ngModelChange)="estado.set($event)"
-              name="taskEstado"
-              [class]="'w-full bg-background border border-surface-border rounded-xl px-3 py-2.5 text-xs outline-none cursor-pointer font-semibold transition-all ' + getStatusBadgeClass(estado())"
-            >
-              <option value="Abierto" class="bg-surface text-text-main">Abierto</option>
-              <option value="En Curso" class="bg-surface text-accent">En Curso</option>
-              <option value="Terminado" class="bg-surface text-success">Terminado</option>
-              <option value="Bloqueado" class="bg-surface text-danger">Bloqueado</option>
-            </select>
+            <app-task-status-select [(value)]="estado" size="md" />
           </div>
         </div>
 

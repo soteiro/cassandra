@@ -114,9 +114,9 @@
               name="proyecto_padre_id"
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
             >
-              <option [ngValue]="null" class="bg-surface text-text-main">Ninguno — Es un Proyecto Principal</option>
+              <option [ngValue]="null" class="bg-background text-text-main">Ninguno — Es un Proyecto Principal</option>
               @for (parent of potentialParents(); track parent.id) {
-                <option [ngValue]="parent.id" class="bg-surface text-text-main">
+                <option [ngValue]="parent.id" class="bg-background text-text-main">
                   ↳ Subproyecto de: {{ parent.nombre }}
                 </option>
               }
@@ -149,10 +149,10 @@
               name="prioridad"
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
             >
-              <option value="Baja" class="bg-surface text-text-main">Baja</option>
-              <option value="Media" class="bg-surface text-text-main">Media</option>
-              <option value="Alta" class="bg-surface text-text-main">Alta</option>
-              <option value="Critica" class="bg-surface text-text-main">Crítica</option>
+              <option value="Baja" class="bg-background text-text-main">Baja</option>
+              <option value="Media" class="bg-background text-text-main">Media</option>
+              <option value="Alta" class="bg-background text-text-main">Alta</option>
+              <option value="Critica" class="bg-background text-text-main">Crítica</option>
             </select>
           </div>
 
@@ -165,13 +165,13 @@
                 name="estado"
                 class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
               >
-                <option value="Idea" class="bg-surface text-text-main">Idea</option>
-                <option value="No Listado" class="bg-surface text-text-main">No Listado</option>
-                <option value="Pendiente" class="bg-surface text-text-main">Pendiente</option>
-                <option value="En Proceso" class="bg-surface text-text-main">En Proceso</option>
-                <option value="Pausado" class="bg-surface text-text-main">Pausado</option>
-                <option value="Completado" class="bg-surface text-text-main">Completado</option>
-                <option value="Cancelado" class="bg-surface text-text-main">Cancelado</option>
+                <option value="Idea" class="bg-background text-text-main">Idea</option>
+                <option value="No Listado" class="bg-background text-text-main">No Listado</option>
+                <option value="Pendiente" class="bg-background text-text-main">Pendiente</option>
+                <option value="En Proceso" class="bg-background text-text-main">En Proceso</option>
+                <option value="Pausado" class="bg-background text-text-main">Pausado</option>
+                <option value="Completado" class="bg-background text-text-main">Completado</option>
+                <option value="Cancelado" class="bg-background text-text-main">Cancelado</option>
               </select>
             </div>
           }
