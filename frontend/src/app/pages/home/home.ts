@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,11 +6,7 @@ import { TaskService } from '../../services/task.service';
 import { ToastService } from '../../services/toast.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
-import {
-  LucideListTodo,
-  LucideRefreshCcw,
-  LucideCheck,
-} from '@lucide/angular';
+import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
 
 @Component({
   selector: 'app-home',
@@ -26,10 +22,20 @@ import {
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
+
 export class Home {
   private readonly taskService = inject(TaskService);
   private readonly toastService = inject(ToastService);
+  readonly sortedTasks = computed(() => {
+  const tasks = this.tasksResource?.value() ?? [];
+  const priorityOrder = { urgente: 0, alta: 1, normal: 2, baja: 3 };
 
+  return [...tasks].sort(
+    (a, b) =>
+      (priorityOrder[a.prioridad.toLowerCase() as keyof typeof priorityOrder] ?? 99) -
+      (priorityOrder[b.prioridad.toLowerCase() as keyof typeof priorityOrder] ?? 99)
+  );
+});
   // Selected task for right-drawer modal
   selectedTask = signal<Task | null>(null);
 
