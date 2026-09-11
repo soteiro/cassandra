@@ -68,7 +68,7 @@
             </div>
           }
         } @else if (tasksResource?.value(); as tareas) {
-          @for (tarea of sor) {
+          @for (tarea of sortedTasks(); track tarea.id) {
             <div
               [class]="
                 'p-2.5 bg-background/60 hover:bg-background border border-surface-border/60 hover:border-primary/40 rounded-xl transition-all flex items-center justify-between gap-2.5 group shadow-2xs ' +
