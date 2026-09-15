@@ -5,10 +5,13 @@
     @theme {
         /* Tu configuración actual */
         --color-primary: oklch(68.1% 0.162 75.834);
+        /* --color-primary: oklch(38.1% 0.176 304.987); */
         --color-background: oklch(21% 0.006 285.885);
+        /* --color-background: #0F1524; */
 
         /* Complementos sugeridos */
         --color-surface: oklch(26% 0.008 285);
+        /* --color-surface: #151D2F; */
         --color-surface-border: oklch(32% 0.01 285);
 
         --color-text-main: oklch(96% 0.003 285);
