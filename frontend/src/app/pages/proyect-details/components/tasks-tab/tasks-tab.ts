@@ -265,20 +265,12 @@ export class TasksTab {
   private getTaskStatusWeight(estado?: string): number {
     switch (estado?.trim()) {
       case 'En Curso':
-      case 'en curso':
-      case 'En curso':
         return 1;
       case 'Bloqueado':
-      case 'bloqueado':
-      case 'Bloqueada':
         return 2;
       case 'Abierto':
-      case 'abierto':
-      case 'Abierta':
         return 3;
       case 'Terminado':
-      case 'terminado':
-      case 'Terminada':
       case 'Completado':
         return 4;
       default:

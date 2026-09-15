@@ -21,7 +21,11 @@ import {
       [class]="getComputedClasses()"
     >
       @for (opt of options(); track opt.value) {
-        <option [value]="opt.value" [class]="'bg-background ' + opt.optionClass">
+        <option
+          [value]="opt.value"
+          [selected]="opt.value === (value() || 'Abierto')"
+          [class]="'bg-background ' + opt.optionClass"
+        >
           {{ opt.label }}
         </option>
       }
