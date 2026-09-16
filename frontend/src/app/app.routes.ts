@@ -41,6 +41,10 @@ export const routes: Routes = [
         redirectTo: 'crm/persona/:id',
       },
       {
+        path: 'finanzas',
+        loadComponent: () => import('./pages/finanzas/finanzas').then((m) => m.Finanzas),
+      },
+      {
         path: 'docs',
         loadComponent: () => import('./pages/docs/docs').then((m) => m.Docs),
       },

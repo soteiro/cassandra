@@ -8,10 +8,10 @@ import {
   LucideFolder,
   LucideLogOut,
   LucideSearch,
-  LucideSparkles,
   LucideX,
   LucideUser,
   LucideBookOpen,
+  LucideWalletMinimal
 } from '@lucide/angular';
 
 @Component({
@@ -26,6 +26,7 @@ import {
     LucideX,
     LucideUser,
     LucideBookOpen,
+    LucideWalletMinimal
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
