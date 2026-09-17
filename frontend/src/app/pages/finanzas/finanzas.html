@@ -1,1 +1,1086 @@
-<p>finanzas works!</p>
+<div class="max-w-7xl mx-auto space-y-6">
+  <!-- 1. ENCABEZADO PRINCIPAL Y ACCIONES -->
+  <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-surface-border">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2.5">
+        <div
+          class="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shadow-xs"
+        >
+          <svg lucideWallet class="w-5 h-5" />
+        </div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-text-main tracking-tight flex items-center gap-2">
+            Finanzas & Presupuesto
+          </h1>
+        </div>
+      </div>
+      <p class="text-xs text-text-muted">
+        Gestiona ingresos, egresos mensuales, cuentas y balance neto con precisión.
+      </p>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN SUPERIOR -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <!-- BOTÓN RECARGAR -->
+      <button
+        type="button"
+        (click)="reload()"
+        [class.animate-spin]="isRotating()"
+        class="p-2.5 bg-surface hover:bg-surface-border text-text-muted hover:text-primary border border-surface-border rounded-xl transition-all cursor-pointer shadow-xs"
+        title="Recargar datos"
+      >
+        <svg lucideRefreshCcw class="w-4 h-4" />
+      </button>
+
+      <!-- SWITCH DE PESTAÑAS (PRESUPUESTO VS CATÁLOGOS) -->
+      <div class="flex items-center bg-surface border border-surface-border rounded-xl p-1 text-xs">
+        <button
+          type="button"
+          (click)="activeTab.set('movimientos')"
+          [class]="
+            activeTab() === 'movimientos'
+              ? 'bg-primary/20 text-primary font-semibold shadow-xs'
+              : 'text-text-muted hover:text-text-main'
+          "
+          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+        >
+          <svg lucideScale class="w-3.5 h-3.5" />
+          <span>Presupuesto</span>
+        </button>
+        <button
+          type="button"
+          (click)="activeTab.set('catalogos')"
+          [class]="
+            activeTab() === 'catalogos'
+              ? 'bg-primary/20 text-primary font-semibold shadow-xs'
+              : 'text-text-muted hover:text-text-main'
+          "
+          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+        >
+          <svg lucideSettings class="w-3.5 h-3.5" />
+          <span>Cuentas & Categorías</span>
+        </button>
+      </div>
+
+      <!-- BOTÓN CLONAR MES -->
+      <button
+        type="button"
+        (click)="openCloneModal()"
+        class="bg-surface hover:bg-surface-border text-text-main border border-surface-border font-medium rounded-xl px-3.5 py-2 text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+        title="Clonar este mes al mes siguiente"
+      >
+        <svg lucideCopy class="w-3.5 h-3.5 text-accent" />
+        <span>Clonar Mes</span>
+      </button>
+
+      <!-- BOTÓN NUEVO MOVIMIENTO -->
+      <button
+        type="button"
+        (click)="openCreateModal('egreso')"
+        class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
+      >
+        <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
+        <span>Nuevo Movimiento</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. BARRA DE CONTROL TEMPORAL (SELECTOR DE MES Y AÑO) -->
+  <div class="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+    <!-- NAVEGACIÓN ANTERIOR / SIGUIENTE -->
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="prevMonth()"
+        class="p-2 rounded-xl bg-background border border-surface-border text-text-muted hover:text-text-main hover:border-primary transition-all cursor-pointer"
+        title="Mes anterior"
+      >
+        <svg lucideChevronLeft class="w-4 h-4" />
+      </button>
+
+      <div class="flex items-center gap-2 px-3 py-1.5 bg-background border border-surface-border rounded-xl">
+        <svg lucideCalendar class="w-4 h-4 text-primary" />
+        <span class="text-sm font-bold text-text-main">
+          {{ mesNombre() }} {{ selectedAnio() }}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="nextMonth()"
+        class="p-2 rounded-xl bg-background border border-surface-border text-text-muted hover:text-text-main hover:border-primary transition-all cursor-pointer"
+        title="Mes siguiente"
+      >
+        <svg lucideChevronRight class="w-4 h-4" />
+      </button>
+
+      <button
+        type="button"
+        (click)="goToCurrentMonth()"
+        class="text-xs text-text-muted hover:text-primary px-2.5 py-1.5 rounded-lg hover:bg-background transition-colors cursor-pointer"
+      >
+        Mes actual
+      </button>
+    </div>
+
+    <!-- SELECTORES DIRECTOS DE MES Y AÑO + BÚSQUEDA -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <div class="flex items-center gap-2">
+        <select
+          [ngModel]="selectedMes()"
+          (ngModelChange)="setPeriodo($event, selectedAnio())"
+          class="bg-background border border-surface-border text-text-main rounded-xl px-3 py-1.5 text-xs outline-none focus:border-primary cursor-pointer font-medium"
+        >
+          @for (m of meses; track $index) {
+            <option [value]="$index + 1">{{ m }}</option>
+          }
+        </select>
+
+        <select
+          [ngModel]="selectedAnio()"
+          (ngModelChange)="setPeriodo(selectedMes(), $event)"
+          class="bg-background border border-surface-border text-text-main rounded-xl px-3 py-1.5 text-xs outline-none focus:border-primary cursor-pointer font-medium"
+        >
+          @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
+            <option [value]="a">{{ a }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- BUSCADOR RÁPIDO EN MOVIMIENTOS -->
+      @if (activeTab() === 'movimientos') {
+        <div class="relative w-44 sm:w-56">
+          <input
+            type="text"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            placeholder="Buscar concepto, cuenta..."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl pl-3 pr-8 py-1.5 text-xs outline-none transition-all"
+          />
+          @if (searchQuery()) {
+            <button
+              type="button"
+              (click)="searchQuery.set('')"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main cursor-pointer"
+            >
+              <svg lucideX class="w-3.5 h-3.5" />
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- 3. TARJETAS DE KPIS Y BALANCE DEL PERÍODO -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- TOTAL INGRESOS -->
+    <div class="bg-surface border border-success/30 rounded-2xl p-5 shadow-sm space-y-2 relative overflow-hidden">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-success"></span>
+          Ingresos Totales
+        </span>
+        <div class="w-7 h-7 rounded-lg bg-success/15 text-success flex items-center justify-center">
+          <svg lucideArrowDownRight class="w-4 h-4" />
+        </div>
+      </div>
+      <div class="flex items-baseline justify-between">
+        <span class="text-2xl font-black text-success tracking-tight">
+          {{ formatCurrency(resumen().total_ingresos) }}
+        </span>
+        <span class="text-xs text-text-muted">
+          {{ ingresos().length }} {{ ingresos().length === 1 ? 'ítem' : 'ítems' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- TOTAL EGRESOS (GASTOS) -->
+    <div class="bg-surface border border-danger/30 rounded-2xl p-5 shadow-sm space-y-2 relative overflow-hidden">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-danger"></span>
+          Gastos Totales
+        </span>
+        <div class="w-7 h-7 rounded-lg bg-danger/15 text-danger flex items-center justify-center">
+          <svg lucideArrowUpRight class="w-4 h-4" />
+        </div>
+      </div>
+      <div class="flex items-baseline justify-between">
+        <span class="text-2xl font-black text-danger tracking-tight">
+          {{ formatCurrency(resumen().total_egresos) }}
+        </span>
+        <span class="text-xs text-text-muted">
+          {{ egresos().length }} {{ egresos().length === 1 ? 'ítem' : 'ítems' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- BALANCE NETO -->
+    <div
+      [class]="
+        resumen().balance >= 0
+          ? 'border-primary/40 bg-linear-to-br from-surface to-primary/5'
+          : 'border-danger/40 bg-linear-to-br from-surface to-danger/5'
+      "
+      class="border rounded-2xl p-5 shadow-sm space-y-2 relative overflow-hidden"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+          <svg lucideScale class="w-3.5 h-3.5 text-primary" />
+          Balance Neto
+        </span>
+        <span
+          [class]="
+            resumen().balance >= 0
+              ? 'bg-success/20 text-success border border-success/30'
+              : 'bg-danger/20 text-danger border border-danger/30'
+          "
+          class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"
+        >
+          {{ resumen().balance >= 0 ? 'Superávit' : 'Déficit' }}
+        </span>
+      </div>
+      <div class="flex items-baseline justify-between">
+        <span
+          [class]="resumen().balance >= 0 ? 'text-primary' : 'text-danger'"
+          class="text-2xl font-black tracking-tight"
+        >
+          {{ formatCurrency(resumen().balance) }}
+        </span>
+        <span class="text-xs text-text-muted">
+          {{ porcentajeReal() }}% del presupuesto
+        </span>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <!-- ========================================== -->
+  <!-- TAB 1: PRESUPUESTO Y MOVIMIENTOS           -->
+  <!-- ========================================== -->
+  @if (activeTab() === 'movimientos') {
+    <!-- BARRA DE CREACIÓN RÁPIDA DE MOVIMIENTO (ZERO FRICTION) -->
+    <div class="bg-surface border border-surface-border rounded-2xl p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-bold text-text-main uppercase tracking-wider flex items-center gap-1.5">
+          <svg lucidePlus class="w-4 h-4 text-primary" />
+          <span>Agregar Movimiento Rápido</span>
+        </h3>
+
+        <!-- FILTROS POR ESTADO -->
+        <div class="flex items-center gap-1 text-[11px]">
+          <button
+            type="button"
+            (click)="statusFilter.set('all')"
+            [class]="statusFilter() === 'all' ? 'bg-primary/20 text-primary font-semibold' : 'text-text-muted hover:text-text-main'"
+            class="px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+          >
+            Todos
+          </button>
+          <button
+            type="button"
+            (click)="statusFilter.set('pendientes')"
+            [class]="statusFilter() === 'pendientes' ? 'bg-amber-500/20 text-amber-400 font-semibold' : 'text-text-muted hover:text-text-main'"
+            class="px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+          >
+            Pendientes
+          </button>
+          <button
+            type="button"
+            (click)="statusFilter.set('completados')"
+            [class]="statusFilter() === 'completados' ? 'bg-success/20 text-success font-semibold' : 'text-text-muted hover:text-text-main'"
+            class="px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+          >
+            Completados
+          </button>
+        </div>
+      </div>
+
+      <form (ngSubmit)="createQuick()" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-center">
+        <!-- TIPO (INGRESO / EGRESO) -->
+        <div class="md:col-span-2">
+          <select
+            [ngModel]="quickTipo()"
+            (ngModelChange)="quickTipo.set($event)"
+            name="quickTipo"
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2 text-xs outline-none transition-all font-medium cursor-pointer"
+          >
+            <option value="egreso">Egreso (Gasto)</option>
+            <option value="ingreso">Ingreso</option>
+          </select>
+        </div>
+
+        <!-- CONCEPTO / NOMBRE -->
+        <div class="md:col-span-3">
+          <input
+            type="text"
+            [ngModel]="quickNombre()"
+            (ngModelChange)="quickNombre.set($event)"
+            name="quickNombre"
+            placeholder="Concepto (ej. Arriendo, Sueldo)..."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl px-3 py-2 text-xs outline-none transition-all"
+          />
+        </div>
+
+        <!-- MONTO CLP -->
+        <div class="md:col-span-2">
+          <input
+            type="number"
+            [ngModel]="quickMonto()"
+            (ngModelChange)="quickMonto.set($event)"
+            name="quickMonto"
+            placeholder="Monto CLP (ej. 135000)"
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl px-3 py-2 text-xs outline-none transition-all"
+          />
+        </div>
+
+        <!-- BANCO / CUENTA -->
+        <div class="md:col-span-2">
+          <select
+            [ngModel]="quickBancoId()"
+            (ngModelChange)="quickBancoId.set($event)"
+            name="quickBancoId"
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2 text-xs outline-none transition-all cursor-pointer"
+          >
+            <option [ngValue]="null">Cuenta (Opcional)</option>
+            @for (b of bancos(); track b.id) {
+              <option [ngValue]="b.id">{{ b.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- CATEGORÍA (SOLO SI ES EGRESO) -->
+        <div class="md:col-span-2">
+          <select
+            [disabled]="quickTipo() === 'ingreso'"
+            [ngModel]="quickGrupoId()"
+            (ngModelChange)="quickGrupoId.set($event)"
+            name="quickGrupoId"
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2 text-xs outline-none transition-all cursor-pointer disabled:opacity-30"
+          >
+            <option [ngValue]="null">Categoría</option>
+            @for (g of grupos(); track g.id) {
+              <option [ngValue]="g.id">{{ g.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- BOTÓN ENTER / GUARDAR -->
+        <div class="md:col-span-1">
+          <button
+            type="submit"
+            [disabled]="isSubmittingQuick() || !quickNombre().trim()"
+            class="w-full bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-3 py-2 rounded-xl text-xs transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1"
+            title="Guardar ítem"
+          >
+            <svg lucidePlus class="w-3.5 h-3.5" />
+            <span>↵</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- LISTADO EN 2 COLUMNAS (TAL COMO LA PLANILLA EXCEL) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- ============================================== -->
+      <!-- COLUMNA IZQUIERDA: GASTOS / EGRESOS (7 COLS)   -->
+      <!-- ============================================== -->
+      <div class="lg:col-span-7 space-y-3">
+        <div class="flex items-center justify-between pb-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-danger"></span>
+            <h2 class="text-sm font-bold text-text-main uppercase tracking-wider">
+              Gastos y Egresos ({{ egresos().length }})
+            </h2>
+          </div>
+          <button
+            type="button"
+            (click)="openCreateModal('egreso')"
+            class="text-xs text-text-muted hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
+          >
+            <svg lucidePlus class="w-3.5 h-3.5" />
+            <span>Añadir gasto</span>
+          </button>
+        </div>
+
+        @if (isLoading() && items().length === 0) {
+          <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
+            <p class="text-xs text-text-muted animate-pulse">Cargando presupuesto del mes...</p>
+          </div>
+        } @else if (egresos().length === 0) {
+          <div class="p-8 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-2">
+            <p class="text-xs text-text-muted">No hay gastos registrados para este período.</p>
+            <button
+              type="button"
+              (click)="openCreateModal('egreso')"
+              class="text-xs text-primary hover:underline cursor-pointer font-medium"
+            >
+              + Agregar el primer gasto
+            </button>
+          </div>
+        } @else {
+          <div class="space-y-2">
+            @for (item of egresos(); track item.id) {
+              <div
+                class="bg-surface hover:bg-surface-border/40 border border-surface-border rounded-xl p-3 shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+              >
+                <!-- CHECKBOX + NOMBRE + BADGES -->
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <!-- CHECKBOX COMPLETADO 1-CLICK -->
+                  <button
+                    type="button"
+                    (click)="toggleItemEstado(item)"
+                    [class]="
+                      item.estado === 'completado'
+                        ? 'bg-success border-success text-background'
+                        : 'border-surface-border hover:border-primary text-transparent bg-background'
+                    "
+                    class="w-4.5 h-4.5 rounded-md border flex items-center justify-center transition-all cursor-pointer shrink-0"
+                    title="Alternar completado / pendiente"
+                  >
+                    <svg lucideCheck class="w-3 h-3 stroke-3" />
+                  </button>
+
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span
+                        (click)="openEditModal(item)"
+                        [class]="
+                          item.estado === 'completado'
+                            ? 'line-through text-text-muted/60 font-normal'
+                            : 'text-text-main font-semibold'
+                        "
+                        class="text-xs hover:text-primary transition-colors cursor-pointer truncate"
+                        title="Editar movimiento"
+                      >
+                        {{ item.nombre }}
+                      </span>
+                    </div>
+
+                    <!-- BADGES DE CUENTA, GRUPO Y MOVIMIENTO -->
+                    <div class="flex flex-wrap items-center gap-1.5 mt-1 text-[10px]">
+                      @if (item.banco_nombre) {
+                        <span class="bg-background text-text-muted px-1.5 py-0.5 rounded-md border border-surface-border">
+                          {{ item.banco_nombre }}
+                        </span>
+                      }
+                      @if (item.grupo_item_nombre) {
+                        <span class="bg-accent/15 text-accent px-1.5 py-0.5 rounded-md border border-accent/30 font-medium">
+                          {{ item.grupo_item_nombre }}
+                        </span>
+                      }
+                      @if (item.movimiento_esperado_nombre) {
+                        <span class="bg-purple-500/15 text-purple-400 px-1.5 py-0.5 rounded-md border border-purple-500/30">
+                          {{ item.movimiento_esperado_nombre }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MONTO Y ACCIONES -->
+                <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                  <span
+                    [class]="item.estado === 'completado' ? 'text-text-muted/70' : 'text-danger font-bold'"
+                    class="text-xs sm:text-sm font-mono"
+                  >
+                    {{ formatCurrency(item.monto) }}
+                  </span>
+
+                  <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      (click)="openEditModal(item)"
+                      class="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-background transition-colors cursor-pointer"
+                      title="Editar"
+                    >
+                      <svg lucidePencil class="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      (click)="requestDelete(item)"
+                      class="p-1 rounded-lg text-text-muted hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer"
+                      title="Eliminar"
+                    >
+                      <svg lucideTrash2 class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ============================================== -->
+      <!-- COLUMNA DERECHA: INGRESOS (5 COLS)             -->
+      <!-- ============================================== -->
+      <div class="lg:col-span-5 space-y-3">
+        <div class="flex items-center justify-between pb-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-success"></span>
+            <h2 class="text-sm font-bold text-text-main uppercase tracking-wider">
+              Ingresos y Entrantes ({{ ingresos().length }})
+            </h2>
+          </div>
+          <button
+            type="button"
+            (click)="openCreateModal('ingreso')"
+            class="text-xs text-text-muted hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
+          >
+            <svg lucidePlus class="w-3.5 h-3.5" />
+            <span>Añadir ingreso</span>
+          </button>
+        </div>
+
+        @if (isLoading() && items().length === 0) {
+          <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
+            <p class="text-xs text-text-muted animate-pulse">Cargando ingresos...</p>
+          </div>
+        } @else if (ingresos().length === 0) {
+          <div class="p-8 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-2">
+            <p class="text-xs text-text-muted">No hay ingresos registrados para este período.</p>
+            <button
+              type="button"
+              (click)="openCreateModal('ingreso')"
+              class="text-xs text-success hover:underline cursor-pointer font-medium"
+            >
+              + Agregar el primer ingreso
+            </button>
+          </div>
+        } @else {
+          <div class="space-y-2">
+            @for (item of ingresos(); track item.id) {
+              <div
+                class="bg-surface hover:bg-surface-border/40 border border-surface-border rounded-xl p-3 shadow-xs transition-all flex items-center justify-between gap-3 group"
+              >
+                <!-- CHECKBOX + NOMBRE + CUENTA -->
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <button
+                    type="button"
+                    (click)="toggleItemEstado(item)"
+                    [class]="
+                      item.estado === 'completado'
+                        ? 'bg-success border-success text-background'
+                        : 'border-surface-border hover:border-primary text-transparent bg-background'
+                    "
+                    class="w-4.5 h-4.5 rounded-md border flex items-center justify-center transition-all cursor-pointer shrink-0"
+                    title="Alternar recibido / pendiente"
+                  >
+                    <svg lucideCheck class="w-3 h-3 stroke-3" />
+                  </button>
+
+                  <div class="min-w-0 flex-1">
+                    <span
+                      (click)="openEditModal(item)"
+                      [class]="
+                        item.estado === 'completado'
+                          ? 'line-through text-text-muted/60 font-normal'
+                          : 'text-text-main font-semibold'
+                      "
+                      class="text-xs hover:text-primary transition-colors cursor-pointer truncate block"
+                      title="Editar ingreso"
+                    >
+                      {{ item.nombre }}
+                    </span>
+                    @if (item.banco_nombre) {
+                      <span class="inline-block mt-0.5 text-[10px] bg-background text-text-muted px-1.5 py-0.2 rounded border border-surface-border">
+                        {{ item.banco_nombre }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- MONTO Y ACCIONES -->
+                <div class="flex items-center gap-3 shrink-0">
+                  <span
+                    [class]="item.estado === 'completado' ? 'text-text-muted/70' : 'text-success font-bold'"
+                    class="text-xs sm:text-sm font-mono"
+                  >
+                    {{ formatCurrency(item.monto) }}
+                  </span>
+
+                  <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      (click)="openEditModal(item)"
+                      class="p-1 rounded-lg text-text-muted hover:text-text-main hover:bg-background transition-colors cursor-pointer"
+                      title="Editar"
+                    >
+                      <svg lucidePencil class="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      (click)="requestDelete(item)"
+                      class="p-1 rounded-lg text-text-muted hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer"
+                      title="Eliminar"
+                    >
+                      <svg lucideTrash2 class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- TAB 2: CATÁLOGOS, CUENTAS Y CATEGORÍAS     -->
+  <!-- ========================================== -->
+  @if (activeTab() === 'catalogos') {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- 1. BANCOS / CUENTAS -->
+      <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-surface-border">
+          <div class="flex items-center gap-2">
+            <svg lucideLandmark class="w-4 h-4 text-primary" />
+            <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
+              Cuentas / Bancos
+            </h3>
+          </div>
+          <span class="text-xs text-text-muted font-medium">{{ bancos().length }}</span>
+        </div>
+
+        <!-- FORMULARIO NUEVO BANCO -->
+        <form (ngSubmit)="createBanco()" class="space-y-2">
+          <input
+            type="text"
+            [ngModel]="newBancoNombre()"
+            (ngModelChange)="newBancoNombre.set($event)"
+            name="newBancoNombre"
+            placeholder="Nombre (ej. Banco Santander, Tenpo)..."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2 text-xs outline-none"
+          />
+          <div class="flex gap-2">
+            <select
+              [ngModel]="newBancoTipo()"
+              (ngModelChange)="newBancoTipo.set($event)"
+              name="newBancoTipo"
+              class="flex-1 bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2 text-xs outline-none cursor-pointer"
+            >
+              @for (tb of tiposBanco; track tb.value) {
+                <option [value]="tb.value">{{ tb.label }}</option>
+              }
+            </select>
+            <button
+              type="submit"
+              [disabled]="isSubmittingBanco() || !newBancoNombre().trim()"
+              class="bg-primary hover:bg-primary/90 text-background px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+            >
+              + Agregar
+            </button>
+          </div>
+        </form>
+
+        <!-- LISTADO DE BANCOS -->
+        <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+          @for (b of bancos(); track b.id) {
+            <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+              <div>
+                <span class="font-medium text-text-main">{{ b.nombre }}</span>
+                <span class="ml-2 text-[10px] text-text-muted uppercase">({{ b.tipo }})</span>
+              </div>
+              <button
+                type="button"
+                (click)="deleteBanco(b.id)"
+                class="text-text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+                title="Eliminar cuenta"
+              >
+                <svg lucideTrash2 class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          } @empty {
+            <p class="text-xs text-text-muted/60 italic py-2">No hay cuentas registradas.</p>
+          }
+        </div>
+      </div>
+
+      <!-- 2. CATEGORÍAS (GRUPOS) -->
+      <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-surface-border">
+          <div class="flex items-center gap-2">
+            <svg lucideTag class="w-4 h-4 text-accent" />
+            <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
+              Categorías
+            </h3>
+          </div>
+          <span class="text-xs text-text-muted font-medium">{{ grupos().length }}</span>
+        </div>
+
+        <!-- FORMULARIO NUEVA CATEGORÍA -->
+        <form (ngSubmit)="createGrupo()" class="flex gap-2">
+          <input
+            type="text"
+            [ngModel]="newGrupoNombre()"
+            (ngModelChange)="newGrupoNombre.set($event)"
+            name="newGrupoNombre"
+            placeholder="Categoría (ej. Hogar, Personal)..."
+            class="flex-1 bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2 text-xs outline-none"
+          />
+          <button
+            type="submit"
+            [disabled]="isSubmittingGrupo() || !newGrupoNombre().trim()"
+            class="bg-accent hover:bg-accent/90 text-background px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+          >
+            + Agregar
+          </button>
+        </form>
+
+        <!-- LISTADO DE CATEGORÍAS -->
+        <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+          @for (g of grupos(); track g.id) {
+            <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+              <span class="font-medium text-text-main">{{ g.nombre }}</span>
+              <button
+                type="button"
+                (click)="deleteGrupo(g.id)"
+                class="text-text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+                title="Eliminar categoría"
+              >
+                <svg lucideTrash2 class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          } @empty {
+            <p class="text-xs text-text-muted/60 italic py-2">No hay categorías registradas.</p>
+          }
+        </div>
+      </div>
+
+      <!-- 3. MOVIMIENTOS ESPERADOS (DESTINO / MECANISMO) -->
+      <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-surface-border">
+          <div class="flex items-center gap-2">
+            <svg lucideSlidersHorizontal class="w-4 h-4 text-purple-400" />
+            <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
+              Mecanismos de Pago
+            </h3>
+          </div>
+          <span class="text-xs text-text-muted font-medium">{{ movimientosEsperados().length }}</span>
+        </div>
+
+        <!-- FORMULARIO NUEVO MECANISMO -->
+        <form (ngSubmit)="createMovimientoEsperado()" class="flex gap-2">
+          <input
+            type="text"
+            [ngModel]="newMovimientoNombre()"
+            (ngModelChange)="newMovimientoNombre.set($event)"
+            name="newMovimientoNombre"
+            placeholder="Mecanismo (ej. pago yo, transf-daniela)..."
+            class="flex-1 bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2 text-xs outline-none"
+          />
+          <button
+            type="submit"
+            [disabled]="isSubmittingMovimiento() || !newMovimientoNombre().trim()"
+            class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+          >
+            + Agregar
+          </button>
+        </form>
+
+        <!-- LISTADO DE MECANISMOS -->
+        <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+          @for (m of movimientosEsperados(); track m.id) {
+            <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+              <span class="font-medium text-text-main">{{ m.nombre }}</span>
+              <button
+                type="button"
+                (click)="deleteMovimientoEsperado(m.id)"
+                class="text-text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+                title="Eliminar mecanismo"
+              >
+                <svg lucideTrash2 class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          } @empty {
+            <p class="text-xs text-text-muted/60 italic py-2">No hay mecanismos registrados.</p>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- MODAL: CREAR / EDITAR MOVIMIENTO           -->
+  <!-- ========================================== -->
+  @if (showItemModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
+      <div class="bg-surface border border-surface-border rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4">
+        <div class="flex items-center justify-between p-5 border-b border-surface-border">
+          <h3 class="text-base font-bold text-text-main flex items-center gap-2">
+            <svg lucideWallet class="w-5 h-5 text-primary" />
+            <span>{{ isEditingItem() ? 'Editar Movimiento' : 'Nuevo Movimiento' }}</span>
+          </h3>
+          <button
+            type="button"
+            (click)="closeItemModal()"
+            class="text-text-muted hover:text-text-main p-1 rounded-lg transition-colors cursor-pointer"
+          >
+            <svg lucideX class="w-5 h-5" />
+          </button>
+        </div>
+
+        <form (ngSubmit)="saveItem()" class="p-5 space-y-4 text-xs">
+          <!-- TIPO DE MOVIMIENTO -->
+          <div>
+            <label class="block text-text-muted font-medium mb-1">Tipo de Movimiento</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                (click)="formTipo.set('egreso')"
+                [class]="
+                  formTipo() === 'egreso'
+                    ? 'bg-danger/20 text-danger border-danger/40 font-bold'
+                    : 'bg-background text-text-muted border-surface-border'
+                "
+                class="py-2.5 rounded-xl border transition-all cursor-pointer text-center"
+              >
+                Egreso (Gasto)
+              </button>
+              <button
+                type="button"
+                (click)="formTipo.set('ingreso')"
+                [class]="
+                  formTipo() === 'ingreso'
+                    ? 'bg-success/20 text-success border-success/40 font-bold'
+                    : 'bg-background text-text-muted border-surface-border'
+                "
+                class="py-2.5 rounded-xl border transition-all cursor-pointer text-center"
+              >
+                Ingreso (Entrante)
+              </button>
+            </div>
+          </div>
+
+          <!-- NOMBRE / CONCEPTO -->
+          <div>
+            <label class="block text-text-muted font-medium mb-1">Concepto *</label>
+            <input
+              type="text"
+              [ngModel]="formNombre()"
+              (ngModelChange)="formNombre.set($event)"
+              name="formNombre"
+              placeholder="Ej. Arriendo, Supermercado, Sueldo..."
+              required
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 text-xs outline-none"
+            />
+          </div>
+
+          <!-- MONTO EN CLP -->
+          <div>
+            <label class="block text-text-muted font-medium mb-1">Monto CLP ($) *</label>
+            <input
+              type="number"
+              [ngModel]="formMonto()"
+              (ngModelChange)="formMonto.set($event)"
+              name="formMonto"
+              placeholder="Ej. 135000"
+              required
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 text-xs outline-none font-mono"
+            />
+          </div>
+
+          <!-- SELECTORES EN GRID: CUENTA Y CATEGORÍA -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-text-muted font-medium mb-1">Cuenta / Banco</label>
+              <select
+                [ngModel]="formBancoId()"
+                (ngModelChange)="formBancoId.set($event)"
+                name="formBancoId"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer"
+              >
+                <option [ngValue]="null">Sin especificar</option>
+                @for (b of bancos(); track b.id) {
+                  <option [ngValue]="b.id">{{ b.nombre }} ({{ b.tipo }})</option>
+                }
+              </select>
+            </div>
+
+            @if (formTipo() === 'egreso') {
+              <div>
+                <label class="block text-text-muted font-medium mb-1">Categoría</label>
+                <select
+                  [ngModel]="formGrupoItemId()"
+                  (ngModelChange)="formGrupoItemId.set($event)"
+                  name="formGrupoItemId"
+                  class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer"
+                >
+                  <option [ngValue]="null">Sin categoría</option>
+                  @for (g of grupos(); track g.id) {
+                    <option [ngValue]="g.id">{{ g.nombre }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+
+          <!-- DESTINO / MECANISMO DE PAGO (SOLO EGRESOS) -->
+          @if (formTipo() === 'egreso') {
+            <div>
+              <label class="block text-text-muted font-medium mb-1">Mecanismo / Destino de Pago</label>
+              <select
+                [ngModel]="formMovimientoEsperadoId()"
+                (ngModelChange)="formMovimientoEsperadoId.set($event)"
+                name="formMovimientoEsperadoId"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer"
+              >
+                <option [ngValue]="null">Sin especificar</option>
+                @for (m of movimientosEsperados(); track m.id) {
+                  <option [ngValue]="m.id">{{ m.nombre }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <!-- ESTADO -->
+          <div>
+            <label class="block text-text-muted font-medium mb-1">Estado</label>
+            <select
+              [ngModel]="formEstado()"
+              (ngModelChange)="formEstado.set($event)"
+              name="formEstado"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer font-medium"
+            >
+              <option value="pendiente">Pendiente</option>
+              <option value="en proceso">En Proceso</option>
+              <option value="completado">Completado</option>
+            </select>
+          </div>
+
+          <!-- BOTONES -->
+          <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-surface-border">
+            <button
+              type="button"
+              (click)="closeItemModal()"
+              class="px-4 py-2 rounded-xl text-text-muted hover:text-text-main border border-surface-border transition-colors cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="isSubmittingItem() || !formNombre().trim()"
+              class="bg-primary hover:bg-primary/90 text-background px-5 py-2 rounded-xl font-medium transition-all disabled:opacity-40 cursor-pointer"
+            >
+              {{ isSubmittingItem() ? 'Guardando...' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- MODAL: CLONAR MES HACIA OTRO PERÍODO       -->
+  <!-- ========================================== -->
+  @if (showCloneModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
+      <div class="bg-surface border border-surface-border rounded-2xl w-full max-w-md overflow-hidden shadow-2xl space-y-4">
+        <div class="flex items-center justify-between p-5 border-b border-surface-border">
+          <h3 class="text-base font-bold text-text-main flex items-center gap-2">
+            <svg lucideCopy class="w-5 h-5 text-accent" />
+            <span>Clonar Período</span>
+          </h3>
+          <button
+            type="button"
+            (click)="closeCloneModal()"
+            class="text-text-muted hover:text-text-main p-1 rounded-lg transition-colors cursor-pointer"
+          >
+            <svg lucideX class="w-5 h-5" />
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4 text-xs">
+          <p class="text-text-muted">
+            Esto duplicará todos los movimientos del mes de origen hacia el mes de destino, reseteando su estado a <strong>pendiente</strong>.
+          </p>
+
+          <!-- ORIGEN -->
+          <div class="p-3 bg-background rounded-xl border border-surface-border space-y-2">
+            <span class="font-bold text-text-muted uppercase text-[10px]">Período de Origen</span>
+            <div class="grid grid-cols-2 gap-2">
+              <select
+                [ngModel]="cloneMesOrigen()"
+                (ngModelChange)="cloneMesOrigen.set($event)"
+                class="bg-surface border border-surface-border text-text-main rounded-lg p-2 outline-none"
+              >
+                @for (m of meses; track $index) {
+                  <option [value]="$index + 1">{{ m }}</option>
+                }
+              </select>
+              <select
+                [ngModel]="cloneAnioOrigen()"
+                (ngModelChange)="cloneAnioOrigen.set($event)"
+                class="bg-surface border border-surface-border text-text-main rounded-lg p-2 outline-none"
+              >
+                @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
+                  <option [value]="a">{{ a }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- DESTINO -->
+          <div class="p-3 bg-background rounded-xl border border-surface-border space-y-2">
+            <span class="font-bold text-accent uppercase text-[10px]">Período de Destino</span>
+            <div class="grid grid-cols-2 gap-2">
+              <select
+                [ngModel]="cloneMesDestino()"
+                (ngModelChange)="cloneMesDestino.set($event)"
+                class="bg-surface border border-accent/40 text-text-main rounded-lg p-2 outline-none"
+              >
+                @for (m of meses; track $index) {
+                  <option [value]="$index + 1">{{ m }}</option>
+                }
+              </select>
+              <select
+                [ngModel]="cloneAnioDestino()"
+                (ngModelChange)="cloneAnioDestino.set($event)"
+                class="bg-surface border border-accent/40 text-text-main rounded-lg p-2 outline-none"
+              >
+                @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
+                  <option [value]="a">{{ a }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- BOTONES -->
+          <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-surface-border">
+            <button
+              type="button"
+              (click)="closeCloneModal()"
+              class="px-4 py-2 rounded-xl text-text-muted hover:text-text-main border border-surface-border transition-colors cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              (click)="submitClone()"
+              [disabled]="isSubmittingClone()"
+              class="bg-accent hover:bg-accent/90 text-background px-5 py-2 rounded-xl font-medium transition-all disabled:opacity-40 cursor-pointer flex items-center gap-1.5"
+            >
+              <svg lucideCopy class="w-4 h-4" />
+              <span>{{ isSubmittingClone() ? 'Clonando...' : 'Clonar Período' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- CONFIRM DELETE MODAL -->
+  <app-confirm-modal
+    [isOpen]="itemToDelete() !== null"
+    title="Eliminar Movimiento"
+    [message]="'¿Estás seguro de eliminar ' + (itemToDelete()?.nombre || '') + '? Esta acción no se puede deshacer.'"
+    confirmText="Eliminar"
+    variant="danger"
+    [isProcessing]="isDeletingItem()"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  />
+</div>

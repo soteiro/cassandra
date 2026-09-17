@@ -14,6 +14,7 @@ http:
         "mes_origen": 3,
         "anio_destino": 2026,
         "mes_destino": 4
+        
       }
   auth: inherit
 
@@ -22,3 +23,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true
