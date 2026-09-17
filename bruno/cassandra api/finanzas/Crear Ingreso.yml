@@ -1,0 +1,26 @@
+info:
+  name: Crear Ingreso
+  type: http
+  seq: 13
+
+http:
+  method: POST
+  url: http://localhost:8080/api/finanzas/plantilla
+  body:
+    type: json
+    data: |-
+      {
+        "tipo": "ingreso",
+        "mes": 3,
+        "anio": 2026,
+        "nombre": "Sueldo",
+        "monto": 600000,
+        "banco_id": 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

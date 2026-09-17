@@ -1,0 +1,21 @@
+info:
+  name: Actualizar Movimiento Esperado
+  type: http
+  seq: 11
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/finanzas/movimientos-esperados/1
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "transf-daniela"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

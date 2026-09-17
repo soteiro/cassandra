@@ -1,0 +1,21 @@
+info:
+  name: Actualizar Grupo Finanzas
+  type: http
+  seq: 7
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/finanzas/grupos/1
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Personal / Trabajo"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,17 @@
+info:
+  name: Eliminar Movimiento Esperado
+  type: http
+  seq: 12
+
+http:
+  method: DELETE
+  url: http://localhost:8080/api/finanzas/movimientos-esperados/1
+  body:
+    type: none
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

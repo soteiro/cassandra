@@ -1,0 +1,21 @@
+info:
+  name: Crear Movimiento Esperado
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: http://localhost:8080/api/finanzas/movimientos-esperados
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "pago yo"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

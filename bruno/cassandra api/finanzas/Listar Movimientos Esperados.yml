@@ -1,0 +1,17 @@
+info:
+  name: Listar Movimientos Esperados
+  type: http
+  seq: 10
+
+http:
+  method: GET
+  url: http://localhost:8080/api/finanzas/movimientos-esperados
+  body:
+    type: none
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

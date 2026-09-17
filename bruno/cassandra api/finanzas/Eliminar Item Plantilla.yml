@@ -1,0 +1,17 @@
+info:
+  name: Eliminar Item Plantilla
+  type: http
+  seq: 18
+
+http:
+  method: DELETE
+  url: http://localhost:8080/api/finanzas/plantilla/1
+  body:
+    type: none
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

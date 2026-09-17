@@ -1,0 +1,22 @@
+info:
+  name: Crear Banco
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/finanzas/bancos
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Santander",
+        "tipo": "debito"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

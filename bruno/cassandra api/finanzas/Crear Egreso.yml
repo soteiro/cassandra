@@ -1,0 +1,29 @@
+info:
+  name: Crear Egreso
+  type: http
+  seq: 14
+
+http:
+  method: POST
+  url: http://localhost:8080/api/finanzas/plantilla
+  body:
+    type: json
+    data: |-
+      {
+        "tipo": "egreso",
+        "mes": 3,
+        "anio": 2026,
+        "nombre": "Arriendo",
+        "monto": 135000,
+        "banco_id": 1,
+        "grupo_item_id": 1,
+        "movimiento_esperado_id": 1,
+        "estado": "pendiente"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

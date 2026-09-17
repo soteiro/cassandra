@@ -1,0 +1,24 @@
+info:
+  name: Clonar Periodo
+  type: http
+  seq: 20
+
+http:
+  method: POST
+  url: http://localhost:8080/api/finanzas/clonar
+  body:
+    type: json
+    data: |-
+      {
+        "anio_origen": 2026,
+        "mes_origen": 3,
+        "anio_destino": 2026,
+        "mes_destino": 4
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
