@@ -65,6 +65,8 @@ func main() {
 	interaccionesHandler := handlers.NewInteraccionesHandler(interaccionesRepo)
 	reflexionesRepo := repository.NewReflexionesRepository(dbPool)
 	reflexionesHandler := handlers.NewReflexionesHandler(reflexionesRepo)
+	finanzasRepo := repository.NewFinanzasRepository(dbPool)
+	finanzasHandler := handlers.NewFinanzasHandler(finanzasRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -170,6 +172,34 @@ func main() {
 		r.Get("/api/reflexiones/{id}", reflexionesHandler.GetByID)
 		r.Put("/api/reflexiones/{id}", reflexionesHandler.Update)
 		r.Delete("/api/reflexiones/{id}", reflexionesHandler.Delete)
+
+		// Rutas de Finanzas
+		r.Post("/api/finanzas/bancos", finanzasHandler.CreateBanco)
+		r.Get("/api/finanzas/bancos", finanzasHandler.GetBancos)
+		r.Get("/api/finanzas/bancos/{id}", finanzasHandler.GetBancoByID)
+		r.Put("/api/finanzas/bancos/{id}", finanzasHandler.UpdateBanco)
+		r.Delete("/api/finanzas/bancos/{id}", finanzasHandler.DeleteBanco)
+
+		r.Post("/api/finanzas/grupos", finanzasHandler.CreateGrupoItem)
+		r.Get("/api/finanzas/grupos", finanzasHandler.GetGruposItems)
+		r.Get("/api/finanzas/grupos/{id}", finanzasHandler.GetGrupoItemByID)
+		r.Put("/api/finanzas/grupos/{id}", finanzasHandler.UpdateGrupoItem)
+		r.Delete("/api/finanzas/grupos/{id}", finanzasHandler.DeleteGrupoItem)
+
+		r.Post("/api/finanzas/movimientos-esperados", finanzasHandler.CreateMovimientoEsperado)
+		r.Get("/api/finanzas/movimientos-esperados", finanzasHandler.GetMovimientosEsperados)
+		r.Get("/api/finanzas/movimientos-esperados/{id}", finanzasHandler.GetMovimientoEsperadoByID)
+		r.Put("/api/finanzas/movimientos-esperados/{id}", finanzasHandler.UpdateMovimientoEsperado)
+		r.Delete("/api/finanzas/movimientos-esperados/{id}", finanzasHandler.DeleteMovimientoEsperado)
+
+		r.Post("/api/finanzas/plantilla", finanzasHandler.CreatePlantilla)
+		r.Get("/api/finanzas/plantilla", finanzasHandler.GetPlantillaByPeriodo)
+		r.Get("/api/finanzas/plantilla/{id}", finanzasHandler.GetPlantillaByID)
+		r.Put("/api/finanzas/plantilla/{id}", finanzasHandler.UpdatePlantilla)
+		r.Delete("/api/finanzas/plantilla/{id}", finanzasHandler.DeletePlantilla)
+
+		r.Get("/api/finanzas/resumen", finanzasHandler.GetResumenPeriodo)
+		r.Post("/api/finanzas/clonar", finanzasHandler.ClonarPeriodo)
 	})
 
 

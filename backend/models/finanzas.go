@@ -177,3 +177,12 @@ type FinanzasResumenPeriodo struct {
 	TotalEgresos  int `json:"total_egresos"`
 	Balance       int `json:"balance"` // TotalIngresos - TotalEgresos
 }
+
+// ClonarPeriodoRequest especifica los parámetros para clonar un mes hacia otro.
+type ClonarPeriodoRequest struct {
+	AnioOrigen  int `json:"anio_origen"`
+	MesOrigen   int `json:"mes_origen"`
+	AnioDestino int `json:"anio_destino"`
+	MesDestino  int `json:"mes_destino"`
+}
+
