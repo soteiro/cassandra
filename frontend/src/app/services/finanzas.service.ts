@@ -1,11 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   Banco,
   BancoRequest,
   ClonarPeriodoRequest,
+  EstadoFinanzas,
   FinanzasPlantillaItem,
   FinanzasPlantillaRequest,
   FinanzasPlantillaUpdateRequest,
@@ -106,6 +107,30 @@ export class FinanzasService {
 
   deletePlantillaItem(id: number): Observable<{ mensaje: string }> {
     return this.http.delete<{ mensaje: string }>(`${this.apiUrl}/finanzas/plantilla/${id}`);
+  }
+
+  batchUpdateEstado(ids: number[], estado: EstadoFinanzas): Observable<FinanzasPlantillaItem[]> {
+    if (!ids || ids.length === 0) return of([]);
+    const calls = ids.map((id) => this.updatePlantillaItem(id, { estado }));
+    return forkJoin(calls);
+  }
+
+  batchDelete(ids: number[]): Observable<{ mensaje: string }[]> {
+    if (!ids || ids.length === 0) return of([]);
+    const calls = ids.map((id) => this.deletePlantillaItem(id));
+    return forkJoin(calls);
+  }
+
+  batchUpdateCategoria(ids: number[], grupoItemId: number | null): Observable<FinanzasPlantillaItem[]> {
+    if (!ids || ids.length === 0) return of([]);
+    const calls = ids.map((id) => this.updatePlantillaItem(id, { grupo_item_id: grupoItemId }));
+    return forkJoin(calls);
+  }
+
+  batchUpdateBanco(ids: number[], bancoId: number | null): Observable<FinanzasPlantillaItem[]> {
+    if (!ids || ids.length === 0) return of([]);
+    const calls = ids.map((id) => this.updatePlantillaItem(id, { banco_id: bancoId }));
+    return forkJoin(calls);
   }
 
   // ==========================================
