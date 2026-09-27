@@ -13,6 +13,9 @@ import {
   FinanzasResumenPeriodo,
   GrupoItemFinanzas,
   GrupoItemFinanzasRequest,
+  ListaDeseosItem,
+  CreateListaDeseosRequest,
+  UpdateListaDeseosRequest,
   MovimientoEsperadoFinanzas,
   MovimientoEsperadoFinanzasRequest,
 } from '../models/finanzas.model';
@@ -150,5 +153,31 @@ export class FinanzasService {
       `${this.apiUrl}/finanzas/clonar`,
       req
     );
+  }
+
+  // ==========================================
+  // LISTA DE DESEOS
+  // ==========================================
+  getListaDeseos(comprado?: boolean, grupoId?: number): Observable<ListaDeseosItem[]> {
+    const params: Record<string, string> = {};
+    if (comprado !== undefined) {
+      params['comprado'] = comprado.toString();
+    }
+    if (grupoId !== undefined) {
+      params['grupo_id'] = grupoId.toString();
+    }
+    return this.http.get<ListaDeseosItem[]>(`${this.apiUrl}/lista-deseos`, { params });
+  }
+
+  createListaDeseos(req: CreateListaDeseosRequest): Observable<ListaDeseosItem> {
+    return this.http.post<ListaDeseosItem>(`${this.apiUrl}/lista-deseos`, req);
+  }
+
+  updateListaDeseos(id: number, req: UpdateListaDeseosRequest): Observable<ListaDeseosItem> {
+    return this.http.put<ListaDeseosItem>(`${this.apiUrl}/lista-deseos/${id}`, req);
+  }
+
+  deleteListaDeseos(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/lista-deseos/${id}`);
   }
 }

@@ -98,3 +98,41 @@ export interface ClonarPeriodoRequest {
   anio_destino: number;
   mes_destino: number;
 }
+
+export interface ListaDeseosItem {
+  id: number;
+  user_id: number;
+  nombre: string;
+  presupuesto: number;
+  valor_estimado: number;
+  comprado: boolean;
+  justificacion?: string | null;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+  fecha_compra?: string | null;
+  grupo_item_finanzas_id?: number | null;
+  grupo_item_finanzas_nombre?: string | null;
+  eliminado: boolean;
+}
+
+export interface CreateListaDeseosRequest {
+  nombre: string;
+  presupuesto: number;
+  valor_estimado: number;
+  comprado?: boolean;
+  justificacion?: string | null;
+  fecha_compra?: string | null;
+  grupo_item_finanzas_id?: number | null;
+}
+
+export interface UpdateListaDeseosRequest {
+  nombre?: string;
+  presupuesto?: number;
+  valor_estimado?: number;
+  comprado?: boolean;
+  justificacion?: string | null;
+  fecha_compra?: string | null;
+  grupo_item_finanzas_id?: number | null;
+  eliminado?: boolean;
+}
+
