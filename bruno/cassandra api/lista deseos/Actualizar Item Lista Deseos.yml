@@ -1,0 +1,26 @@
+info:
+  name: Actualizar Item Lista Deseos
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/lista-deseos/1
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Monitor Curvo 34''",
+        "presupuesto": 350000,
+        "valor_estimado": 310000,
+        "comprado": true,
+        "justificacion": "Comprado en oferta CyberDay.",
+        "grupo_item_finanzas_id": 3
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

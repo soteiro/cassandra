@@ -67,6 +67,8 @@ func main() {
 	reflexionesHandler := handlers.NewReflexionesHandler(reflexionesRepo)
 	finanzasRepo := repository.NewFinanzasRepository(dbPool)
 	finanzasHandler := handlers.NewFinanzasHandler(finanzasRepo)
+	listaDeseosRepo := repository.NewListaDeseosRepository(dbPool)
+	listaDeseosHandler := handlers.NewListaDeseosHandler(listaDeseosRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -200,6 +202,13 @@ func main() {
 
 		r.Get("/api/finanzas/resumen", finanzasHandler.GetResumenPeriodo)
 		r.Post("/api/finanzas/clonar", finanzasHandler.ClonarPeriodo)
+
+		// Rutas de Lista de Deseos
+		r.Post("/api/lista-deseos", listaDeseosHandler.Create)
+		r.Get("/api/lista-deseos", listaDeseosHandler.GetAll)
+		r.Get("/api/lista-deseos/{id}", listaDeseosHandler.GetByID)
+		r.Put("/api/lista-deseos/{id}", listaDeseosHandler.Update)
+		r.Delete("/api/lista-deseos/{id}", listaDeseosHandler.Delete)
 	})
 
 
