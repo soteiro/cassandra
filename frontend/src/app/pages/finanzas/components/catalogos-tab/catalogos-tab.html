@@ -1,0 +1,169 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <!-- 1. BANCOS / CUENTAS -->
+  <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
+    <div class="flex items-center justify-between pb-2 border-b border-surface-border">
+      <div class="flex items-center gap-2">
+        <svg lucideLandmark class="w-4 h-4 text-primary" />
+        <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
+          Cuentas / Bancos
+        </h3>
+      </div>
+      <span class="text-xs text-text-muted font-medium">{{ bancos().length }}</span>
+    </div>
+
+    <!-- FORMULARIO NUEVO BANCO -->
+    <form (ngSubmit)="createBanco()" class="space-y-2">
+      <input
+        type="text"
+        [ngModel]="newBancoNombre()"
+        (ngModelChange)="newBancoNombre.set($event)"
+        name="newBancoNombre"
+        placeholder="Nombre (ej. Banco Santander, Tenpo)..."
+        class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2 text-xs outline-none"
+      />
+      <div class="flex gap-2">
+        <select
+          [ngModel]="newBancoTipo()"
+          (ngModelChange)="newBancoTipo.set($event)"
+          name="newBancoTipo"
+          class="flex-1 bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2 text-xs outline-none cursor-pointer"
+        >
+          @for (tb of tiposBanco; track tb.value) {
+            <option [value]="tb.value">{{ tb.label }}</option>
+          }
+        </select>
+        <button
+          type="submit"
+          [disabled]="isSubmittingBanco() || !newBancoNombre().trim()"
+          class="bg-primary hover:bg-primary/90 text-background px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+        >
+          + Agregar
+        </button>
+      </div>
+    </form>
+
+    <!-- LISTADO DE BANCOS -->
+    <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+      @for (b of bancos(); track b.id) {
+        <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+          <div>
+            <span class="font-medium text-text-main">{{ b.nombre }}</span>
+            <span class="ml-2 text-[10px] text-text-muted uppercase">({{ b.tipo }})</span>
+          </div>
+          <button
+            type="button"
+            (click)="deleteBanco(b.id)"
+            class="text-text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+            title="Eliminar cuenta"
+          >
+            <svg lucideTrash2 class="w-3.5 h-3.5" />
+          </button>
+        </div>
+      } @empty {
+        <p class="text-xs text-text-muted/60 italic py-2">No hay cuentas registradas.</p>
+      }
+    </div>
+  </div>
+
+  <!-- 2. CATEGORÍAS (GRUPOS) -->
+  <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
+    <div class="flex items-center justify-between pb-2 border-b border-surface-border">
+      <div class="flex items-center gap-2">
+        <svg lucideTag class="w-4 h-4 text-accent" />
+        <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
+          Categorías
+        </h3>
+      </div>
+      <span class="text-xs text-text-muted font-medium">{{ grupos().length }}</span>
+    </div>
+
+    <!-- FORMULARIO NUEVA CATEGORÍA -->
+    <form (ngSubmit)="createGrupo()" class="flex gap-2">
+      <input
+        type="text"
+        [ngModel]="newGrupoNombre()"
+        (ngModelChange)="newGrupoNombre.set($event)"
+        name="newGrupoNombre"
+        placeholder="Categoría (ej. Hogar, Personal)..."
+        class="flex-1 bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2 text-xs outline-none"
+      />
+      <button
+        type="submit"
+        [disabled]="isSubmittingGrupo() || !newGrupoNombre().trim()"
+        class="bg-accent hover:bg-accent/90 text-background px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+      >
+        + Agregar
+      </button>
+    </form>
+
+    <!-- LISTADO DE CATEGORÍAS -->
+    <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+      @for (g of grupos(); track g.id) {
+        <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+          <span class="font-medium text-text-main">{{ g.nombre }}</span>
+          <button
+            type="button"
+            (click)="deleteGrupo(g.id)"
+            class="text-text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+            title="Eliminar categoría"
+          >
+            <svg lucideTrash2 class="w-3.5 h-3.5" />
+          </button>
+        </div>
+      } @empty {
+        <p class="text-xs text-text-muted/60 italic py-2">No hay categorías registradas.</p>
+      }
+    </div>
+  </div>
+
+  <!-- 3. MOVIMIENTOS ESPERADOS (DESTINO / MECANISMO) -->
+  <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
+    <div class="flex items-center justify-between pb-2 border-b border-surface-border">
+      <div class="flex items-center gap-2">
+        <svg lucideSlidersHorizontal class="w-4 h-4 text-purple-400" />
+        <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
+          Mecanismos de Pago
+        </h3>
+      </div>
+      <span class="text-xs text-text-muted font-medium">{{ movimientosEsperados().length }}</span>
+    </div>
+
+    <!-- FORMULARIO NUEVO MECANISMO -->
+    <form (ngSubmit)="createMovimientoEsperado()" class="flex gap-2">
+      <input
+        type="text"
+        [ngModel]="newMovimientoNombre()"
+        (ngModelChange)="newMovimientoNombre.set($event)"
+        name="newMovimientoNombre"
+        placeholder="Mecanismo (ej. pago yo, transf-daniela)..."
+        class="flex-1 bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2 text-xs outline-none"
+      />
+      <button
+        type="submit"
+        [disabled]="isSubmittingMovimiento() || !newMovimientoNombre().trim()"
+        class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+      >
+        + Agregar
+      </button>
+    </form>
+
+    <!-- LISTADO DE MECANISMOS -->
+    <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+      @for (m of movimientosEsperados(); track m.id) {
+        <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+          <span class="font-medium text-text-main">{{ m.nombre }}</span>
+          <button
+            type="button"
+            (click)="deleteMovimientoEsperado(m.id)"
+            class="text-text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+            title="Eliminar mecanismo"
+          >
+            <svg lucideTrash2 class="w-3.5 h-3.5" />
+          </button>
+        </div>
+      } @empty {
+        <p class="text-xs text-text-muted/60 italic py-2">No hay mecanismos registrados.</p>
+      }
+    </div>
+  </div>
+</div>
