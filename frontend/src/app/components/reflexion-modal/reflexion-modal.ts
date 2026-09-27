@@ -1,4 +1,4 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -6,6 +6,7 @@ import {
   ReflexionTipo,
   ReflexionUpdateRequest,
 } from '../../models/reflexion.model';
+import { BackButtonService } from '../../services/back-button.service';
 import {
   LucidePencil,
   LucideX,
@@ -28,12 +29,20 @@ import {
   templateUrl: './reflexion-modal.html',
 })
 export class ReflexionModal {
+  private readonly backButtonService = inject(BackButtonService);
+
   isOpen = input<boolean>(false);
   initialData = input<ReflexionResponse | null>(null);
   isSubmitting = input<boolean>(false);
 
   save = output<ReflexionUpdateRequest>();
   close = output<void>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => this.close.emit(),
+    80
+  );
 
   // Internal form signals
   texto = signal('');

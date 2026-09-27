@@ -1,7 +1,8 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
+import { BackButtonService } from '../../services/back-button.service';
 import {
   LucideSparkles,
   LucidePencil,
@@ -22,6 +23,8 @@ import {
   templateUrl: './project-modal.html',
 })
 export class ProjectModal {
+  private readonly backButtonService = inject(BackButtonService);
+
   isOpen = input<boolean>(false);
   mode = input<'create' | 'edit' | 'create-subproject'>('create');
   initialData = input<ProjectResponse | null>(null);
@@ -31,6 +34,12 @@ export class ProjectModal {
 
   save = output<ProjectRequest | ProjectUpdateRequest>();
   close = output<void>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => this.onClose(),
+    80
+  );
 
   // Internal form signals
   nombre = signal('');

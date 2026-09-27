@@ -8,6 +8,7 @@ import {
   ListaDeseosItem,
 } from '../../../../models/finanzas.model';
 import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
+import { BackButtonService } from '../../../../services/back-button.service';
 import {
   LucideSparkles,
   LucideCheckCircle2,
@@ -47,6 +48,7 @@ export class DeseosTab implements OnInit {
 
   private readonly finanzasService = inject(FinanzasService);
   private readonly toastService = inject(ToastService);
+  private readonly backButtonService = inject(BackButtonService);
 
   listaDeseos = signal<ListaDeseosItem[]>([]);
   isLoadingDeseos = signal<boolean>(false);
@@ -56,6 +58,12 @@ export class DeseosTab implements OnInit {
 
   // Modal Crear/Editar Deseo
   showDeseoModal = signal<boolean>(false);
+
+  private readonly _backBtnDeseo = this.backButtonService.registerEffect(
+    () => this.showDeseoModal(),
+    () => this.closeDeseoModal(),
+    80
+  );
   isEditingDeseo = signal<boolean>(false);
   editingDeseoId = signal<number | null>(null);
   isSubmittingDeseo = signal<boolean>(false);

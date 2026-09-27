@@ -5,6 +5,7 @@ import { InteraccionResponse } from '../../models/interaccion.model';
 import { InteraccionService } from '../../services/interaccion.service';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmModal } from '../confirm-modal/confirm-modal';
+import { BackButtonService } from '../../services/back-button.service';
 import {
   LucideMessageSquare,
   LucideX,
@@ -36,6 +37,7 @@ import {
 export class InteraccionModal {
   private readonly interaccionService = inject(InteraccionService);
   private readonly toast = inject(ToastService);
+  private readonly backButtonService = inject(BackButtonService);
 
   isOpen = input<boolean>(false);
   interaccion = input<InteraccionResponse | null>(null);
@@ -43,6 +45,18 @@ export class InteraccionModal {
   close = output<void>();
   updated = output<void>();
   deleted = output<void>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => {
+      if (this.isEditing()) {
+        this.cancelEdit();
+      } else {
+        this.onClose();
+      }
+    },
+    80
+  );
 
   // Cached item for smooth exit slide animation
   displayedItem = signal<InteraccionResponse | null>(null);

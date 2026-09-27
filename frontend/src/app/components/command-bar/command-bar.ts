@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { LucideFolder, LucideSearch } from '@lucide/angular';
 import { CommandBarService } from '../../services/command-bar.service';
 import { ProjectSearchService } from '../../services/project-search.service';
+import { BackButtonService } from '../../services/back-button.service';
 
 @Component({
   selector: 'app-command-bar',
@@ -16,12 +17,19 @@ export class CommandBar {
   protected readonly commandBarService = inject(CommandBarService);
   private readonly projectSearch = inject(ProjectSearchService);
   private readonly router = inject(Router);
+  private readonly backButtonService = inject(BackButtonService);
 
   protected readonly query = signal('');
   protected readonly selectedIndex = signal(0);
   protected readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('inputRef');
 
   protected readonly matches = computed(() => this.projectSearch.search(this.query()));
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.commandBarService.state.isOpen(),
+    () => this.close(),
+    90
+  );
 
   constructor() {
     effect(() => {

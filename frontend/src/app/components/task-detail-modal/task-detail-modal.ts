@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Task, TaskPrioridad } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 import { ToastService } from '../../services/toast.service';
+import { BackButtonService } from '../../services/back-button.service';
 import {
   LucideX,
   LucideCheck,
@@ -35,6 +36,7 @@ import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
 export class TaskDetailModal {
   private readonly taskService = inject(TaskService);
   private readonly toastService = inject(ToastService);
+  private readonly backButtonService = inject(BackButtonService);
 
   // Inputs
   isOpen = input<boolean>(false);
@@ -45,6 +47,12 @@ export class TaskDetailModal {
   closeModal = output<void>();
   taskUpdated = output<void>();
   taskDeleted = output<number>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => this.onClose(),
+    80
+  );
 
   // Visibility & Render state for smooth transitions
   shouldRender = signal(false);

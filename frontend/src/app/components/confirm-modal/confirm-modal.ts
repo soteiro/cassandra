@@ -1,6 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideTriangleAlert, LucideTrash2, LucideX } from '@lucide/angular';
+import { BackButtonService } from '../../services/back-button.service';
 
 @Component({
   selector: 'app-confirm-modal',
@@ -8,6 +9,8 @@ import { LucideTriangleAlert, LucideTrash2, LucideX } from '@lucide/angular';
   templateUrl: './confirm-modal.html',
 })
 export class ConfirmModal {
+  private readonly backButtonService = inject(BackButtonService);
+
   isOpen = input<boolean>(false);
   title = input<string>('¿Estás seguro?');
   message = input<string>('Esta acción no se puede deshacer.');
@@ -18,6 +21,12 @@ export class ConfirmModal {
 
   confirm = output<void>();
   cancel = output<void>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => this.onCancel(),
+    100
+  );
 
   onBackdropClick(event: MouseEvent) {
     if ((event.target as HTMLElement).classList.contains('backdrop-layer')) {

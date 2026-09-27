@@ -3,16 +3,18 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, LucideEye, LucideEyeOff],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
   protected readonly email = signal('');
   protected readonly password = signal('');
+  protected readonly showPassword = signal(false);
   protected readonly errorMessage = signal<string | null>('');
 
   private readonly authService = inject(AuthService);

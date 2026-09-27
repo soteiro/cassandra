@@ -23,6 +23,7 @@ import {
   TipoMovimientoFinanzas,
 } from '../../../../models/finanzas.model';
 import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
+import { BackButtonService } from '../../../../services/back-button.service';
 import {
   LucideWallet,
   LucidePlus,
@@ -110,6 +111,7 @@ export class PresupuestoTab {
 
   private readonly finanzasService = inject(FinanzasService);
   private readonly toastService = inject(ToastService);
+  private readonly backButtonService = inject(BackButtonService);
 
   // Subpestaña de movimientos: 'egresos' (principal) o 'ingresos'
   movimientosSubTab = signal<'egresos' | 'ingresos'>('egresos');
@@ -145,6 +147,12 @@ export class PresupuestoTab {
   editingItemId = signal<number | null>(null);
   isSubmittingItem = signal<boolean>(false);
 
+  private readonly _backBtnItem = this.backButtonService.registerEffect(
+    () => this.showItemModal(),
+    () => this.closeItemModal(),
+    80
+  );
+
   formTipo = signal<TipoMovimientoFinanzas>('egreso');
   formNombre = signal<string>('');
   formMonto = signal<number | null>(null);
@@ -160,6 +168,12 @@ export class PresupuestoTab {
   cloneAnioDestino = signal<number>(new Date().getFullYear());
   cloneMesDestino = signal<number>(new Date().getMonth() + 2 > 12 ? 1 : new Date().getMonth() + 2);
   isSubmittingClone = signal<boolean>(false);
+
+  private readonly _backBtnClone = this.backButtonService.registerEffect(
+    () => this.showCloneModal(),
+    () => this.closeCloneModal(),
+    80
+  );
 
   // Modal de Confirmación de Borrado individual
   itemToDelete = signal<FinanzasPlantillaItem | null>(null);

@@ -1,7 +1,8 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PersonaRequest, PersonaResponse, PersonaUpdateRequest } from '../../models/persona.model';
+import { BackButtonService } from '../../services/back-button.service';
 import {
   LucideUserPlus,
   LucidePencil,
@@ -22,6 +23,8 @@ import {
   templateUrl: './persona-modal.html',
 })
 export class PersonaModal {
+  private readonly backButtonService = inject(BackButtonService);
+
   isOpen = input<boolean>(false);
   mode = input<'create' | 'edit'>('create');
   initialData = input<PersonaResponse | null>(null);
@@ -29,6 +32,12 @@ export class PersonaModal {
 
   save = output<PersonaRequest | PersonaUpdateRequest>();
   close = output<void>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => this.close.emit(),
+    80
+  );
 
   // Internal form signals
   nombre = signal('');

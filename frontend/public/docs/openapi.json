@@ -29,6 +29,10 @@
       "description": "Operaciones de Interacciones"
     },
     {
+      "name": "Lista deseos",
+      "description": "Operaciones de Lista deseos"
+    },
+    {
       "name": "Notas proyectos",
       "description": "Operaciones de Notas proyectos"
     },
@@ -1173,6 +1177,211 @@
             "description": "ID numérico de interaccione"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/lista-deseos/{lista-deseo_id}": {
+      "put": {
+        "tags": [
+          "Lista deseos"
+        ],
+        "summary": "Actualizar Item Lista Deseos",
+        "operationId": "put__api_lista_deseos__lista_deseo_id_",
+        "parameters": [
+          {
+            "name": "lista-deseo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de lista-deseo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Lista deseos"
+        ],
+        "summary": "Eliminar Item Lista Deseos",
+        "operationId": "delete__api_lista_deseos__lista_deseo_id_",
+        "parameters": [
+          {
+            "name": "lista-deseo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de lista-deseo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Lista deseos"
+        ],
+        "summary": "Obtener Item Lista Deseos por ID",
+        "operationId": "get__api_lista_deseos__lista_deseo_id_",
+        "parameters": [
+          {
+            "name": "lista-deseo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de lista-deseo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/lista-deseos": {
+      "post": {
+        "tags": [
+          "Lista deseos"
+        ],
+        "summary": "Crear Item Lista Deseos",
+        "operationId": "post__api_lista_deseos",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Lista deseos"
+        ],
+        "summary": "Listar Lista Deseos",
+        "operationId": "get__api_lista_deseos",
         "responses": {
           "200": {
             "description": "Operación exitosa",
