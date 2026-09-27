@@ -4,6 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.cassandra.app', 
   appName: 'Cassandra', 
   webDir: 'dist/frontend/browser', 
+  backgroundColor: '#18181b',
   plugins: {
     CapacitorHttp: {
       enabled: true,
