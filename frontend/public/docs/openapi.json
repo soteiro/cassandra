@@ -1219,7 +1219,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 4
             },
             "description": "ID numérico de lista-deseo"
           }
@@ -1264,7 +1264,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 4
             },
             "description": "ID numérico de lista-deseo"
           }
@@ -1309,7 +1309,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 1
+              "example": 4
             },
             "description": "ID numérico de lista-deseo"
           }
