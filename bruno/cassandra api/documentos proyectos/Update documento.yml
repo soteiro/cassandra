@@ -1,0 +1,24 @@
+info:
+  name: Update documento
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/documentos/1
+  body:
+    type: json
+    data: |-
+      {
+        "titulo": "Arquitectura Actualizada del Sistema",
+        "contenido": "# Arquitectura v2\n\nActualización de decisiones arquitectónicas.\n\n- Categoría: arquitectura",
+        "tipo": "arquitectura",
+        "tags": "backend, v2"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

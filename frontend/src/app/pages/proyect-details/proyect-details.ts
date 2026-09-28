@@ -5,18 +5,21 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { NotaService } from '../../services/nota.service';
+import { DocumentoService } from '../../services/documento.service';
 import { ToastService } from '../../services/toast.service';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
 import { ProjectHeader } from './components/project-header/project-header';
 import { SubprojectsTab } from './components/subprojects-tab/subprojects-tab';
 import { TasksTab } from './components/tasks-tab/tasks-tab';
 import { NotesTab } from './components/notes-tab/notes-tab';
+import { DocumentsTab } from './components/documents-tab/documents-tab';
 import { ProjectModal } from '../../components/project-modal/project-modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import {
   LucideListTodo,
   LucideFileText,
   LucideLayers,
+  LucideBookOpen,
 } from '@lucide/angular';
 
 interface Tab {
@@ -32,11 +35,13 @@ interface Tab {
     SubprojectsTab,
     TasksTab,
     NotesTab,
+    DocumentsTab,
     ProjectModal,
     ConfirmModal,
     LucideListTodo,
     LucideFileText,
     LucideLayers,
+    LucideBookOpen,
   ],
   templateUrl: './proyect-details.html',
   styleUrl: './proyect-details.css',
@@ -47,6 +52,7 @@ export class ProyectDetails {
   private readonly proyectService = inject(proyectService);
   private readonly taskService = inject(TaskService);
   private readonly notaService = inject(NotaService);
+  private readonly documentoService = inject(DocumentoService);
   private readonly toast = inject(ToastService);
 
   private readonly paramMap = toSignal(this.route.paramMap);
@@ -58,12 +64,14 @@ export class ProyectDetails {
   protected readonly subproyectosResource = this.proyectService.getSubproyectos(this.id);
   protected readonly tasksResource = this.taskService.getTasksByProyectoId(this.id);
   protected readonly notasResource = this.notaService.getNotasByProyectoId(this.id);
+  protected readonly documentosResource = this.documentoService.getDocumentosByProyectoId(this.id);
 
   // Tabs
   tabs: Tab[] = [
     { id: 'subproyectos', label: 'Subproyectos' },
     { id: 'tareas', label: 'Tareas' },
     { id: 'notas', label: 'Notas' },
+    { id: 'documentos', label: 'Documentos' },
   ];
 
   activeTab = signal<string>('tareas');
@@ -173,5 +181,9 @@ export class ProyectDetails {
 
   reloadNotas() {
     this.notasResource?.reload();
+  }
+
+  reloadDocumentos() {
+    this.documentosResource?.reload();
   }
 }

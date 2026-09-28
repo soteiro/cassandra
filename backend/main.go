@@ -69,6 +69,8 @@ func main() {
 	finanzasHandler := handlers.NewFinanzasHandler(finanzasRepo)
 	listaDeseosRepo := repository.NewListaDeseosRepository(dbPool)
 	listaDeseosHandler := handlers.NewListaDeseosHandler(listaDeseosRepo)
+	documentosProyectoRepo := repository.NewDocumentosProyectoRepository(dbPool)
+	documentosProyectoHandler := handlers.NewDocumentosProyectoHandler(documentosProyectoRepo)
 
 	// 5. Configurar el Router HTTP
 	r := chi.NewRouter()
@@ -149,10 +151,18 @@ func main() {
 		r.Get("/api/proyects/{proyect_id}/notas", notasProyectoHandler.GetByProyectoID)
 		r.Get("/api/tareas/{tarea_id}/notas", notasProyectoHandler.GetByTareaID)
 		r.Post("/api/tareas/{tarea_id}/notas", notasProyectoHandler.Create)
+		r.Post("/api/notas", notasProyectoHandler.Create)
 		r.Get("/api/notas", notasProyectoHandler.GetAll)
 		r.Get("/api/notas/{id}", notasProyectoHandler.GetByID)
 		r.Put("/api/notas/{id}", notasProyectoHandler.Update)
 		r.Delete("/api/notas/{id}", notasProyectoHandler.Delete)
+		
+		// Rutas de Documentos de Proyectos
+		r.Post("/api/proyects/{proyect_id}/documentos", documentosProyectoHandler.Create)
+		r.Get("/api/proyects/{proyect_id}/documentos", documentosProyectoHandler.GetByProyectoID)
+		r.Get("/api/documentos/{id}", documentosProyectoHandler.GetByID)
+		r.Put("/api/documentos/{id}", documentosProyectoHandler.Update)
+		r.Delete("/api/documentos/{id}", documentosProyectoHandler.Delete)
 		
 		// Rutas de Personas
 		r.Post("/api/personas", personaHandler.Create)

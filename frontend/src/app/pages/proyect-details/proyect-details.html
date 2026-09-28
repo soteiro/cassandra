@@ -31,6 +31,8 @@
             <svg lucideListTodo class="w-4 h-4" />
           } @else if (tab.id === 'notas') {
             <svg lucideFileText class="w-4 h-4" />
+          } @else if (tab.id === 'documentos') {
+            <svg lucideBookOpen class="w-4 h-4" />
           }
           {{ tab.label }}
           @if (tab.id === 'subproyectos' && subproyectosResource?.value(); as subs) {
@@ -44,6 +46,10 @@
           } @else if (tab.id === 'notas' && notasResource?.value(); as notas) {
             <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
               {{ notas.length }}
+            </span>
+          } @else if (tab.id === 'documentos' && documentosResource?.value(); as docs) {
+            <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
+              {{ docs.length }}
             </span>
           }
         </button>
@@ -71,6 +77,13 @@
         [tareas]="tasksResource?.value() || []"
         [isLoading]="notasResource?.isLoading() || false"
         (reload)="reloadNotas()"
+      />
+    } @else if (activeTab() === 'documentos') {
+      <app-documents-tab
+        [projectId]="project.id"
+        [documentos]="documentosResource?.value() || []"
+        [isLoading]="documentosResource?.isLoading() || false"
+        (reload)="reloadDocumentos()"
       />
     }
 

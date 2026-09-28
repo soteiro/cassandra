@@ -1,0 +1,24 @@
+info:
+  name: Create documento
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/proyects/1/documentos
+  body:
+    type: json
+    data: |-
+      {
+        "titulo": "Arquitectura del Sistema de Documentación",
+        "contenido": "# Arquitectura\n\nEste documento describe la estructura del sistema.\n\n## Decisiones\n- Base de datos relacional PostgreSQL\n- Backend Go Chi\n- Frontend Angular 22",
+        "tipo": "arquitectura",
+        "tags": "backend, go, postgres, frontend"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
