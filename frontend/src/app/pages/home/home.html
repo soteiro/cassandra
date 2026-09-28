@@ -94,6 +94,9 @@
 
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono text-text-muted bg-surface px-1.5 py-0.5 rounded border border-surface-border shrink-0">
+                      #{{ tarea.id }}
+                    </span>
                     <span
                       (click)="selectedTask.set(tarea)"
                       class="text-xs font-medium tracking-tight truncate transition-colors cursor-pointer hover:text-primary"

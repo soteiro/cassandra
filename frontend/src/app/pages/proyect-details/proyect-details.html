@@ -68,6 +68,7 @@
       <app-notes-tab
         [projectId]="project.id"
         [notas]="notasResource?.value() || []"
+        [tareas]="tasksResource?.value() || []"
         [isLoading]="notasResource?.isLoading() || false"
         (reload)="reloadNotas()"
       />

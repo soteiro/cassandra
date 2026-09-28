@@ -10,9 +10,9 @@ http:
     type: json
     data: |-
       {
-        "user_id": 8,
-        "proyecto_id":1,
-        "nota": "esta 4 es una nota de proyecto"
+        "proyecto_id": 1,
+        "tarea_id": 1,
+        "nota": "Cápsula de solución documentada para la tarea #1"
       }
   auth: inherit
 

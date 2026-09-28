@@ -5,15 +5,15 @@
       <div>
         <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
           <svg lucideFileText class="w-5 h-5 text-primary" />
-          Notas del Proyecto
+          Notas y Bitácora del Proyecto
         </h3>
         <p class="text-xs text-text-muted mt-0.5">
-          Espacio para notas rápidas, decisiones técnicas, bitácora y documentación.
+          Cápsulas de información, soluciones técnicas y notas rápidas.
         </p>
       </div>
 
+      <!-- BUSCADOR DE NOTAS -->
       @if (notas().length > 0) {
-        <!-- BUSCADOR DE NOTAS -->
         <div class="relative w-full sm:w-64">
           <span
             class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted flex items-center pointer-events-none"
@@ -40,6 +40,49 @@
       }
     </div>
 
+    <!-- FILTROS POR TIPO DE NOTA -->
+    @if (notas().length > 0) {
+      <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-surface-border/50 text-xs">
+        <button
+          type="button"
+          (click)="filterTipo.set('todas')"
+          [class]="
+            filterTipo() === 'todas'
+              ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+              : 'text-text-muted hover:text-text-main bg-background border-surface-border'
+          "
+          class="px-3 py-1 rounded-lg border transition-colors cursor-pointer"
+        >
+          Todas ({{ notas().length }})
+        </button>
+        <button
+          type="button"
+          (click)="filterTipo.set('generales')"
+          [class]="
+            filterTipo() === 'generales'
+              ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+              : 'text-text-muted hover:text-text-main bg-background border-surface-border'
+          "
+          class="px-3 py-1 rounded-lg border transition-colors cursor-pointer"
+        >
+          Generales ({{ getGeneralesCount() }})
+        </button>
+        <button
+          type="button"
+          (click)="filterTipo.set('tareas')"
+          [class]="
+            filterTipo() === 'tareas'
+              ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+              : 'text-text-muted hover:text-text-main bg-background border-surface-border'
+          "
+          class="px-3 py-1 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5"
+        >
+          <svg lucideListTodo class="w-3.5 h-3.5" />
+          <span>Soluciones de Tareas ({{ getTareasCount() }})</span>
+        </button>
+      </div>
+    }
+
     <!-- FORMULARIO CREAR NOTA -->
     <form (ngSubmit)="createNota()" class="space-y-3 pt-2">
       <div class="relative">
@@ -48,27 +91,52 @@
           (ngModelChange)="newNotaText.set($event)"
           name="newNotaText"
           rows="3"
-          placeholder="Escribe una nueva nota o apunte para este proyecto..."
+          placeholder="Escribe una nueva nota o cápsula de solución para este proyecto..."
           class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-3.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30 resize-y min-h-21.5"
         ></textarea>
       </div>
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-xs text-text-muted">
-          {{ newNotaText().trim().length }} caracteres
-        </span>
-        <button
-          type="submit"
-          [disabled]="isSubmittingNota() || !newNotaText().trim()"
-          class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5"
-        >
-          @if (isSubmittingNota()) {
-            <span class="animate-spin text-xs">⏳</span>
-            <span>Guardando...</span>
-          } @else {
-            <svg lucidePlus class="w-3.5 h-3.5" />
-            <span>Añadir Nota</span>
-          }
-        </button>
+
+      <!-- SELECCIONAR TAREA VINCULADA + BOTÓN AÑADIR -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-text-muted flex items-center gap-1">
+            <svg lucideListTodo class="w-3.5 h-3.5 text-primary/70" />
+            <span>Vincular tarea:</span>
+          </span>
+          <select
+            [ngModel]="newNotaTareaId()"
+            (ngModelChange)="newNotaTareaId.set($event)"
+            name="newNotaTarea"
+            class="bg-background border border-surface-border text-text-main text-xs rounded-xl px-2.5 py-1.5 outline-none focus:border-primary max-w-xs cursor-pointer"
+          >
+            <option [ngValue]="null">Ninguna (Nota general)</option>
+            @for (t of tareasEnCurso(); track t.id) {
+              <option [ngValue]="t.id">#{{ t.id }} - {{ t.nombre }}</option>
+            }
+            @if (tareasEnCurso().length === 0) {
+              <option disabled [ngValue]="undefined">(No hay tareas «En Curso»)</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-text-muted">
+            {{ newNotaText().trim().length }} caracteres
+          </span>
+          <button
+            type="submit"
+            [disabled]="isSubmittingNota() || !newNotaText().trim()"
+            class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            @if (isSubmittingNota()) {
+              <span class="animate-spin text-xs">⏳</span>
+              <span>Guardando...</span>
+            } @else {
+              <svg lucidePlus class="w-3.5 h-3.5" />
+              <span>Añadir Nota</span>
+            }
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -95,7 +163,7 @@
       @if (getFilteredNotas(notas()).length === 0) {
         <div class="p-8 text-center bg-surface border border-surface-border rounded-2xl">
           <p class="text-text-muted text-xs">
-            No se encontraron notas que coincidan con "{{ notaSearchQuery() }}".
+            No se encontraron notas con el filtro seleccionado.
           </p>
         </div>
       } @else {
@@ -106,10 +174,26 @@
             >
               <!-- HEADER DE LA TARJETA DE NOTA -->
               <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2 text-xs text-text-muted">
-                  <svg lucideClock class="w-3.5 h-3.5 text-primary/70" />
-                  <span>{{ n.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
+                <div class="flex flex-wrap items-center gap-2 text-xs text-text-muted">
+                  <div class="flex items-center gap-1.5">
+                    <svg lucideClock class="w-3.5 h-3.5 text-primary/70" />
+                    <span>{{ n.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+
+                  <!-- BADGE DE TAREA VINCULADA (CLICKABLE PARA ABRIR MODAL) -->
+                  @if (n.tarea_id) {
+                    <button
+                      type="button"
+                      (click)="openTaskModal(n.tarea_id)"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 hover:border-primary/40 transition-all cursor-pointer shadow-xs active:scale-95"
+                      title="Abrir detalles de la tarea #{{ n.tarea_id }}"
+                    >
+                      <svg lucideListTodo class="w-3 h-3" />
+                      <span>Tarea #{{ n.tarea_id }}: {{ n.tarea_nombre || getTaskNombre(n.tarea_id) }}</span>
+                    </button>
+                  }
                 </div>
+
                 <div class="flex items-center gap-1">
                   <!-- COPIAR -->
                   <button
@@ -154,27 +238,44 @@
                     rows="3"
                     class="w-full bg-background border border-primary/50 text-text-main rounded-xl p-3 text-sm outline-none transition-colors resize-y"
                   ></textarea>
-                  <div class="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      (click)="cancelEditNota()"
-                      class="px-3 py-1.5 text-xs text-text-muted hover:text-text-main border border-surface-border hover:bg-background rounded-xl transition-colors cursor-pointer"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="button"
-                      (click)="saveEditNota(n)"
-                      [disabled]="isUpdatingNota() || !editingNotaText().trim()"
-                      class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-background font-semibold text-xs px-4 py-1.5 rounded-xl transition-all shadow-md cursor-pointer inline-flex items-center gap-1"
-                    >
-                      @if (isUpdatingNota()) {
-                        <span class="animate-spin text-xs">⏳</span>
-                        <span>Guardando...</span>
-                      } @else {
-                        <span>Guardar</span>
-                      }
-                    </button>
+
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs text-text-muted">Tarea:</span>
+                      <select
+                        [ngModel]="editingNotaTareaId()"
+                        (ngModelChange)="editingNotaTareaId.set($event)"
+                        class="bg-background border border-surface-border text-text-main text-xs rounded-lg px-2 py-1 outline-none focus:border-primary cursor-pointer"
+                      >
+                        <option [ngValue]="null">Sin vincular</option>
+                        @for (t of getLinkableTasks(editingNotaTareaId()); track t.id) {
+                          <option [ngValue]="t.id">#{{ t.id }} - {{ t.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <button
+                        type="button"
+                        (click)="cancelEditNota()"
+                        class="px-3 py-1.5 text-xs text-text-muted hover:text-text-main border border-surface-border hover:bg-background rounded-xl transition-colors cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        (click)="saveEditNota(n)"
+                        [disabled]="isUpdatingNota() || !editingNotaText().trim()"
+                        class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-background font-semibold text-xs px-4 py-1.5 rounded-xl transition-all shadow-md cursor-pointer inline-flex items-center gap-1"
+                      >
+                        @if (isUpdatingNota()) {
+                          <span class="animate-spin text-xs">⏳</span>
+                          <span>Guardando...</span>
+                        } @else {
+                          <span>Guardar</span>
+                        }
+                      </button>
+                    </div>
                   </div>
                 </div>
               } @else {
@@ -200,5 +301,15 @@
     [isProcessing]="isDeletingNota()"
     (confirm)="confirmDeleteNota()"
     (cancel)="cancelDeleteNota()"
+  />
+
+  <!-- MODAL DE DETALLE DE TAREA VINCULADA -->
+  <app-task-detail-modal
+    [isOpen]="selectedTask() !== null"
+    [task]="selectedTask()"
+    [proyectId]="projectId()"
+    (closeModal)="selectedTask.set(null)"
+    (taskUpdated)="onTaskModalUpdated()"
+    (taskDeleted)="onTaskModalDeleted($event)"
   />
 </div>

@@ -37,7 +37,16 @@ export class NotaService {
     return this.http.put<NotaProyecto>(`${this.apiUrl}/notas/${id}`, req);
   }
 
+  getNotasByTareaId(tareaId: number): Observable<NotaProyecto[]> {
+    return this.http.get<NotaProyecto[]>(`${this.apiUrl}/tareas/${tareaId}/notas`);
+  }
+
+  createNotaTarea(tareaId: number, req: NotaProyectoRequest): Observable<NotaProyecto> {
+    return this.http.post<NotaProyecto>(`${this.apiUrl}/tareas/${tareaId}/notas`, req);
+  }
+
   deleteNota(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/notas/${id}`);
   }
 }
+

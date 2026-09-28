@@ -204,6 +204,86 @@
             </div>
           </div>
         }
+
+        <!-- SECCIÓN DE CÁPSULAS DE NOTAS / SOLUCIÓN VINCULADAS -->
+        <div class="pt-4 border-t border-surface-border space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-text-main uppercase tracking-wider flex items-center gap-1.5">
+              <svg lucideFileText class="w-3.5 h-3.5 text-primary" />
+              <span>Notas y Soluciones Asociadas</span>
+              <span class="text-[10px] bg-primary/20 text-primary font-bold px-2 py-0.5 rounded-full border border-primary/30">
+                {{ taskNotas().length }}
+              </span>
+            </h4>
+            <span class="text-[10px] text-text-muted">Cápsulas vinculadas</span>
+          </div>
+
+          <!-- MINI-FORMULARIO PARA AGREGAR NOTA VINCULADA -->
+          <div class="space-y-2 bg-background/50 border border-surface-border rounded-xl p-3">
+            <textarea
+              [ngModel]="newNotaTexto()"
+              (ngModelChange)="newNotaTexto.set($event)"
+              name="taskNotaNueva"
+              rows="2"
+              placeholder="Documenta cómo lo solucionaste o detalles técnicos..."
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-lg p-2.5 text-xs outline-none transition-all focus:ring-1 focus:ring-primary/30 resize-y"
+            ></textarea>
+            <div class="flex justify-end">
+              <button
+                type="button"
+                (click)="addTaskNota()"
+                [disabled]="isSavingNota() || !newNotaTexto().trim()"
+                class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-3 py-1.5 rounded-lg transition-all disabled:opacity-30 cursor-pointer flex items-center gap-1"
+              >
+                <svg lucidePlus class="w-3 h-3" />
+                <span>{{ isSavingNota() ? 'Guardando...' : 'Añadir nota' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- LISTADO DE NOTAS VINCULADAS -->
+          @if (isLoadingNotas()) {
+            <p class="text-xs text-text-muted animate-pulse py-1">Cargando notas de la tarea...</p>
+          } @else {
+            <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+              @for (n of taskNotas(); track n.id) {
+                <div class="p-3.5 rounded-xl border border-surface-border bg-background/60 shadow-xs space-y-2 text-xs">
+                  <div class="flex items-center justify-between text-[11px] text-text-muted">
+                    <span class="flex items-center gap-1">
+                      <svg lucideFileText class="w-3 h-3 text-primary/70" />
+                      {{ n.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}
+                    </span>
+                    <div class="flex items-center gap-1">
+                      <button
+                        type="button"
+                        (click)="copyNotaContent(n)"
+                        class="p-1 text-text-muted hover:text-text-main hover:bg-surface rounded-md transition-colors cursor-pointer"
+                        [title]="copiedNotaId() === n.id ? '¡Copiado!' : 'Copiar nota'"
+                      >
+                        @if (copiedNotaId() === n.id) {
+                          <svg lucideCheck class="w-3.5 h-3.5 text-success" />
+                        } @else {
+                          <svg lucideCopy class="w-3.5 h-3.5" />
+                        }
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deleteTaskNota(n.id)"
+                        class="text-text-muted hover:text-danger hover:bg-danger/10 p-1 rounded-md transition-colors cursor-pointer"
+                        title="Eliminar cápsula"
+                      >
+                        <svg lucideTrash2 class="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p class="text-text-main whitespace-pre-wrap leading-relaxed">{{ n.nota }}</p>
+                </div>
+              } @empty {
+                <p class="text-xs text-text-muted/60 italic py-1">Sin notas de bitácora asociadas a esta tarea.</p>
+              }
+            </div>
+          }
+        </div>
       </form>
 
       <!-- FOOTER CON BOTONES DE ACCIÓN -->

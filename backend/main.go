@@ -16,7 +16,7 @@ import (
 	"cassandra/handlers"
 	"cassandra/middleware"
 	"cassandra/repository"
-
+	
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -147,6 +147,8 @@ func main() {
 		// Rutas de Notas de Proyectos
 		r.Post("/api/proyects/{proyect_id}/notas", notasProyectoHandler.Create)
 		r.Get("/api/proyects/{proyect_id}/notas", notasProyectoHandler.GetByProyectoID)
+		r.Get("/api/tareas/{tarea_id}/notas", notasProyectoHandler.GetByTareaID)
+		r.Post("/api/tareas/{tarea_id}/notas", notasProyectoHandler.Create)
 		r.Get("/api/notas", notasProyectoHandler.GetAll)
 		r.Get("/api/notas/{id}", notasProyectoHandler.GetByID)
 		r.Put("/api/notas/{id}", notasProyectoHandler.Update)

@@ -215,18 +215,23 @@
 
               <!-- TÍTULO DE LA TAREA -->
               <div class="flex-1 min-w-0">
-                <h4
-                  (click)="openEditTask(t); $event.stopPropagation()"
-                  [class]="
-                    t.estado === 'Terminado'
-                      ? 'line-through text-text-muted/60 font-normal'
-                      : 'text-text-main font-semibold'
-                  "
-                  class="text-sm tracking-tight truncate hover:text-primary transition-colors cursor-pointer"
-                  title="Haz clic para editar la tarea"
-                >
-                  {{ t.nombre }}
-                </h4>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono text-text-muted bg-background px-1.5 py-0.5 rounded-md border border-surface-border shrink-0">
+                    #{{ t.id }}
+                  </span>
+                  <h4
+                    (click)="openEditTask(t); $event.stopPropagation()"
+                    [class]="
+                      t.estado === 'Terminado'
+                        ? 'line-through text-text-muted/60 font-normal'
+                        : 'text-text-main font-semibold'
+                    "
+                    class="text-sm tracking-tight truncate hover:text-primary transition-colors cursor-pointer"
+                    title="Haz clic para editar la tarea"
+                  >
+                    {{ t.nombre }}
+                  </h4>
+                </div>
                 @if (t.descripcion) {
                   <p class="text-xs text-text-muted truncate mt-0.5">{{ t.descripcion }}</p>
                 }
@@ -329,6 +334,10 @@
                     >
                       <svg lucideCheck class="w-3 h-3 stroke-3" />
                     </button>
+
+                    <span class="text-[10px] font-mono text-text-muted bg-surface px-1.5 py-0.5 rounded border border-surface-border shrink-0">
+                      #{{ sub.id }}
+                    </span>
 
                     <span
                       (click)="openEditTask(sub); $event.stopPropagation()"

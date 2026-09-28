@@ -5,6 +5,8 @@ import { Task, TaskPrioridad } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 import { ToastService } from '../../services/toast.service';
 import { BackButtonService } from '../../services/back-button.service';
+import { NotaService } from '../../services/nota.service';
+import { NotaProyecto } from '../../models/nota.model';
 import {
   LucideX,
   LucideCheck,
@@ -12,6 +14,8 @@ import {
   LucideTrash2,
   LucideSave,
   LucideCornerDownRight,
+  LucideFileText,
+  LucideCopy,
 } from '@lucide/angular';
 import { TaskStatusSelect } from '../task-status-select/task-status-select';
 import { TaskPrioritySelect } from '../task-priority-select/task-priority-select';
@@ -28,6 +32,8 @@ import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
     LucideTrash2,
     LucideSave,
     LucideCornerDownRight,
+    LucideFileText,
+    LucideCopy,
     TaskStatusSelect,
     TaskPrioritySelect,
   ],
@@ -35,6 +41,7 @@ import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
 })
 export class TaskDetailModal {
   private readonly taskService = inject(TaskService);
+  private readonly notaService = inject(NotaService);
   private readonly toastService = inject(ToastService);
   private readonly backButtonService = inject(BackButtonService);
 
@@ -68,6 +75,26 @@ export class TaskDetailModal {
 
   isSaving = signal(false);
   isDeleting = signal(false);
+
+  // Notas de la tarea (Cápsulas de bitácora y solución)
+  taskNotas = signal<NotaProyecto[]>([]);
+  isLoadingNotas = signal(false);
+  newNotaTexto = signal('');
+  isSavingNota = signal(false);
+  copiedNotaId = signal<number | null>(null);
+
+  copyNotaContent(nota: NotaProyecto) {
+    if (!navigator?.clipboard) return;
+    navigator.clipboard.writeText(nota.nota).then(() => {
+      this.copiedNotaId.set(nota.id);
+      this.toastService.success('Nota copiada al portapapeles');
+      setTimeout(() => {
+        if (this.copiedNotaId() === nota.id) {
+          this.copiedNotaId.set(null);
+        }
+      }, 2000);
+    });
+  }
 
   // Subtarea formulario en línea
   nuevaSubtareaNombre = signal('');
@@ -126,6 +153,9 @@ export class TaskDetailModal {
     this.nuevaSubtareaNombre.set('');
     this.isSaving.set(false);
     this.isDeleting.set(false);
+    this.newNotaTexto.set('');
+    this.isSavingNota.set(false);
+    this.loadTaskNotas(t.id);
   }
 
   ngOnDestroy() {
@@ -268,6 +298,61 @@ export class TaskDetailModal {
     return getTaskPriorityBorderClass(prioridad);
   }
 
+  loadTaskNotas(tareaId: number) {
+    this.isLoadingNotas.set(true);
+    this.notaService.getNotasByTareaId(tareaId).subscribe({
+      next: (notas) => {
+        this.taskNotas.set(notas || []);
+        this.isLoadingNotas.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar notas de la tarea:', err);
+        this.isLoadingNotas.set(false);
+      },
+    });
+  }
+
+  addTaskNota() {
+    const t = this.currentTask();
+    const text = this.newNotaTexto().trim();
+    if (!t || !text) return;
+
+    this.isSavingNota.set(true);
+    this.notaService
+      .createNota(this.proyectId(), {
+        nota: text,
+        tarea_id: t.id,
+      })
+      .subscribe({
+        next: (nuevaNota) => {
+          this.isSavingNota.set(false);
+          this.newNotaTexto.set('');
+          this.taskNotas.update((list) => [nuevaNota, ...list]);
+          this.toastService.success('Cápsula de solución guardada');
+          this.taskUpdated.emit();
+        },
+        error: (err) => {
+          this.isSavingNota.set(false);
+          this.toastService.error('Error al guardar nota');
+          console.error('Error al crear nota de tarea:', err);
+        },
+      });
+  }
+
+  deleteTaskNota(notaId: number) {
+    if (!confirm('¿Eliminar esta cápsula de nota?')) return;
+    this.notaService.deleteNota(notaId).subscribe({
+      next: () => {
+        this.taskNotas.update((list) => list.filter((n) => n.id !== notaId));
+        this.toastService.success('Nota eliminada');
+        this.taskUpdated.emit();
+      },
+      error: (err) => {
+        this.toastService.error('Error al eliminar nota');
+        console.error('Error al eliminar nota:', err);
+      },
+    });
+  }
 
   onClose() {
     this.isVisible.set(false);

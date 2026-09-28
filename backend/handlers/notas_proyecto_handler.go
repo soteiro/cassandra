@@ -61,6 +61,22 @@ func (h *NotasProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Si tarea_id viene en los parámetros de la URL
+	tareaIDStr := chi.URLParam(r, "tarea_id")
+	if tareaIDStr != "" {
+		if tID, err := strconv.Atoi(tareaIDStr); err == nil && tID > 0 {
+			req.TareaID = &tID
+		}
+	}
+
+	// Si proyecto_id no vino explícito pero vino tarea_id, resolver proyecto_id desde la tarea
+	if req.ProyectoID <= 0 && req.TareaID != nil && *req.TareaID > 0 {
+		pID, err := h.NotasRepo.GetProyectoIDByTareaID(r.Context(), *req.TareaID, userID)
+		if err == nil && pID > 0 {
+			req.ProyectoID = pID
+		}
+	}
+
 	if req.ProyectoID <= 0 {
 		log.Printf("[HANDLER:NotasProyecto.Create] Validación fallida: proyecto_id es obligatorio | user_id=%d", userID)
 		http.Error(w, "El ID del proyecto (proyecto_id) es obligatorio", http.StatusBadRequest)
@@ -260,4 +276,37 @@ func (h *NotasProyectoHandler) GetByProyectoID(w http.ResponseWriter, r *http.Re
 	w.WriteHeader(http.StatusOK)
 	log.Printf("[HANDLER:NotasProyecto.GetByProyectoID] Éxito: %d notas obtenidas | proyecto_id=%d user_id=%d", len(notasProyecto), proyectoID, userID)
 	json.NewEncoder(w).Encode(notasProyecto)
+}
+
+// llamar por tarea id
+func (h *NotasProyectoHandler) GetByTareaID(w http.ResponseWriter, r *http.Request) {
+	tareaIDStr := chi.URLParam(r, "tarea_id")
+	if tareaIDStr == "" {
+		tareaIDStr = chi.URLParam(r, "id")
+	}
+	tareaID, err := strconv.Atoi(tareaIDStr)
+	if err != nil || tareaID <= 0 {
+		log.Printf("[HANDLER:NotasProyecto.GetByTareaID] ID de tarea inválido: %s", tareaIDStr)
+		http.Error(w, "ID de tarea inválido", http.StatusBadRequest)
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		log.Printf("[HANDLER:NotasProyecto.GetByTareaID] Acceso no autorizado")
+		http.Error(w, "Error al obtener el ID del usuario", http.StatusUnauthorized)
+		return
+	}
+
+	notas, err := h.NotasRepo.GetByTareaID(r.Context(), tareaID, userID)
+	if err != nil {
+		log.Printf("[HANDLER:NotasProyecto.GetByTareaID] Error en repositorio: %v | tarea_id=%d user_id=%d", err, tareaID, userID)
+		http.Error(w, "Error al obtener las notas por tarea_id", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	log.Printf("[HANDLER:NotasProyecto.GetByTareaID] Éxito: %d notas obtenidas | tarea_id=%d user_id=%d", len(notas), tareaID, userID)
+	json.NewEncoder(w).Encode(notas)
 }
