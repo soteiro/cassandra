@@ -4,9 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-User=apps
-WorkingDirectory=/home/apps/cassandra
-ExecStart=/home/apps/cassandra/cassandra-app
+User=cassandra
+Group=cassandra
+WorkingDirectory=/opt/cassandra
+ExecStart=/opt/cassandra/cassandra-app
 Restart=always
 RestartSec=5s
 

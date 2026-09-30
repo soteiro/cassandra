@@ -21,6 +21,10 @@
       "description": "Operaciones de Auth"
     },
     {
+      "name": "Documentos proyectos",
+      "description": "Operaciones de Documentos proyectos"
+    },
+    {
       "name": "Finanzas",
       "description": "Operaciones de Finanzas"
     },
@@ -151,6 +155,235 @@
             "description": "Error interno del servidor"
           }
         }
+      }
+    },
+    "/api/proyects/{proyect_id}/documentos": {
+      "post": {
+        "tags": [
+          "Documentos proyectos"
+        ],
+        "summary": "Create documento",
+        "operationId": "post__api_proyects__proyect_id__documentos",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Documentos proyectos"
+        ],
+        "summary": "Get all by proyecto",
+        "operationId": "get__api_proyects__proyect_id__documentos",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/documentos/{documento_id}": {
+      "delete": {
+        "tags": [
+          "Documentos proyectos"
+        ],
+        "summary": "Delete documento",
+        "operationId": "delete__api_documentos__documento_id_",
+        "parameters": [
+          {
+            "name": "documento_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de documento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Documentos proyectos"
+        ],
+        "summary": "Get by ID",
+        "operationId": "get__api_documentos__documento_id_",
+        "parameters": [
+          {
+            "name": "documento_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de documento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Documentos proyectos"
+        ],
+        "summary": "Update documento",
+        "operationId": "put__api_documentos__documento_id_",
+        "parameters": [
+          {
+            "name": "documento_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de documento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/finanzas/bancos/{banco_id}": {

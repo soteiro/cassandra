@@ -5,6 +5,7 @@
 
 # Compiled binaries
 cassandra-app
+cassandra-mobile.apk
 *.exe
 
 # Dependencies
