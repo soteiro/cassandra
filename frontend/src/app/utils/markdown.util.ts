@@ -25,7 +25,7 @@ export function parseMarkdown(markdown: string): string {
       lang: (lang || '').trim(),
       code: escapeHtml(code.replace(/\n$/, '')),
     });
-    return `\n\n%%CODEBLOCK_${idx}%%\n\n`;
+    return `\n\n%%CODEBLOCK${idx}%%\n\n`;
   });
 
   // 2. Extraer y proteger código inline (`code`)
@@ -33,7 +33,7 @@ export function parseMarkdown(markdown: string): string {
   processed = processed.replace(/`([^`\n]+)`/g, (_, code) => {
     const idx = inlineCodes.length;
     inlineCodes.push(escapeHtml(code));
-    return `%%INLINECODE_${idx}%%`;
+    return `%%INLINECODE${idx}%%`;
   });
 
   // 3. Sanitizar caracteres HTML en el resto del texto
@@ -50,7 +50,7 @@ export function parseMarkdown(markdown: string): string {
     const trimmed = line.trim();
 
     // Bloque de código guardado
-    const codeMatch = trimmed.match(/^%%CODEBLOCK_(\d+)%%$/);
+    const codeMatch = trimmed.match(/^%%CODEBLOCK(\d+)%%$/);
     if (codeMatch) {
       const idx = parseInt(codeMatch[1], 10);
       const { lang, code } = codeBlocks[idx];
@@ -220,7 +220,7 @@ export function parseMarkdown(markdown: string): string {
     while (
       i < lines.length &&
       lines[i].trim() &&
-      !lines[i].trim().match(/^%%CODEBLOCK_\d+%%$/) &&
+      !lines[i].trim().match(/^%%CODEBLOCK\d+%%$/) &&
       !lines[i].trim().match(/^(\*{3,}|-{3,}|_{3,})$/) &&
       !lines[i].match(/^(#{1,6})\s+/) &&
       !lines[i].trim().startsWith('&gt;') &&
@@ -245,7 +245,7 @@ export function parseMarkdown(markdown: string): string {
   let html = outputBlocks.join('\n');
 
   // 5. Reinsertar tokens de código inline
-  html = html.replace(/%%INLINECODE_(\d+)%%/g, (_, idx) => {
+  html = html.replace(/%%INLINECODE(\d+)%%/g, (_, idx) => {
     const code = inlineCodes[parseInt(idx, 10)] || '';
     return `<code class="px-1.5 py-0.5 rounded bg-surface-border/50 text-primary font-mono text-xs font-semibold">${code}</code>`;
   });
