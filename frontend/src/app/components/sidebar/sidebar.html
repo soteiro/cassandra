@@ -1,6 +1,7 @@
 <aside
-  class="fixed bg-surface inset-y-0 z-50 left-0 w-64 h-full flex flex-col justify-between p-4 border-r border-surface-border -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto"
+  class="fixed bg-surface inset-y-0 z-50 left-0 w-64 h-full flex flex-col justify-between p-4 border-r border-surface-border -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto shadow-2xl md:shadow-none"
   [class.translate-x-0]="sidebar.isOpen()"
+  style="padding-top: max(1rem, env(safe-area-inset-top)); padding-bottom: max(1rem, env(safe-area-inset-bottom));"
 >
   <!-- HEADER / BRAND -->
   <div class="space-y-6">
