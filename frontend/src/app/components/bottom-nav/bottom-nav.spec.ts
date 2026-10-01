@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { BottomNav } from './bottom-nav';
 
-import { MainLayout } from './main-layout';
-
-describe('MainLayout', () => {
-  let component: MainLayout;
-  let fixture: ComponentFixture<MainLayout>;
+describe('BottomNav', () => {
+  let component: BottomNav;
+  let fixture: ComponentFixture<BottomNav>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MainLayout],
+      imports: [BottomNav],
       providers: [provideRouter([])],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MainLayout);
+    fixture = TestBed.createComponent(BottomNav);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

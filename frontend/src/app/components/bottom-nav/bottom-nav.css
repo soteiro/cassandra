@@ -1,0 +1,7 @@
+:host {
+  display: contents;
+}
+
+nav, nav * {
+  -webkit-tap-highlight-color: transparent;
+}

@@ -1,18 +1,19 @@
 <div class="h-screen bg-background text-white overflow-hidden flex flex-col">
   
   <app-header [sidebar]="sidebar"></app-header>
-  <div class="flex flex-1 min-h-0">
+  <div class="flex flex-1 min-h-0 relative">
     @if (sidebar.isOpen()){
       <div (click)="sidebar.close()" 
-      class="bg-black/20 w-full backdrop-blur-md h-full z-10 fixed md:hidden">   
+      class="bg-black/50 inset-0 backdrop-blur-sm z-45 fixed md:hidden transition-opacity">   
       </div>
     }
     <app-sidebar [sidebar]="sidebar" />
 
-    <main class="p-6 flex-1 min-w-0 overflow-y-auto">
+    <main class="p-4 md:p-6 pb-24 md:pb-6 flex-1 min-w-0 overflow-y-auto">
       <router-outlet />
     </main>
   </div>
 
+  <app-bottom-nav [sidebar]="sidebar" />
   <app-command-bar />
 </div>
