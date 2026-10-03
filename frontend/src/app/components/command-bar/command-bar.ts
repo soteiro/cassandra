@@ -48,7 +48,11 @@ export class CommandBar {
     const isToggleShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'p';
     if (isToggleShortcut) {
       event.preventDefault();
-      this.commandBarService.state.toggle();
+      if (this.commandBarService.state.isOpen()) {
+        this.close();
+      } else {
+        this.commandBarService.state.open();
+      }
       return;
     }
 

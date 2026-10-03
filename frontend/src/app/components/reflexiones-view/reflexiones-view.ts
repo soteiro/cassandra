@@ -20,6 +20,7 @@ import {
   LucideBookOpen,
   LucideFeather,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-reflexiones-view',
@@ -119,7 +120,7 @@ export class ReflexionesView {
         error: (err) => {
           this.isSubmittingNuevo.set(false);
           const errorMsg =
-            err.error?.message || err.error || 'Error al guardar la reflexión';
+            getErrorMessage(err, 'Error al guardar la reflexión');
           this.toast.error(errorMsg);
         },
       });
@@ -151,7 +152,7 @@ export class ReflexionesView {
       error: (err) => {
         this.isSubmittingEdit.set(false);
         const errorMsg =
-          err.error?.message || err.error || 'Error al actualizar la entrada';
+          getErrorMessage(err, 'Error al actualizar la entrada');
         this.toast.error(errorMsg);
       },
     });
@@ -183,7 +184,7 @@ export class ReflexionesView {
       error: (err) => {
         this.isDeleting.set(false);
         const errorMsg =
-          err.error?.message || err.error || 'Error al eliminar la entrada';
+          getErrorMessage(err, 'Error al eliminar la entrada');
         this.toast.error(errorMsg);
       },
     });

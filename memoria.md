@@ -5,7 +5,7 @@ el objetivo del proyecto es:
 4.- intentar centralizar el estado de mis cuentas. ver como usar actual budget con mis finanzas personales
 5.- centro de informacion, buscar data relevante para mi contexto
 6.- conexion con ticktick y con google calendar para cargar los eventos
-7.- integracion con un futuro proyecto llamado gandalf (capa de agentes de IA)
+7.- integracion con un futuro proyecto llamado Kairos --> (capa de agentes de IA)
 8.- ver este documento una vez suelto con angular y go
 9.- esta capa (cassandra), se encargara de ingesta de data y visualizacion
 10.- migrar la integracion de correos del proyecto aurora hacia este proyecto, y luego deprecar aurora (por cambio de tecnologias)

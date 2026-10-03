@@ -9,6 +9,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:ci": "ng test --watch=false",
     "build:mobile": "ng build --configuration mobile",
     "cap:sync": "cap sync android",
     "cap:open": "cap open android",

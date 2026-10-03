@@ -21,6 +21,7 @@ import {
   LucideLayers,
   LucideBookOpen,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../utils/http-error.util';
 
 interface Tab {
   id: string;
@@ -169,7 +170,7 @@ export class ProyectDetails {
         this.projectResource?.reload();
       },
       error: (err) => {
-        this.toast.error(err.error?.message || err.error || 'Error al crear el subproyecto');
+        this.toast.error(getErrorMessage(err, 'Error al crear el subproyecto'));
         this.isSubmittingSubproject.set(false);
       },
     });

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { ProyectDetails } from './proyect-details';
 
@@ -9,6 +10,7 @@ describe('ProyectDetails', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProyectDetails],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProyectDetails);
@@ -18,5 +20,11 @@ describe('ProyectDetails', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should default to the tareas tab and switch tabs', () => {
+    expect(component.activeTab()).toBe('tareas');
+    component.selectedTab('notas');
+    expect(component.activeTab()).toBe('notas');
   });
 });

@@ -17,6 +17,7 @@ import {
   LucideBrain,
   LucideArrowRight,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-crm',
@@ -80,7 +81,7 @@ export class Crm {
       error: (err) => {
         this.isSubmitting.set(false);
         const errorMsg =
-          err.error?.message || err.error || 'Error al registrar la persona';
+          getErrorMessage(err, 'Error al registrar la persona');
         this.toastService.error(errorMsg);
       },
     });

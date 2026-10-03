@@ -33,8 +33,6 @@ import {
   LucideCode,
   LucideTag,
   LucideCalendar,
-  LucideBrain,
-  LucideSparkles,
 } from '@lucide/angular';
 
 export interface CategoryMeta {
@@ -102,8 +100,6 @@ export const CATEGORIES: CategoryMeta[] = [
     LucideCode,
     LucideTag,
     LucideCalendar,
-    LucideBrain,
-    LucideSparkles,
   ],
   templateUrl: './documents-tab.html',
 })
@@ -240,11 +236,13 @@ export class DocumentsTab {
     const tags = this.editorTags().trim() || undefined;
     const pId = this.projectId();
 
-    this.isSaving.set(true);
-
     if (this.isEditing()) {
       const docId = this.editorDocId();
-      if (!docId) return;
+      if (!docId) {
+        this.toastService.error('No se encontró el documento a editar');
+        return;
+      }
+      this.isSaving.set(true);
 
       this.documentoService
         .updateDocumento(docId, {
@@ -268,6 +266,7 @@ export class DocumentsTab {
           },
         });
     } else {
+      this.isSaving.set(true);
       this.documentoService
         .createDocumento(pId, {
           proyecto_id: pId,

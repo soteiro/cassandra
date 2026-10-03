@@ -24,6 +24,7 @@ import {
   LucideArrowRight,
   LucideClock,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-persona-details',
@@ -169,7 +170,7 @@ export class PersonaDetails {
         error: (err) => {
           this.isSubmittingEdit.set(false);
           const errorMsg =
-            err.error?.message || err.error || 'Error al actualizar el perfil';
+            getErrorMessage(err, 'Error al actualizar el perfil');
           this.toast.error(errorMsg);
         },
       });
@@ -197,7 +198,7 @@ export class PersonaDetails {
       error: (err) => {
         this.isDeleting.set(false);
         const errorMsg =
-          err.error?.message || err.error || 'Error al eliminar la persona';
+          getErrorMessage(err, 'Error al eliminar la persona');
         this.toast.error(errorMsg);
       },
     });
@@ -223,7 +224,7 @@ export class PersonaDetails {
         error: (err) => {
           this.isSubmittingInteraccion.set(false);
           const errorMsg =
-            err.error?.message || err.error || 'Error al registrar interacción';
+            getErrorMessage(err, 'Error al registrar interacción');
           this.toast.error(errorMsg);
         },
       });
