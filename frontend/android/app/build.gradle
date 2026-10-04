@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// Versión de la release (p. ej. "v1.2.3" o "1.2.3"), inyectada por CI con APP_VERSION.
+// versionCode debe crecer en cada release para que Android acepte la actualización:
+// major*10000 + minor*100 + patch (minor y patch < 100).
+def appVersion = (System.getenv("APP_VERSION") ?: "0.0.0-dev").replaceFirst(/^v/, "")
+def versionParts = (appVersion.tokenize("-")[0].tokenize(".") + ["0", "0", "0"]).take(3).collect { it as Integer }
+def appVersionCode = Math.max(1, versionParts[0] * 10000 + versionParts[1] * 100 + versionParts[2])
+
+// Firma de release: solo si CI entrega la keystore por variables de entorno.
+def releaseKeystore = System.getenv("ANDROID_KEYSTORE_PATH")
+
 android {
     namespace = "com.cassandra.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +17,8 @@ android {
         applicationId "com.cassandra.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode appVersionCode
+        versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +26,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (releaseKeystore) {
+            release {
+                storeFile file(releaseKeystore)
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
+            if (releaseKeystore) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

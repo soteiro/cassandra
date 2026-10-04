@@ -9,10 +9,13 @@ on:
   push:
     branches: [main, qa]
   workflow_dispatch:
+  # Reutilizado por release-please.yml para volver a testear antes del build de release.
+  workflow_call:
 
-# Un push nuevo al mismo PR o rama cancela la ejecución anterior.
+# Un push nuevo al mismo PR o rama cancela la ejecución anterior. github.workflow
+# distingue la ejecución directa ("CI") de la llamada desde la release.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:

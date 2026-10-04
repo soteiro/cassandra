@@ -14,9 +14,12 @@
     mkdir -p backend/dist
     cp -r frontend/dist/frontend/browser/* backend/dist/
 
-    echo "3. Compilando binario de Go..."
+    # Versión: VERSION del entorno (CI) o el último tag de git (+commits y -dirty).
+    VERSION="${VERSION:-$(git describe --tags --always --dirty 2>/dev/null || echo dev)}"
+
+    echo "3. Compilando binario de Go (versión $VERSION)..."
     cd backend
-    go build --ldflags="-s -w" -o ../cassandra-app main.go
+    go build -ldflags="-s -w -X main.version=$VERSION" -o ../cassandra-app .
     cd ..
 
     echo "✅ ¡Compilación exitosa! Binario generado: ./cassandra-app"

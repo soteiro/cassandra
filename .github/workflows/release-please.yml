@@ -1,19 +1,25 @@
 name: Release Please
 
 # Mantiene abierto un PR de release con la próxima versión y el CHANGELOG
-# (a partir de los commits feat:/fix:). Al mergear ese PR crea el tag vX.Y.Z
-# y la GitHub Release.
+# (a partir de los commits feat:/fix:). Al mergear ese PR crea el tag vX.Y.Z y la
+# GitHub Release; entonces se vuelven a pasar los tests y, solo si pasan, se compilan
+# y adjuntan el binario del servidor, el APK firmado y SHA256SUMS.
 on:
   push:
     branches: [main]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+env:
+  NODE_VERSION: '24'
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -23,3 +29,107 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  tests:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    uses: ./.github/workflows/ci.yml
+
+  build-server:
+    name: Binario del servidor (linux-amd64)
+    needs: [release-please, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      # build.sh: docs + Angular + copia a backend/dist + go build con la versión.
+      - name: Compilar
+        run: bash build.sh
+        env:
+          VERSION: ${{ needs.release-please.outputs.tag_name }}
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: '0'
+      - run: mv cassandra-app cassandra-app-linux-amd64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: server
+          path: cassandra-app-linux-amd64
+
+  build-android:
+    name: APK firmado
+    needs: [release-please, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      # Build de Angular con environment.mobile.ts + cap sync android.
+      - run: pnpm run mobile:sync
+        working-directory: frontend
+      - name: Keystore de release
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      - name: Compilar APK
+        run: ./gradlew assembleRelease --no-daemon
+        working-directory: frontend/android
+        env:
+          APP_VERSION: ${{ needs.release-please.outputs.tag_name }}
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      - run: mv frontend/android/app/build/outputs/apk/release/app-release.apk cassandra.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: cassandra.apk
+
+  publish:
+    name: Adjuntar a la release
+    needs: [release-please, build-server, build-android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - run: sha256sum cassandra-app-linux-amd64 cassandra.apk > SHA256SUMS
+      - name: Subir assets
+        run: gh release upload "$TAG" cassandra-app-linux-amd64 cassandra.apk SHA256SUMS --clobber --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
