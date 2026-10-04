@@ -16,11 +16,12 @@ import (
 
 type ProyectHandler struct {
 	repo *repository.ProyectRepository
+	owner *repository.Ownership
 }
 
 // constructor para inyectar el repo
-func NewProyectHandler(repo *repository.ProyectRepository) *ProyectHandler {
-	return &ProyectHandler{repo: repo}
+func NewProyectHandler(repo *repository.ProyectRepository, owner *repository.Ownership) *ProyectHandler {
+	return &ProyectHandler{repo: repo, owner: owner}
 }
 
 // crear proyecto
@@ -76,6 +77,10 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 	req.UserID = userID
 
 	// guardar datos 
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: idOf(req.ProyectoPadreID)}) {
+		return
+	}
+
 	proyect, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Proyect.CreateProyect] Error en repositorio: %v | user_id=%d", err, userID)
@@ -256,6 +261,10 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Prioridad != nil {
 		*req.Prioridad = strings.TrimSpace(*req.Prioridad)
+	}
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: idOf(req.ProyectoPadreID)}) {
+		return
 	}
 
 	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, &req)

@@ -85,10 +85,10 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		p.prioridad,
 		p.fecha_limite,
 		p.proyecto_padre_id,
-		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count,
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count,
 		padre.nombre as nombre_padre
 	FROM proyectos p
-	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
+	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id AND padre.user_id = p.user_id
 	WHERE p.user_id = $1
 	AND p.eliminado IS false
 	ORDER BY p.id DESC
@@ -156,10 +156,10 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 		p.prioridad,
 		p.fecha_limite,
 		p.proyecto_padre_id,
-		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count,
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count,
 		padre.nombre as nombre_padre
 	FROM proyectos p
-	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
+	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id AND padre.user_id = p.user_id
 	WHERE p.proyecto_padre_id = $1
 	AND p.user_id = $2
 	AND p.eliminado IS false
@@ -251,10 +251,10 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		p.prioridad, 
 		p.fecha_limite, 
 		p.proyecto_padre_id, 
-		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.eliminado = false) as subproyectos_count, 
+		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count, 
 		padre.nombre as nombre_padre
 	FROM proyectos p
-	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id
+	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id AND padre.user_id = p.user_id
 	WHERE p.id = $1
 	AND p.user_id = $2
 	AND p.eliminado IS false

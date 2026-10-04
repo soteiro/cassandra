@@ -37,7 +37,6 @@ func TestAislamientoProyectos(t *testing.T) {
 }
 
 func TestAislamientoSubproyectoConPadreAjeno(t *testing.T) {
-	bug(t, "se puede crear un subproyecto colgando de un proyecto ajeno (proyecto_padre_id sin validar dueño)")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Padre de Ana", nil)
 
@@ -58,7 +57,6 @@ func TestAislamientoSubproyectoConPadreAjeno(t *testing.T) {
 }
 
 func TestAislamientoMoverProyectoBajoPadreAjeno(t *testing.T) {
-	bug(t, "PUT de un proyecto propio acepta proyecto_padre_id de un proyecto ajeno")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Padre de Ana", nil)
 	pB := crearProyecto(t, api, beto, "Proyecto de Beto", nil)
@@ -116,7 +114,6 @@ func TestAislamientoTareas(t *testing.T) {
 }
 
 func TestAislamientoCrearTareaEnProyectoAjeno(t *testing.T) {
-	bug(t, "POST /api/tareas acepta proyect_id de un proyecto ajeno y luego filtra su nombre en proyecto_nombre")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Proyecto secreto de Ana", nil)
 
@@ -130,7 +127,6 @@ func TestAislamientoCrearTareaEnProyectoAjeno(t *testing.T) {
 }
 
 func TestAislamientoSubtareaConPadreAjeno(t *testing.T) {
-	bug(t, "POST /api/tareas acepta tarea_padre_id de una tarea ajena")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Proyecto de Ana", nil)
 	tA := crearTarea(t, api, ana, pA.ID, "Tarea de Ana", nil)
@@ -142,7 +138,6 @@ func TestAislamientoSubtareaConPadreAjeno(t *testing.T) {
 }
 
 func TestAislamientoReasignarTareaAPadreAjeno(t *testing.T) {
-	bug(t, "PUT /api/tareas/{id} acepta tarea_padre_id de una tarea ajena")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Proyecto de Ana", nil)
 	tA := crearTarea(t, api, ana, pA.ID, "Tarea de Ana", nil)
@@ -194,7 +189,6 @@ func TestAislamientoNotas(t *testing.T) {
 }
 
 func TestAislamientoCrearNotaEnProyectoAjeno(t *testing.T) {
-	bug(t, "POST de notas acepta un proyecto ajeno (por URL o por proyecto_id en el cuerpo)")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Proyecto de Ana", nil)
 
@@ -205,7 +199,6 @@ func TestAislamientoCrearNotaEnProyectoAjeno(t *testing.T) {
 }
 
 func TestAislamientoNotaVinculadaATareaAjena(t *testing.T) {
-	bug(t, "las notas aceptan tarea_id de una tarea ajena (creación y PUT) y devuelven su tarea_nombre")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Proyecto de Ana", nil)
 	tA := crearTarea(t, api, ana, pA.ID, "Tarea secreta de Ana", nil)
@@ -253,7 +246,6 @@ func TestAislamientoLogs(t *testing.T) {
 }
 
 func TestAislamientoCrearLogEnProyectoAjeno(t *testing.T) {
-	bug(t, "POST /api/proyects/{id}/logs acepta un proyecto ajeno")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "Proyecto de Ana", nil)
 	expect4xx(t, api.Do(beto, http.MethodPost, apitest.Path("/api/proyects/%d/logs", pA.ID), map[string]any{"contenido_raw": "intruso"}),

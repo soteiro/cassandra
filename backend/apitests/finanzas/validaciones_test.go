@@ -158,7 +158,6 @@ func TestValidaciones_Plantilla(t *testing.T) {
 
 // banco_id/grupo_item_id/movimiento_esperado_id inexistentes violan la FK: debería ser 4xx.
 func TestValidaciones_Plantilla_ReferenciaInexistente(t *testing.T) {
-	bug(t, "POST/PUT plantilla con banco_id/grupo_item_id/movimiento_esperado_id inexistente responde 500 (violación de FK) en vez de 400")
 	api, a, _ := setup(t)
 	it := crearItem(t, api, a, "egreso", 1, 2026, 6, nil)
 	for _, campo := range []string{"banco_id", "grupo_item_id", "movimiento_esperado_id"} {
@@ -245,11 +244,12 @@ func TestValidaciones_PeriodoInvalidoNo500(t *testing.T) {
 
 func TestValidaciones_Deseos(t *testing.T) {
 	api, a, _ := setup(t)
-	// Grupo inexistente: 400 (el handler traduce la violación de FK).
+	// Grupo inexistente: 404, igual que un grupo ajeno (no se distingue para no revelar
+	// qué ids existen en otras cuentas).
 	res := api.Do(a, http.MethodPost, pathDeseos, map[string]any{"nombre": "x", "grupo_item_finanzas_id": 999999})
-	res.Expect(t, http.StatusBadRequest)
+	res.Expect(t, http.StatusNotFound)
 	d := crearDeseo(t, api, a, map[string]any{"nombre": "x"})
-	api.Do(a, http.MethodPut, apitest.Path("%s/%d", pathDeseos, d.ID), map[string]any{"grupo_item_finanzas_id": 999999}).Expect(t, http.StatusBadRequest)
+	api.Do(a, http.MethodPut, apitest.Path("%s/%d", pathDeseos, d.ID), map[string]any{"grupo_item_finanzas_id": 999999}).Expect(t, http.StatusNotFound)
 
 	// grupo_item_finanzas_id <= 0 se trata como "sin grupo".
 	d0 := crearDeseo(t, api, a, map[string]any{"nombre": "y", "grupo_item_finanzas_id": 0})

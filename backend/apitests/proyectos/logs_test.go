@@ -126,7 +126,6 @@ func TestLogInexistenteOAjenoDevuelve404(t *testing.T) {
 }
 
 func TestLogProyectoInexistente(t *testing.T) {
-	bug(t, "POST /api/proyects/{inexistente}/logs produce 500 (violación de FK) en vez de 4xx")
 	api, ana, _ := setup(t)
 	expect4xx(t, api.Do(ana, http.MethodPost, apitest.Path("/api/proyects/%d/logs", inexistente), map[string]any{"contenido_raw": "x"}),
 		"POST log en proyecto inexistente")

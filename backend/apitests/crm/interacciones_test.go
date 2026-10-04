@@ -122,7 +122,6 @@ func TestInteraccionesValidaciones(t *testing.T) {
 }
 
 func TestInteraccionPersonaInexistenteDevuelve4xx(t *testing.T) {
-	bug(t, "crear una interacción con persona_id inexistente responde 500 (violación de FK) en vez de 404/400")
 	api, ana, _ := setup(t)
 	expect4xx(t, api.Do(ana, http.MethodPost, "/api/personas/999999/interacciones",
 		map[string]any{"interaccion": "x"}), "POST anidado persona inexistente")

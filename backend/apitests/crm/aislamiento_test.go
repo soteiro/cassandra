@@ -73,7 +73,6 @@ func TestAislamientoInteracciones(t *testing.T) {
 
 // Beto no debe poder colgar interacciones de una persona de Ana.
 func TestAislamientoCrearInteraccionEnPersonaAjena(t *testing.T) {
-	bug(t, "se pueden crear interacciones sobre personas de otro usuario (no se valida la propiedad de persona_id)")
 	api, ana, beto := setup(t)
 	p := createPersona(t, api, ana, "Carla")
 

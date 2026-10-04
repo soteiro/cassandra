@@ -140,7 +140,6 @@ func TestAislamiento_Plantilla_CodigoPutDeleteAjeno(t *testing.T) {
 // B no debe poder crear un ítem que apunte a banco/grupo/movimiento de A: además de
 // mezclar datos, la respuesta (JOIN) le devolvería los nombres de A.
 func TestAislamiento_Plantilla_CrearConReferenciasAjenas(t *testing.T) {
-	bug(t, "POST /api/finanzas/plantilla acepta banco_id/grupo_item_id/movimiento_esperado_id de otro usuario y devuelve sus nombres")
 	api, a, b := setup(t)
 	bancoA := crearBanco(t, api, a, nombreSecret, "debito")
 	grupoA := crearGrupo(t, api, a, nombreSecret)
@@ -161,7 +160,6 @@ func TestAislamiento_Plantilla_CrearConReferenciasAjenas(t *testing.T) {
 }
 
 func TestAislamiento_Plantilla_EditarConReferenciasAjenas(t *testing.T) {
-	bug(t, "PUT /api/finanzas/plantilla/{id} acepta banco_id/grupo_item_id/movimiento_esperado_id de otro usuario")
 	api, a, b := setup(t)
 	bancoA := crearBanco(t, api, a, nombreSecret, "debito")
 	grupoA := crearGrupo(t, api, a, nombreSecret)
@@ -246,7 +244,6 @@ func TestAislamiento_Deseos_CodigoDeleteAjeno(t *testing.T) {
 }
 
 func TestAislamiento_Deseos_GrupoAjeno(t *testing.T) {
-	bug(t, "lista de deseos acepta grupo_item_finanzas_id de otro usuario (POST y PUT) y devuelve su nombre")
 	api, a, b := setup(t)
 	grupoA := crearGrupo(t, api, a, nombreSecret)
 

@@ -117,14 +117,12 @@ func TestTareaEstadoFueraDeCheck(t *testing.T) {
 }
 
 func TestTareaProyectoInexistente(t *testing.T) {
-	bug(t, "POST /api/tareas con proyect_id inexistente produce 500 (violación de FK) en vez de 4xx")
 	api, ana, _ := setup(t)
 	expect4xx(t, api.Do(ana, http.MethodPost, "/api/tareas", map[string]any{"nombre": "x", "proyect_id": inexistente}),
 		"POST proyect_id inexistente")
 }
 
 func TestTareaPadreInexistente(t *testing.T) {
-	bug(t, "tarea_padre_id inexistente produce 500 (violación de FK) en vez de 4xx")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	expect4xx(t, api.Do(ana, http.MethodPost, "/api/tareas", map[string]any{"nombre": "x", "proyect_id": p.ID, "tarea_padre_id": inexistente}),
