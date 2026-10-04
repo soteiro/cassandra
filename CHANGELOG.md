@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0](https://github.com/soteiro/cassandra/compare/v0.4.0...v0.5.0) (2026-10-04)
+
+
+### Features
+
+* **backend:** subcomando seed-demo con datos de ejemplo para QA ([087a08a](https://github.com/soteiro/cassandra/commit/087a08a09589ebe06f537538e153ef04bcccb25d))
+
+
+### Bug Fixes
+
+* **deploy:** aceptar s/si/y/yes al confirmar el cambio de producción ([626ec5e](https://github.com/soteiro/cassandra/commit/626ec5ea5f0f08d49a1a081960d87b77ca108c8f))
+* **deploy:** cassandra_qa es dueño del esquema public de su base ([235814a](https://github.com/soteiro/cassandra/commit/235814a7822b58b44c171162561152fa41ba5618))
+* **deploy:** cassandra_qa también es dueño de su base de datos ([ffc7dc4](https://github.com/soteiro/cassandra/commit/ffc7dc459d5c92cca44cfe8ab1caa789f467b18a))
+
 ## [0.4.0](https://github.com/soteiro/cassandra/compare/v0.3.0...v0.4.0) (2026-10-04)
 
 
