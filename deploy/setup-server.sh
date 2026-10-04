@@ -143,9 +143,11 @@ if [[ ! -e $qa_env ]]; then
   install -m 0640 -o root -g "$SERVICE_USER" "$tmp" "$qa_env" && rm -f "$tmp"
   echo "    creado $qa_env (usuario demo: qa@cassandra.local; contraseña en DEMO_PASSWORD)"
 fi
-# cassandra_qa debe ser dueño del esquema public de su base: cada deploy lo borra y
-# lo recrea. En clusters migrados desde versiones antiguas, public pertenece a postgres.
+# cassandra_qa debe ser dueño de su base y del esquema public: cada deploy borra y
+# recrea public. Si la base se creó a mano, o el cluster viene de una versión antigua
+# de PostgreSQL, ambos pertenecen a postgres.
 if [[ $(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = 'cassandra_qa'") == 1 ]]; then
+  sudo -u postgres psql -q -c "ALTER DATABASE cassandra_qa OWNER TO cassandra_qa"
   sudo -u postgres psql -q -d cassandra_qa -c "ALTER SCHEMA public OWNER TO cassandra_qa"
 fi
 systemctl enable cassandra@qa.service >/dev/null 2>&1
