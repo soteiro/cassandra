@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -34,15 +35,36 @@ func Load() (*Config, error) {
 		log.Println("error cargando las env, usando variables del sistema")
 	}
 
+	jwtSecret, err := validateJWTSecret(os.Getenv("JWT_SECRET"))
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
 		DatabaseUrl: getEnv("DATABASE_URL_LOCAL", "postgres://localhost:5432/db"),
 		Port: getEnv("PORT", "8080"),
-		JwtSecret: getEnv("JWT_SECRET", "jtwsecretlasjkndlaskndlakmd"),
+		JwtSecret: jwtSecret,
 		RateLimitPerMin: getEnvInt("RATE_LIMIT_PER_MIN", 100),
 		AllowedOrigins: allowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
 		}, nil
 	}
 
+
+// MinJWTSecretLength: 32 bytes (256 bits), el tamaño de clave de HS256.
+const MinJWTSecretLength = 32
+
+// validateJWTSecret exige un secreto propio: sin valor por defecto (el código es
+// público) y lo bastante largo para que no se pueda adivinar ni falsificar sesiones.
+func validateJWTSecret(secret string) (string, error) {
+	secret = strings.TrimSpace(secret)
+	if secret == "" {
+		return "", fmt.Errorf("JWT_SECRET no está definido; genera uno con: openssl rand -base64 48")
+	}
+	if len(secret) < MinJWTSecretLength {
+		return "", fmt.Errorf("JWT_SECRET debe tener al menos %d caracteres (tiene %d); genera uno con: openssl rand -base64 48", MinJWTSecretLength, len(secret))
+	}
+	return secret, nil
+}
 
 func getEnv(key, fallback string) string {
 		if value, ok := os.LookupEnv(key); ok {

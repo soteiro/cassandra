@@ -37,7 +37,8 @@ export default defineConfig({
       env: {
         DATABASE_URL_LOCAL: e2eDatabaseUrl(),
         PORT: String(BACKEND_PORT),
-        JWT_SECRET: 'e2e-jwt-secret',
+        // Solo para e2e; el backend exige al menos 32 caracteres.
+        JWT_SECRET: 'e2e-jwt-secret-solo-para-tests-0123456789',
         RATE_LIMIT_PER_MIN: '100000',
       },
       reuseExistingServer: false,

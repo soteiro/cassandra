@@ -46,7 +46,7 @@ func main() {
 	// 1. Cargar configuración
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalln("error al cargar las env")
+		log.Fatalf("configuración inválida: %v", err)
 	}
 
 	// 2. Conectar a PostgreSQL	"github.com/go-chi/cors"
