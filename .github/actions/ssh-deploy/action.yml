@@ -1,0 +1,55 @@
+name: Deploy por SSH
+description: >-
+  Envía el binario al servidor por stdin del SSH. La clave de deploy solo puede ejecutar
+  /usr/local/bin/cassandra-deploy (comando forzado), que verifica, activa y comprueba la versión.
+
+inputs:
+  environment:
+    description: qa o prod
+    required: true
+  version:
+    description: Versión que reporta el binario (cassandra-app version)
+    required: true
+  binary:
+    description: Ruta al binario linux-amd64
+    required: true
+  ssh-key:
+    description: Clave privada de deploy
+    required: true
+  host:
+    description: Host del servidor
+    required: true
+  port:
+    description: Puerto SSH
+    required: false
+    default: '22'
+  known-hosts:
+    description: Líneas de known_hosts del servidor (ssh-keyscan)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Desplegar
+      shell: bash
+      env:
+        DEPLOY_ENV: ${{ inputs.environment }}
+        DEPLOY_VERSION: ${{ inputs.version }}
+        DEPLOY_BINARY: ${{ inputs.binary }}
+        DEPLOY_KEY: ${{ inputs.ssh-key }}
+        DEPLOY_HOST: ${{ inputs.host }}
+        DEPLOY_PORT: ${{ inputs.port }}
+        DEPLOY_KNOWN_HOSTS: ${{ inputs.known-hosts }}
+      run: |
+        set -euo pipefail
+        dir=$(mktemp -d)
+        trap 'rm -rf "$dir"' EXIT
+        printf '%s\n' "$DEPLOY_KEY" > "$dir/key"
+        printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$dir/known_hosts"
+        chmod 600 "$dir/key"
+        sha=$(sha256sum "$DEPLOY_BINARY" | cut -d' ' -f1)
+        echo "Desplegando $DEPLOY_VERSION en $DEPLOY_ENV (sha256 $sha)"
+        ssh -i "$dir/key" -p "$DEPLOY_PORT" \
+          -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$dir/known_hosts" \
+          -o ConnectTimeout=20 \
+          "cassandra-deploy@$DEPLOY_HOST" "$DEPLOY_ENV $sha $DEPLOY_VERSION" < "$DEPLOY_BINARY"

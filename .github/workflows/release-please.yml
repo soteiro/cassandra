@@ -3,7 +3,9 @@ name: Release Please
 # Mantiene abierto un PR de release con la próxima versión y el CHANGELOG
 # (a partir de los commits feat:/fix:). Al mergear ese PR crea el tag vX.Y.Z y la
 # GitHub Release; entonces se vuelven a pasar los tests y, solo si pasan, se compilan
-# y adjuntan el binario del servidor, el APK firmado y SHA256SUMS.
+# y adjuntan el binario del servidor, el APK firmado y SHA256SUMS, y se despliega
+# en producción. Un disparo manual con un tag existente recompila y despliega ese tag
+# (sirve también para volver a una versión anterior).
 on:
   push:
     branches: [main]
@@ -147,3 +149,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
+
+  deploy-prod:
+    name: Deploy a producción
+    needs: [release-please, publish]
+    if: ${{ always() && needs.publish.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: server
+      - uses: ./.github/actions/ssh-deploy
+        with:
+          environment: prod
+          version: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
+          binary: cassandra-app-linux-amd64
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ vars.DEPLOY_PORT || '22' }}
+          known-hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
