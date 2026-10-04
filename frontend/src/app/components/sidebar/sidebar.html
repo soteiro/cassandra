@@ -107,6 +107,23 @@
       <svg lucideBookOpen class="w-4 h-4 group-hover:scale-105 transition-transform" />
       <span>API Docs</span>
     </a>
+    <!-- ACTUALIZACIONES (solo app Android) -->
+    @if (updates.isNative) {
+      <button
+        type="button"
+        (click)="checkForUpdates()"
+        [disabled]="updates.checking()"
+        class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-text-muted hover:text-text-main hover:bg-surface-border/60 border border-surface-border transition-all cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+      >
+        <span class="flex items-center gap-2">
+          <svg lucideRefreshCw class="w-3.5 h-3.5" [class.animate-spin]="updates.checking()" />
+          <span>{{ updates.checking() ? 'Buscando...' : 'Buscar actualizaciones' }}</span>
+        </span>
+        @if (updates.currentVersion(); as version) {
+          <span class="font-mono text-[10px] text-text-muted/80">v{{ version }}</span>
+        }
+      </button>
+    }
     <!-- LOGOUT BUTTON -->
     <button
       type="button"
