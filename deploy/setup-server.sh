@@ -100,7 +100,7 @@ if systemctl is-active --quiet cassandra@prod.service; then
   echo "    cassandra@prod ya está activo"
 else
   read -r -p "    Cambiar cassandra.service por cassandra@prod ahora (corte de unos segundos)? [s/N] " ok
-  if [[ $ok =~ ^[sS]$ ]]; then
+  if [[ ${ok,,} =~ ^(s|si|sí|y|yes)$ ]]; then
     systemctl disable --now cassandra.service 2>/dev/null || true
     systemctl enable --now cassandra@prod.service
     port=$(sed -n 's/^PORT=//p' "$prod_env" | head -n1); port=${port:-8080}
