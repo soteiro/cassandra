@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -36,6 +38,11 @@ func versionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	if len(os.Args) > 1 && (os.Args[1] == "version" || os.Args[1] == "--version") {
+		fmt.Println(version)
+		return
+	}
+
 	// 1. Cargar configuración
 	cfg, err := config.Load()
 	if err != nil {
@@ -53,6 +60,17 @@ func main() {
 	// 3. Ejecutar migraciones
 	if err := database.RunMigrations(cfg.DatabaseUrl); err != nil {
 		log.Fatalf("error al ejecutar las migraciones: %v", err)
+	}
+
+	// Subcomandos de administración (create-user, reset-password): se ejecutan y salen.
+	if len(os.Args) > 1 {
+		err := runCommand(context.Background(), os.Args[1:], repository.NewUserRepository(dbPool), terminalPassword, os.Stdout)
+		dbPool.Close()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+			os.Exit(1)
+		}
+		return
 	}
 
 	// 4. Inicializar Capas (Inyección de Dependencias)
@@ -91,15 +109,9 @@ func main() {
 	r.Use(chiMiddleware.Recoverer)
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{
-			"http://localhost:4200",
-			"http://localhost",
-			"https://localhost",
-			"capacitor://localhost",
-			"http://localhost:8080",
-			"https://cassandra.soteiro.dev",
-			"http://cassandra.soteiro.dev",
-		},
+		// La web se sirve desde el mismo origen que la API; CORS solo hace falta para el
+		// dev server de Angular, la app Capacitor y orígenes extra de ALLOWED_ORIGINS.
+		AllowedOrigins: cfg.AllowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin"},
 		ExposedHeaders:   []string{"Link"},
@@ -128,8 +140,7 @@ func main() {
 		
 		r.Use(middleware.AuthMiddleware(cfg.JwtSecret))
 		
-		r.Post("/api/users", userHandler.CreateUser)
-		r.Get("/api/users", userHandler.ListUsers)
+		// Las cuentas se crean desde la terminal del servidor (cassandra-app create-user).
 		r.Get("/api/users/{id}", userHandler.GetUser)
 		r.Put("/api/users/{id}", userHandler.UpdateUser)
 		r.Delete("/api/users/{id}", userHandler.DeleteUser)

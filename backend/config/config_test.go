@@ -1,6 +1,9 @@
 package config
 
-import "testing"
+import (
+	"slices"
+	"testing"
+)
 
 func TestGetEnvInt(t *testing.T) {
 	cases := []struct {
@@ -24,5 +27,20 @@ func TestGetEnvInt(t *testing.T) {
 				t.Errorf("getEnvInt() = %d, se esperaba %d", got, c.want)
 			}
 		})
+	}
+}
+
+func TestAllowedOrigins(t *testing.T) {
+	if got := allowedOrigins(""); !slices.Equal(got, DefaultAllowedOrigins) {
+		t.Errorf("sin ALLOWED_ORIGINS = %v, se esperaban los valores por defecto", got)
+	}
+
+	got := allowedOrigins(" https://cassandra.ejemplo.com/ , ,https://otra.ejemplo.com")
+	want := append(append([]string{}, DefaultAllowedOrigins...), "https://cassandra.ejemplo.com", "https://otra.ejemplo.com")
+	if !slices.Equal(got, want) {
+		t.Errorf("allowedOrigins = %v, se esperaba %v", got, want)
+	}
+	if len(DefaultAllowedOrigins) != 5 {
+		t.Error("allowedOrigins no debe modificar DefaultAllowedOrigins")
 	}
 }

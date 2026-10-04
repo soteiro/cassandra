@@ -197,3 +197,16 @@ func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpd
 	return &user, nil
 }
 
+
+// UpdatePasswordByEmail reemplaza el hash de la contraseña de un usuario activo.
+// Devuelve cuántas filas cambió (0 si no existe el email).
+func (r *UserRepository) UpdatePasswordByEmail(ctx context.Context, email, passwordHash string) (int64, error) {
+	tag, err := r.db.Exec(ctx,
+		`UPDATE users SET password = $1 WHERE email = $2 AND eliminado = false`,
+		passwordHash, email)
+	if err != nil {
+		log.Printf("[REPO:User.UpdatePasswordByEmail] Error en SQL UPDATE: %v | email=%s", err, email)
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}

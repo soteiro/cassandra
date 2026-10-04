@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -14,6 +15,18 @@ type Config struct {
 	JwtSecret string
 	// Peticiones máximas por IP y minuto. Se sube en los tests e2e.
 	RateLimitPerMin int
+	// Orígenes CORS: los de desarrollo y la app Capacitor, más ALLOWED_ORIGINS.
+	AllowedOrigins []string
+}
+
+// DefaultAllowedOrigins cubre el dev server de Angular y la app Android (Capacitor).
+// La web desplegada no los necesita: se sirve desde el mismo origen que la API.
+var DefaultAllowedOrigins = []string{
+	"http://localhost:4200",
+	"http://localhost",
+	"https://localhost",
+	"capacitor://localhost",
+	"http://localhost:8080",
 }
 
 func Load() (*Config, error) {
@@ -26,6 +39,7 @@ func Load() (*Config, error) {
 		Port: getEnv("PORT", "8080"),
 		JwtSecret: getEnv("JWT_SECRET", "jtwsecretlasjkndlaskndlakmd"),
 		RateLimitPerMin: getEnvInt("RATE_LIMIT_PER_MIN", 100),
+		AllowedOrigins: allowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
 		}, nil
 	}
 
@@ -49,4 +63,15 @@ func getEnvInt(key string, fallback int) int {
 		return fallback
 	}
 	return n
+}
+
+// allowedOrigins agrega a los orígenes por defecto los de extra (separados por comas).
+func allowedOrigins(extra string) []string {
+	origins := append([]string{}, DefaultAllowedOrigins...)
+	for _, o := range strings.Split(extra, ",") {
+		if o = strings.TrimRight(strings.TrimSpace(o), "/"); o != "" {
+			origins = append(origins, o)
+		}
+	}
+	return origins
 }

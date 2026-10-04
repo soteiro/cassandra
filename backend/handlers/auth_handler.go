@@ -272,8 +272,7 @@ func getCookieSettings(r *http.Request) (bool, http.SameSite) {
 	isHttps := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
 	isCrossOrMobile := strings.HasPrefix(origin, "http://localhost") ||
 		strings.HasPrefix(origin, "capacitor://") ||
-		strings.HasPrefix(origin, "https://") ||
-		strings.Contains(origin, "soteiro.dev")
+		strings.HasPrefix(origin, "https://")
 
 	if isHttps || isCrossOrMobile {
 		return true, http.SameSiteNoneMode
