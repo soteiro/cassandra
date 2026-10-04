@@ -166,6 +166,8 @@ export class PersonaDetails {
           this.isSubmittingEdit.set(false);
           this.closeEditModal();
           this.personaResource?.reload();
+          // La lista global de personas es un recurso compartido: hay que refrescarla.
+          this.personaService.reload();
         },
         error: (err) => {
           this.isSubmittingEdit.set(false);
@@ -193,6 +195,7 @@ export class PersonaDetails {
         this.toast.success('Persona eliminada del CRM');
         this.isDeleting.set(false);
         this.closeDeleteModal();
+        this.personaService.reload();
         this.router.navigate(['/crm']);
       },
       error: (err) => {

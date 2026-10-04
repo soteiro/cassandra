@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { FinanzasService } from '../../services/finanzas.service';
 import { ToastService } from '../../services/toast.service';
 import {
@@ -145,12 +146,19 @@ export class Finanzas implements OnInit {
     });
   }
 
+  // Carga en curso del período. Se cancela al pedir otro período para que una
+  // respuesta lenta de un período anterior no pise los datos del seleccionado.
+  private periodoSub?: Subscription;
+
   loadPeriodo(): void {
     this.isLoading.set(true);
     const anio = this.selectedAnio();
     const mes = this.selectedMes();
 
-    this.finanzasService.getPlantilla(anio, mes).subscribe({
+    this.periodoSub?.unsubscribe();
+    this.periodoSub = new Subscription();
+
+    this.periodoSub.add(this.finanzasService.getPlantilla(anio, mes).subscribe({
       next: (items) => {
         this.items.set(items || []);
         this.isLoading.set(false);
@@ -160,9 +168,9 @@ export class Finanzas implements OnInit {
         this.toastService.error('Error al cargar movimientos del período');
         this.isLoading.set(false);
       },
-    });
+    }));
 
-    this.finanzasService.getResumen(anio, mes).subscribe({
+    this.periodoSub.add(this.finanzasService.getResumen(anio, mes).subscribe({
       next: (res) => {
         this.resumen.set(
           res || {
@@ -175,7 +183,7 @@ export class Finanzas implements OnInit {
         );
       },
       error: (err) => console.error('Error cargando resumen:', err),
-    });
+    }));
   }
 
   loadListaDeseosCount(): void {
@@ -229,9 +237,10 @@ export class Finanzas implements OnInit {
     this.loadPeriodo();
   }
 
-  setPeriodo(mes: number, anio: number): void {
-    this.selectedMes.set(mes);
-    this.selectedAnio.set(anio);
+  setPeriodo(mes: number | string, anio: number | string): void {
+    // Number(): el período viaja al backend como int; un string provoca un 400.
+    this.selectedMes.set(Number(mes));
+    this.selectedAnio.set(Number(anio));
     this.loadPeriodo();
   }
 

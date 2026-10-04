@@ -106,6 +106,8 @@ export class ProyectDetails {
         this.isSubmittingEditProject.set(false);
         this.closeEditProjectModal();
         this.projectResource?.reload();
+        // La lista global de proyectos es un recurso compartido: hay que refrescarla.
+        this.proyectService.reload();
       },
       error: (err) => {
         this.toast.error('Error al editar el proyecto');
@@ -132,6 +134,7 @@ export class ProyectDetails {
         this.toast.success('Proyecto eliminado');
         this.isDeletingProject.set(false);
         this.projectToDelete.set(null);
+        this.proyectService.reload();
         this.router.navigate(['/proyectos']);
       },
       error: (err) => {
@@ -168,6 +171,7 @@ export class ProyectDetails {
         this.closeCreateSubprojectModal();
         this.subproyectosResource?.reload();
         this.projectResource?.reload();
+        this.proyectService.reload();
       },
       error: (err) => {
         this.toast.error(getErrorMessage(err, 'Error al crear el subproyecto'));

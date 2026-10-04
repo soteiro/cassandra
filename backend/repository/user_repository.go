@@ -126,6 +126,10 @@ func (r *UserRepository) GetById(ctx context.Context, id int) (*models.UserRespo
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 
+	// FIXME: users.alias admite NULL, pero se escanea en un string. Un usuario sin alias
+	// no puede iniciar sesión ("cannot scan NULL into *string"). Usar *string/pgtype.Text
+	// o COALESCE(alias, ''). Cubierto por el test.fixme de e2e/auth.spec.ts.
+
 	query := "SELECT id, nombre, alias, email, password,fecha_creacion FROM users WHERE email = $1 AND eliminado is false"
 
 	err := r.db.QueryRow(ctx, query, email).Scan(

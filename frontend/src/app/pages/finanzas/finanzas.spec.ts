@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 import { Finanzas } from './finanzas';
 import { FinanzasService } from '../../services/finanzas.service';
@@ -112,6 +112,31 @@ describe('Finanzas', () => {
   });
 
   describe('month navigation', () => {
+    it('should ignore a slow response from a previous period', () => {
+      const viejo = new Subject<FinanzasPlantillaItem[]>();
+      const nuevo = new Subject<FinanzasPlantillaItem[]>();
+      finanzas['getPlantilla'].mockReturnValueOnce(viejo).mockReturnValueOnce(nuevo);
+
+      component.setPeriodo(10, 2027); // carga lenta
+      component.setPeriodo(2, 2027); // período que el usuario quiere ver
+
+      nuevo.next([{ id: 2, nombre: 'Febrero' } as FinanzasPlantillaItem]);
+      viejo.next([{ id: 10, nombre: 'Octubre' } as FinanzasPlantillaItem]);
+
+      expect(component.items().map((i) => i.nombre)).toEqual(['Febrero']);
+      expect(viejo.observed).toBe(false);
+    });
+
+    it('setPeriodo should store numbers even if the selects emit strings', () => {
+      component.setPeriodo('3', '2027');
+      expect(component.selectedMes()).toBe(3);
+      expect(component.selectedAnio()).toBe(2027);
+      expect(finanzas['getPlantilla']).toHaveBeenLastCalledWith(2027, 3);
+
+      component.nextMonth();
+      expect(component.selectedMes()).toBe(4);
+    });
+
     it('prevMonth should wrap January to December of the previous year', () => {
       component.setPeriodo(1, 2026);
       component.prevMonth();

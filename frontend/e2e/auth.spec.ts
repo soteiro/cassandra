@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { expectLoggedIn, login } from './support/auth';
+import { sql } from './support/db';
+import { E2E_USER } from './support/env.mjs';
 
 test.describe('sin sesión', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
@@ -38,6 +40,19 @@ test.describe('sin sesión', () => {
 
     await page.goto('/home');
     await expect(page).toHaveURL(/\/login$/);
+  });
+
+  // FIXME(backend): un usuario con alias NULL no puede iniciar sesión porque
+  // UserRepository.GetByEmail escanea alias en un string. Quitar el fixme al corregirlo.
+  test.fixme('inicia sesión con un usuario sin alias', async ({ page }, testInfo) => {
+    const email = `sin-alias-${testInfo.project.name}@cassandra.test`;
+    sql(
+      `INSERT INTO users (nombre, email, password) VALUES ('Sin alias', :'email', :'hash')
+       ON CONFLICT (email) DO NOTHING;`,
+      { email, hash: E2E_USER.passwordHash },
+    );
+    await login(page, email);
+    await expectLoggedIn(page);
   });
 });
 

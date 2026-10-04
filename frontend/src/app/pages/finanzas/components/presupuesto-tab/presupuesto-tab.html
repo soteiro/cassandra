@@ -880,7 +880,7 @@
                 class="bg-surface border border-surface-border text-text-main rounded-lg p-2 outline-none"
               >
                 @for (m of meses(); track $index) {
-                  <option [value]="$index + 1">{{ m }}</option>
+                  <option [ngValue]="$index + 1">{{ m }}</option>
                 }
               </select>
               <select
@@ -889,7 +889,7 @@
                 class="bg-surface border border-surface-border text-text-main rounded-lg p-2 outline-none"
               >
                 @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
-                  <option [value]="a">{{ a }}</option>
+                  <option [ngValue]="a">{{ a }}</option>
                 }
               </select>
             </div>
@@ -905,7 +905,7 @@
                 class="bg-surface border border-accent/40 text-text-main rounded-lg p-2 outline-none"
               >
                 @for (m of meses(); track $index) {
-                  <option [value]="$index + 1">{{ m }}</option>
+                  <option [ngValue]="$index + 1">{{ m }}</option>
                 }
               </select>
               <select
@@ -914,7 +914,7 @@
                 class="bg-surface border border-accent/40 text-text-main rounded-lg p-2 outline-none"
               >
                 @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
-                  <option [value]="a">{{ a }}</option>
+                  <option [ngValue]="a">{{ a }}</option>
                 }
               </select>
             </div>

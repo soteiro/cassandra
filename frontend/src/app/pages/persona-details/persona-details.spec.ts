@@ -56,6 +56,7 @@ describe('PersonaDetails', () => {
     getPersonaById: ReturnType<typeof vi.fn>;
     updatePersona: ReturnType<typeof vi.fn>;
     deletePersona: ReturnType<typeof vi.fn>;
+    reload: ReturnType<typeof vi.fn>;
   };
   let interaccionService: {
     getInteraccionesByPersonaId: ReturnType<typeof vi.fn>;
@@ -74,6 +75,7 @@ describe('PersonaDetails', () => {
       getPersonaById: vi.fn().mockReturnValue(personaRes),
       updatePersona: vi.fn().mockReturnValue(of(persona)),
       deletePersona: vi.fn().mockReturnValue(of(undefined)),
+      reload: vi.fn(),
     };
     interaccionService = {
       getInteraccionesByPersonaId: vi.fn().mockReturnValue(interRes),
@@ -144,6 +146,7 @@ describe('PersonaDetails', () => {
     expect(component.showEditModal()).toBe(false);
     expect(component.isSubmittingEdit()).toBe(false);
     expect(personaRes.reload).toHaveBeenCalled();
+    expect(personaService.reload).toHaveBeenCalled();
     expect(toast.success).toHaveBeenCalledWith('Perfil actualizado correctamente');
   });
 
@@ -156,12 +159,13 @@ describe('PersonaDetails', () => {
     expect(toast.error).toHaveBeenCalledWith('mal');
   });
 
-  it('confirmDeletePersona success navigates to /crm', () => {
+  it('confirmDeletePersona success refreshes the global list and navigates to /crm', () => {
     component.openDeleteModal();
     component.confirmDeletePersona();
     expect(personaService.deletePersona).toHaveBeenCalledWith(5);
     expect(component.showDeleteModal()).toBe(false);
     expect(component.isDeleting()).toBe(false);
+    expect(personaService.reload).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/crm']);
   });
 
@@ -170,6 +174,7 @@ describe('PersonaDetails', () => {
     component.openDeleteModal();
     component.confirmDeletePersona();
     expect(component.showDeleteModal()).toBe(true);
+    expect(personaService.reload).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith('Error al eliminar la persona');
   });
