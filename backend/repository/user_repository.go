@@ -33,7 +33,7 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
 	queryUser := `
 		INSERT INTO users (nombre, alias, email, password)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id, nombre, alias, email, fecha_creacion
+		RETURNING id, nombre, COALESCE(alias, ''), email, fecha_creacion
 	`
 
 	err = tx.QueryRow(
@@ -76,7 +76,7 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
 
 // GetAll obtiene todos los usuarios de la base de datos
 func (r *UserRepository) GetAll(ctx context.Context) ([]models.UserResponse, error) {
-	query := "SELECT id, nombre, alias, email, fecha_creacion FROM users WHERE eliminado = false"
+	query := "SELECT id, nombre, COALESCE(alias, ''), email, fecha_creacion FROM users WHERE eliminado = false"
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		log.Printf("[REPO:User.GetAll] Error en SQL SELECT: %v", err)
@@ -107,7 +107,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]models.UserResponse, err
 // seleccionar usuario por id
 func (r *UserRepository) GetById(ctx context.Context, id int) (*models.UserResponse, error) {
 	var user models.UserResponse
-	query := "SELECT id, nombre, alias, email, fecha_creacion FROM users WHERE id = $1 AND eliminado is false"
+	query := "SELECT id, nombre, COALESCE(alias, ''), email, fecha_creacion FROM users WHERE id = $1 AND eliminado is false"
 	err := r.db.QueryRow(ctx, query, id).Scan(
 		&user.ID,
 		&user.Nombre,
@@ -126,11 +126,7 @@ func (r *UserRepository) GetById(ctx context.Context, id int) (*models.UserRespo
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 
-	// FIXME: users.alias admite NULL, pero se escanea en un string. Un usuario sin alias
-	// no puede iniciar sesión ("cannot scan NULL into *string"). Usar *string/pgtype.Text
-	// o COALESCE(alias, ''). Cubierto por el test.fixme de e2e/auth.spec.ts.
-
-	query := "SELECT id, nombre, alias, email, password,fecha_creacion FROM users WHERE email = $1 AND eliminado is false"
+	query := "SELECT id, nombre, COALESCE(alias, ''), email, password, fecha_creacion FROM users WHERE email = $1 AND eliminado is false"
 
 	err := r.db.QueryRow(ctx, query, email).Scan(
 		&user.ID,
@@ -175,7 +171,7 @@ func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpd
 	UPDATE users
 	SET nombre  = $1, alias = $2, email = $3
 	WHERE id  = $4 AND eliminado = false
-	RETURNING id, nombre, alias, email, fecha_creacion	
+	RETURNING id, nombre, COALESCE(alias, ''), email, fecha_creacion	
 	`
 
 	err := r.db.QueryRow(

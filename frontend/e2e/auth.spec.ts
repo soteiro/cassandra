@@ -42,9 +42,8 @@ test.describe('sin sesión', () => {
     await expect(page).toHaveURL(/\/login$/);
   });
 
-  // FIXME(backend): un usuario con alias NULL no puede iniciar sesión porque
-  // UserRepository.GetByEmail escanea alias en un string. Quitar el fixme al corregirlo.
-  test.fixme('inicia sesión con un usuario sin alias', async ({ page }, testInfo) => {
+  // Regresión: users.alias admite NULL y antes impedía iniciar sesión.
+  test('inicia sesión con un usuario sin alias', async ({ page }, testInfo) => {
     const email = `sin-alias-${testInfo.project.name}@cassandra.test`;
     sql(
       `INSERT INTO users (nombre, email, password) VALUES ('Sin alias', :'email', :'hash')

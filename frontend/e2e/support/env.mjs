@@ -13,7 +13,6 @@ export const BASE_URL = `http://localhost:${FRONTEND_PORT}`;
 
 export const E2E_USER = {
   nombre: 'Usuario E2E',
-  // alias no puede ser NULL: el repositorio de usuarios del backend lo lee en un string.
   alias: 'e2e',
   email: 'e2e@cassandra.test',
   password: 'e2e-Cassandra-2026',

@@ -27,8 +27,8 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 // 2. Validar el jwt
 		userId, err := utils.ValidateAccessToken(tokenStr, jwtSecret)
 		if err != nil {
-			log.Printf("[AUTH DEBUG] token recibido (len=%d): %q  origen=%s", len(tokenStr), tokenStr, origenToken(r))
-			log.Printf("[AUTH DEBUG] error al validar: %v", err)
+			// No se registra el token: en los logs permitiría reutilizar sesiones vigentes.
+			log.Printf("[AUTH] token inválido (len=%d, origen=%s): %v", len(tokenStr), origenToken(r), err)
 			http.Error(w, "Token invalido", http.StatusUnauthorized)
 			return
 		}

@@ -22,7 +22,7 @@ func Connect(databaseURL string)  (*pgxpool.Pool, error) {
 	config, err  := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
 		// aqui se pasa %v y no %w ya que el linter se queja de que se cancelara la operacion si llega en un formato incorrecto
-		return nil, fmt.Errorf("no se pudo parsear la url: %v", cancel)
+		return nil, fmt.Errorf("no se pudo parsear la url: %w", err)
 	}
 	// crear el pool de conexiones
 	pool, err := pgxpool.NewWithConfig(ctx, config)
