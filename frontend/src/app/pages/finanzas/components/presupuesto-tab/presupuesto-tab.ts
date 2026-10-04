@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  linkedSignal,
   HostListener,
   inject,
   input,
@@ -39,6 +40,7 @@ import {
   LucideClock,
   LucideX,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../../../utils/http-error.util';
 
 export type FinanzasGroupMode = 'categoria' | 'banco' | 'mecanismo' | 'estado' | 'ninguno';
 
@@ -165,8 +167,10 @@ export class PresupuestoTab {
   showCloneModal = signal<boolean>(false);
   cloneAnioOrigen = signal<number>(new Date().getFullYear());
   cloneMesOrigen = signal<number>(new Date().getMonth() + 1);
-  cloneAnioDestino = signal<number>(new Date().getFullYear());
-  cloneMesDestino = signal<number>(new Date().getMonth() + 2 > 12 ? 1 : new Date().getMonth() + 2);
+  cloneAnioDestino = signal<number>(
+    new Date().getMonth() === 11 ? new Date().getFullYear() + 1 : new Date().getFullYear(),
+  );
+  cloneMesDestino = signal<number>(new Date().getMonth() === 11 ? 1 : new Date().getMonth() + 2);
   isSubmittingClone = signal<boolean>(false);
 
   private readonly _backBtnClone = this.backButtonService.registerEffect(
@@ -187,9 +191,17 @@ export class PresupuestoTab {
   quickGrupoId = signal<number | null>(null);
   isSubmittingQuick = signal<boolean>(false);
 
+  // Copia local de `items` para actualizaciones optimistas; se resincroniza
+  // con el input cada vez que el padre recarga.
+  readonly localItems = linkedSignal(() => this.items());
+
+  private patchItem(id: number, patch: Partial<FinanzasPlantillaItem>): void {
+    this.localItems.update((list) => list.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+  }
+
   // Computados
   ingresos = computed(() => {
-    let list = this.items().filter((i) => i.tipo === 'ingreso');
+    let list = this.localItems().filter((i) => i.tipo === 'ingreso');
     const query = this.searchQuery().toLowerCase().trim();
     if (query) {
       list = list.filter(
@@ -210,7 +222,7 @@ export class PresupuestoTab {
   });
 
   egresos = computed(() => {
-    let list = this.items().filter((i) => i.tipo === 'egreso');
+    let list = this.localItems().filter((i) => i.tipo === 'egreso');
     const query = this.searchQuery().toLowerCase().trim();
     if (query) {
       list = list.filter(
@@ -236,7 +248,7 @@ export class PresupuestoTab {
 
   selectedTotalMonto = computed(() => {
     const sel = this.selectedIds();
-    return this.items()
+    return this.localItems()
       .filter((i) => sel.has(i.id))
       .reduce((sum, i) => sum + (i.monto || 0), 0);
   });
@@ -478,7 +490,7 @@ export class PresupuestoTab {
     if (item.estado === estado) return;
 
     const prev = item.estado;
-    item.estado = estado;
+    this.patchItem(item.id, { estado });
 
     this.finanzasService.updatePlantillaItem(item.id, { estado }).subscribe({
       next: () => {
@@ -486,7 +498,7 @@ export class PresupuestoTab {
         this.reload.emit();
       },
       error: (err) => {
-        item.estado = prev;
+        this.patchItem(item.id, { estado: prev });
         this.toastService.error('Error al actualizar estado');
         console.error(err);
       },
@@ -547,6 +559,7 @@ export class PresupuestoTab {
       error: (err) => {
         this.toastService.error('Error al eliminar movimientos en lote');
         this.isBulkProcessing.set(false);
+        this.reload.emit();
         this.showBulkDeleteModal.set(false);
         console.error(err);
       },
@@ -570,6 +583,7 @@ export class PresupuestoTab {
       error: (err) => {
         this.toastService.error('Error al asignar categoría en lote');
         this.isBulkProcessing.set(false);
+        this.reload.emit();
         console.error(err);
       },
     });
@@ -592,6 +606,7 @@ export class PresupuestoTab {
       error: (err) => {
         this.toastService.error('Error al asignar cuenta en lote');
         this.isBulkProcessing.set(false);
+        this.reload.emit();
         console.error(err);
       },
     });
@@ -623,7 +638,7 @@ export class PresupuestoTab {
     if (isNaN(newVal) || newVal === item.monto) return;
 
     const prevMonto = item.monto;
-    item.monto = newVal;
+    this.patchItem(item.id, { monto: newVal });
 
     this.finanzasService.updatePlantillaItem(item.id, { monto: newVal }).subscribe({
       next: () => {
@@ -631,7 +646,7 @@ export class PresupuestoTab {
         this.reload.emit();
       },
       error: (err) => {
-        item.monto = prevMonto;
+        this.patchItem(item.id, { monto: prevMonto });
         this.toastService.error('Error al actualizar monto');
         console.error(err);
         this.reload.emit();
@@ -665,14 +680,14 @@ export class PresupuestoTab {
     if (!newName || newName === item.nombre) return;
 
     const prevName = item.nombre;
-    item.nombre = newName;
+    this.patchItem(item.id, { nombre: newName });
 
     this.finanzasService.updatePlantillaItem(item.id, { nombre: newName }).subscribe({
       next: () => {
         this.toastService.success('Concepto actualizado');
       },
       error: (err) => {
-        item.nombre = prevName;
+        this.patchItem(item.id, { nombre: prevName });
         this.toastService.error('Error al actualizar concepto');
         console.error(err);
       },
@@ -767,11 +782,14 @@ export class PresupuestoTab {
     }
 
     const monto = Number(this.formMonto()) || 0;
-    this.isSubmittingItem.set(true);
 
     if (this.isEditingItem()) {
       const id = this.editingItemId();
-      if (!id) return;
+      if (!id) {
+        this.toastService.error('No se encontró el movimiento a editar');
+        return;
+      }
+      this.isSubmittingItem.set(true);
 
       this.finanzasService
         .updatePlantillaItem(id, {
@@ -799,6 +817,7 @@ export class PresupuestoTab {
           },
         });
     } else {
+      this.isSubmittingItem.set(true);
       const req: FinanzasPlantillaRequest = {
         tipo: this.formTipo(),
         nombre,
@@ -940,7 +959,7 @@ export class PresupuestoTab {
         this.periodoChange.emit({ mes: req.mes_destino, anio: req.anio_destino });
       },
       error: (err) => {
-        this.toastService.error('Error al clonar el período: ' + (err.error || err.message));
+        this.toastService.error('Error al clonar el período: ' + getErrorMessage(err, err.message ?? 'error desconocido'));
         this.isSubmittingClone.set(false);
         console.error(err);
       },

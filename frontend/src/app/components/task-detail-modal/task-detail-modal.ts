@@ -258,8 +258,7 @@ export class TaskDetailModal {
           this.nuevaSubtareaNombre.set('');
           this.isSubmittingSubtarea.set(false);
           this.toastService.success('Subtarea añadida');
-          if (!t.subtareas) t.subtareas = [];
-          t.subtareas.push(newSub);
+          this.updateSubtareas((subs) => [...subs, newSub]);
           this.taskUpdated.emit();
         },
         error: (err) => {
@@ -270,23 +269,34 @@ export class TaskDetailModal {
       });
   }
 
+  // Actualiza las subtareas de forma inmutable para que los computed se recalculen.
+  private updateSubtareas(fn: (subtareas: Task[]) => Task[]) {
+    this.currentTask.update((t) => (t ? { ...t, subtareas: fn(t.subtareas ?? []) } : t));
+  }
+
+  private setSubtareaEstado(id: number, estado: string) {
+    this.updateSubtareas((subs) => subs.map((s) => (s.id === id ? { ...s, estado } : s)));
+  }
+
   toggleSubtareaStatus(subtarea: Task) {
+    const prev = subtarea.estado;
     const nextEstado = subtarea.estado === 'Terminado' ? 'Abierto' : 'Terminado';
-    subtarea.estado = nextEstado;
+    this.setSubtareaEstado(subtarea.id, nextEstado);
     this.taskService.updateTask(subtarea.id, { estado: nextEstado }).subscribe({
       next: () => this.taskUpdated.emit(),
-      error: (err) => console.error('Error al cambiar estado de subtarea:', err),
+      error: (err) => {
+        this.setSubtareaEstado(subtarea.id, prev);
+        this.toastService.error('Error al cambiar estado de subtarea');
+        console.error('Error al cambiar estado de subtarea:', err);
+      },
     });
   }
 
   deleteSubtarea(subtareaId: number) {
-    const t = this.currentTask();
     if (!confirm('¿Eliminar esta subtarea?')) return;
     this.taskService.deleteTask(subtareaId).subscribe({
       next: () => {
-        if (t && t.subtareas) {
-          t.subtareas = t.subtareas.filter((s) => s.id !== subtareaId);
-        }
+        this.updateSubtareas((subs) => subs.filter((s) => s.id !== subtareaId));
         this.toastService.success('Subtarea eliminada');
         this.taskUpdated.emit();
       },

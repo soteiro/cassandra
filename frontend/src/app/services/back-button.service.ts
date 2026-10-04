@@ -168,13 +168,19 @@ export class BackButtonService {
   private handleRootExit(): void {
     const now = Date.now();
     if (now - this.lastBackPressTime < this.exitWindowMs) {
-      App.exitApp();
+      this.exitApp();
     } else {
       this.lastBackPressTime = now;
       this.toastService.info('Presiona de nuevo para salir', {
         duration: this.exitWindowMs,
       });
     }
+  }
+
+  // Aislado en un método para poder espiarlo en tests: vi.mock('@capacitor/app')
+  // no es fiable con el bundling del builder de unit-test de Angular.
+  protected exitApp(): Promise<void> {
+    return App.exitApp();
   }
 
   private isRootRoute(url: string): boolean {

@@ -33,6 +33,13 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		prioridad = *req.Prioridad
 	}
 
+	// Sin estado explícito se usa "Abierto" (el DEFAULT de la columna): pasar nil
+	// insertaría NULL y la tarea quedaría sin estado.
+	estado := "Abierto"
+	if req.Estado != nil && *req.Estado != "" {
+		estado = *req.Estado
+	}
+
 	query := `
 		INSERT INTO tareas_proyectos (
 			nombre, 
@@ -56,7 +63,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		req.Descripcion,
 		req.Comentario,
 		req.UserID,
-		req.Estado,
+		estado,
 		prioridad,
 		req.ProyectID,
 		req.TareaPadreID,
@@ -271,7 +278,9 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 		ORDER BY id ASC
 	`
 	rows, err := r.db.Query(ctx, subQuery, id, userID)
-	if err == nil {
+	if err != nil {
+		log.Printf("[REPO:Tareas.GetByID] Error en SQL SELECT de subtareas: %v | tarea_id=%d", err, id)
+	} else {
 		defer rows.Close()
 		var subtareas []models.TareaResponse
 		for rows.Next() {
@@ -288,9 +297,15 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 				&sub.UserID,
 				&sub.ProyectID,
 				&sub.TareaPadreID,
-			); err == nil {
-				subtareas = append(subtareas, sub)
+			); err != nil {
+				// Se omite la subtarea pero queda registrado, en vez de perderla en silencio.
+				log.Printf("[REPO:Tareas.GetByID] Error al leer subtarea: %v | tarea_id=%d", err, id)
+				continue
 			}
+			subtareas = append(subtareas, sub)
+		}
+		if err := rows.Err(); err != nil {
+			log.Printf("[REPO:Tareas.GetByID] Error iterando subtareas: %v | tarea_id=%d", err, id)
 		}
 		tarea.Subtareas = subtareas
 	}

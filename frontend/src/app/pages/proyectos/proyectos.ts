@@ -13,6 +13,7 @@ import {
   LucidePlus,
   LucideSearch,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-proyectos',
@@ -84,11 +85,11 @@ export class Proyectos {
 
     // 3. Filtro por estado / prioridad
     if (status === 'active') {
-      list = list.filter((p) => p.estado !== 'Terminado' && p.estado !== 'Completado' && p.estado !== 'Cancelado');
+      list = list.filter((p) => this.isActive(p));
     } else if (status === 'completed') {
-      list = list.filter((p) => p.estado === 'Terminado' || p.estado === 'Completado');
+      list = list.filter((p) => this.isCompleted(p));
     } else if (status === 'critical') {
-      list = list.filter((p) => p.prioridad === 'Critica' || p.prioridad === 'Alta');
+      list = list.filter((p) => this.isCritical(p));
     }
 
     // 4. Ordenar por prioridad (Crítica -> Alta -> Media -> Baja) y por fecha_creacion DESC si coinciden
@@ -102,6 +103,19 @@ export class Proyectos {
       const dateB = b.fecha_creacion ? new Date(b.fecha_creacion).getTime() : 0;
       return dateB - dateA;
     });
+  }
+
+  private isCompleted(p: ProjectResponse): boolean {
+    return p.estado === 'Terminado' || p.estado === 'Completado';
+  }
+
+  private isActive(p: ProjectResponse): boolean {
+    return !this.isCompleted(p) && p.estado !== 'Cancelado';
+  }
+
+  // Crítica (con o sin tilde) o Alta: pesos 1 y 2.
+  private isCritical(p: ProjectResponse): boolean {
+    return this.getPriorityWeight(p.prioridad) <= 2;
   }
 
   private getPriorityWeight(priority?: string): number {
@@ -127,13 +141,9 @@ export class Proyectos {
     // Estadísticas sobre los proyectos principales
     const rootProjects = proyectos.filter((p) => !p.proyecto_padre_id);
     const total = rootProjects.length;
-    const completed = rootProjects.filter(
-      (p) => p.estado === 'Terminado' || p.estado === 'Completado',
-    ).length;
-    const active = total - completed;
-    const critical = rootProjects.filter(
-      (p) => p.prioridad === 'Critica' || p.prioridad === 'Alta',
-    ).length;
+    const completed = rootProjects.filter((p) => this.isCompleted(p)).length;
+    const active = rootProjects.filter((p) => this.isActive(p)).length;
+    const critical = rootProjects.filter((p) => this.isCritical(p)).length;
     return { total, active, completed, critical };
   }
 
@@ -149,7 +159,7 @@ export class Proyectos {
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        const errorMsg = err.error?.message || err.error || 'Error al crear el proyecto';
+        const errorMsg = getErrorMessage(err, 'Error al crear el proyecto');
         this.toastService.error(errorMsg);
       },
     });

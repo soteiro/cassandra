@@ -38,8 +38,8 @@ export class Home {
 
   return [...tasks].sort(
     (a, b) =>
-      (priorityOrder[a.prioridad.toLowerCase() as keyof typeof priorityOrder] ?? 99) -
-      (priorityOrder[b.prioridad.toLowerCase() as keyof typeof priorityOrder] ?? 99)
+      (priorityOrder[a.prioridad?.toLowerCase() as keyof typeof priorityOrder] ?? 99) -
+      (priorityOrder[b.prioridad?.toLowerCase() as keyof typeof priorityOrder] ?? 99)
   );
 });
   // Selected task for right-drawer modal
@@ -62,10 +62,15 @@ export class Home {
     this.selectedEstado.set(estado);
   }
 
+  // Actualiza el estado de forma inmutable para que los computed se recalculen.
+  private setTaskEstado(id: number, estado: string) {
+    this.tasksResource?.update((tasks) => tasks?.map((t) => (t.id === id ? { ...t, estado } : t)));
+  }
+
   toggleTaskComplete(task: Task) {
     const prev = task.estado;
     const nextEstado = task.estado === 'Terminado' ? 'Abierto' : 'Terminado';
-    task.estado = nextEstado;
+    this.setTaskEstado(task.id, nextEstado);
 
     this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
       next: () => {
@@ -75,7 +80,7 @@ export class Home {
         this.tasksResource?.reload();
       },
       error: (err) => {
-        task.estado = prev;
+        this.setTaskEstado(task.id, prev);
         this.toastService.error('Error al actualizar tarea');
         console.error('Error:', err);
       },
@@ -84,7 +89,7 @@ export class Home {
 
   changeTaskStatus(task: Task, nextEstado: string) {
     const prev = task.estado;
-    task.estado = nextEstado;
+    this.setTaskEstado(task.id, nextEstado);
 
     this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
       next: () => {
@@ -92,7 +97,7 @@ export class Home {
         this.tasksResource?.reload();
       },
       error: (err) => {
-        task.estado = prev;
+        this.setTaskEstado(task.id, prev);
         this.toastService.error('Error al cambiar estado');
         console.error('Error:', err);
       },

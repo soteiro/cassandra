@@ -16,6 +16,7 @@ import {
   LucideCopy,
   LucideCheck,
 } from '@lucide/angular';
+import { getErrorMessage } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-interaccion-modal',
@@ -127,7 +128,7 @@ export class InteraccionModal {
         error: (err) => {
           this.isSubmitting.set(false);
           const errorMsg =
-            err.error?.message || err.error || 'Error al actualizar interacción';
+            getErrorMessage(err, 'Error al actualizar interacción');
           this.toast.error(errorMsg);
         },
       });
@@ -157,7 +158,7 @@ export class InteraccionModal {
       error: (err) => {
         this.isDeleting.set(false);
         const errorMsg =
-          err.error?.message || err.error || 'Error al eliminar interacción';
+          getErrorMessage(err, 'Error al eliminar interacción');
         this.toast.error(errorMsg);
       },
     });

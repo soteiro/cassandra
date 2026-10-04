@@ -6,20 +6,6 @@ import { Location } from '@angular/common';
 import { Subject } from 'rxjs';
 import { BackButtonService } from './back-button.service';
 import { ToastService } from './toast.service';
-import { App } from '@capacitor/app';
-
-vi.mock('@capacitor/app', () => ({
-  App: {
-    addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
-    exitApp: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-vi.mock('@capacitor/core', () => ({
-  Capacitor: {
-    isNativePlatform: vi.fn().mockReturnValue(false),
-  },
-}));
 
 describe('BackButtonService', () => {
   let service: BackButtonService;
@@ -28,6 +14,7 @@ describe('BackButtonService', () => {
   let mockLocation: any;
   let mockToastService: any;
   let mockNgZone: any;
+  let exitApp: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,6 +46,7 @@ describe('BackButtonService', () => {
     ], {} as EnvironmentInjector);
 
     service = runInInjectionContext(injector, () => new BackButtonService());
+    exitApp = vi.spyOn(service as any, 'exitApp').mockResolvedValue(undefined);
   });
 
   it('should be created', () => {
@@ -147,7 +135,7 @@ describe('BackButtonService', () => {
       expect(mockToastService.info).toHaveBeenCalledWith('Presiona de nuevo para salir', {
         duration: 2000,
       });
-      expect(App.exitApp).not.toHaveBeenCalled();
+      expect(exitApp).not.toHaveBeenCalled();
     });
 
     it('should exit app when pressed twice within exit window on root route', async () => {
@@ -157,7 +145,7 @@ describe('BackButtonService', () => {
       expect(mockToastService.info).toHaveBeenCalledTimes(1);
 
       await service.handleBackButton();
-      expect(App.exitApp).toHaveBeenCalledTimes(1);
+      expect(exitApp).toHaveBeenCalledTimes(1);
     });
 
     it('should prompt to exit on /login route', async () => {
