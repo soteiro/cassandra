@@ -1,0 +1,48 @@
+<section class="flex flex-col p-2 gap-6 justify-center items-center min-h-[80vh]">
+  <form
+    (submit)="onSubmit($event)"
+    class="flex flex-col gap-4 w-full max-w-sm p-6 rounded-xl border border-surface-border shadow-2xl"
+  >
+    <div class="space-y-1 text-center">
+      <h2 class="text-2xl font-bold text-text-main">Conecta tu servidor</h2>
+      <p class="text-xs text-text-muted leading-relaxed">
+        Cassandra se autoaloja: escribe la dirección de tu propio servidor.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="server-address" class="text-sm font-medium text-slate-300">Dirección del servidor</label>
+      <input
+        id="server-address"
+        type="url"
+        inputmode="url"
+        autocapitalize="off"
+        autocomplete="url"
+        spellcheck="false"
+        required
+        name="address"
+        [ngModel]="address()"
+        (ngModelChange)="address.set($event)"
+        placeholder="cassandra.midominio.com"
+        [attr.aria-invalid]="errorMessage() ? true : null"
+        aria-describedby="server-help"
+        class="px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-primary"
+      />
+      <p id="server-help" class="text-[11px] text-text-muted">Debe usar https. No hace falta escribir /api.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <p role="alert" class="p-3 bg-danger/15 border border-danger/30 rounded-xl text-danger text-xs">
+        {{ errorMessage() }}
+      </p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="connecting() || !address().trim()"
+      class="mt-2 py-2 px-4 bg-primary/70 hover:bg-primary text-white font-bold rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+    >
+      {{ connecting() ? 'Conectando...' : 'Conectar' }}
+    </button>
+  </form>
+</section>

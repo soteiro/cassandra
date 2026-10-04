@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { ServerConfigService } from '../../services/server-config.service';
 import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({
@@ -20,6 +21,13 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
+  protected readonly serverConfig = inject(ServerConfigService);
+
+  /** Volver a elegir servidor (solo en la app; aún no hay sesión que cerrar). */
+  protected changeServer(): void {
+    this.serverConfig.disconnect();
+    this.router.navigate(['/servidor']);
+  }
 
   protected onSubmit(event: Event): void {
     event.preventDefault();

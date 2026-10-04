@@ -185,7 +185,7 @@ export class BackButtonService {
 
   private isRootRoute(url: string): boolean {
     const clean = this.cleanUrl(url);
-    return clean === '/home' || clean === '/login' || clean === '/' || clean === '';
+    return clean === '/home' || clean === '/login' || clean === '/servidor' || clean === '/' || clean === '';
   }
 
   private getCurrentCleanUrl(): string {

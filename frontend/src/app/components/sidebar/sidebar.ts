@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { CommandBarService } from '../../services/command-bar.service';
 import { AppUpdateService } from '../../services/app-update.service';
 import { ToastService } from '../../services/toast.service';
+import { ServerConfigService } from '../../services/server-config.service';
 import { useToggle } from '../../utils/use-toggle';
 import {
   LucideHouse,
@@ -41,6 +42,7 @@ export class Sidebar {
   protected readonly commandBarService = inject(CommandBarService);
   protected readonly updates = inject(AppUpdateService);
   private readonly toast = inject(ToastService);
+  protected readonly serverConfig = inject(ServerConfigService);
 
   @Input() sidebar = useToggle(false);
 
@@ -65,6 +67,16 @@ export class Sidebar {
         this.toast.error('No se pudo comprobar si hay actualizaciones. Revisa tu conexión.');
         break;
     }
+  }
+
+  /** Cierra la sesión en el servidor actual y vuelve a la pantalla de conexión. */
+  protected changeServer(): void {
+    const leave = () => {
+      this.authservice.isLoggedIn.set(false);
+      this.serverConfig.disconnect();
+      this.router.navigate(['/servidor']);
+    };
+    this.authservice.logout().subscribe({ next: leave, error: leave });
   }
 
   protected chau(): void {

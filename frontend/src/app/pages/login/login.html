@@ -61,6 +61,15 @@
       >
         Iniciar Sesión
       </button>
+
+      @if (serverConfig.isNative && serverConfig.serverUrl(); as server) {
+        <p class="text-[11px] text-center text-text-muted">
+          Conectado a <span class="font-mono">{{ server }}</span> ·
+          <button type="button" (click)="changeServer()" class="underline hover:text-text-main cursor-pointer">
+            Cambiar
+          </button>
+        </p>
+      }
     </form>
   </section>
   

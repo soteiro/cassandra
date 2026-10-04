@@ -2,13 +2,17 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, of, map } from 'rxjs';
 import { LoginRequest, MeResponse } from '../models/auth.model';
-import { environment } from '../../environments/environment';
+import { ServerConfigService } from './server-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly serverConfig = inject(ServerConfigService);
+  // Getter: se lee en cada petición (en la app el servidor puede cambiar en caliente).
+  private get apiUrl(): string {
+    return this.serverConfig.apiUrl();
+  }
   private readonly http = inject(HttpClient);
   public readonly isLoggedIn = signal<boolean>(false);
 
@@ -29,6 +33,10 @@ export class AuthService {
   // NUNCA propaga el error: el initializer de la app lo espera y
   // necesitamos que la app arranque igual aunque no haya sesion.
   public me(): Observable<boolean> {
+    // App sin servidor configurado: no hay a quién preguntar (irá a /servidor).
+    if (!this.serverConfig.isConfigured()) {
+      return of(false);
+    }
     return this.http.get<MeResponse>(`${this.apiUrl}/auth/me`).pipe(
       tap(() => this.isLoggedIn.set(true)),
       map(() => true),

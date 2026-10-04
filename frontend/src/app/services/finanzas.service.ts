@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, Observable, of } from 'rxjs';
-import { environment } from '../../environments/environment';
 import {
   Banco,
   BancoRequest,
@@ -19,13 +18,18 @@ import {
   MovimientoEsperadoFinanzas,
   MovimientoEsperadoFinanzasRequest,
 } from '../models/finanzas.model';
+import { ServerConfigService } from './server-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FinanzasService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl;
+  private readonly serverConfig = inject(ServerConfigService);
+  // Getter: se lee en cada petición (en la app el servidor puede cambiar en caliente).
+  private get apiUrl(): string {
+    return this.serverConfig.apiUrl();
+  }
 
   // ==========================================
   // BANCOS

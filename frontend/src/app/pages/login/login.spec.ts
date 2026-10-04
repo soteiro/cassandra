@@ -5,6 +5,8 @@ import { of, throwError } from 'rxjs';
 import { Login } from './login';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { signal } from '@angular/core';
+import { ServerConfigService } from '../../services/server-config.service';
 
 type LoginInternals = {
   email: { (): string; set: (v: string) => void };
@@ -97,5 +99,34 @@ describe('Login', () => {
 
     expect(component.showPassword()).toBe(true);
     expect(passInput.type).toBe('text');
+  });
+});
+
+describe('Login en la app Android', () => {
+  it('should show the connected server and allow changing it', async () => {
+    const serverConfig = {
+      isNative: true,
+      serverUrl: signal<string | null>('https://cassandra.midominio.com'),
+      disconnect: vi.fn(),
+    };
+    await TestBed.configureTestingModule({
+      imports: [Login],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: { login: vi.fn() } },
+        { provide: ServerConfigService, useValue: serverConfig },
+      ],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(Login);
+    const router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Conectado a https://cassandra.midominio.com');
+
+    Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Cambiar')!.click();
+    expect(serverConfig.disconnect).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/servidor']);
   });
 });
