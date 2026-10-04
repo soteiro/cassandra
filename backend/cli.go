@@ -10,9 +10,13 @@ import (
 	"os"
 	"strings"
 
+	"time"
+
 	"cassandra/internal/admin"
+	"cassandra/internal/demo"
 	"cassandra/repository"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/term"
 )
 
@@ -20,6 +24,7 @@ const cliUsage = `Uso:
   cassandra-app                                   inicia el servidor
   cassandra-app create-user --email E --nombre N [--alias A]
   cassandra-app reset-password --email E
+  cassandra-app seed-demo --email E           datos de ejemplo en una base vacía (QA)
   cassandra-app version
 
 La contraseña se pide por la terminal (sin mostrarla). En scripts puede
@@ -30,7 +35,8 @@ entregarse por stdin: echo "$PASS" | cassandra-app create-user ...
 type passwordPrompt func(confirm bool) (string, error)
 
 // runCommand ejecuta un subcomando de administración.
-func runCommand(ctx context.Context, args []string, users *repository.UserRepository, readPassword passwordPrompt, out io.Writer) error {
+func runCommand(ctx context.Context, args []string, db *pgxpool.Pool, readPassword passwordPrompt, out io.Writer) error {
+	users := repository.NewUserRepository(db)
 	switch args[0] {
 	case "create-user":
 		fs := flag.NewFlagSet("create-user", flag.ContinueOnError)
@@ -67,6 +73,25 @@ func runCommand(ctx context.Context, args []string, users *repository.UserReposi
 			return err
 		}
 		fmt.Fprintf(out, "Contraseña actualizada para %s\n", strings.ToLower(strings.TrimSpace(*email)))
+		return nil
+
+	case "seed-demo":
+		fs := flag.NewFlagSet("seed-demo", flag.ContinueOnError)
+		fs.SetOutput(out)
+		email := fs.String("email", "", "email del usuario demo")
+		if err := fs.Parse(args[1:]); err != nil {
+			return err
+		}
+		password, err := readPassword(false)
+		if err != nil {
+			return err
+		}
+		sum, err := demo.Seed(ctx, db, *email, password, time.Now())
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(out, "Datos demo creados para %s: %d proyectos, %d tareas, %d personas, %d movimientos\n",
+			sum.Email, sum.Proyectos, sum.Tareas, sum.Personas, sum.Movimientos)
 		return nil
 
 	default:
