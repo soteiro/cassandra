@@ -7,6 +7,13 @@ name: Release Please
 on:
   push:
     branches: [main]
+  # Recompila y adjunta los assets de una release ya creada (p. ej. si falló el build).
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag de la release existente (p. ej. v0.2.0)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -16,6 +23,7 @@ env:
 
 jobs:
   release-please:
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,17 +40,18 @@ jobs:
 
   tests:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ always() && (needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch') }}
     uses: ./.github/workflows/ci.yml
 
   build-server:
     name: Binario del servidor (linux-amd64)
     needs: [release-please, tests]
+    if: ${{ always() && needs.tests.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
+          ref: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
       - uses: actions/setup-go@v5
         with:
           go-version-file: backend/go.mod
@@ -61,7 +70,7 @@ jobs:
       - name: Compilar
         run: bash build.sh
         env:
-          VERSION: ${{ needs.release-please.outputs.tag_name }}
+          VERSION: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
           GOOS: linux
           GOARCH: amd64
           CGO_ENABLED: '0'
@@ -74,17 +83,21 @@ jobs:
   build-android:
     name: APK firmado
     needs: [release-please, tests]
+    if: ${{ always() && needs.tests.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
+          ref: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: gradle
+      # El paquete 'tools' (por defecto en la action) ya no existe en el repositorio de Google.
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: frontend/package.json
@@ -106,7 +119,7 @@ jobs:
         run: ./gradlew assembleRelease --no-daemon
         working-directory: frontend/android
         env:
-          APP_VERSION: ${{ needs.release-please.outputs.tag_name }}
+          APP_VERSION: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
           ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -120,6 +133,7 @@ jobs:
   publish:
     name: Adjuntar a la release
     needs: [release-please, build-server, build-android]
+    if: ${{ always() && needs.build-server.result == 'success' && needs.build-android.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -132,4 +146,4 @@ jobs:
         run: gh release upload "$TAG" cassandra-app-linux-amd64 cassandra.apk SHA256SUMS --clobber --repo "$GITHUB_REPOSITORY"
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ needs.release-please.outputs.tag_name }}
+          TAG: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
