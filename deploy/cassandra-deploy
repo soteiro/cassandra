@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# Comando forzado de la clave de deploy de GitHub Actions.
+# En ~cassandra-deploy/.ssh/authorized_keys:
+#   command="/usr/local/bin/cassandra-deploy",restrict ssh-ed25519 AAAA... github-actions
+#
+# GitHub envía:  ssh cassandra-deploy@servidor "<qa|prod> <sha256> <versión>" < cassandra-app
+# El binario llega por stdin. Pasos: verificar → (prod: respaldo | qa: base limpia) →
+# activar → reiniciar → healthcheck → (qa: datos demo). Si el healthcheck falla vuelve
+# a la versión anterior.
+set -euo pipefail
+umask 022
+
+KEEP_RELEASES=5
+KEEP_BACKUPS=10
+MAX_BINARY_BYTES=$((200 * 1024 * 1024))
+
+log() { printf '[deploy] %s\n' "$*"; }
+die() { printf '[deploy] ERROR: %s\n' "$*" >&2; exit 1; }
+
+# --- Argumentos (vienen de SSH_ORIGINAL_COMMAND, nunca se evalúan como shell) ---
+read -r -a args <<< "${SSH_ORIGINAL_COMMAND:-}"
+[[ ${#args[@]} -eq 3 ]] || die "uso: <qa|prod> <sha256> <versión>"
+env_name=${args[0]} sha=${args[1]} version=${args[2]}
+[[ $env_name == qa || $env_name == prod ]] || die "entorno inválido: $env_name"
+[[ $sha =~ ^[0-9a-f]{64}$ ]] || die "sha256 inválido"
+[[ $version =~ ^v[0-9A-Za-z.+-]{1,64}$ ]] || die "versión inválida: $version"
+
+base=/opt/cassandra-$env_name
+env_file=/etc/cassandra/$env_name.env
+unit=cassandra@$env_name.service
+[[ -d $base/releases && -r $env_file ]] || die "el entorno $env_name no está instalado (ver deploy/README.md)"
+
+# Un deploy a la vez por entorno. El descriptor 9 no se pasa a systemctl (9>&-):
+# si lo heredara el servicio, el candado quedaría tomado mientras la app corra.
+exec 9> "$base/.deploy.lock"
+flock -n 9 || die "ya hay un deploy en curso para $env_name"
+
+# --- Recibir y verificar el binario ---
+incoming=$(mktemp -d "$base/.incoming.XXXXXX")
+trap 'rm -rf "$incoming"' EXIT
+head -c "$MAX_BINARY_BYTES" > "$incoming/cassandra-app"
+echo "$sha  $incoming/cassandra-app" | sha256sum --check --status || die "el SHA256 no coincide; binario descartado"
+chmod 0755 "$incoming/cassandra-app"
+reported=$("$incoming/cassandra-app" version) || die "el binario no se ejecuta"
+[[ $reported == "$version" ]] || die "el binario dice ser $reported, se esperaba $version"
+log "binario $version verificado"
+
+# Configuración del entorno (DATABASE_URL_LOCAL, PORT, DEMO_EMAIL, DEMO_PASSWORD...).
+set -a
+# shellcheck disable=SC1090
+. "$env_file"
+set +a
+port=${PORT:-8080}
+db_name=$(basename "${DATABASE_URL_LOCAL%%\?*}")
+
+# --- Antes de activar ---
+if [[ $env_name == prod ]]; then
+  backup_dir=/var/backups/cassandra
+  backup="$backup_dir/prod-$(date +%Y%m%d-%H%M%S)-before-$version.sql.gz"
+  log "respaldando $db_name en $backup"
+  pg_dump --no-owner "$DATABASE_URL_LOCAL" | gzip > "$backup" || die "falló el respaldo; deploy cancelado"
+  ls -1t "$backup_dir"/prod-*.sql.gz | tail -n +$((KEEP_BACKUPS + 1)) | xargs -r rm -f
+else
+  # QA arranca siempre desde cero: migraciones completas + datos demo.
+  [[ $db_name == *_qa ]] || die "la base de QA debe terminar en _qa (es $db_name); no se borra nada"
+  log "reiniciando la base $db_name"
+  sudo /usr/bin/systemctl stop "$unit" 9>&-
+  psql "$DATABASE_URL_LOCAL" -v ON_ERROR_STOP=1 -q -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' \
+    || die "no se pudo reiniciar la base de QA"
+fi
+
+# --- Activar (cambio atómico del symlink current) ---
+release="$base/releases/$version-$(date +%Y%m%d%H%M%S)"
+mkdir -p "$release"
+mv "$incoming/cassandra-app" "$release/cassandra-app"
+previous=$(readlink -f "$base/current" 2>/dev/null || true)
+ln -sfn "$release" "$base/current.new"
+mv -Tf "$base/current.new" "$base/current"
+log "reiniciando $unit"
+sudo /usr/bin/systemctl restart "$unit" 9>&-
+
+# --- Healthcheck ---
+# healthy <versión>: espera hasta 30 s a que /api/version la reporte ("" = cualquiera).
+healthy() {
+  local pattern="\"version\":\"$1"
+  [[ -n $1 ]] && pattern+='"'
+  for _ in $(seq 1 30); do
+    if curl -fsS --max-time 2 "http://127.0.0.1:$port/api/version" 2>/dev/null | grep -qF "$pattern"; then
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
+
+if ! healthy "$version"; then
+  if [[ -n $previous && -d $previous ]]; then
+    ln -sfn "$previous" "$base/current.new"
+    mv -Tf "$base/current.new" "$base/current"
+    sudo /usr/bin/systemctl restart "$unit" 9>&-
+    if healthy ""; then
+      die "$version no respondió en :$port; se restauró $(basename "$previous"), que está respondiendo (revisa: journalctl -u $unit)"
+    fi
+    die "$version no respondió y la versión restaurada $(basename "$previous") TAMPOCO responde en :$port (revisa: journalctl -u $unit)"
+  fi
+  die "$version no respondió en :$port y no hay versión anterior (revisa: journalctl -u $unit)"
+fi
+log "$env_name responde con $version en :$port"
+
+# --- QA: datos de ejemplo ---
+if [[ $env_name == qa ]]; then
+  [[ -n ${DEMO_EMAIL:-} && -n ${DEMO_PASSWORD:-} ]] || die "faltan DEMO_EMAIL / DEMO_PASSWORD en $env_file"
+  printf '%s\n' "$DEMO_PASSWORD" | "$release/cassandra-app" seed-demo --email "$DEMO_EMAIL"
+fi
+
+# --- Limpieza: conservar las últimas versiones (nunca la activa) ---
+current=$(readlink -f "$base/current")
+# (grep devuelve 1 si no hay otras versiones: no es un error.)
+{ ls -1dt "$base"/releases/*/ | sed 's:/$::' | grep -vxF "$current" || true; } \
+  | tail -n +"$KEEP_RELEASES" | xargs -r rm -rf
+
+log "deploy de $version en $env_name completado"

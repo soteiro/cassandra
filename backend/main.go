@@ -64,7 +64,7 @@ func main() {
 
 	// Subcomandos de administración (create-user, reset-password): se ejecutan y salen.
 	if len(os.Args) > 1 {
-		err := runCommand(context.Background(), os.Args[1:], repository.NewUserRepository(dbPool), terminalPassword, os.Stdout)
+		err := runCommand(context.Background(), os.Args[1:], dbPool, terminalPassword, os.Stdout)
 		dbPool.Close()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "error:", err)

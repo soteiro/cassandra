@@ -1,0 +1,85 @@
+name: Deploy QA
+
+# Cada merge a qa: tests completos → binario → deploy en el servidor de QA (:8081).
+# QA se reinicia desde cero en cada deploy (migraciones + datos demo).
+on:
+  push:
+    branches: [qa]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-qa
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  tests:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Binario de QA
+    needs: tests
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags para git describe
+      - name: Versión
+        id: version
+        run: |
+          v=$(git describe --tags --always)
+          [[ $v == v* ]] || v="v0.0.0-$v"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - name: Compilar
+        run: bash build.sh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: '0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: server-qa
+          path: cassandra-app
+          retention-days: 7
+
+  deploy:
+    name: Deploy a QA
+    needs: build
+    runs-on: ubuntu-latest
+    environment: qa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: server-qa
+      - uses: ./.github/actions/ssh-deploy
+        with:
+          environment: qa
+          version: ${{ needs.build.outputs.version }}
+          binary: cassandra-app
+          ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ vars.DEPLOY_PORT || '22' }}
+          known-hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
