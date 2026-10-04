@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/soteiro/cassandra/compare/v0.2.1...v0.3.0) (2026-10-04)
+
+
+### Features
+
+* botón de buscar actualizaciones en la app Android ([a523fce](https://github.com/soteiro/cassandra/commit/a523fcebc9e4119b3a2849f0f01ff794e1bd3b4a))
+* botón de buscar actualizaciones en la app Android ([f5a3f29](https://github.com/soteiro/cassandra/commit/f5a3f292b630c5551005f484e95fb0096ca00af3))
+
 ## [0.2.1](https://github.com/soteiro/cassandra/compare/v0.2.0...v0.2.1) (2026-10-04)
 
 
