@@ -7,13 +7,17 @@ import {
   ReflexionUpdateRequest,
 } from '../models/reflexion.model';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { ServerConfigService } from './server-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReflexionService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly serverConfig = inject(ServerConfigService);
+  // Getter: se lee en cada petición (en la app el servidor puede cambiar en caliente).
+  private get apiUrl(): string {
+    return this.serverConfig.apiUrl();
+  }
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
 

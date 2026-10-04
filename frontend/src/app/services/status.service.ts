@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { ServerConfigService } from './server-config.service';
 
 export interface StatusResponse {
   status: string;
@@ -25,7 +25,11 @@ export interface DbVersionResponse {
   providedIn: 'root',
 })
 export class StatusService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly serverConfig = inject(ServerConfigService);
+  // Getter: se lee en cada petición (en la app el servidor puede cambiar en caliente).
+  private get apiUrl(): string {
+    return this.serverConfig.apiUrl();
+  }
 
   readonly health = httpResource<StatusResponse>(
     () => `${this.apiUrl}/health`,

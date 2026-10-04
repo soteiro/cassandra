@@ -1,25 +1,11 @@
-import { DOCUMENT, Injectable, InjectionToken, inject, signal } from '@angular/core';
+import { DOCUMENT, Injectable, inject, signal } from '@angular/core';
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Capacitor } from '@capacitor/core';
-import { App } from '@capacitor/app';
 import { environment } from '../../environments/environment';
 import { isNewerVersion } from '../utils/version.util';
+import { APP_PLATFORM } from './app-platform';
 
-/** Acceso a la plataforma nativa, aislado para poder reemplazarlo en tests. */
-export interface AppPlatform {
-  isNative(): boolean;
-  /** versionName del APK instalado (p. ej. "0.2.1"). */
-  getVersion(): Promise<string>;
-}
-
-export const APP_PLATFORM = new InjectionToken<AppPlatform>('APP_PLATFORM', {
-  providedIn: 'root',
-  factory: () => ({
-    isNative: () => Capacitor.isNativePlatform(),
-    getVersion: async () => (await App.getInfo()).version,
-  }),
-});
+export { APP_PLATFORM, type AppPlatform } from './app-platform';
 
 interface GithubRelease {
   tag_name: string;

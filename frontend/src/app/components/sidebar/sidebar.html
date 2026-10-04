@@ -124,6 +124,15 @@
         }
       </button>
     }
+    <!-- SERVIDOR CONECTADO (solo app Android) -->
+    @if (serverConfig.isNative && serverConfig.serverUrl(); as server) {
+      <div class="flex items-center justify-between gap-2 px-1 text-[11px] text-text-muted">
+        <span class="truncate font-mono" [title]="server">{{ server }}</span>
+        <button type="button" (click)="changeServer()" class="shrink-0 underline hover:text-text-main cursor-pointer">
+          Cambiar servidor
+        </button>
+      </div>
+    }
     <!-- LOGOUT BUTTON -->
     <button
       type="button"

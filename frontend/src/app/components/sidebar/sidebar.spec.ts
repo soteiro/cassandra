@@ -7,11 +7,13 @@ import { Sidebar } from './sidebar';
 import { AuthService } from '../../services/auth.service';
 import { AppUpdateService, UpdateCheckResult } from '../../services/app-update.service';
 import { ToastService } from '../../services/toast.service';
+import { ServerConfigService } from '../../services/server-config.service';
 
 describe('Sidebar', () => {
   let component: Sidebar;
   let fixture: ComponentFixture<Sidebar>;
-  let authService: { logout: ReturnType<typeof vi.fn> };
+  let authService: { logout: ReturnType<typeof vi.fn>; isLoggedIn: ReturnType<typeof signal<boolean>> };
+  let serverConfig: { isNative: boolean; serverUrl: ReturnType<typeof signal<string | null>>; disconnect: ReturnType<typeof vi.fn> };
   let updates: {
     isNative: boolean;
     currentVersion: ReturnType<typeof signal<string | null>>;
@@ -24,7 +26,12 @@ describe('Sidebar', () => {
   let router: Router;
 
   async function create(isNative: boolean) {
-    authService = { logout: vi.fn().mockReturnValue(of({})) };
+    authService = { logout: vi.fn().mockReturnValue(of({})), isLoggedIn: signal(true) };
+    serverConfig = {
+      isNative,
+      serverUrl: signal<string | null>(isNative ? 'https://cassandra.midominio.com' : null),
+      disconnect: vi.fn(),
+    };
     updates = {
       isNative,
       currentVersion: signal<string | null>(isNative ? '0.2.1' : null),
@@ -40,6 +47,7 @@ describe('Sidebar', () => {
         provideRouter([]),
         { provide: AuthService, useValue: authService },
         { provide: AppUpdateService, useValue: updates },
+        { provide: ServerConfigService, useValue: serverConfig },
       ],
     }).compileComponents();
 
@@ -77,8 +85,9 @@ describe('Sidebar', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/login']);
     });
 
-    it('should not show the update button', () => {
+    it('should not show the update button nor the server', () => {
       expect(updateButton()).toBeUndefined();
+      expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Cambiar servidor');
     });
   });
 
@@ -122,6 +131,26 @@ describe('Sidebar', () => {
       updates.checkForUpdate.mockResolvedValue({ status: 'up-to-date', current: '0.2.1' });
       await checkForUpdates();
       expect(toast.toasts()[0]).toMatchObject({ type: 'success', message: 'Tienes la última versión (v0.2.1).' });
+    });
+
+    it('should show the connected server', () => {
+      expect((fixture.nativeElement as HTMLElement).textContent).toContain('https://cassandra.midominio.com');
+    });
+
+    it.each([
+      ['el logout funciona', () => of({})],
+      ['el servidor anterior no responde', () => throwError(() => new Error('offline'))],
+    ])('Cambiar servidor cierra la sesión y vuelve a /servidor cuando %s', (_, logout) => {
+      authService.logout.mockImplementation(logout);
+      const button = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button')).find(
+        (b) => b.textContent?.trim() === 'Cambiar servidor',
+      );
+      button!.click();
+
+      expect(authService.logout).toHaveBeenCalled();
+      expect(authService.isLoggedIn()).toBe(false);
+      expect(serverConfig.disconnect).toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith(['/servidor']);
     });
 
     it('should show an error toast if the check fails', async () => {
