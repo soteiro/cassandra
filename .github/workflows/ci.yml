@@ -1,0 +1,123 @@
+name: CI
+
+# Solo PRs hacia qa/main y merges a qa/main. Las ramas personales no disparan nada.
+# Los PRs desde forks no reciben secrets; en Settings → Actions conviene exigir
+# aprobación manual para colaboradores externos.
+on:
+  pull_request:
+    branches: [main, qa]
+  push:
+    branches: [main, qa]
+  workflow_dispatch:
+
+# Un push nuevo al mismo PR o rama cancela la ejecución anterior.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '24'
+  # Postgres de los servicios (desechable, solo vive durante el job).
+  PG_URL: postgres://postgres:postgres@localhost:5432
+
+jobs:
+  backend:
+    name: Backend (go test)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      # main.go embebe dist/* (el build de Angular); en CI basta un placeholder.
+      - name: Placeholder del frontend embebido
+        run: mkdir -p dist && echo '<!doctype html>' > dist/index.html
+      - run: go vet ./...
+      - name: go test
+        run: go test -race -count=1 ./...
+        env:
+          # internal/testdb crea cassandra_test_<paquete> en este servidor.
+          TEST_DATABASE_URL: ${{ env.PG_URL }}/postgres?sslmode=disable
+
+  frontend:
+    name: Frontend (unit + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test:ci
+      - run: pnpm run build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      E2E_DATABASE_URL: postgres://postgres:postgres@localhost:5432/cassandra_e2e?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Placeholder del frontend embebido
+        run: mkdir -p backend/dist && echo '<!doctype html>' > backend/dist/index.html
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - name: Instalar Chromium de Playwright
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: frontend
+      # Recrea cassandra_e2e; Playwright levanta el backend (go run) y ng serve.
+      - run: pnpm run e2e
+        working-directory: frontend
+      - name: Subir reporte de Playwright
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 14
