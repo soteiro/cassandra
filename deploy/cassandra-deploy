@@ -25,7 +25,7 @@ env_name=${args[0]} sha=${args[1]} version=${args[2]}
 [[ $sha =~ ^[0-9a-f]{64}$ ]] || die "sha256 inválido"
 [[ $version =~ ^v[0-9A-Za-z.+-]{1,64}$ ]] || die "versión inválida: $version"
 
-base=/opt/cassandra/$env_name
+base=/opt/cassandra-$env_name
 env_file=/etc/cassandra/$env_name.env
 unit=cassandra@$env_name.service
 [[ -d $base/releases && -r $env_file ]] || die "el entorno $env_name no está instalado (ver deploy/README.md)"

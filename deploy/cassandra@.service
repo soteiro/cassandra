@@ -1,6 +1,6 @@
 # Cassandra por entorno: cassandra@prod (8080) y cassandra@qa (8081).
 # La configuración de cada instancia está en /etc/cassandra/<entorno>.env y el binario
-# activo en /opt/cassandra/<entorno>/current (lo cambia /usr/local/bin/cassandra-deploy).
+# activo en /opt/cassandra-<entorno>/current (lo cambia /usr/local/bin/cassandra-deploy).
 [Unit]
 Description=Cassandra (%i)
 After=network-online.target postgresql.service
@@ -10,9 +10,9 @@ Wants=network-online.target
 Type=simple
 User=cassandra
 Group=cassandra
-WorkingDirectory=/opt/cassandra/%i
+WorkingDirectory=/opt/cassandra-%i
 EnvironmentFile=/etc/cassandra/%i.env
-ExecStart=/opt/cassandra/%i/current/cassandra-app
+ExecStart=/opt/cassandra-%i/current/cassandra-app
 Restart=always
 RestartSec=5s
 NoNewPrivileges=true

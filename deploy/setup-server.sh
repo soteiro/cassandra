@@ -6,7 +6,7 @@
 # Idempotente: se puede volver a ejecutar sin pisar configuraciones existentes.
 # Hace:
 #   1. Usuario cassandra-deploy (solo puede ejecutar cassandra-deploy por SSH).
-#   2. /opt/cassandra/{prod,qa}/releases, /var/backups/cassandra, script y unit cassandra@.service.
+#   2. /opt/cassandra-{prod,qa}/releases, /var/backups/cassandra, script y unit cassandra@.service.
 #   3. sudoers mínimo: reiniciar cassandra@prod / cassandra@qa y detener cassandra@qa.
 #   4. Producción: pasa del cassandra.service antiguo (/opt/cassandra/cassandra-app + .env)
 #      a cassandra@prod con /etc/cassandra/prod.env (pide confirmación; corte de segundos).
@@ -52,7 +52,7 @@ command -v restorecon >/dev/null && restorecon -R "/home/$DEPLOY_USER/.ssh" || t
 # --- 2. Directorios, script y unit ---
 log "Directorios, script de deploy y unit"
 for env in prod qa; do
-  install -d -m 0755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$LEGACY_DIR/$env" "$LEGACY_DIR/$env/releases"
+  install -d -m 0755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "/opt/cassandra-$env" "/opt/cassandra-$env/releases"
 done
 install -d -m 0700 -o "$DEPLOY_USER" -g "$DEPLOY_USER" /var/backups/cassandra
 install -d -m 0750 -o root -g "$SERVICE_USER" /etc/cassandra
@@ -85,22 +85,22 @@ if (( ${#jwt} < 32 )); then
   warn "Reemplázalo en $prod_env (se cierran las sesiones abiertas) antes del próximo deploy."
 fi
 
-if [[ ! -e $LEGACY_DIR/prod/current ]]; then
+if [[ ! -e /opt/cassandra-prod/current ]]; then
   [[ -x $LEGACY_DIR/cassandra-app ]] || die "no encuentro el binario actual $LEGACY_DIR/cassandra-app"
   legacy_version=$("$LEGACY_DIR/cassandra-app" version 2>/dev/null || echo legacy)
   [[ $legacy_version == v* ]] || legacy_version=legacy
-  legacy_release="$LEGACY_DIR/prod/releases/$legacy_version-migrado"
+  legacy_release="/opt/cassandra-prod/releases/$legacy_version-migrado"
   install -d -m 0755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$legacy_release"
   install -m 0755 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$LEGACY_DIR/cassandra-app" "$legacy_release/cassandra-app"
-  ln -sfn "$legacy_release" "$LEGACY_DIR/prod/current"
-  chown -h "$DEPLOY_USER:$DEPLOY_USER" "$LEGACY_DIR/prod/current"
+  ln -sfn "$legacy_release" /opt/cassandra-prod/current
+  chown -h "$DEPLOY_USER:$DEPLOY_USER" /opt/cassandra-prod/current
 fi
 
 if systemctl is-active --quiet cassandra@prod.service; then
   echo "    cassandra@prod ya está activo"
 else
   read -r -p "    Cambiar cassandra.service por cassandra@prod ahora (corte de unos segundos)? [s/N] " ok
-  if [[ $ok =~ ^[sS]$ ]]; then
+  if [[ ${ok,,} =~ ^(s|si|sí|y|yes)$ ]]; then
     systemctl disable --now cassandra.service 2>/dev/null || true
     systemctl enable --now cassandra@prod.service
     port=$(sed -n 's/^PORT=//p' "$prod_env" | head -n1); port=${port:-8080}
@@ -142,6 +142,13 @@ if [[ ! -e $qa_env ]]; then
   } > "$tmp"
   install -m 0640 -o root -g "$SERVICE_USER" "$tmp" "$qa_env" && rm -f "$tmp"
   echo "    creado $qa_env (usuario demo: qa@cassandra.local; contraseña en DEMO_PASSWORD)"
+fi
+# cassandra_qa debe ser dueño de su base y del esquema public: cada deploy borra y
+# recrea public. Si la base se creó a mano, o el cluster viene de una versión antigua
+# de PostgreSQL, ambos pertenecen a postgres.
+if [[ $(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = 'cassandra_qa'") == 1 ]]; then
+  sudo -u postgres psql -q -c "ALTER DATABASE cassandra_qa OWNER TO cassandra_qa"
+  sudo -u postgres psql -q -d cassandra_qa -c "ALTER SCHEMA public OWNER TO cassandra_qa"
 fi
 systemctl enable cassandra@qa.service >/dev/null 2>&1
 echo "    cassandra@qa habilitado; arrancará con el primer deploy a qa"

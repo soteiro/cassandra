@@ -12,12 +12,12 @@ SHA256 y la versión, cambia el symlink `current`, reinicia el servicio y compru
 `/api/version`. Si la versión nueva no responde, vuelve a la anterior.
 
 ```
-/opt/cassandra/
-├── cassandra-app, .env        ← instalación antigua (queda como respaldo, ya no se usa)
-├── prod/{current → releases/vX.Y.Z-…, releases/}
-└── qa/{current → releases/…, releases/}
-/etc/cassandra/{prod,qa}.env   ← configuración de cada entorno
-/var/backups/cassandra/        ← pg_dump antes de cada deploy a producción (últimos 10)
+/opt/cassandra/                     ← instalación antigua (queda como respaldo, ya no se usa)
+/opt/cassandra-prod/{current → releases/vX.Y.Z-…, releases/}
+/opt/cassandra-qa/{current → releases/…, releases/}
+/etc/cassandra/{prod,qa}.env        ← configuración de cada entorno
+/var/backups/cassandra/             ← pg_dump antes de cada deploy a producción (últimos 10)
+/home/cassandra-deploy/.ssh/        ← solo authorized_keys (contexto SELinux ssh_home_t)
 ```
 
 ## 1. Generar la clave de deploy (en tu máquina)
