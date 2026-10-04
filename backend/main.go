@@ -97,7 +97,7 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
-	r.Use(httprate.LimitByIP(100, time.Minute))
+	r.Use(httprate.LimitByIP(cfg.RateLimitPerMin, time.Minute))
 
 	// Rutas de prueba
 	r.Get("/api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -269,6 +269,6 @@ func main() {
 		http.ServeContent(w, r, "index.html", stat.ModTime(), indexFile.(io.ReadSeeker))
 	}))
 
-	fmt.Println("Server running on port 8080")
-	http.ListenAndServe(":8080", r)
+	fmt.Println("Server running on port " + cfg.Port)
+	http.ListenAndServe(":"+cfg.Port, r)
 }

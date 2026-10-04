@@ -6,7 +6,7 @@ APK_MOBILE = cassandra-mobile.apk
 # JDK para Gradle (fallback si JAVA_HOME no existe o es inválido)
 JAVA_FALLBACK = $(HOME)/.jdks/jbr-21.0.11
 
-.PHONY: help migration build run dev-backend dev-frontend test test-frontend test-all docs mobile mobile-sync mobile-install mobile-clean all
+.PHONY: help migration build run dev-backend dev-frontend test test-frontend test-e2e test-all docs mobile mobile-sync mobile-install mobile-clean all
 
 help: ## Muestra la lista de comandos disponibles
 	@echo "Comandos disponibles:"
@@ -18,6 +18,7 @@ help: ## Muestra la lista de comandos disponibles
 	@echo "  make dev-frontend           -> Regenera docs y ejecuta el servidor de desarrollo de Angular"
 	@echo "  make test                   -> Ejecuta los tests del backend"
 	@echo "  make test-frontend          -> Ejecuta los tests del frontend (Vitest)"
+	@echo "  make test-e2e               -> Ejecuta los tests e2e (Playwright) contra backend y Postgres reales"
 	@echo "  make test-all               -> Ejecuta los tests de backend y frontend"
 	@echo "  make upload-server          -> sube al server configurado en config ssh"
 	@echo "  make mobile                 -> Compila Angular (mobile) + Capacitor + Gradle y deja listo ./$(APK_MOBILE)"
@@ -61,6 +62,9 @@ test: ## Ejecuta los tests de Go
 
 test-frontend: ## Ejecuta los tests de Angular (Vitest) una sola vez
 	@cd frontend && pnpm run test:ci
+
+test-e2e: ## Recrea la BD cassandra_e2e y ejecuta Playwright (levanta backend y frontend)
+	@cd frontend && pnpm run e2e
 
 test-all: test test-frontend ## Ejecuta los tests de backend y frontend
 
