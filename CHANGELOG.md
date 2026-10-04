@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.0](https://github.com/soteiro/cassandra/compare/v0.3.0...v0.4.0) (2026-10-04)
+
+
+### Features
+
+* **backend:** administración de cuentas por CLI y CORS configurable ([807ff00](https://github.com/soteiro/cassandra/commit/807ff0053d8370f1dac3f9a12a6024019d40ebb6))
+* **backend:** exigir un JWT_SECRET propio de al menos 32 caracteres ([5de29fb](https://github.com/soteiro/cassandra/commit/5de29fb44dc041d1de44de6c946f5281c4654dae))
+* la app Android se conecta al servidor que elija cada usuario ([701ee17](https://github.com/soteiro/cassandra/commit/701ee17a6484ae1095a559541f0be931a524f91f))
+* la app Android se conecta al servidor que elija cada usuario ([b79b1f5](https://github.com/soteiro/cassandra/commit/b79b1f5eca9eed154a4ea8e083374db28085903f))
+
 ## [0.3.0](https://github.com/soteiro/cassandra/compare/v0.2.1...v0.3.0) (2026-10-04)
 
 
