@@ -1,9 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -14,6 +16,18 @@ type Config struct {
 	JwtSecret string
 	// Peticiones máximas por IP y minuto. Se sube en los tests e2e.
 	RateLimitPerMin int
+	// Orígenes CORS: los de desarrollo y la app Capacitor, más ALLOWED_ORIGINS.
+	AllowedOrigins []string
+}
+
+// DefaultAllowedOrigins cubre el dev server de Angular y la app Android (Capacitor).
+// La web desplegada no los necesita: se sirve desde el mismo origen que la API.
+var DefaultAllowedOrigins = []string{
+	"http://localhost:4200",
+	"http://localhost",
+	"https://localhost",
+	"capacitor://localhost",
+	"http://localhost:8080",
 }
 
 func Load() (*Config, error) {
@@ -21,14 +35,36 @@ func Load() (*Config, error) {
 		log.Println("error cargando las env, usando variables del sistema")
 	}
 
+	jwtSecret, err := validateJWTSecret(os.Getenv("JWT_SECRET"))
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
 		DatabaseUrl: getEnv("DATABASE_URL_LOCAL", "postgres://localhost:5432/db"),
 		Port: getEnv("PORT", "8080"),
-		JwtSecret: getEnv("JWT_SECRET", "jtwsecretlasjkndlaskndlakmd"),
+		JwtSecret: jwtSecret,
 		RateLimitPerMin: getEnvInt("RATE_LIMIT_PER_MIN", 100),
+		AllowedOrigins: allowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
 		}, nil
 	}
 
+
+// MinJWTSecretLength: 32 bytes (256 bits), el tamaño de clave de HS256.
+const MinJWTSecretLength = 32
+
+// validateJWTSecret exige un secreto propio: sin valor por defecto (el código es
+// público) y lo bastante largo para que no se pueda adivinar ni falsificar sesiones.
+func validateJWTSecret(secret string) (string, error) {
+	secret = strings.TrimSpace(secret)
+	if secret == "" {
+		return "", fmt.Errorf("JWT_SECRET no está definido; genera uno con: openssl rand -base64 48")
+	}
+	if len(secret) < MinJWTSecretLength {
+		return "", fmt.Errorf("JWT_SECRET debe tener al menos %d caracteres (tiene %d); genera uno con: openssl rand -base64 48", MinJWTSecretLength, len(secret))
+	}
+	return secret, nil
+}
 
 func getEnv(key, fallback string) string {
 		if value, ok := os.LookupEnv(key); ok {
@@ -49,4 +85,15 @@ func getEnvInt(key string, fallback int) int {
 		return fallback
 	}
 	return n
+}
+
+// allowedOrigins agrega a los orígenes por defecto los de extra (separados por comas).
+func allowedOrigins(extra string) []string {
+	origins := append([]string{}, DefaultAllowedOrigins...)
+	for _, o := range strings.Split(extra, ",") {
+		if o = strings.TrimRight(strings.TrimSpace(o), "/"); o != "" {
+			origins = append(origins, o)
+		}
+	}
+	return origins
 }

@@ -1,6 +1,10 @@
 package config
 
-import "testing"
+import (
+	"slices"
+	"strings"
+	"testing"
+)
 
 func TestGetEnvInt(t *testing.T) {
 	cases := []struct {
@@ -24,5 +28,55 @@ func TestGetEnvInt(t *testing.T) {
 				t.Errorf("getEnvInt() = %d, se esperaba %d", got, c.want)
 			}
 		})
+	}
+}
+
+func TestAllowedOrigins(t *testing.T) {
+	if got := allowedOrigins(""); !slices.Equal(got, DefaultAllowedOrigins) {
+		t.Errorf("sin ALLOWED_ORIGINS = %v, se esperaban los valores por defecto", got)
+	}
+
+	got := allowedOrigins(" https://cassandra.ejemplo.com/ , ,https://otra.ejemplo.com")
+	want := append(append([]string{}, DefaultAllowedOrigins...), "https://cassandra.ejemplo.com", "https://otra.ejemplo.com")
+	if !slices.Equal(got, want) {
+		t.Errorf("allowedOrigins = %v, se esperaba %v", got, want)
+	}
+	if len(DefaultAllowedOrigins) != 5 {
+		t.Error("allowedOrigins no debe modificar DefaultAllowedOrigins")
+	}
+}
+
+func TestValidateJWTSecret(t *testing.T) {
+	ok := strings.Repeat("a", MinJWTSecretLength)
+	if got, err := validateJWTSecret("  " + ok + "\n"); err != nil || got != ok {
+		t.Errorf("secreto válido rechazado: %q, %v", got, err)
+	}
+	for name, secret := range map[string]string{
+		"vacío":                  "",
+		"solo espacios":          "   ",
+		"corto":                  strings.Repeat("a", MinJWTSecretLength-1),
+		"el antiguo por defecto": "jtwsecretlasjkndlaskndlakmd",
+	} {
+		t.Run(name, func(t *testing.T) {
+			if _, err := validateJWTSecret(secret); err == nil {
+				t.Error("se esperaba error")
+			}
+		})
+	}
+}
+
+func TestLoadRequiresJWTSecret(t *testing.T) {
+	t.Setenv("JWT_SECRET", "")
+	if _, err := Load(); err == nil || !strings.Contains(err.Error(), "JWT_SECRET") {
+		t.Errorf("Load sin JWT_SECRET: err = %v, se esperaba un error que lo mencione", err)
+	}
+
+	t.Setenv("JWT_SECRET", strings.Repeat("s", 48))
+	cfg, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.JwtSecret != strings.Repeat("s", 48) {
+		t.Error("Load no usó el JWT_SECRET del entorno")
 	}
 }
