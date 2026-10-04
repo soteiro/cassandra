@@ -26,6 +26,15 @@ import (
 //go:embed dist/*
 var frontendFS embed.FS
 
+// version se inyecta al compilar: go build -ldflags "-X main.version=v1.2.3".
+var version = "dev"
+
+// versionHandler expone la versión desplegada (deploy y botón de actualizaciones).
+func versionHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"version": version})
+}
+
 func main() {
 	// 1. Cargar configuración
 	cfg, err := config.Load()
@@ -103,6 +112,7 @@ func main() {
 	r.Get("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
+	r.Get("/api/version", versionHandler)
 
 	
 
@@ -269,6 +279,6 @@ func main() {
 		http.ServeContent(w, r, "index.html", stat.ModTime(), indexFile.(io.ReadSeeker))
 	}))
 
-	fmt.Println("Server running on port " + cfg.Port)
+	fmt.Printf("Cassandra %s running on port %s\n", version, cfg.Port)
 	http.ListenAndServe(":"+cfg.Port, r)
 }
