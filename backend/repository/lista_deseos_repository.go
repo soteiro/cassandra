@@ -49,7 +49,7 @@ func (r *ListaDeseosRepository) Create(ctx context.Context, req *models.CreateLi
 			i.justificacion, i.fecha_creacion, i.fecha_actualizacion, i.fecha_compra,
 			i.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, i.eliminado
 		FROM inserted i
-		LEFT JOIN grupo_item_finanzas g ON g.id = i.grupo_item_finanzas_id;
+		LEFT JOIN grupo_item_finanzas g ON g.id = i.grupo_item_finanzas_id AND g.user_id = i.user_id;
 	`
 
 	var item models.ListaDeseosResponse
@@ -96,7 +96,7 @@ func (r *ListaDeseosRepository) GetAll(ctx context.Context, userID int, comprado
 			l.justificacion, l.fecha_creacion, l.fecha_actualizacion, l.fecha_compra,
 			l.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, l.eliminado
 		FROM lista_deseos l
-		LEFT JOIN grupo_item_finanzas g ON g.id = l.grupo_item_finanzas_id
+		LEFT JOIN grupo_item_finanzas g ON g.id = l.grupo_item_finanzas_id AND g.user_id = l.user_id
 		WHERE l.user_id = $1
 		  AND l.eliminado = false
 	`
@@ -165,7 +165,7 @@ func (r *ListaDeseosRepository) GetByID(ctx context.Context, id int, userID int)
 			l.justificacion, l.fecha_creacion, l.fecha_actualizacion, l.fecha_compra,
 			l.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, l.eliminado
 		FROM lista_deseos l
-		LEFT JOIN grupo_item_finanzas g ON g.id = l.grupo_item_finanzas_id
+		LEFT JOIN grupo_item_finanzas g ON g.id = l.grupo_item_finanzas_id AND g.user_id = l.user_id
 		WHERE l.id = $1
 		  AND l.user_id = $2
 		  AND l.eliminado = false
@@ -245,7 +245,7 @@ func (r *ListaDeseosRepository) Update(ctx context.Context, id int, userID int, 
 			u.justificacion, u.fecha_creacion, u.fecha_actualizacion, u.fecha_compra,
 			u.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, u.eliminado
 		FROM updated u
-		LEFT JOIN grupo_item_finanzas g ON g.id = u.grupo_item_finanzas_id;
+		LEFT JOIN grupo_item_finanzas g ON g.id = u.grupo_item_finanzas_id AND g.user_id = u.user_id;
 	`
 
 	var item models.ListaDeseosResponse

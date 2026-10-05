@@ -16,10 +16,11 @@ import (
 
 type LogsHandler struct {
 	repo *repository.LogsRepository
+	owner *repository.Ownership
 }
 
-func NewLogsHandler(repo *repository.LogsRepository) *LogsHandler {
-	return &LogsHandler{repo: repo}
+func NewLogsHandler(repo *repository.LogsRepository, owner *repository.Ownership) *LogsHandler {
+	return &LogsHandler{repo: repo, owner: owner}
 }
 
 // Crear un log para un proyecto POST /api/proyects/{proyect_id}/logs o POST /api/logs
@@ -58,6 +59,10 @@ func (h *LogsHandler) CreateLog(w http.ResponseWriter, r *http.Request) {
 	if strings.TrimSpace(req.ContenidoRaw) == "" {
 		log.Printf("[HANDLER:Logs.CreateLog] Validación fallida: contenido_raw vacío | user_id=%d proyecto_id=%d", userID, req.ProyectoID)
 		http.Error(w, "el contenido en crudo (contenido_raw) no puede estar vacío", http.StatusBadRequest)
+		return
+	}
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: req.ProyectoID}) {
 		return
 	}
 

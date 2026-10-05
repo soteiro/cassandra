@@ -121,7 +121,6 @@ func TestNotaInexistenteOAjenaDeleteDevuelve404(t *testing.T) {
 }
 
 func TestNotaProyectoInexistente(t *testing.T) {
-	bug(t, "POST de nota con proyecto inexistente produce 500 (violación de FK) en vez de 4xx")
 	api, ana, _ := setup(t)
 	expect4xx(t, api.Do(ana, http.MethodPost, "/api/notas", map[string]any{"proyecto_id": inexistente, "nota": "x"}),
 		"POST /api/notas proyecto inexistente")
@@ -130,7 +129,6 @@ func TestNotaProyectoInexistente(t *testing.T) {
 }
 
 func TestNotaTareaInexistente(t *testing.T) {
-	bug(t, "nota con tarea_id inexistente (POST o PUT) produce 500 (violación de FK) en vez de 4xx")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	n := crearNota(t, api, ana, p.ID, "nota")

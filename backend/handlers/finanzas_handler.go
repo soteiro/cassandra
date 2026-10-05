@@ -17,10 +17,11 @@ import (
 
 type FinanzasHandler struct {
 	repo *repository.FinanzasRepository
+	owner *repository.Ownership
 }
 
-func NewFinanzasHandler(repo *repository.FinanzasRepository) *FinanzasHandler {
-	return &FinanzasHandler{repo: repo}
+func NewFinanzasHandler(repo *repository.FinanzasRepository, owner *repository.Ownership) *FinanzasHandler {
+	return &FinanzasHandler{repo: repo, owner: owner}
 }
 
 // ==========================================
@@ -541,6 +542,10 @@ func (h *FinanzasHandler) CreatePlantilla(w http.ResponseWriter, r *http.Request
 	}
 
 	req.UserID = userID
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Banco, ID: idOf(req.BancoID)}, repository.Ref{Recurso: repository.GrupoFinanzas, ID: idOf(req.GrupoItemID)}, repository.Ref{Recurso: repository.MovimientoEsperado, ID: idOf(req.MovimientoEsperadoID)}) {
+		return
+	}
+
 	item, err := h.repo.CreatePlantilla(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.CreatePlantilla] Error en repositorio: %v | user_id=%d", err, userID)
@@ -673,6 +678,10 @@ func (h *FinanzasHandler) UpdatePlantilla(w http.ResponseWriter, r *http.Request
 			http.Error(w, "Estado inválido. Debe ser: pendiente, en proceso o completado", http.StatusBadRequest)
 			return
 		}
+	}
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Banco, ID: idOf(req.BancoID)}, repository.Ref{Recurso: repository.GrupoFinanzas, ID: idOf(req.GrupoItemID)}, repository.Ref{Recurso: repository.MovimientoEsperado, ID: idOf(req.MovimientoEsperadoID)}) {
+		return
 	}
 
 	item, err := h.repo.UpdatePlantilla(r.Context(), id, userID, &req)

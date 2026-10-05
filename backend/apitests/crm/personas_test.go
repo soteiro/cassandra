@@ -232,7 +232,6 @@ func TestBorrarPersonaConservaSusInteracciones(t *testing.T) {
 }
 
 func TestNoSeCreanInteraccionesEnPersonaBorrada(t *testing.T) {
-	bug(t, "se pueden crear interacciones sobre una persona borrada (eliminado=true)")
 	api, ana, _ := setup(t)
 	p := createPersona(t, api, ana, "Carla")
 	api.Do(ana, http.MethodDelete, apitest.Path("/api/personas/%d", p.ID), nil).Expect(t, http.StatusNoContent)

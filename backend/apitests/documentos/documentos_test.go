@@ -86,7 +86,6 @@ func TestAislamiento_BorrarDocAjenoNoLoBorra(t *testing.T) {
 }
 
 func TestAislamiento_CrearDocEnProyectoAjeno(t *testing.T) {
-	bug(t, "POST /api/proyects/{id}/documentos no verifica que el proyecto sea del usuario; Beto crea documentos (201) dentro del proyecto de Ana")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	beto := usuario(t, api, "beto@cassandra.test")
@@ -278,7 +277,6 @@ func TestValidacion_TipoFueraDelCheck(t *testing.T) {
 }
 
 func TestValidacion_ProyectoInexistente(t *testing.T) {
-	bug(t, "POST /api/proyects/999999/documentos (proyecto inexistente) responde 500 por violación de FK en vez de 404")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	api.Do(ana, http.MethodPost, "/api/proyects/999999/documentos",

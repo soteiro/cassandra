@@ -39,7 +39,7 @@ func (r *NotasProyectoRepository) Create(ctx context.Context, req *models.NotasP
 		i.eliminado,
 		COALESCE(t.nombre, '') AS tarea_nombre
 	FROM inserted i
-	LEFT JOIN tareas_proyectos t ON t.id = i.tarea_id
+	LEFT JOIN tareas_proyectos t ON t.id = i.tarea_id AND t.user_id = i.user_id
 	`
 
 	var tareaNombre string
@@ -85,7 +85,7 @@ func (r *NotasProyectoRepository) GetAll(ctx context.Context, userID int) ([]*mo
 		np.eliminado,
 		COALESCE(t.nombre, '') AS tarea_nombre
 	FROM notas_proyecto np
-	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id
+	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id AND t.user_id = np.user_id
 	WHERE np.eliminado = false
 	  AND np.user_id = $1
 	ORDER BY np.fecha_creacion DESC
@@ -165,7 +165,7 @@ func (r *NotasProyectoRepository) GetById(ctx context.Context, id int, userID in
 		np.eliminado,
 		COALESCE(t.nombre, '') AS tarea_nombre
 	FROM notas_proyecto np
-	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id
+	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id AND t.user_id = np.user_id
 	WHERE np.id = $1 
 	  AND np.user_id = $2
 	  AND np.eliminado = false
@@ -230,7 +230,7 @@ func (r *NotasProyectoRepository) Update(ctx context.Context, id int, userID int
 		u.eliminado,
 		COALESCE(t.nombre, '') AS tarea_nombre
 	FROM updated u
-	LEFT JOIN tareas_proyectos t ON t.id = u.tarea_id
+	LEFT JOIN tareas_proyectos t ON t.id = u.tarea_id AND t.user_id = u.user_id
 	`
 
 	err := r.db.QueryRow(
@@ -277,7 +277,7 @@ func (r *NotasProyectoRepository) GetByProyectoID(ctx context.Context, proyectoI
 		np.eliminado,
 		COALESCE(t.nombre, '') AS tarea_nombre
 	FROM notas_proyecto np
-	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id
+	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id AND t.user_id = np.user_id
 	WHERE np.eliminado = false
 	  AND np.proyecto_id = $1
 	  AND np.user_id = $2
@@ -336,7 +336,7 @@ func (r *NotasProyectoRepository) GetByTareaID(ctx context.Context, tareaID int,
 		np.eliminado,
 		COALESCE(t.nombre, '') AS tarea_nombre
 	FROM notas_proyecto np
-	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id
+	LEFT JOIN tareas_proyectos t ON t.id = np.tarea_id AND t.user_id = np.user_id
 	WHERE np.eliminado = false
 	  AND np.tarea_id = $1
 	  AND np.user_id = $2

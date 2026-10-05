@@ -139,7 +139,6 @@ func TestProyectoValoresFueraDeCheck(t *testing.T) {
 }
 
 func TestProyectoPadreInexistente(t *testing.T) {
-	bug(t, "crear/mover un proyecto con proyecto_padre_id inexistente produce 500 (violación de FK) en vez de 4xx")
 	api, ana, _ := setup(t)
 	body := proyectoBody("Huerfano")
 	body["proyecto_padre_id"] = inexistente

@@ -19,10 +19,11 @@ import (
 
 type ListaDeseosHandler struct {
 	repo *repository.ListaDeseosRepository
+	owner *repository.Ownership
 }
 
-func NewListaDeseosHandler(repo *repository.ListaDeseosRepository) *ListaDeseosHandler {
-	return &ListaDeseosHandler{repo: repo}
+func NewListaDeseosHandler(repo *repository.ListaDeseosRepository, owner *repository.Ownership) *ListaDeseosHandler {
+	return &ListaDeseosHandler{repo: repo, owner: owner}
 }
 
 // Create atiende POST /api/lista-deseos
@@ -53,6 +54,10 @@ func (h *ListaDeseosHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.UserID = userID
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.GrupoFinanzas, ID: idOf(req.GrupoItemFinanzasID)}) {
+		return
+	}
 
 	item, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
@@ -180,6 +185,10 @@ func (h *ListaDeseosHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	if req.GrupoItemFinanzasID != nil && *req.GrupoItemFinanzasID <= 0 {
 		req.GrupoItemFinanzasID = nil
+	}
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.GrupoFinanzas, ID: idOf(req.GrupoItemFinanzasID)}) {
+		return
 	}
 
 	item, err := h.repo.Update(r.Context(), id, userID, &req)
