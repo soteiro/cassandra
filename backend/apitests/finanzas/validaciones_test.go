@@ -98,7 +98,6 @@ func TestValidaciones_TipoBanco(t *testing.T) {
 
 // El handler anuncia y acepta 'prepago', pero el CHECK de la tabla banco no lo incluye.
 func TestValidaciones_TipoBancoPrepago(t *testing.T) {
-	bug(t, "tipo de banco 'prepago' pasa la validación del handler pero el CHECK de la BD lo rechaza: 500")
 	api, a, _ := setup(t)
 	res := api.Do(a, http.MethodPost, pathBancos, map[string]any{"nombre": "Tenpo", "tipo": "prepago"})
 	if res.Status != http.StatusCreated && res.Status != http.StatusBadRequest {
@@ -209,7 +208,6 @@ func TestValidaciones_IDs(t *testing.T) {
 
 // PUT/DELETE de ids inexistentes: deberían ser 404 (hoy 500 salvo PUT de deseos).
 func TestValidaciones_IDsInexistentesPutDelete(t *testing.T) {
-	bug(t, "PUT/DELETE de id inexistente en bancos/grupos/movimientos/plantilla y DELETE en lista-deseos responden 500 en vez de 404")
 	api, a, _ := setup(t)
 	for _, p := range []string{pathBancos, pathGrupos, pathMovs, pathPlant} {
 		expectDenegado(t, api.Do(a, http.MethodPut, p+"/999999", map[string]any{"nombre": "x"}), "PUT "+p)
@@ -221,7 +219,6 @@ func TestValidaciones_IDsInexistentesPutDelete(t *testing.T) {
 // anio/mes inválidos en GET plantilla y resumen se ignoran en silencio y se responde con
 // el mes actual: el cliente recibe datos de OTRO período sin enterarse. Debería ser 400.
 func TestValidaciones_PeriodoInvalidoEnGET(t *testing.T) {
-	bug(t, "GET /api/finanzas/plantilla y /resumen con anio/mes inválidos (mes=13, anio=abc…) responden 200 con el mes actual en vez de 400")
 	api, a, _ := setup(t)
 	for _, p := range []string{pathPlant, pathResumen} {
 		for _, q := range []string{"?anio=2026&mes=13", "?anio=2026&mes=0", "?anio=2026&mes=abc", "?anio=abc&mes=1", "?anio=1999&mes=1"} {
@@ -267,7 +264,6 @@ func TestValidaciones_Deseos(t *testing.T) {
 // Nombres más largos que la columna (VARCHAR(100) en finanzas, VARCHAR(150) en deseos)
 // deberían rechazarse con 400, no con un 500 de la BD.
 func TestValidaciones_NombreDemasiadoLargo(t *testing.T) {
-	bug(t, "nombres que exceden el VARCHAR de la columna responden 500 (error de BD) en vez de 400")
 	api, a, _ := setup(t)
 	largo := strings.Repeat("x", 151)
 	for _, p := range []string{pathBancos, pathGrupos, pathMovs, pathDeseos} {

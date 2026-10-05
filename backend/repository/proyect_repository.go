@@ -228,7 +228,7 @@ func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*m
 	}
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:Proyect.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, user_id)
-		return nil, fmt.Errorf("no se encontro el proyecto con id: %d", id)
+		return nil, fmt.Errorf("%w: no se encontro el proyecto con id: %d", ErrNoEncontrado, id)
 	}
 
 	return nil, nil

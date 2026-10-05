@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -58,7 +57,7 @@ func (h *PersonaHandler) Create(w http.ResponseWriter, r *http.Request) {
 	persona, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Persona.Create] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al crear la persona", http.StatusInternalServerError)
+		dbError(w, "Error al crear la persona", err)
 		return
 	}
 
@@ -80,7 +79,7 @@ func (h *PersonaHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	personas, err := h.repo.GetAll(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Persona.GetAll] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener personas", http.StatusInternalServerError)
+		dbError(w, "Error al obtener personas", err)
 		return
 	}
 
@@ -100,7 +99,7 @@ func (h *PersonaHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Persona.GetByID] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -111,11 +110,11 @@ func (h *PersonaHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:Persona.GetByID] No encontrada | id=%d user_id=%d", id, userID)
-			http.Error(w, "Persona no encontrada", http.StatusNotFound)
+			dbError(w, "Persona no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:Persona.GetByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al obtener la persona", http.StatusInternalServerError)
+		dbError(w, "Error al obtener la persona", err)
 		return
 	}
 
@@ -135,7 +134,7 @@ func (h *PersonaHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Persona.Update] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -180,11 +179,11 @@ func (h *PersonaHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:Persona.Update] No encontrada para actualizar | id=%d user_id=%d", id, userID)
-			http.Error(w, "Persona no encontrada", http.StatusNotFound)
+			dbError(w, "Persona no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:Persona.Update] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar la persona", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar la persona", err)
 		return
 	}
 
@@ -204,7 +203,7 @@ func (h *PersonaHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Persona.Delete] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -213,7 +212,7 @@ func (h *PersonaHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.repo.Delete(r.Context(), id, userID); err != nil {
 		log.Printf("[HANDLER:Persona.Delete] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al eliminar la persona", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar la persona", err)
 		return
 	}
 

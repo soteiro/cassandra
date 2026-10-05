@@ -89,7 +89,6 @@ func TestPersonaYoNoSeBorraConDelete(t *testing.T) {
 }
 
 func TestPersonaYoDeleteDevuelve4xx(t *testing.T) {
-	bug(t, "DELETE de la persona yo responde 500 en vez de un 4xx (400/403/409)")
 	api, ana, _ := setup(t)
 	yo := yoDe(t, api, ana)
 	expect4xx(t, api.Do(ana, http.MethodDelete, apitest.Path("/api/personas/%d", yo.ID), nil), "DELETE persona yo")
@@ -185,7 +184,6 @@ func TestPersonasValidaciones(t *testing.T) {
 }
 
 func TestPersonaDeleteInexistenteDevuelve404(t *testing.T) {
-	bug(t, "DELETE de persona inexistente, ajena o ya borrada responde 500 en vez de 404")
 	api, ana, beto := setup(t)
 	p := createPersona(t, api, ana, "Carla")
 	api.Do(ana, http.MethodDelete, "/api/personas/999999", nil).Expect(t, http.StatusNotFound)
@@ -195,7 +193,6 @@ func TestPersonaDeleteInexistenteDevuelve404(t *testing.T) {
 }
 
 func TestPersonaCamposLargosDevuelven400(t *testing.T) {
-	bug(t, "nombre/alias/entorno más largos que la columna VARCHAR responden 500 en vez de 400")
 	api, ana, _ := setup(t)
 	largo := strings.Repeat("x", 101)
 	expect4xx(t, api.Do(ana, http.MethodPost, "/api/personas", map[string]any{"nombre": largo}), "POST nombre de 101 caracteres")
@@ -207,7 +204,6 @@ func TestPersonaCamposLargosDevuelven400(t *testing.T) {
 }
 
 func TestPersonaIDFueraDeRangoDevuelve4xx(t *testing.T) {
-	bug(t, "ids numéricos mayores que int4 (p. ej. 99999999999) responden 500 en vez de 400/404")
 	api, ana, _ := setup(t)
 	expect4xx(t, api.Do(ana, http.MethodGet, "/api/personas/99999999999", nil), "GET id > int4")
 }

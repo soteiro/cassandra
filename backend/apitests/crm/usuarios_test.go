@@ -82,7 +82,6 @@ func TestUsuarioValidaciones(t *testing.T) {
 }
 
 func TestUsuarioEmailOAliasDuplicadoDevuelve409(t *testing.T) {
-	bug(t, "PUT /api/users/{id} con email o alias de otro usuario responde 500 (unique_violation) en vez de 409")
 	api, ana, beto := setup(t)
 	path := apitest.Path("/api/users/%d", ana.ID)
 	api.Do(ana, http.MethodPut, path, map[string]any{"nombre": "Ana", "alias": "ana", "email": beto.Email}).Expect(t, http.StatusConflict)
@@ -106,7 +105,6 @@ func TestCrearDosUsuariosSinAlias(t *testing.T) {
 }
 
 func TestUsuarioCamposLargosDevuelven400(t *testing.T) {
-	bug(t, "PUT /api/users/{id} con nombre/email/alias > 50 caracteres responde 500 en vez de 400")
 	api, ana, _ := setup(t)
 	path := apitest.Path("/api/users/%d", ana.ID)
 	expect4xx(t, api.Do(ana, http.MethodPut, path,

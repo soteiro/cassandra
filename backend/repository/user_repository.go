@@ -161,7 +161,7 @@ func (r *UserRepository) Delete(ctx context.Context, id int) error {
 	}
 	if result.RowsAffected() == 0 {
 		log.Printf("[REPO:User.Delete] Registro no encontrado o sin permisos | id=%d", id)
-		return fmt.Errorf("no se encontro el usuario con el id %d", id)
+		return fmt.Errorf("%w: no se encontro el usuario con el id %d", ErrNoEncontrado, id)
 	}
 
 	if _, err := tx.Exec(ctx, "DELETE FROM refresh_tokens WHERE user_id = $1", id); err != nil {

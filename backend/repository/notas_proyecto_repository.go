@@ -145,7 +145,7 @@ func (r *NotasProyectoRepository) Delete(ctx context.Context, id int, userID int
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:NotasProyecto.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró la nota de proyecto con id %d o no tiene permisos", id)
+		return fmt.Errorf("%w: no se encontró la nota de proyecto con id %d o no tiene permisos", ErrNoEncontrado, id)
 	}
 
 	return nil

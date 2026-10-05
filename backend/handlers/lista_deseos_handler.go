@@ -68,7 +68,7 @@ func (h *ListaDeseosHandler) Create(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("[HANDLER:ListaDeseos.Create] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al guardar el ítem de lista de deseos", http.StatusInternalServerError)
+		dbError(w, "Error al guardar el ítem de lista de deseos", err)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (h *ListaDeseosHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	var grupoIDFilter *int
 	if grupoStr := strings.TrimSpace(r.URL.Query().Get("grupo_id")); grupoStr != "" {
-		if val, err := strconv.Atoi(grupoStr); err == nil && val > 0 {
+		if val, err := atoi32(grupoStr); err == nil && val > 0 {
 			grupoIDFilter = &val
 		}
 	}
@@ -104,7 +104,7 @@ func (h *ListaDeseosHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	items, err := h.repo.GetAll(r.Context(), userID, compradoFilter, grupoIDFilter)
 	if err != nil {
 		log.Printf("[HANDLER:ListaDeseos.GetAll] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener la lista de deseos", http.StatusInternalServerError)
+		dbError(w, "Error al obtener la lista de deseos", err)
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *ListaDeseosHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:ListaDeseos.GetByID] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -135,11 +135,11 @@ func (h *ListaDeseosHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:ListaDeseos.GetByID] No encontrado | id=%d user_id=%d", id, userID)
-			http.Error(w, "Ítem no encontrado", http.StatusNotFound)
+			dbError(w, "Ítem no encontrado", err)
 			return
 		}
 		log.Printf("[HANDLER:ListaDeseos.GetByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al obtener el ítem", http.StatusInternalServerError)
+		dbError(w, "Error al obtener el ítem", err)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (h *ListaDeseosHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:ListaDeseos.Update] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -195,7 +195,7 @@ func (h *ListaDeseosHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:ListaDeseos.Update] No encontrado para actualizar | id=%d user_id=%d", id, userID)
-			http.Error(w, "Ítem no encontrado", http.StatusNotFound)
+			dbError(w, "Ítem no encontrado", err)
 			return
 		}
 		var pgErr *pgconn.PgError
@@ -205,7 +205,7 @@ func (h *ListaDeseosHandler) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("[HANDLER:ListaDeseos.Update] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar el ítem", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar el ítem", err)
 		return
 	}
 
@@ -225,7 +225,7 @@ func (h *ListaDeseosHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:ListaDeseos.Delete] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -234,7 +234,7 @@ func (h *ListaDeseosHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.repo.Delete(r.Context(), id, userID); err != nil {
 		log.Printf("[HANDLER:ListaDeseos.Delete] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al eliminar el ítem", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar el ítem", err)
 		return
 	}
 

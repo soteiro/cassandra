@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -72,7 +71,7 @@ func (h *ReflexionesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	reflexion, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Reflexiones.Create] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al guardar la reflexión", http.StatusInternalServerError)
+		dbError(w, "Error al guardar la reflexión", err)
 		return
 	}
 
@@ -96,7 +95,7 @@ func (h *ReflexionesHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	reflexiones, err := h.repo.GetAll(r.Context(), userID, tipoFilter)
 	if err != nil {
 		log.Printf("[HANDLER:Reflexiones.GetAll] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener las reflexiones", http.StatusInternalServerError)
+		dbError(w, "Error al obtener las reflexiones", err)
 		return
 	}
 
@@ -116,7 +115,7 @@ func (h *ReflexionesHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Reflexiones.GetByID] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID de reflexión inválido", http.StatusBadRequest)
@@ -127,11 +126,11 @@ func (h *ReflexionesHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:Reflexiones.GetByID] No encontrada | id=%d user_id=%d", id, userID)
-			http.Error(w, "Reflexión no encontrada", http.StatusNotFound)
+			dbError(w, "Reflexión no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:Reflexiones.GetByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al obtener la reflexión", http.StatusInternalServerError)
+		dbError(w, "Error al obtener la reflexión", err)
 		return
 	}
 
@@ -151,7 +150,7 @@ func (h *ReflexionesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Reflexiones.Update] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID de reflexión inválido", http.StatusBadRequest)
@@ -189,11 +188,11 @@ func (h *ReflexionesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:Reflexiones.Update] No encontrada para actualizar | id=%d user_id=%d", id, userID)
-			http.Error(w, "Reflexión no encontrada", http.StatusNotFound)
+			dbError(w, "Reflexión no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:Reflexiones.Update] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar la reflexión", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar la reflexión", err)
 		return
 	}
 
@@ -213,7 +212,7 @@ func (h *ReflexionesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Reflexiones.Delete] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID de reflexión inválido", http.StatusBadRequest)
@@ -222,7 +221,7 @@ func (h *ReflexionesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.repo.Delete(r.Context(), id, userID); err != nil {
 		log.Printf("[HANDLER:Reflexiones.Delete] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al eliminar la reflexión", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar la reflexión", err)
 		return
 	}
 

@@ -53,7 +53,6 @@ func TestAislamiento_LecturaYEdicionAjenas(t *testing.T) {
 }
 
 func TestAislamiento_BorrarDocAjeno(t *testing.T) {
-	bug(t, "DELETE /api/documentos/{id} ajeno o inexistente responde 500 en vez de 404")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	beto := usuario(t, api, "beto@cassandra.test")
@@ -214,7 +213,6 @@ func TestCRUD(t *testing.T) {
 }
 
 func TestBorrarDosVeces(t *testing.T) {
-	bug(t, "DELETE de un documento ya borrado/inexistente responde 500 en vez de 404")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	p := crearProyecto(t, api, ana, "P")
@@ -261,7 +259,6 @@ func TestValidaciones(t *testing.T) {
 }
 
 func TestValidacion_TipoFueraDelCheck(t *testing.T) {
-	bug(t, "un tipo fuera del CHECK (p. ej. \"receta\") en POST/PUT de documentos llega a la BD y responde 500 en vez de 400")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	p := crearProyecto(t, api, ana, "P")
@@ -284,7 +281,6 @@ func TestValidacion_ProyectoInexistente(t *testing.T) {
 }
 
 func TestValidacion_IDFueraDeRangoInt4(t *testing.T) {
-	bug(t, "ids que caben en int de Go pero no en INTEGER de Postgres (2147483648) responden 500 en vez de 400/404")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	expect4xx(t, api.Do(ana, http.MethodGet, "/api/documentos/2147483648", nil), "GET id 2^31")
