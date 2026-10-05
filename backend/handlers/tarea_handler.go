@@ -17,11 +17,12 @@ import (
 // TareasHandler maneja las solicitudes HTTP para las tareas
 type TareasHandler struct {
 	repo *repository.TareasRepository
+	owner *repository.Ownership
 }
 
 // NewTareasHandler crea un nuevo TareasHandler
-func NewTareasHandler(repo *repository.TareasRepository) *TareasHandler {
-	return &TareasHandler{repo: repo}
+func NewTareasHandler(repo *repository.TareasRepository, owner *repository.Ownership) *TareasHandler {
+	return &TareasHandler{repo: repo, owner: owner}
 }
 
 // CreateTarea atiende la ruta POST /api/tareas
@@ -80,6 +81,10 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.UserID = userID
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: req.ProyectID}, repository.Ref{Recurso: repository.Tarea, ID: idOf(req.TareaPadreID)}) {
+		return
+	}
+
 	tarea, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.CreateTarea] Error en repositorio: %v | user_id=%d proyect_id=%d", err, userID, req.ProyectID)
@@ -203,6 +208,13 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Tarea, ID: idOf(req.TareaPadreID)}) {
+		return
+	}
+
+	// El borrado va por DELETE; por PUT no se puede borrar ni restaurar una tarea.
+	req.Eliminado = nil
 
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)
 	if err != nil {

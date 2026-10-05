@@ -146,21 +146,38 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.
 }
 
 // eliminar user por id
+// Delete marca al usuario como eliminado y revoca todas sus sesiones (refresh tokens).
 func (r *UserRepository) Delete(ctx context.Context, id int) error {
-	query := "UPDATE users SET eliminado = true WHERE id = $1"
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("error al iniciar transacción: %w", err)
+	}
+	defer tx.Rollback(ctx)
 
-	result, err := r.db.Exec(ctx, query, id)
+	result, err := tx.Exec(ctx, "UPDATE users SET eliminado = true WHERE id = $1 AND eliminado = false", id)
 	if err != nil {
 		log.Printf("[REPO:User.Delete] Error en SQL UPDATE: %v | id=%d", err, id)
 		return err
 	}
-
 	if result.RowsAffected() == 0 {
 		log.Printf("[REPO:User.Delete] Registro no encontrado o sin permisos | id=%d", id)
 		return fmt.Errorf("no se encontro el usuario con el id %d", id)
 	}
 
-	return nil
+	if _, err := tx.Exec(ctx, "DELETE FROM refresh_tokens WHERE user_id = $1", id); err != nil {
+		log.Printf("[REPO:User.Delete] Error al revocar sesiones: %v | id=%d", err, id)
+		return err
+	}
+	return tx.Commit(ctx)
+}
+
+// IsActive indica si el usuario existe y no está eliminado. Lo usa el middleware de
+// autenticación: un token válido de un usuario eliminado no debe dar acceso.
+func (r *UserRepository) IsActive(ctx context.Context, id int) (bool, error) {
+	var active bool
+	err := r.db.QueryRow(ctx,
+		"SELECT EXISTS (SELECT 1 FROM users WHERE id = $1 AND eliminado = false)", id).Scan(&active)
+	return active, err
 }
 
 // Update user

@@ -215,6 +215,11 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 		// validar el token
 		userID, err := utils.ValidateAccessToken(accessCookie.Value, h.jwtSecret)
 		if err == nil {
+			if active, aerr := h.UserRepo.IsActive(r.Context(), userID); aerr != nil || !active {
+				log.Printf("[HANDLER:Auth.Me] Usuario eliminado o no verificable: %d (%v)", userID, aerr)
+				http.Error(w, "sesion invalida", http.StatusUnauthorized)
+				return
+			}
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			log.Printf("[HANDLER:Auth.Me] Éxito vía access_token | user_id=%d", userID)

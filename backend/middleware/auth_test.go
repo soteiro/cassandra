@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +13,13 @@ import (
 )
 
 const secret = "test-secret"
+
+// activeUsers simula la tabla users: ids activos.
+type activeUsers map[int]bool
+
+func (a activeUsers) IsActive(_ context.Context, id int) (bool, error) { return a[id], nil }
+
+var onlyUser7 = activeUsers{7: true}
 
 // run ejecuta el middleware y devuelve el código de respuesta y el userID que vio el handler.
 func run(t *testing.T, req *http.Request) (int, int) {
@@ -26,7 +34,7 @@ func run(t *testing.T, req *http.Request) (int, int) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 	rec := httptest.NewRecorder()
-	AuthMiddleware(secret)(next).ServeHTTP(rec, req)
+	AuthMiddleware(secret, onlyUser7)(next).ServeHTTP(rec, req)
 	return rec.Code, seen
 }
 
@@ -99,5 +107,14 @@ func TestAuthMiddlewareDoesNotLogTokens(t *testing.T) {
 	}
 	if !strings.Contains(logs.String(), "token inválido") {
 		t.Errorf("se esperaba un log del rechazo; logs:\n%s", logs.String())
+	}
+}
+
+func TestAuthMiddlewareRejectsInactiveUsers(t *testing.T) {
+	// Token válido y vigente, pero el usuario 8 no está activo (eliminado o inexistente).
+	req := httptest.NewRequest(http.MethodGet, "/api/proyects", nil)
+	req.Header.Set("Authorization", "Bearer "+token(t, 8, secret))
+	if code, _ := run(t, req); code != http.StatusUnauthorized {
+		t.Errorf("código = %d, se esperaba 401", code)
 	}
 }

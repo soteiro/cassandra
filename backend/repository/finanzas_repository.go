@@ -413,9 +413,9 @@ func (r *FinanzasRepository) CreatePlantilla(ctx context.Context, req *models.Fi
 			i.grupo_item_id, g.nombre AS grupo_item_nombre,
 			i.movimiento_esperado_id, m.nombre AS movimiento_esperado_nombre
 		FROM inserted i
-		LEFT JOIN banco b ON b.id = i.banco_id
-		LEFT JOIN grupo_item_finanzas g ON g.id = i.grupo_item_id
-		LEFT JOIN movimiento_esperado_finanzas m ON m.id = i.movimiento_esperado_id;
+		LEFT JOIN banco b ON b.id = i.banco_id AND b.user_id = i.user_id
+		LEFT JOIN grupo_item_finanzas g ON g.id = i.grupo_item_id AND g.user_id = i.user_id
+		LEFT JOIN movimiento_esperado_finanzas m ON m.id = i.movimiento_esperado_id AND m.user_id = i.user_id;
 	`
 
 	var item models.FinanzasPlantillaResponse
@@ -479,9 +479,9 @@ func (r *FinanzasRepository) GetPlantillaByPeriodo(ctx context.Context, userID i
 			fp.movimiento_esperado_id,
 			m.nombre AS movimiento_esperado_nombre
 		FROM finanzas_plantilla fp
-		LEFT JOIN banco b ON b.id = fp.banco_id
-		LEFT JOIN grupo_item_finanzas g ON g.id = fp.grupo_item_id
-		LEFT JOIN movimiento_esperado_finanzas m ON m.id = fp.movimiento_esperado_id
+		LEFT JOIN banco b ON b.id = fp.banco_id AND b.user_id = fp.user_id
+		LEFT JOIN grupo_item_finanzas g ON g.id = fp.grupo_item_id AND g.user_id = fp.user_id
+		LEFT JOIN movimiento_esperado_finanzas m ON m.id = fp.movimiento_esperado_id AND m.user_id = fp.user_id
 		WHERE fp.user_id = $1 
 		  AND fp.anio = $2 
 		  AND fp.mes = $3
@@ -547,9 +547,9 @@ func (r *FinanzasRepository) GetPlantillaByID(ctx context.Context, id int, userI
 			fp.movimiento_esperado_id,
 			m.nombre AS movimiento_esperado_nombre
 		FROM finanzas_plantilla fp
-		LEFT JOIN banco b ON b.id = fp.banco_id
-		LEFT JOIN grupo_item_finanzas g ON g.id = fp.grupo_item_id
-		LEFT JOIN movimiento_esperado_finanzas m ON m.id = fp.movimiento_esperado_id
+		LEFT JOIN banco b ON b.id = fp.banco_id AND b.user_id = fp.user_id
+		LEFT JOIN grupo_item_finanzas g ON g.id = fp.grupo_item_id AND g.user_id = fp.user_id
+		LEFT JOIN movimiento_esperado_finanzas m ON m.id = fp.movimiento_esperado_id AND m.user_id = fp.user_id
 		WHERE fp.id = $1 AND fp.user_id = $2 AND fp.eliminado = false
 	`
 
@@ -602,9 +602,9 @@ func (r *FinanzasRepository) UpdatePlantilla(ctx context.Context, id int, userID
 			u.grupo_item_id, g.nombre AS grupo_item_nombre,
 			u.movimiento_esperado_id, m.nombre AS movimiento_esperado_nombre
 		FROM updated u
-		LEFT JOIN banco b ON b.id = u.banco_id
-		LEFT JOIN grupo_item_finanzas g ON g.id = u.grupo_item_id
-		LEFT JOIN movimiento_esperado_finanzas m ON m.id = u.movimiento_esperado_id;
+		LEFT JOIN banco b ON b.id = u.banco_id AND b.user_id = u.user_id
+		LEFT JOIN grupo_item_finanzas g ON g.id = u.grupo_item_id AND g.user_id = u.user_id
+		LEFT JOIN movimiento_esperado_finanzas m ON m.id = u.movimiento_esperado_id AND m.user_id = u.user_id;
 	`
 
 	var item models.FinanzasPlantillaResponse

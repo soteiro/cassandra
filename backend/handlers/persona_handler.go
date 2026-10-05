@@ -52,6 +52,8 @@ func (h *PersonaHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.UserID = userID
+	// La persona "yo" la crea el sistema junto con el usuario; el cliente no puede crear otra.
+	req.EsYo = false
 
 	persona, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
@@ -168,6 +170,11 @@ func (h *PersonaHandler) Update(w http.ResponseWriter, r *http.Request) {
 		trimmed := strings.TrimSpace(*req.Informacion)
 		req.Informacion = &trimmed
 	}
+
+	// eliminado y es_yo no se editan por PUT: el borrado va por DELETE (que protege a la
+	// persona "yo") y la persona "yo" la define el sistema.
+	req.Eliminado = nil
+	req.EsYo = nil
 
 	persona, err := h.repo.Update(r.Context(), id, userID, &req)
 	if err != nil {

@@ -18,10 +18,11 @@ import (
 
 type DocumentosProyectoHandler struct {
 	Repo *repository.DocumentosProyectoRepository
+	owner *repository.Ownership
 }
 
-func NewDocumentosProyectoHandler(repo *repository.DocumentosProyectoRepository) *DocumentosProyectoHandler {
-	return &DocumentosProyectoHandler{Repo: repo}
+func NewDocumentosProyectoHandler(repo *repository.DocumentosProyectoRepository, owner *repository.Ownership) *DocumentosProyectoHandler {
+	return &DocumentosProyectoHandler{Repo: repo, owner: owner}
 }
 
 func (h *DocumentosProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -60,6 +61,10 @@ func (h *DocumentosProyectoHandler) Create(w http.ResponseWriter, r *http.Reques
 
 	req.Contenido = strings.TrimSpace(req.Contenido)
 	req.UserID = userID
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: req.ProyectoID}) {
+		return
+	}
 
 	doc, err := h.Repo.Create(r.Context(), &req)
 	if err != nil {

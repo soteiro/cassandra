@@ -52,9 +52,10 @@ func (r *AuthRepository) GetUserIDByRefreshToken(ctx context.Context, token stri
 	var ExpiraEn time.Time
 
 	query := `
-		SELECT user_id, expira_en
-		FROM refresh_tokens
-		WHERE token = $1
+		SELECT rt.user_id, rt.expira_en
+		FROM refresh_tokens rt
+		JOIN users u ON u.id = rt.user_id AND u.eliminado = false
+		WHERE rt.token = $1
 	`
 
 	err := r.db.QueryRow(ctx, query, token).Scan(&UserID, &ExpiraEn)

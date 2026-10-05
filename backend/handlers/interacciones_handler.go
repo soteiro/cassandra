@@ -18,11 +18,13 @@ import (
 
 type InteraccionesHandler struct {
 	repo *repository.InteraccionesRepository
+	owner *repository.Ownership
 }
 
-func NewInteraccionesHandler(repo *repository.InteraccionesRepository) *InteraccionesHandler {
+func NewInteraccionesHandler(repo *repository.InteraccionesRepository, owner *repository.Ownership) *InteraccionesHandler {
 	return &InteraccionesHandler{
-		repo: repo,
+		repo:  repo,
+		owner: owner,
 	}
 }
 
@@ -62,6 +64,10 @@ func (h *InteraccionesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if req.Interaccion == "" {
 		log.Printf("[HANDLER:Interacciones.Create] Validación fallida: interacción vacía | user_id=%d", userID)
 		http.Error(w, "El texto de la interacción no puede estar vacío", http.StatusBadRequest)
+		return
+	}
+
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Persona, ID: req.PersonaID}) {
 		return
 	}
 

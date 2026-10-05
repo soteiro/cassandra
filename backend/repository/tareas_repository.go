@@ -100,7 +100,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id,
 				COALESCE(p.nombre, '') AS proyecto_nombre
 			FROM tareas_proyectos t
-			LEFT JOIN proyectos p ON p.id = t.proyecto_id
+			LEFT JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id
 			WHERE t.user_id = $1
 			  AND t.eliminado = false
 			  AND t.estado ILIKE $2
@@ -113,7 +113,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id,
 				COALESCE(p.nombre, '') AS proyecto_nombre
 			FROM tareas_proyectos t
-			LEFT JOIN proyectos p ON p.id = t.proyecto_id
+			LEFT JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id
 			WHERE t.user_id = $1
 			  AND t.eliminado = false
 			ORDER BY t.id ASC
@@ -339,7 +339,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 				WHEN $8 = 2 THEN NULL
 				ELSE fecha_terminado
 			END
-		WHERE id = $9 AND user_id = $10
+		WHERE id = $9 AND user_id = $10 AND eliminado = false
 		RETURNING id, nombre, descripcion, comentario, estado, prioridad, fecha_terminado, eliminado, tarea_padre_id
 	`
 
@@ -381,7 +381,7 @@ func (r *TareasRepository) Delete(ctx context.Context, id int, userID int) error
 	query := `
 		UPDATE tareas_proyectos
 		SET eliminado = true
-		WHERE id = $1 AND user_id = $2
+		WHERE id = $1 AND user_id = $2 AND eliminado = false
 	`
 
 	res, err := r.db.Exec(ctx, query, id, userID)

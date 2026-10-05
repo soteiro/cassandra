@@ -18,18 +18,15 @@ import (
 
 type NotasProyectoHandler struct {
 	NotasRepo *repository.NotasProyectoRepository
+	owner *repository.Ownership
 }
 
 // constructor
-func NewNotasProyectoHandler(notasRepo *repository.NotasProyectoRepository) *NotasProyectoHandler {
+func NewNotasProyectoHandler(notasRepo *repository.NotasProyectoRepository, owner *repository.Ownership) *NotasProyectoHandler {
 	return &NotasProyectoHandler{
 		NotasRepo: notasRepo,
+		owner:     owner,
 	}
-}
-
-// NewProyectoNotasHandler alias por retrocompatibilidad
-func NewProyectoNotasHandler(notasRepo *repository.NotasProyectoRepository) *NotasProyectoHandler {
-	return NewNotasProyectoHandler(notasRepo)
 }
 
 // crear nota
@@ -95,6 +92,10 @@ func (h *NotasProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// guardar en la base de datos
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: req.ProyectoID}, repository.Ref{Recurso: repository.Tarea, ID: idOf(req.TareaID)}) {
+		return
+	}
+
 	notaProyecto, err := h.NotasRepo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.Create] Error en repositorio: %v | user_id=%d proyecto_id=%d", err, userID, req.ProyectoID)
@@ -225,6 +226,10 @@ func (h *NotasProyectoHandler) Update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		req.Nota = &trimmedNota
+	}
+
+	if !requireOwned(w, r, h.owner, userId, repository.Ref{Recurso: repository.Tarea, ID: idOf(req.TareaID)}) {
+		return
 	}
 
 	res, err := h.NotasRepo.Update(r.Context(), id, userId, &req)
