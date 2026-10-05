@@ -83,6 +83,10 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 
 	proyect, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
+		if isUniqueViolation(err) {
+			http.Error(w, "Ya tienes un proyecto con ese nombre", http.StatusConflict)
+			return
+		}
 		log.Printf("[HANDLER:Proyect.CreateProyect] Error en repositorio: %v | user_id=%d", err, userID)
 		http.Error(w, "error al crear el proyecto: ", http.StatusInternalServerError)
 		return
@@ -269,6 +273,10 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, &req)
 	if err != nil {
+		if isUniqueViolation(err) {
+			http.Error(w, "Ya tienes un proyecto con ese nombre", http.StatusConflict)
+			return
+		}
 		log.Printf("[HANDLER:Proyect.Update] Error en repositorio: %v | id=%d user_id=%d", err, strProyectId, userID)
 		http.Error(w, "error al modificar el proyecto", http.StatusInternalServerError)
 		return

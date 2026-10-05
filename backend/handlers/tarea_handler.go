@@ -88,7 +88,7 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	tarea, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.CreateTarea] Error en repositorio: %v | user_id=%d proyect_id=%d", err, userID, req.ProyectID)
-		http.Error(w, "error al crear la tarea: "+err.Error(), http.StatusInternalServerError)
+		internalError(w, "error al crear la tarea", err)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 	tareas, err := h.repo.GetAll(r.Context(), userID, estadoFilter)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.GetAllTareas] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "error al obtener las tareas: "+err.Error(), http.StatusInternalServerError)
+		internalError(w, "error al obtener las tareas", err)
 		return
 	}
 
@@ -219,7 +219,7 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.UpdateTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)
-		http.Error(w, "error al actualizar la tarea: "+err.Error(), http.StatusInternalServerError)
+		internalError(w, "error al actualizar la tarea", err)
 		return
 	}
 
@@ -248,7 +248,7 @@ func (h *TareasHandler) DeleteTarea(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Delete(r.Context(), tareaID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.DeleteTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)
-		http.Error(w, "Error al eliminar la tarea: "+err.Error(), http.StatusInternalServerError)
+		internalError(w, "Error al eliminar la tarea", err)
 		return
 	}
 
@@ -280,7 +280,7 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 	tareas, err := h.repo.GetByProyectoID(r.Context(), proyectID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
-		http.Error(w, "Error al obtener tareas del proyecto: "+err.Error(), http.StatusInternalServerError)
+		internalError(w, "Error al obtener tareas del proyecto", err)
 		return
 	}
 

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/fs"
+	"net/netip"
 	"net/http"
 	"strings"
 	"time"
@@ -58,7 +59,8 @@ func NewRouter(opts Options) http.Handler {
 
 	// Middlewares globales (DEBEN definirse antes de registrar cualquier ruta)
 	r.Use(chiMiddleware.RequestID)
-	r.Use(chiMiddleware.RealIP)
+	// IP real solo si viene de un proxy de confianza (antes: RealIP, falsificable).
+	r.Use(middleware.TrustedRealIP(trustedProxies(cfg)))
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.Recoverer)
 
@@ -249,4 +251,17 @@ func spaHandler(dist fs.FS) http.Handler {
 		stat, _ := indexFile.Stat()
 		http.ServeContent(w, r, "index.html", stat.ModTime(), indexFile.(io.ReadSeeker))
 	})
+}
+
+// trustedProxies devuelve los proxies configurados o, si la configuración se armó a mano
+// (tests), los de por defecto.
+func trustedProxies(cfg *config.Config) []netip.Prefix {
+	if len(cfg.TrustedProxies) > 0 {
+		return cfg.TrustedProxies
+	}
+	var prefixes []netip.Prefix
+	for _, p := range config.DefaultTrustedProxies {
+		prefixes = append(prefixes, netip.MustParsePrefix(p))
+	}
+	return prefixes
 }

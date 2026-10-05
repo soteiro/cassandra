@@ -80,3 +80,23 @@ func TestLoadRequiresJWTSecret(t *testing.T) {
 		t.Error("Load no usó el JWT_SECRET del entorno")
 	}
 }
+
+func TestParseTrustedProxies(t *testing.T) {
+	got, err := parseTrustedProxies("")
+	if err != nil || len(got) != 2 || got[0].String() != "127.0.0.0/8" {
+		t.Errorf("por defecto = %v, %v", got, err)
+	}
+	got, err = parseTrustedProxies(" 10.0.0.5 , 192.168.1.0/24, ::1 ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"10.0.0.5/32", "192.168.1.0/24", "::1/128"}
+	for i, p := range got {
+		if p.String() != want[i] {
+			t.Errorf("prefijo %d = %s, se esperaba %s", i, p, want[i])
+		}
+	}
+	if _, err := parseTrustedProxies("no-es-ip"); err == nil {
+		t.Error("se esperaba error con un valor inválido")
+	}
+}

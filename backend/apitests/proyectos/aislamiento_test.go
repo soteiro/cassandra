@@ -74,7 +74,6 @@ func TestAislamientoMoverProyectoBajoPadreAjeno(t *testing.T) {
 }
 
 func TestAislamientoNombreDeProyectoNoColisionaEntreUsuarios(t *testing.T) {
-	bug(t, "proyectos.nombre es UNIQUE global: otro usuario no puede usar el mismo nombre (500) y eso revela que existe")
 	api, ana, beto := setup(t)
 	crearProyecto(t, api, ana, "Mudanza", nil)
 	api.Do(beto, http.MethodPost, "/api/proyects", proyectoBody("Mudanza")).Expect(t, http.StatusCreated)

@@ -22,6 +22,7 @@ const MinPasswordLength = 8
 var (
 	ErrUserNotFound = errors.New("no existe un usuario activo con ese email")
 	ErrEmailTaken   = errors.New("ya existe un usuario con ese email")
+	ErrAliasTaken   = errors.New("ya existe un usuario con ese alias")
 )
 
 type NewUser struct {
@@ -54,6 +55,9 @@ func CreateUser(ctx context.Context, repo *repository.UserRepository, u NewUser)
 	})
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23505" { // unique_violation
+		if pgErr.ConstraintName == "users_alias_key" {
+			return nil, ErrAliasTaken
+		}
 		return nil, ErrEmailTaken
 	}
 	return user, err

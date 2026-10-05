@@ -89,3 +89,23 @@ func TestResetPassword(t *testing.T) {
 		t.Error("se esperaba error por contraseña corta")
 	}
 }
+
+func TestCreateUserAlias(t *testing.T) {
+	repo := setup(t)
+	ctx := context.Background()
+
+	// Sin alias se guarda NULL: varios usuarios pueden no tener alias.
+	for _, email := range []string{"uno@cassandra.test", "dos@cassandra.test"} {
+		if _, err := CreateUser(ctx, repo, NewUser{Nombre: "X", Email: email, Password: "clave-segura"}); err != nil {
+			t.Fatalf("usuario sin alias %s: %v", email, err)
+		}
+	}
+
+	if _, err := CreateUser(ctx, repo, NewUser{Nombre: "A", Alias: "ada", Email: "a@cassandra.test", Password: "clave-segura"}); err != nil {
+		t.Fatal(err)
+	}
+	_, err := CreateUser(ctx, repo, NewUser{Nombre: "B", Alias: "ada", Email: "b@cassandra.test", Password: "clave-segura"})
+	if !errors.Is(err, ErrAliasTaken) {
+		t.Errorf("alias repetido: error = %v, se esperaba ErrAliasTaken", err)
+	}
+}

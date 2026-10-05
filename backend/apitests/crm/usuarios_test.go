@@ -91,7 +91,6 @@ func TestUsuarioEmailOAliasDuplicadoDevuelve409(t *testing.T) {
 
 // Varios usuarios sin alias deben poder convivir: alias vacío debería guardarse como NULL.
 func TestUsuarioAliasVacioEnVariosUsuarios(t *testing.T) {
-	bug(t, "alias vacío se guarda como '' (no NULL) y users.alias es UNIQUE: el segundo usuario sin alias falla")
 	api, ana, beto := setup(t)
 	api.Do(ana, http.MethodPut, apitest.Path("/api/users/%d", ana.ID),
 		map[string]any{"nombre": "Ana", "alias": "", "email": ana.Email}).Expect(t, http.StatusOK)
@@ -101,7 +100,6 @@ func TestUsuarioAliasVacioEnVariosUsuarios(t *testing.T) {
 
 // Lo mismo al crear cuentas como el CLI (create-user sin --alias) — es lo que hace api.User.
 func TestCrearDosUsuariosSinAlias(t *testing.T) {
-	bug(t, "create-user sin alias inserta alias '' y el segundo usuario sin alias choca con users_alias_key")
 	api := apitest.New(t, "crm")
 	api.User("uno@crm.test")
 	api.User("dos@crm.test")
