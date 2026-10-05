@@ -305,7 +305,7 @@ func (r *ListaDeseosRepository) Delete(ctx context.Context, id int, userID int) 
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:ListaDeseos.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró el ítem con id %d o no tiene permisos", id)
+		return fmt.Errorf("%w: no se encontró el ítem con id %d o no tiene permisos", ErrNoEncontrado, id)
 	}
 
 	return nil

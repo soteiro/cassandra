@@ -392,7 +392,7 @@ func (r *TareasRepository) Delete(ctx context.Context, id int, userID int) error
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:Tareas.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró la tarea o no tienes permisos para eliminarla")
+		return fmt.Errorf("%w: no se encontró la tarea o no tienes permisos para eliminarla", ErrNoEncontrado)
 	}
 
 	return nil

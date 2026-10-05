@@ -32,7 +32,7 @@ func (r *UserRepository) Create(ctx context.Context, req *models.UserRequest) (*
 
 	queryUser := `
 		INSERT INTO users (nombre, alias, email, password)
-		VALUES ($1, $2, $3, $4)
+		VALUES ($1, NULLIF($2, ''), $3, $4)
 		RETURNING id, nombre, COALESCE(alias, ''), email, fecha_creacion
 	`
 
@@ -161,7 +161,7 @@ func (r *UserRepository) Delete(ctx context.Context, id int) error {
 	}
 	if result.RowsAffected() == 0 {
 		log.Printf("[REPO:User.Delete] Registro no encontrado o sin permisos | id=%d", id)
-		return fmt.Errorf("no se encontro el usuario con el id %d", id)
+		return fmt.Errorf("%w: no se encontro el usuario con el id %d", ErrNoEncontrado, id)
 	}
 
 	if _, err := tx.Exec(ctx, "DELETE FROM refresh_tokens WHERE user_id = $1", id); err != nil {
@@ -186,7 +186,7 @@ func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpd
 
 	query := `
 	UPDATE users
-	SET nombre  = $1, alias = $2, email = $3
+	SET nombre  = $1, alias = NULLIF($2, ''), email = $3
 	WHERE id  = $4 AND eliminado = false
 	RETURNING id, nombre, COALESCE(alias, ''), email, fecha_creacion	
 	`

@@ -82,7 +82,6 @@ func TestUsuarioValidaciones(t *testing.T) {
 }
 
 func TestUsuarioEmailOAliasDuplicadoDevuelve409(t *testing.T) {
-	bug(t, "PUT /api/users/{id} con email o alias de otro usuario responde 500 (unique_violation) en vez de 409")
 	api, ana, beto := setup(t)
 	path := apitest.Path("/api/users/%d", ana.ID)
 	api.Do(ana, http.MethodPut, path, map[string]any{"nombre": "Ana", "alias": "ana", "email": beto.Email}).Expect(t, http.StatusConflict)
@@ -91,7 +90,6 @@ func TestUsuarioEmailOAliasDuplicadoDevuelve409(t *testing.T) {
 
 // Varios usuarios sin alias deben poder convivir: alias vacío debería guardarse como NULL.
 func TestUsuarioAliasVacioEnVariosUsuarios(t *testing.T) {
-	bug(t, "alias vacío se guarda como '' (no NULL) y users.alias es UNIQUE: el segundo usuario sin alias falla")
 	api, ana, beto := setup(t)
 	api.Do(ana, http.MethodPut, apitest.Path("/api/users/%d", ana.ID),
 		map[string]any{"nombre": "Ana", "alias": "", "email": ana.Email}).Expect(t, http.StatusOK)
@@ -101,14 +99,12 @@ func TestUsuarioAliasVacioEnVariosUsuarios(t *testing.T) {
 
 // Lo mismo al crear cuentas como el CLI (create-user sin --alias) — es lo que hace api.User.
 func TestCrearDosUsuariosSinAlias(t *testing.T) {
-	bug(t, "create-user sin alias inserta alias '' y el segundo usuario sin alias choca con users_alias_key")
 	api := apitest.New(t, "crm")
 	api.User("uno@crm.test")
 	api.User("dos@crm.test")
 }
 
 func TestUsuarioCamposLargosDevuelven400(t *testing.T) {
-	bug(t, "PUT /api/users/{id} con nombre/email/alias > 50 caracteres responde 500 en vez de 400")
 	api, ana, _ := setup(t)
 	path := apitest.Path("/api/users/%d", ana.ID)
 	expect4xx(t, api.Do(ana, http.MethodPut, path,

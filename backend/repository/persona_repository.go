@@ -202,7 +202,7 @@ func (r *PersonaRepository) Delete(ctx context.Context, id int, userID int) erro
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:Persona.Delete] Registro no encontrado, sin permisos o es el perfil personal | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró la persona con id %d, no tiene permisos o no se puede eliminar el perfil personal", id)
+		return fmt.Errorf("%w: no se encontró la persona con id %d, no tiene permisos o no se puede eliminar el perfil personal", ErrNoEncontrado, id)
 	}
 
 	return nil

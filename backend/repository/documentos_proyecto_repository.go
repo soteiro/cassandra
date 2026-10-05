@@ -218,7 +218,7 @@ func (r *DocumentosProyectoRepository) Delete(ctx context.Context, id int, userI
 	}
 
 	if res.RowsAffected() == 0 {
-		return fmt.Errorf("documento no encontrado o sin permisos")
+		return fmt.Errorf("%w: documento no encontrado o sin permisos", ErrNoEncontrado)
 	}
 
 	return nil

@@ -141,7 +141,7 @@ func (r *FinanzasRepository) DeleteBanco(ctx context.Context, id int, userID int
 		return err
 	}
 	if res.RowsAffected() == 0 {
-		return fmt.Errorf("no se encontró el banco o no tienes permisos")
+		return fmt.Errorf("%w: no se encontró el banco o no tienes permisos", ErrNoEncontrado)
 	}
 
 	return nil
@@ -262,7 +262,7 @@ func (r *FinanzasRepository) DeleteGrupoItem(ctx context.Context, id int, userID
 		return err
 	}
 	if res.RowsAffected() == 0 {
-		return fmt.Errorf("no se encontró el grupo de finanzas o no tienes permisos")
+		return fmt.Errorf("%w: no se encontró el grupo de finanzas o no tienes permisos", ErrNoEncontrado)
 	}
 
 	return nil
@@ -383,7 +383,7 @@ func (r *FinanzasRepository) DeleteMovimientoEsperado(ctx context.Context, id in
 		return err
 	}
 	if res.RowsAffected() == 0 {
-		return fmt.Errorf("no se encontró el movimiento esperado o no tienes permisos")
+		return fmt.Errorf("%w: no se encontró el movimiento esperado o no tienes permisos", ErrNoEncontrado)
 	}
 
 	return nil
@@ -663,7 +663,7 @@ func (r *FinanzasRepository) DeletePlantilla(ctx context.Context, id int, userID
 		return err
 	}
 	if res.RowsAffected() == 0 {
-		return fmt.Errorf("no se encontró el ítem de finanzas o no tienes permisos")
+		return fmt.Errorf("%w: no se encontró el ítem de finanzas o no tienes permisos", ErrNoEncontrado)
 	}
 
 	return nil

@@ -137,7 +137,6 @@ func TestReflexionesValidaciones(t *testing.T) {
 }
 
 func TestReflexionDeleteInexistenteDevuelve404(t *testing.T) {
-	bug(t, "DELETE de reflexión inexistente, ajena o ya borrada responde 500 en vez de 404")
 	api, ana, beto := setup(t)
 	r := createReflexion(t, api, ana, "x", "")
 	path := apitest.Path("/api/reflexiones/%d", r.ID)

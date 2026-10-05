@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -42,7 +41,7 @@ func (h *LogsHandler) CreateLog(w http.ResponseWriter, r *http.Request) {
 	// Si proyect_id viene en la URL, sobrescribir o asignar
 	proyectIDStr := chi.URLParam(r, "proyect_id")
 	if proyectIDStr != "" {
-		pID, err := strconv.Atoi(proyectIDStr)
+		pID, err := atoi32(proyectIDStr)
 		if err == nil && pID > 0 {
 			req.ProyectoID = pID
 		}
@@ -69,7 +68,7 @@ func (h *LogsHandler) CreateLog(w http.ResponseWriter, r *http.Request) {
 	createdLog, err := h.repo.Create(r.Context(), userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Logs.CreateLog] Error en repositorio: %v | user_id=%d proyecto_id=%d", err, userID, req.ProyectoID)
-		http.Error(w, "error al crear el log", http.StatusInternalServerError)
+		dbError(w, "error al crear el log", err)
 		return
 	}
 
@@ -89,7 +88,7 @@ func (h *LogsHandler) GetLogsByProyecto(w http.ResponseWriter, r *http.Request) 
 	}
 
 	proyectIDStr := chi.URLParam(r, "proyect_id")
-	proyectID, err := strconv.Atoi(proyectIDStr)
+	proyectID, err := atoi32(proyectIDStr)
 	if err != nil || proyectID <= 0 {
 		log.Printf("[HANDLER:Logs.GetLogsByProyecto] ID de proyecto inválido: %s", proyectIDStr)
 		http.Error(w, "proyect_id invalido", http.StatusBadRequest)
@@ -99,7 +98,7 @@ func (h *LogsHandler) GetLogsByProyecto(w http.ResponseWriter, r *http.Request) 
 	logsList, err := h.repo.GetByProyectoID(r.Context(), userID, proyectID)
 	if err != nil {
 		log.Printf("[HANDLER:Logs.GetLogsByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
-		http.Error(w, "error al obtener logs", http.StatusInternalServerError)
+		dbError(w, "error al obtener logs", err)
 		return
 	}
 
@@ -118,7 +117,7 @@ func (h *LogsHandler) GetLogByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Logs.GetLogByID] ID inválido: %s", idStr)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -128,7 +127,7 @@ func (h *LogsHandler) GetLogByID(w http.ResponseWriter, r *http.Request) {
 	logEntry, err := h.repo.GetByID(r.Context(), userID, id)
 	if err != nil {
 		log.Printf("[HANDLER:Logs.GetLogByID] Error o no encontrado: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "log no encontrado", http.StatusNotFound)
+		dbError(w, "log no encontrado", err)
 		return
 	}
 
@@ -147,7 +146,7 @@ func (h *LogsHandler) UpdateLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Logs.UpdateLog] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -165,11 +164,16 @@ func (h *LogsHandler) UpdateLog(w http.ResponseWriter, r *http.Request) {
 		trimmed := strings.TrimSpace(*req.Titulo)
 		req.Titulo = &trimmed
 	}
+	// Igual que al crear: si se envía contenido, no puede quedar vacío.
+	if req.ContenidoRaw != nil && strings.TrimSpace(*req.ContenidoRaw) == "" {
+		http.Error(w, "El contenido del log no puede estar vacío", http.StatusBadRequest)
+		return
+	}
 
 	updatedLog, err := h.repo.Update(r.Context(), userID, id, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Logs.UpdateLog] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "error al actualizar el log", http.StatusInternalServerError)
+		dbError(w, "error al actualizar el log", err)
 		return
 	}
 
@@ -188,7 +192,7 @@ func (h *LogsHandler) DeleteLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Logs.DeleteLog] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -197,7 +201,7 @@ func (h *LogsHandler) DeleteLog(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.repo.Delete(r.Context(), userID, id); err != nil {
 		log.Printf("[HANDLER:Logs.DeleteLog] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "error al eliminar el log", http.StatusInternalServerError)
+		dbError(w, "error al eliminar el log", err)
 		return
 	}
 

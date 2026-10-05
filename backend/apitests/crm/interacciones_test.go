@@ -130,7 +130,6 @@ func TestInteraccionPersonaInexistenteDevuelve4xx(t *testing.T) {
 }
 
 func TestInteraccionDeleteInexistenteDevuelve404(t *testing.T) {
-	bug(t, "DELETE de interacción inexistente, ajena o ya borrada responde 500 en vez de 404")
 	api, ana, beto := setup(t)
 	i := createInteraccion(t, api, ana, createPersona(t, api, ana, "Carla").ID, "café")
 	path := apitest.Path("/api/interacciones/%d", i.ID)

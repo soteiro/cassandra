@@ -127,7 +127,6 @@ func TestMetodosNoPermitidos_NoTocanNada(t *testing.T) {
 }
 
 func TestMetodosNoPermitidos(t *testing.T) {
-	bug(t, "un método no registrado en una ruta existente (PATCH /api/documentos/1, GET /api/auth/login...) responde 404 en vez de 405: el catch-all r.Handle(\"/*\") del SPA lo captura")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	p := crearProyecto(t, api, ana, "P")

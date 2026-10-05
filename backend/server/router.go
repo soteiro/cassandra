@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"net/netip"
 	"strings"
 	"time"
 
@@ -58,7 +59,8 @@ func NewRouter(opts Options) http.Handler {
 
 	// Middlewares globales (DEBEN definirse antes de registrar cualquier ruta)
 	r.Use(chiMiddleware.RequestID)
-	r.Use(chiMiddleware.RealIP)
+	// IP real solo si viene de un proxy de confianza (antes: RealIP, falsificable).
+	r.Use(middleware.TrustedRealIP(trustedProxies(cfg)))
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.Recoverer)
 
@@ -197,7 +199,22 @@ func NewRouter(opts Options) http.Handler {
 	r.Get("/api/auth/me", authHandler.Me)
 
 	// Servidor de Archivos Estáticos y Fallback SPA (DEBE ir al final de las rutas)
-	r.Handle("/*", spaHandler(opts.Frontend))
+	// Solo GET/HEAD: así un método no registrado en una ruta de la API (p. ej. PATCH
+	// /api/documentos/1) responde 405 en vez de caer en el SPA y dar 404.
+	spa := spaHandler(opts.Frontend)
+	serveSPA := func(w http.ResponseWriter, req *http.Request) {
+		// GET a una ruta de la API que solo existe con otro método (p. ej. GET /api/auth/login).
+		if strings.HasPrefix(req.URL.Path, "/api") {
+			if allowed := allowedMethods(r, req.URL.Path); len(allowed) > 0 {
+				w.Header().Set("Allow", strings.Join(allowed, ", "))
+				http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+				return
+			}
+		}
+		spa.ServeHTTP(w, req)
+	}
+	r.Get("/*", serveSPA)
+	r.Head("/*", serveSPA)
 
 	return r
 }
@@ -249,4 +266,30 @@ func spaHandler(dist fs.FS) http.Handler {
 		stat, _ := indexFile.Stat()
 		http.ServeContent(w, r, "index.html", stat.ModTime(), indexFile.(io.ReadSeeker))
 	})
+}
+
+// trustedProxies devuelve los proxies configurados o, si la configuración se armó a mano
+// (tests), los de por defecto.
+func trustedProxies(cfg *config.Config) []netip.Prefix {
+	if len(cfg.TrustedProxies) > 0 {
+		return cfg.TrustedProxies
+	}
+	var prefixes []netip.Prefix
+	for _, p := range config.DefaultTrustedProxies {
+		prefixes = append(prefixes, netip.MustParsePrefix(p))
+	}
+	return prefixes
+}
+
+// allowedMethods devuelve los métodos con los que path coincide con una ruta concreta
+// (no el comodín del SPA).
+func allowedMethods(routes chi.Routes, path string) []string {
+	var allowed []string
+	for _, m := range []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete} {
+		rctx := chi.NewRouteContext()
+		if routes.Match(rctx, m, path) && rctx.RoutePattern() != "/*" {
+			allowed = append(allowed, m)
+		}
+	}
+	return allowed
 }

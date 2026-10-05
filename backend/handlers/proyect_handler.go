@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -83,8 +82,12 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 
 	proyect, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
+		if isUniqueViolation(err) {
+			http.Error(w, "Ya tienes un proyecto con ese nombre", http.StatusConflict)
+			return
+		}
 		log.Printf("[HANDLER:Proyect.CreateProyect] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "error al crear el proyecto: ", http.StatusInternalServerError)
+		dbError(w, "error al crear el proyecto", err)
 		return
 	}
 
@@ -108,7 +111,7 @@ func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
 	proyect, err := h.repo.GetAll(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Proyect.ListProyect] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "error al listar usuario", http.StatusInternalServerError)
+		dbError(w, "error al listar usuario", err)
 		return
 	}
 	if proyect == nil {
@@ -129,7 +132,7 @@ func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.Atoi(idstr)
+	id, err := atoi32(idstr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Proyect.DeleteByID] ID inválido: %s | user_id=%d", idstr, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -139,7 +142,7 @@ func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	res, err := h.repo.Delete(r.Context(), id, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Proyect.DeleteByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "error al borrar el proyecto", http.StatusInternalServerError)
+		dbError(w, "error al borrar el proyecto", err)
 		return
 	}
 	if res == nil {
@@ -157,7 +160,7 @@ func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	strProyectID, err := strconv.Atoi(proyectID)
+	strProyectID, err := atoi32(proyectID)
 	if err != nil || strProyectID <= 0 {
 		log.Printf("[HANDLER:Proyect.GetByID] ID inválido: %s | user_id=%d", proyectID, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -167,7 +170,7 @@ func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	res, err := h.repo.GetById(r.Context(), strProyectID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Proyect.GetByID] Error o no encontrado: %v | id=%d user_id=%d", err, strProyectID, userID)
-		http.Error(w, "error en la peticion", http.StatusBadRequest)
+		dbError(w, "Error al obtener el proyecto", err)
 		return
 	}
 
@@ -185,7 +188,7 @@ func (h *ProyectHandler) GetSubproyectos(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	strProyectID, err := strconv.Atoi(proyectID)
+	strProyectID, err := atoi32(proyectID)
 	if err != nil || strProyectID <= 0 {
 		log.Printf("[HANDLER:Proyect.GetSubproyectos] ID inválido: %s | user_id=%d", proyectID, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
@@ -195,7 +198,7 @@ func (h *ProyectHandler) GetSubproyectos(w http.ResponseWriter, r *http.Request)
 	subproyectos, err := h.repo.GetSubproyectos(r.Context(), strProyectID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Proyect.GetSubproyectos] Error en repositorio: %v | parent_id=%d user_id=%d", err, strProyectID, userID)
-		http.Error(w, "error al obtener subproyectos", http.StatusInternalServerError)
+		dbError(w, "error al obtener subproyectos", err)
 		return
 	}
 	if subproyectos == nil {
@@ -216,7 +219,7 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	strProyectId, err := strconv.Atoi(proyectID)
+	strProyectId, err := atoi32(proyectID)
 	if err != nil || strProyectId <= 0 {
 		log.Printf("[HANDLER:Proyect.Update] ID inválido: %s | user_id=%d", proyectID, userID)
 		http.Error(w, "ID de proyecto invalido", http.StatusBadRequest)
@@ -269,8 +272,12 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, &req)
 	if err != nil {
+		if isUniqueViolation(err) {
+			http.Error(w, "Ya tienes un proyecto con ese nombre", http.StatusConflict)
+			return
+		}
 		log.Printf("[HANDLER:Proyect.Update] Error en repositorio: %v | id=%d user_id=%d", err, strProyectId, userID)
-		http.Error(w, "error al modificar el proyecto", http.StatusInternalServerError)
+		dbError(w, "error al modificar el proyecto", err)
 		return
 	}
 

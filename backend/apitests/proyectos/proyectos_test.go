@@ -59,7 +59,6 @@ func TestProyectoCRUD(t *testing.T) {
 }
 
 func TestProyectoInexistenteDevuelve404(t *testing.T) {
-	bug(t, "proyecto inexistente/borrado: GET devuelve 400, PUT y DELETE devuelven 500 en vez de 404")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Borrable", nil)
 	api.Do(ana, http.MethodDelete, apitest.Path("/api/proyects/%d", p.ID), nil).Expect(t, http.StatusNoContent)
@@ -73,7 +72,6 @@ func TestProyectoInexistenteDevuelve404(t *testing.T) {
 }
 
 func TestProyectoAjenoDevuelve404(t *testing.T) {
-	bug(t, "proyecto ajeno: GET devuelve 400 y PUT/DELETE devuelven 500 en vez de 403/404")
 	api, ana, beto := setup(t)
 	pA := crearProyecto(t, api, ana, "De Ana", nil)
 	path := apitest.Path("/api/proyects/%d", pA.ID)
@@ -122,7 +120,6 @@ func TestProyectoValidaciones(t *testing.T) {
 }
 
 func TestProyectoValoresFueraDeCheck(t *testing.T) {
-	bug(t, "estado/prioridad fuera del CHECK de proyectos producen 500 en vez de 400 (no se validan en el handler)")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Check", nil)
 

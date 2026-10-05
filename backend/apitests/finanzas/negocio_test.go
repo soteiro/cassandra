@@ -186,7 +186,6 @@ func TestClonar_DestinoConDatosAcumula(t *testing.T) {
 
 // Clonar un período sobre sí mismo no tiene sentido y duplica todo el mes.
 func TestClonar_MismoPeriodoSeRechaza(t *testing.T) {
-	bug(t, "POST /api/finanzas/clonar con origen == destino duplica todos los ítems del mes en vez de rechazarlo")
 	api, a, _ := setup(t)
 	crearItem(t, api, a, "egreso", 100, 2026, 3, nil)
 	res := api.Do(a, http.MethodPost, pathClonar, map[string]any{"anio_origen": 2026, "mes_origen": 3, "anio_destino": 2026, "mes_destino": 3})

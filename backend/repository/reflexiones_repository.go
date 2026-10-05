@@ -206,7 +206,7 @@ func (r *ReflexionesRepository) Delete(ctx context.Context, id int, userID int) 
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:Reflexiones.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró la reflexión con id %d o no tiene permisos", id)
+		return fmt.Errorf("%w: no se encontró la reflexión con id %d o no tiene permisos", ErrNoEncontrado, id)
 	}
 
 	return nil

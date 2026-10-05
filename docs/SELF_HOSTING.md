@@ -68,6 +68,7 @@ PORT=8080
 | `PORT` | No (8080) | Puerto HTTP local; el proxy inverso apunta aquí. |
 | `RATE_LIMIT_PER_MIN` | No (100) | Peticiones por minuto y por IP. |
 | `ALLOWED_ORIGINS` | No | Orígenes CORS extra, separados por comas. La web y la app Android no los necesitan; solo si sirves otro frontend desde otro dominio. |
+| `TRUSTED_PROXIES` | No (`127.0.0.0/8,::1/128`) | IPs o CIDR de los proxies de los que se acepta `X-Real-IP`. Con nginx en el mismo servidor no hace falta cambiarlo. |
 
 ## 5. Servicio systemd
 
@@ -124,7 +125,46 @@ server {
 ```
 
 - `X-Forwarded-Proto` hace que las cookies de sesión se marquen `Secure`.
-- `X-Real-IP` hace que el límite de peticiones se aplique por IP real y no a todo el tráfico del proxy.
+- `X-Real-IP` hace que el límite de peticiones y los logs usen la IP real del usuario.
+  **nginx debe fijarla siempre** (`proxy_set_header`, como arriba): el backend la acepta solo
+  desde `TRUSTED_PROXIES`, y si nginx la dejara pasar tal cual la enviara el cliente, se podría
+  falsear para saltarse el límite.
+
+### Detrás de Cloudflare
+
+Con el proxy de Cloudflare activado, para nginx todas las peticiones vienen de IPs de
+Cloudflare. Para recuperar la IP real del usuario, nginx debe confiar en los rangos de
+Cloudflare y leer `CF-Connecting-IP` (en el bloque `http` o en el `server`):
+
+```nginx
+# Rangos publicados en https://www.cloudflare.com/ips/ (revísalos de vez en cuando)
+set_real_ip_from 173.245.48.0/20;
+set_real_ip_from 103.21.244.0/22;
+set_real_ip_from 103.22.200.0/22;
+set_real_ip_from 103.31.4.0/22;
+set_real_ip_from 141.101.64.0/18;
+set_real_ip_from 108.162.192.0/18;
+set_real_ip_from 190.93.240.0/20;
+set_real_ip_from 188.114.96.0/20;
+set_real_ip_from 197.234.240.0/22;
+set_real_ip_from 198.41.128.0/17;
+set_real_ip_from 162.158.0.0/15;
+set_real_ip_from 104.16.0.0/13;
+set_real_ip_from 104.24.0.0/14;
+set_real_ip_from 172.64.0.0/13;
+set_real_ip_from 131.0.72.0/22;
+set_real_ip_from 2400:cb00::/32;
+set_real_ip_from 2606:4700::/32;
+set_real_ip_from 2803:f800::/32;
+set_real_ip_from 2405:b500::/32;
+set_real_ip_from 2405:8100::/32;
+set_real_ip_from 2a06:98c0::/29;
+set_real_ip_from 2c0f:f248::/32;
+real_ip_header CF-Connecting-IP;
+```
+
+Con eso `$remote_addr` pasa a ser la IP del usuario y el `X-Real-IP $remote_addr` de arriba
+la entrega al backend. Conviene además que el firewall solo acepte HTTP/HTTPS desde Cloudflare.
 
 ## 7. Crear tu cuenta
 

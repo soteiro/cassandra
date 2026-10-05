@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/netip"
 	"log"
 	"os"
 	"strconv"
@@ -18,7 +19,12 @@ type Config struct {
 	RateLimitPerMin int
 	// Orígenes CORS: los de desarrollo y la app Capacitor, más ALLOWED_ORIGINS.
 	AllowedOrigins []string
+	// Proxies de los que se acepta X-Real-IP (TRUSTED_PROXIES; por defecto localhost).
+	TrustedProxies []netip.Prefix
 }
+
+// DefaultTrustedProxies: nginx en el mismo servidor.
+var DefaultTrustedProxies = []string{"127.0.0.0/8", "::1/128"}
 
 // DefaultAllowedOrigins cubre el dev server de Angular y la app Android (Capacitor).
 // La web desplegada no los necesita: se sirve desde el mismo origen que la API.
@@ -39,6 +45,10 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	trustedProxies, err := parseTrustedProxies(os.Getenv("TRUSTED_PROXIES"))
+	if err != nil {
+		return nil, err
+	}
 
 	return &Config{
 		DatabaseUrl: getEnv("DATABASE_URL_LOCAL", "postgres://localhost:5432/db"),
@@ -46,6 +56,7 @@ func Load() (*Config, error) {
 		JwtSecret: jwtSecret,
 		RateLimitPerMin: getEnvInt("RATE_LIMIT_PER_MIN", 100),
 		AllowedOrigins: allowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
+		TrustedProxies: trustedProxies,
 		}, nil
 	}
 
@@ -96,4 +107,33 @@ func allowedOrigins(extra string) []string {
 		}
 	}
 	return origins
+}
+
+// parseTrustedProxies lee IPs o CIDR separados por comas; vacío = DefaultTrustedProxies.
+func parseTrustedProxies(value string) ([]netip.Prefix, error) {
+	items := strings.Split(value, ",")
+	if strings.TrimSpace(value) == "" {
+		items = DefaultTrustedProxies
+	}
+	var prefixes []netip.Prefix
+	for _, item := range items {
+		item = strings.TrimSpace(item)
+		if item == "" {
+			continue
+		}
+		if !strings.Contains(item, "/") {
+			addr, err := netip.ParseAddr(item)
+			if err != nil {
+				return nil, fmt.Errorf("TRUSTED_PROXIES: %q no es una IP ni un CIDR válido", item)
+			}
+			prefixes = append(prefixes, netip.PrefixFrom(addr.Unmap(), addr.Unmap().BitLen()))
+			continue
+		}
+		p, err := netip.ParsePrefix(item)
+		if err != nil {
+			return nil, fmt.Errorf("TRUSTED_PROXIES: %q no es una IP ni un CIDR válido", item)
+		}
+		prefixes = append(prefixes, p.Masked())
+	}
+	return prefixes, nil
 }

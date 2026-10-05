@@ -97,7 +97,6 @@ func TestLogValidaciones(t *testing.T) {
 }
 
 func TestLogContenidoVacioEnUpdate(t *testing.T) {
-	bug(t, "PUT /api/logs/{id} acepta contenido_raw vacío aunque POST lo exige")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	l := crearLog(t, api, ana, p.ID, "titulo", "contenido")
@@ -109,7 +108,6 @@ func TestLogContenidoVacioEnUpdate(t *testing.T) {
 }
 
 func TestLogInexistenteOAjenoDevuelve404(t *testing.T) {
-	bug(t, "PUT y DELETE de un log inexistente, borrado o ajeno devuelven 500 en vez de 404")
 	api, ana, beto := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	l := crearLog(t, api, ana, p.ID, "titulo", "contenido")
