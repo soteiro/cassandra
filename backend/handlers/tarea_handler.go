@@ -213,6 +213,9 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// El borrado va por DELETE; por PUT no se puede borrar ni restaurar una tarea.
+	req.Eliminado = nil
+
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.UpdateTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)

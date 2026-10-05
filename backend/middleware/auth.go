@@ -12,7 +12,14 @@ type contextKey string
 
 const UserIDKey contextKey = "userID"
 
-func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
+// ActiveUsers responde si un usuario sigue activo (existe y no está eliminado).
+type ActiveUsers interface {
+	IsActive(ctx context.Context, userID int) (bool, error)
+}
+
+// AuthMiddleware valida el JWT y, además, que el usuario siga activo: un token aún
+// vigente de un usuario eliminado no da acceso.
+func AuthMiddleware(jwtSecret string, users ActiveUsers) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// 1. Intentar obtener el access token desde el header Authorization: Bearer <token>
@@ -32,6 +39,18 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 			http.Error(w, "Token invalido", http.StatusUnauthorized)
 			return
 		}
+
+			active, err := users.IsActive(r.Context(), userId)
+			if err != nil {
+				log.Printf("[AUTH] error al verificar el usuario %d: %v", userId, err)
+				http.Error(w, "Error al verificar la sesión", http.StatusInternalServerError)
+				return
+			}
+			if !active {
+				log.Printf("[AUTH] token de usuario eliminado o inexistente: %d", userId)
+				http.Error(w, "Token invalido", http.StatusUnauthorized)
+				return
+			}
 
 			// 3. Inyectar el userId en el contexto de la aplicacion
 			ctx := context.WithValue(r.Context(), UserIDKey, userId)

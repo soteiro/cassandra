@@ -136,7 +136,6 @@ func TestUsuarioDeleteImpideLogin(t *testing.T) {
 
 // Tras borrarse, un access token emitido antes no debe seguir sirviendo.
 func TestUsuarioBorradoNoPuedeUsarLaAPI(t *testing.T) {
-	bug(t, "el AuthMiddleware solo valida la firma del JWT: un usuario borrado sigue usando la API con su token")
 	api, ana, _ := setup(t)
 	createPersona(t, api, ana, "Carla")
 	api.Do(ana, http.MethodDelete, apitest.Path("/api/users/%d", ana.ID), nil).Expect(t, http.StatusNoContent)
@@ -150,7 +149,6 @@ func TestUsuarioBorradoNoPuedeUsarLaAPI(t *testing.T) {
 
 // Tras borrarse, el refresh token de una sesión previa no debe emitir tokens nuevos.
 func TestUsuarioBorradoNoPuedeRefrescarSesion(t *testing.T) {
-	bug(t, "DELETE /api/users/{id} no revoca los refresh tokens: /api/auth/refresh sigue emitiendo access tokens")
 	api, ana, _ := setup(t)
 	res := login(t, api, ana.Email, password).Expect(t, http.StatusOK)
 	var refresh *http.Cookie

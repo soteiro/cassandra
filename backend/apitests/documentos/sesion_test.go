@@ -323,7 +323,6 @@ func TestSesion_UsuarioEliminado_NoPuedeHacerLogin(t *testing.T) {
 }
 
 func TestSesion_UsuarioEliminado_AccessTokenRechazado(t *testing.T) {
-	bug(t, "el middleware solo valida la firma del JWT: un usuario eliminado (DELETE /api/users/{id}) sigue accediendo a rutas protegidas con su access token")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	p := crearProyecto(t, api, ana, "P")
@@ -336,7 +335,6 @@ func TestSesion_UsuarioEliminado_AccessTokenRechazado(t *testing.T) {
 }
 
 func TestSesion_UsuarioEliminado_RefreshRechazado(t *testing.T) {
-	bug(t, "/api/auth/refresh y /api/auth/me siguen emitiendo access tokens a un usuario eliminado: el refresh token no se revoca ni se comprueba users.eliminado")
 	api := apitest.New(t, "documentos")
 	ana := usuario(t, api, "ana@cassandra.test")
 	n := nuevoNavegador(t, api)

@@ -339,7 +339,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 				WHEN $8 = 2 THEN NULL
 				ELSE fecha_terminado
 			END
-		WHERE id = $9 AND user_id = $10
+		WHERE id = $9 AND user_id = $10 AND eliminado = false
 		RETURNING id, nombre, descripcion, comentario, estado, prioridad, fecha_terminado, eliminado, tarea_padre_id
 	`
 
@@ -381,7 +381,7 @@ func (r *TareasRepository) Delete(ctx context.Context, id int, userID int) error
 	query := `
 		UPDATE tareas_proyectos
 		SET eliminado = true
-		WHERE id = $1 AND user_id = $2
+		WHERE id = $1 AND user_id = $2 AND eliminado = false
 	`
 
 	res, err := r.db.Exec(ctx, query, id, userID)

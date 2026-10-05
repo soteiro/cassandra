@@ -85,7 +85,7 @@ func NewRouter(opts Options) http.Handler {
 
 	// Grupo de rutas protegidas
 	r.Group(func(r chi.Router) {
-		r.Use(middleware.AuthMiddleware(cfg.JwtSecret))
+		r.Use(middleware.AuthMiddleware(cfg.JwtSecret, userRepo))
 
 		// Las cuentas se crean desde la terminal del servidor (cassandra-app create-user).
 		r.Get("/api/users/{id}", userHandler.GetUser)
