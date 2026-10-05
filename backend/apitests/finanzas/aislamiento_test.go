@@ -81,7 +81,6 @@ func TestAislamiento_Catalogos(t *testing.T) {
 
 // Igual que el anterior, pero exige el código correcto (403/404) en PUT/DELETE ajeno.
 func TestAislamiento_Catalogos_CodigoPutDeleteAjeno(t *testing.T) {
-	bug(t, "PUT/DELETE de banco/grupo/movimiento ajeno o inexistente responde 500 en vez de 404")
 	for _, c := range catalogos {
 		t.Run(c.nombre, func(t *testing.T) {
 			api, a, b := setup(t)
@@ -130,7 +129,6 @@ func TestAislamiento_Plantilla(t *testing.T) {
 }
 
 func TestAislamiento_Plantilla_CodigoPutDeleteAjeno(t *testing.T) {
-	bug(t, "PUT/DELETE de ítem de plantilla ajeno o inexistente responde 500 en vez de 404")
 	api, a, b := setup(t)
 	itA := crearItem(t, api, a, "ingreso", 10, 2026, 3, nil)
 	expectDenegado(t, api.Do(b, http.MethodPut, apitest.Path("%s/%d", pathPlant, itA.ID), map[string]any{"monto": 1}), "PUT ajeno")
@@ -237,7 +235,6 @@ func TestAislamiento_Deseos(t *testing.T) {
 }
 
 func TestAislamiento_Deseos_CodigoDeleteAjeno(t *testing.T) {
-	bug(t, "DELETE /api/lista-deseos/{id} ajeno o inexistente responde 500 en vez de 404")
 	api, a, b := setup(t)
 	dA := crearDeseo(t, api, a, map[string]any{"nombre": "x"})
 	expectDenegado(t, api.Do(b, http.MethodDelete, apitest.Path("%s/%d", pathDeseos, dA.ID), nil), "DELETE ajeno")

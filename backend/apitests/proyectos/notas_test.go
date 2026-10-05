@@ -112,7 +112,6 @@ func TestNotaValidaciones(t *testing.T) {
 }
 
 func TestNotaInexistenteOAjenaDeleteDevuelve404(t *testing.T) {
-	bug(t, "DELETE /api/notas/{id} inexistente o ajena devuelve 500 en vez de 404")
 	api, ana, beto := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	n := crearNota(t, api, ana, p.ID, "de Ana")

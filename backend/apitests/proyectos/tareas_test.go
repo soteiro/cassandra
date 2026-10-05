@@ -102,7 +102,6 @@ func TestTareaValidaciones(t *testing.T) {
 }
 
 func TestTareaEstadoFueraDeCheck(t *testing.T) {
-	bug(t, "estado de tarea fuera del CHECK produce 500 en vez de 400 (no se valida en el handler)")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	tr := crearTarea(t, api, ana, p.ID, "Tarea", nil)
@@ -133,7 +132,6 @@ func TestTareaPadreInexistente(t *testing.T) {
 }
 
 func TestTareaInexistenteOAjenaDevuelve404(t *testing.T) {
-	bug(t, "PUT y DELETE de una tarea inexistente o ajena devuelven 500 en vez de 404")
 	api, ana, beto := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	tr := crearTarea(t, api, ana, p.ID, "De Ana", nil)
@@ -149,7 +147,6 @@ func TestTareaInexistenteOAjenaDevuelve404(t *testing.T) {
 }
 
 func TestTareaBorradaNoSeEdita(t *testing.T) {
-	bug(t, "PUT /api/tareas/{id} edita (y con eliminado=false resucita) tareas borradas: el UPDATE no filtra eliminado=false")
 	api, ana, _ := setup(t)
 	p := crearProyecto(t, api, ana, "Proyecto", nil)
 	tr := crearTarea(t, api, ana, p.ID, "Borrada", nil)

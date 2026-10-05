@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -47,7 +46,7 @@ func (h *InteraccionesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// Extraer persona_id de URL si está presente
 	personaIDStr := chi.URLParam(r, "persona_id")
 	if personaIDStr != "" {
-		if pID, err := strconv.Atoi(personaIDStr); err == nil && pID > 0 {
+		if pID, err := atoi32(personaIDStr); err == nil && pID > 0 {
 			req.PersonaID = pID
 		}
 	}
@@ -74,7 +73,7 @@ func (h *InteraccionesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	interaccion, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Interacciones.Create] Error en repositorio: %v | user_id=%d persona_id=%d", err, userID, req.PersonaID)
-		http.Error(w, "Error al crear la interacción", http.StatusInternalServerError)
+		dbError(w, "Error al crear la interacción", err)
 		return
 	}
 
@@ -96,7 +95,7 @@ func (h *InteraccionesHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	interacciones, err := h.repo.GetAll(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Interacciones.GetAll] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener las interacciones", http.StatusInternalServerError)
+		dbError(w, "Error al obtener las interacciones", err)
 		return
 	}
 
@@ -109,7 +108,7 @@ func (h *InteraccionesHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // GetByPersonaID atiende GET /api/personas/{persona_id}/interacciones
 func (h *InteraccionesHandler) GetByPersonaID(w http.ResponseWriter, r *http.Request) {
 	personaIDStr := chi.URLParam(r, "persona_id")
-	personaID, err := strconv.Atoi(personaIDStr)
+	personaID, err := atoi32(personaIDStr)
 	if err != nil || personaID <= 0 {
 		log.Printf("[HANDLER:Interacciones.GetByPersonaID] ID de persona inválido: %s", personaIDStr)
 		http.Error(w, "ID de persona inválido", http.StatusBadRequest)
@@ -126,7 +125,7 @@ func (h *InteraccionesHandler) GetByPersonaID(w http.ResponseWriter, r *http.Req
 	interacciones, err := h.repo.GetByPersonaID(r.Context(), personaID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Interacciones.GetByPersonaID] Error en repositorio: %v | persona_id=%d user_id=%d", err, personaID, userID)
-		http.Error(w, "Error al obtener las interacciones de la persona", http.StatusInternalServerError)
+		dbError(w, "Error al obtener las interacciones de la persona", err)
 		return
 	}
 
@@ -139,7 +138,7 @@ func (h *InteraccionesHandler) GetByPersonaID(w http.ResponseWriter, r *http.Req
 // GetByID atiende GET /api/interacciones/{id}
 func (h *InteraccionesHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Interacciones.GetByID] ID inválido: %s", idStr)
 		http.Error(w, "ID de interacción inválido", http.StatusBadRequest)
@@ -157,11 +156,11 @@ func (h *InteraccionesHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:Interacciones.GetByID] No encontrada | id=%d user_id=%d", id, userID)
-			http.Error(w, "Interacción no encontrada", http.StatusNotFound)
+			dbError(w, "Interacción no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:Interacciones.GetByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al obtener la interacción", http.StatusInternalServerError)
+		dbError(w, "Error al obtener la interacción", err)
 		return
 	}
 
@@ -181,7 +180,7 @@ func (h *InteraccionesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Interacciones.Update] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID de interacción inválido", http.StatusBadRequest)
@@ -209,11 +208,11 @@ func (h *InteraccionesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:Interacciones.Update] No encontrada para actualizar | id=%d user_id=%d", id, userID)
-			http.Error(w, "Interacción no encontrada", http.StatusNotFound)
+			dbError(w, "Interacción no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:Interacciones.Update] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar la interacción", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar la interacción", err)
 		return
 	}
 
@@ -226,7 +225,7 @@ func (h *InteraccionesHandler) Update(w http.ResponseWriter, r *http.Request) {
 // Delete atiende DELETE /api/interacciones/{id}
 func (h *InteraccionesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:Interacciones.Delete] ID inválido: %s", idStr)
 		http.Error(w, "ID de interacción inválido", http.StatusBadRequest)
@@ -242,7 +241,7 @@ func (h *InteraccionesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.repo.Delete(r.Context(), id, userID); err != nil {
 		log.Printf("[HANDLER:Interacciones.Delete] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al eliminar la interacción", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar la interacción", err)
 		return
 	}
 

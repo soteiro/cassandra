@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -65,7 +64,7 @@ func (h *FinanzasHandler) CreateBanco(w http.ResponseWriter, r *http.Request) {
 	banco, err := h.repo.CreateBanco(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.CreateBanco] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al crear el banco: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al crear el banco", err)
 		return
 	}
 
@@ -85,7 +84,7 @@ func (h *FinanzasHandler) GetBancos(w http.ResponseWriter, r *http.Request) {
 	bancos, err := h.repo.GetBancos(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.GetBancos] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener los bancos: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al obtener los bancos", err)
 		return
 	}
 
@@ -102,7 +101,7 @@ func (h *FinanzasHandler) GetBancoByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de banco inválido", http.StatusBadRequest)
 		return
@@ -110,7 +109,7 @@ func (h *FinanzasHandler) GetBancoByID(w http.ResponseWriter, r *http.Request) {
 
 	banco, err := h.repo.GetBancoByID(r.Context(), id, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		dbError(w, "Recurso no encontrado", err)
 		return
 	}
 
@@ -127,7 +126,7 @@ func (h *FinanzasHandler) UpdateBanco(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de banco inválido", http.StatusBadRequest)
 		return
@@ -162,7 +161,7 @@ func (h *FinanzasHandler) UpdateBanco(w http.ResponseWriter, r *http.Request) {
 	banco, err := h.repo.UpdateBanco(r.Context(), id, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.UpdateBanco] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar el banco: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al actualizar el banco", err)
 		return
 	}
 
@@ -179,14 +178,14 @@ func (h *FinanzasHandler) DeleteBanco(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de banco inválido", http.StatusBadRequest)
 		return
 	}
 
 	if err := h.repo.DeleteBanco(r.Context(), id, userID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error interno del servidor", err)
 		return
 	}
 
@@ -222,7 +221,7 @@ func (h *FinanzasHandler) CreateGrupoItem(w http.ResponseWriter, r *http.Request
 	grupo, err := h.repo.CreateGrupoItem(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.CreateGrupoItem] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al crear el grupo: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al crear el grupo", err)
 		return
 	}
 
@@ -242,7 +241,7 @@ func (h *FinanzasHandler) GetGruposItems(w http.ResponseWriter, r *http.Request)
 	grupos, err := h.repo.GetGruposItems(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.GetGruposItems] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener grupos: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al obtener grupos", err)
 		return
 	}
 
@@ -259,7 +258,7 @@ func (h *FinanzasHandler) GetGrupoItemByID(w http.ResponseWriter, r *http.Reques
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de grupo inválido", http.StatusBadRequest)
 		return
@@ -267,7 +266,7 @@ func (h *FinanzasHandler) GetGrupoItemByID(w http.ResponseWriter, r *http.Reques
 
 	grupo, err := h.repo.GetGrupoItemByID(r.Context(), id, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		dbError(w, "Recurso no encontrado", err)
 		return
 	}
 
@@ -284,7 +283,7 @@ func (h *FinanzasHandler) UpdateGrupoItem(w http.ResponseWriter, r *http.Request
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de grupo inválido", http.StatusBadRequest)
 		return
@@ -308,7 +307,7 @@ func (h *FinanzasHandler) UpdateGrupoItem(w http.ResponseWriter, r *http.Request
 	grupo, err := h.repo.UpdateGrupoItem(r.Context(), id, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.UpdateGrupoItem] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar grupo: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al actualizar grupo", err)
 		return
 	}
 
@@ -325,14 +324,14 @@ func (h *FinanzasHandler) DeleteGrupoItem(w http.ResponseWriter, r *http.Request
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de grupo inválido", http.StatusBadRequest)
 		return
 	}
 
 	if err := h.repo.DeleteGrupoItem(r.Context(), id, userID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error interno del servidor", err)
 		return
 	}
 
@@ -368,7 +367,7 @@ func (h *FinanzasHandler) CreateMovimientoEsperado(w http.ResponseWriter, r *htt
 	mov, err := h.repo.CreateMovimientoEsperado(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.CreateMovimientoEsperado] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al crear movimiento esperado: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al crear movimiento esperado", err)
 		return
 	}
 
@@ -388,7 +387,7 @@ func (h *FinanzasHandler) GetMovimientosEsperados(w http.ResponseWriter, r *http
 	movs, err := h.repo.GetMovimientosEsperados(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.GetMovimientosEsperados] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener movimientos esperados: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al obtener movimientos esperados", err)
 		return
 	}
 
@@ -405,7 +404,7 @@ func (h *FinanzasHandler) GetMovimientoEsperadoByID(w http.ResponseWriter, r *ht
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de movimiento esperado inválido", http.StatusBadRequest)
 		return
@@ -413,7 +412,7 @@ func (h *FinanzasHandler) GetMovimientoEsperadoByID(w http.ResponseWriter, r *ht
 
 	mov, err := h.repo.GetMovimientoEsperadoByID(r.Context(), id, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		dbError(w, "Recurso no encontrado", err)
 		return
 	}
 
@@ -430,7 +429,7 @@ func (h *FinanzasHandler) UpdateMovimientoEsperado(w http.ResponseWriter, r *htt
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de movimiento esperado inválido", http.StatusBadRequest)
 		return
@@ -454,7 +453,7 @@ func (h *FinanzasHandler) UpdateMovimientoEsperado(w http.ResponseWriter, r *htt
 	mov, err := h.repo.UpdateMovimientoEsperado(r.Context(), id, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.UpdateMovimientoEsperado] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar movimiento esperado: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al actualizar movimiento esperado", err)
 		return
 	}
 
@@ -471,14 +470,14 @@ func (h *FinanzasHandler) DeleteMovimientoEsperado(w http.ResponseWriter, r *htt
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de movimiento esperado inválido", http.StatusBadRequest)
 		return
 	}
 
 	if err := h.repo.DeleteMovimientoEsperado(r.Context(), id, userID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error interno del servidor", err)
 		return
 	}
 
@@ -549,7 +548,7 @@ func (h *FinanzasHandler) CreatePlantilla(w http.ResponseWriter, r *http.Request
 	item, err := h.repo.CreatePlantilla(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.CreatePlantilla] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al registrar ítem de finanzas: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al registrar ítem de finanzas", err)
 		return
 	}
 
@@ -571,15 +570,21 @@ func (h *FinanzasHandler) GetPlantillaByPeriodo(w http.ResponseWriter, r *http.R
 	mes := int(now.Month())
 
 	if anioParam := r.URL.Query().Get("anio"); anioParam != "" {
-		if a, err := strconv.Atoi(anioParam); err == nil && a > 2000 {
-			anio = a
+		a, err := atoi32(anioParam)
+		if err != nil || a <= 2000 {
+			http.Error(w, "anio inválido", http.StatusBadRequest)
+			return
 		}
+		anio = a
 	}
 
 	if mesParam := r.URL.Query().Get("mes"); mesParam != "" {
-		if m, err := strconv.Atoi(mesParam); err == nil && m >= 1 && m <= 12 {
-			mes = m
+		m, err := atoi32(mesParam)
+		if err != nil || m < 1 || m > 12 {
+			http.Error(w, "mes inválido (1-12)", http.StatusBadRequest)
+			return
 		}
+		mes = m
 	}
 
 	log.Printf("[HANDLER:Finanzas.GetPlantillaByPeriodo] user_id=%d consultando anio=%d mes=%d (query: anio=%q mes=%q)", userID, anio, mes, r.URL.Query().Get("anio"), r.URL.Query().Get("mes"))
@@ -587,7 +592,7 @@ func (h *FinanzasHandler) GetPlantillaByPeriodo(w http.ResponseWriter, r *http.R
 	items, err := h.repo.GetPlantillaByPeriodo(r.Context(), userID, anio, mes)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.GetPlantillaByPeriodo] Error en repositorio: %v | user_id=%d anio=%d mes=%d", err, userID, anio, mes)
-		http.Error(w, "Error al obtener finanzas: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al obtener finanzas", err)
 		return
 	}
 
@@ -604,7 +609,7 @@ func (h *FinanzasHandler) GetPlantillaByID(w http.ResponseWriter, r *http.Reques
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de ítem de finanzas inválido", http.StatusBadRequest)
 		return
@@ -612,7 +617,7 @@ func (h *FinanzasHandler) GetPlantillaByID(w http.ResponseWriter, r *http.Reques
 
 	item, err := h.repo.GetPlantillaByID(r.Context(), id, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		dbError(w, "Recurso no encontrado", err)
 		return
 	}
 
@@ -629,7 +634,7 @@ func (h *FinanzasHandler) UpdatePlantilla(w http.ResponseWriter, r *http.Request
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de ítem de finanzas inválido", http.StatusBadRequest)
 		return
@@ -687,7 +692,7 @@ func (h *FinanzasHandler) UpdatePlantilla(w http.ResponseWriter, r *http.Request
 	item, err := h.repo.UpdatePlantilla(r.Context(), id, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.UpdatePlantilla] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al actualizar ítem de finanzas: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al actualizar ítem de finanzas", err)
 		return
 	}
 
@@ -704,14 +709,14 @@ func (h *FinanzasHandler) DeletePlantilla(w http.ResponseWriter, r *http.Request
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de ítem de finanzas inválido", http.StatusBadRequest)
 		return
 	}
 
 	if err := h.repo.DeletePlantilla(r.Context(), id, userID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error interno del servidor", err)
 		return
 	}
 
@@ -736,15 +741,21 @@ func (h *FinanzasHandler) GetResumenPeriodo(w http.ResponseWriter, r *http.Reque
 	mes := int(now.Month())
 
 	if anioParam := r.URL.Query().Get("anio"); anioParam != "" {
-		if a, err := strconv.Atoi(anioParam); err == nil && a > 2000 {
-			anio = a
+		a, err := atoi32(anioParam)
+		if err != nil || a <= 2000 {
+			http.Error(w, "anio inválido", http.StatusBadRequest)
+			return
 		}
+		anio = a
 	}
 
 	if mesParam := r.URL.Query().Get("mes"); mesParam != "" {
-		if m, err := strconv.Atoi(mesParam); err == nil && m >= 1 && m <= 12 {
-			mes = m
+		m, err := atoi32(mesParam)
+		if err != nil || m < 1 || m > 12 {
+			http.Error(w, "mes inválido (1-12)", http.StatusBadRequest)
+			return
 		}
+		mes = m
 	}
 
 	log.Printf("[HANDLER:Finanzas.GetResumenPeriodo] user_id=%d consultando anio=%d mes=%d (query: anio=%q mes=%q)", userID, anio, mes, r.URL.Query().Get("anio"), r.URL.Query().Get("mes"))
@@ -752,7 +763,7 @@ func (h *FinanzasHandler) GetResumenPeriodo(w http.ResponseWriter, r *http.Reque
 	resumen, err := h.repo.GetResumenPeriodo(r.Context(), userID, anio, mes)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.GetResumenPeriodo] Error en repositorio: %v | user_id=%d anio=%d mes=%d", err, userID, anio, mes)
-		http.Error(w, "Error al obtener resumen de finanzas: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al obtener resumen de finanzas", err)
 		return
 	}
 
@@ -784,10 +795,15 @@ func (h *FinanzasHandler) ClonarPeriodo(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	if req.AnioOrigen == req.AnioDestino && req.MesOrigen == req.MesDestino {
+		http.Error(w, "El período de destino debe ser distinto del de origen", http.StatusBadRequest)
+		return
+	}
+
 	clonados, err := h.repo.ClonarPeriodo(r.Context(), userID, req.AnioOrigen, req.MesOrigen, req.AnioDestino, req.MesDestino)
 	if err != nil {
 		log.Printf("[HANDLER:Finanzas.ClonarPeriodo] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al clonar período: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al clonar período", err)
 		return
 	}
 

@@ -38,7 +38,6 @@ func usuario(t *testing.T, api *apitest.API, email string) *apitest.User {
 // TestBug_SegundoUsuarioSinAlias: crear dos usuarios sin alias (como hace el CLI
 // create-user sin --alias) debe funcionar.
 func TestBug_SegundoUsuarioSinAlias(t *testing.T) {
-	bug(t, "admin.CreateUser inserta alias '' (no NULL) y users.alias es UNIQUE: el segundo usuario sin alias falla con 'ya existe un usuario con ese email'")
 	api := apitest.New(t, "documentos")
 	api.User("uno@cassandra.test")
 	api.User("dos@cassandra.test")

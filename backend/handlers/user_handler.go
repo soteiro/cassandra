@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -35,7 +34,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idSrt := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idSrt)
+	id, err := atoi32(idSrt)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:User.GetUser] ID inválido: %s | user_id=%d", idSrt, userID)
 		http.Error(w, "ID inválido, debe ser un número", http.StatusBadRequest)
@@ -52,7 +51,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.repo.GetById(r.Context(), id)
 	if err != nil {
 		log.Printf("[HANDLER:User.GetUser] Error o no encontrado: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+		dbError(w, "Usuario no encontrado", err)
 		return
 	}
 
@@ -71,7 +70,7 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:User.DeleteUser] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -88,7 +87,7 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
 		log.Printf("[HANDLER:User.DeleteUser] Error en repositorio: %v | id=%d", err, id)
-		http.Error(w, "Error al eliminar usuario", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar usuario", err)
 		return
 	}
 
@@ -106,7 +105,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:User.UpdateUser] ID inválido: %s | user_id=%d", idStr, userID)
 		http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -151,7 +150,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	user, err := h.repo.Update(r.Context(), id, &req)
 	if err != nil {
 		log.Printf("[HANDLER:User.UpdateUser] Error en repositorio: %v | id=%d", err, id)
-		http.Error(w, "Error al actualizar el usuario", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar el usuario", err)
 		return
 	}
 

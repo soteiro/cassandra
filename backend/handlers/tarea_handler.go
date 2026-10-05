@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"cassandra/middleware"
@@ -88,7 +87,7 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	tarea, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.CreateTarea] Error en repositorio: %v | user_id=%d proyect_id=%d", err, userID, req.ProyectID)
-		http.Error(w, "error al crear la tarea: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "error al crear la tarea", err)
 		return
 	}
 
@@ -112,7 +111,7 @@ func (h *TareasHandler) GetAllTareas(w http.ResponseWriter, r *http.Request) {
 	tareas, err := h.repo.GetAll(r.Context(), userID, estadoFilter)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.GetAllTareas] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "error al obtener las tareas: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "error al obtener las tareas", err)
 		return
 	}
 
@@ -135,7 +134,7 @@ func (h *TareasHandler) GetTareaByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tareaID, err := strconv.Atoi(tareaIDStr)
+	tareaID, err := atoi32(tareaIDStr)
 	if err != nil || tareaID <= 0 {
 		log.Printf("[HANDLER:Tareas.GetTareaByID] ID inválido: %s", tareaIDStr)
 		http.Error(w, "ID inválido, debe ser un número entero", http.StatusBadRequest)
@@ -145,7 +144,7 @@ func (h *TareasHandler) GetTareaByID(w http.ResponseWriter, r *http.Request) {
 	tarea, err := h.repo.GetByID(r.Context(), tareaID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.GetTareaByID] Error o no encontrada: %v | id=%d user_id=%d", err, tareaID, userID)
-		http.Error(w, "Tarea no encontrada o acceso denegado", http.StatusNotFound)
+		dbError(w, "Tarea no encontrada o acceso denegado", err)
 		return
 	}
 
@@ -164,7 +163,7 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tareaID, err := strconv.Atoi(tareaIDStr)
+	tareaID, err := atoi32(tareaIDStr)
 	if err != nil || tareaID <= 0 {
 		log.Printf("[HANDLER:Tareas.UpdateTarea] ID inválido: %s", tareaIDStr)
 		http.Error(w, "ID inválido, debe ser un número entero", http.StatusBadRequest)
@@ -213,10 +212,13 @@ func (h *TareasHandler) UpdateTarea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// El borrado va por DELETE; por PUT no se puede borrar ni restaurar una tarea.
+	req.Eliminado = nil
+
 	tarea, err := h.repo.Update(r.Context(), tareaID, userID, &req)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.UpdateTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)
-		http.Error(w, "error al actualizar la tarea: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "error al actualizar la tarea", err)
 		return
 	}
 
@@ -235,7 +237,7 @@ func (h *TareasHandler) DeleteTarea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tareaID, err := strconv.Atoi(tareaIDStr)
+	tareaID, err := atoi32(tareaIDStr)
 	if err != nil || tareaID <= 0 {
 		log.Printf("[HANDLER:Tareas.DeleteTarea] ID inválido: %s", tareaIDStr)
 		http.Error(w, "ID inválido, debe ser un número entero", http.StatusBadRequest)
@@ -245,7 +247,7 @@ func (h *TareasHandler) DeleteTarea(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Delete(r.Context(), tareaID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.DeleteTarea] Error en repositorio: %v | id=%d user_id=%d", err, tareaID, userID)
-		http.Error(w, "Error al eliminar la tarea: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al eliminar la tarea", err)
 		return
 	}
 
@@ -267,7 +269,7 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	proyectID, err := strconv.Atoi(proyectIDStr)
+	proyectID, err := atoi32(proyectIDStr)
 	if err != nil || proyectID <= 0 {
 		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] ID de proyecto inválido: %s", proyectIDStr)
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
@@ -277,7 +279,7 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 	tareas, err := h.repo.GetByProyectoID(r.Context(), proyectID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
-		http.Error(w, "Error al obtener tareas del proyecto: "+err.Error(), http.StatusInternalServerError)
+		dbError(w, "Error al obtener tareas del proyecto", err)
 		return
 	}
 

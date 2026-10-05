@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -53,7 +52,7 @@ func (h *NotasProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
 		proyectIDStr = chi.URLParam(r, "proyecto_id")
 	}
 	if proyectIDStr != "" {
-		if pID, err := strconv.Atoi(proyectIDStr); err == nil && pID > 0 {
+		if pID, err := atoi32(proyectIDStr); err == nil && pID > 0 {
 			req.ProyectoID = pID
 		}
 	}
@@ -61,7 +60,7 @@ func (h *NotasProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// Si tarea_id viene en los parámetros de la URL
 	tareaIDStr := chi.URLParam(r, "tarea_id")
 	if tareaIDStr != "" {
-		if tID, err := strconv.Atoi(tareaIDStr); err == nil && tID > 0 {
+		if tID, err := atoi32(tareaIDStr); err == nil && tID > 0 {
 			req.TareaID = &tID
 		}
 	}
@@ -99,7 +98,7 @@ func (h *NotasProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
 	notaProyecto, err := h.NotasRepo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.Create] Error en repositorio: %v | user_id=%d proyecto_id=%d", err, userID, req.ProyectoID)
-		http.Error(w, "Error al crear la nota de proyecto", http.StatusInternalServerError)
+		dbError(w, "Error al crear la nota de proyecto", err)
 		return
 	}
 
@@ -120,7 +119,7 @@ func (h *NotasProyectoHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	notasProyecto, err := h.NotasRepo.GetAll(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.GetAll] Error en repositorio: %v | user_id=%d", err, userID)
-		http.Error(w, "Error al obtener las notas de proyecto", http.StatusInternalServerError)
+		dbError(w, "Error al obtener las notas de proyecto", err)
 		return
 	}
 
@@ -133,7 +132,7 @@ func (h *NotasProyectoHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // eliminar nota de proyecto
 func (h *NotasProyectoHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:NotasProyecto.Delete] ID inválido: %s", idStr)
 		http.Error(w, "ID de nota de proyecto inválido", http.StatusBadRequest)
@@ -150,7 +149,7 @@ func (h *NotasProyectoHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	err = h.NotasRepo.Delete(r.Context(), id, userID)
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.Delete] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al eliminar la nota de proyecto", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar la nota de proyecto", err)
 		return 
 	}
 
@@ -160,7 +159,7 @@ func (h *NotasProyectoHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (h *NotasProyectoHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	nota := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(nota)
+	id, err := atoi32(nota)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:NotasProyecto.GetByID] ID inválido: %s", nota)
 		http.Error(w, "ID de nota de proyecto inválido", http.StatusBadRequest)
@@ -178,11 +177,11 @@ func (h *NotasProyectoHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:NotasProyecto.GetByID] No encontrada | id=%d user_id=%d", id, userID)
-			http.Error(w, "Nota de proyecto no encontrada", http.StatusNotFound)
+			dbError(w, "Nota de proyecto no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:NotasProyecto.GetByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
-		http.Error(w, "Error al obtener la nota de proyecto", http.StatusInternalServerError)
+		dbError(w, "Error al obtener la nota de proyecto", err)
 		return 
 	}
 
@@ -202,7 +201,7 @@ func (h *NotasProyectoHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		log.Printf("[HANDLER:NotasProyecto.Update] ID inválido: %s | user_id=%d", idStr, userId)
 		http.Error(w, "ID de nota de proyecto inválido", http.StatusBadRequest)
@@ -236,11 +235,11 @@ func (h *NotasProyectoHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			log.Printf("[HANDLER:NotasProyecto.Update] No encontrada para actualizar | id=%d user_id=%d", id, userId)
-			http.Error(w, "Nota de proyecto no encontrada", http.StatusNotFound)
+			dbError(w, "Nota de proyecto no encontrada", err)
 			return
 		}
 		log.Printf("[HANDLER:NotasProyecto.Update] Error en repositorio: %v | id=%d user_id=%d", err, id, userId)
-		http.Error(w, "Error al actualizar la nota de proyecto", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar la nota de proyecto", err)
 		return
 	}
 
@@ -256,7 +255,7 @@ func (h *NotasProyectoHandler) GetByProyectoID(w http.ResponseWriter, r *http.Re
 	if proyectoIDStr == "" {
 		proyectoIDStr = chi.URLParam(r, "proyecto_id")
 	}
-	proyectoID, err := strconv.Atoi(proyectoIDStr)
+	proyectoID, err := atoi32(proyectoIDStr)
 	if err != nil || proyectoID <= 0 {
 		log.Printf("[HANDLER:NotasProyecto.GetByProyectoID] ID de proyecto inválido: %s", proyectoIDStr)
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
@@ -273,7 +272,7 @@ func (h *NotasProyectoHandler) GetByProyectoID(w http.ResponseWriter, r *http.Re
 	notasProyecto, err := h.NotasRepo.GetByProyectoID(r.Context(), proyectoID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.GetByProyectoID] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
-		http.Error(w, "Error al obtener las notas de proyecto por proyecto_id", http.StatusInternalServerError)
+		dbError(w, "Error al obtener las notas de proyecto por proyecto_id", err)
 		return
 	}
 
@@ -289,7 +288,7 @@ func (h *NotasProyectoHandler) GetByTareaID(w http.ResponseWriter, r *http.Reque
 	if tareaIDStr == "" {
 		tareaIDStr = chi.URLParam(r, "id")
 	}
-	tareaID, err := strconv.Atoi(tareaIDStr)
+	tareaID, err := atoi32(tareaIDStr)
 	if err != nil || tareaID <= 0 {
 		log.Printf("[HANDLER:NotasProyecto.GetByTareaID] ID de tarea inválido: %s", tareaIDStr)
 		http.Error(w, "ID de tarea inválido", http.StatusBadRequest)
@@ -306,7 +305,7 @@ func (h *NotasProyectoHandler) GetByTareaID(w http.ResponseWriter, r *http.Reque
 	notas, err := h.NotasRepo.GetByTareaID(r.Context(), tareaID, userID)
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.GetByTareaID] Error en repositorio: %v | tarea_id=%d user_id=%d", err, tareaID, userID)
-		http.Error(w, "Error al obtener las notas por tarea_id", http.StatusInternalServerError)
+		dbError(w, "Error al obtener las notas por tarea_id", err)
 		return
 	}
 

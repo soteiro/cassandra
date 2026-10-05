@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -43,7 +42,7 @@ func (h *DocumentosProyectoHandler) Create(w http.ResponseWriter, r *http.Reques
 		proyectIDStr = chi.URLParam(r, "proyecto_id")
 	}
 	if proyectIDStr != "" {
-		if pID, err := strconv.Atoi(proyectIDStr); err == nil && pID > 0 {
+		if pID, err := atoi32(proyectIDStr); err == nil && pID > 0 {
 			req.ProyectoID = pID
 		}
 	}
@@ -69,7 +68,7 @@ func (h *DocumentosProyectoHandler) Create(w http.ResponseWriter, r *http.Reques
 	doc, err := h.Repo.Create(r.Context(), &req)
 	if err != nil {
 		log.Printf("[HANDLER:Documentos.Create] Error: %v", err)
-		http.Error(w, "Error al crear documento", http.StatusInternalServerError)
+		dbError(w, "Error al crear documento", err)
 		return
 	}
 
@@ -89,7 +88,7 @@ func (h *DocumentosProyectoHandler) GetByProyectoID(w http.ResponseWriter, r *ht
 	if proyectIDStr == "" {
 		proyectIDStr = chi.URLParam(r, "proyecto_id")
 	}
-	proyectID, err := strconv.Atoi(proyectIDStr)
+	proyectID, err := atoi32(proyectIDStr)
 	if err != nil || proyectID <= 0 {
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
 		return
@@ -100,7 +99,7 @@ func (h *DocumentosProyectoHandler) GetByProyectoID(w http.ResponseWriter, r *ht
 	docs, err := h.Repo.GetByProyectoID(r.Context(), proyectID, userID, tipoFilter)
 	if err != nil {
 		log.Printf("[HANDLER:Documentos.GetByProyectoID] Error: %v", err)
-		http.Error(w, "Error al obtener documentos", http.StatusInternalServerError)
+		dbError(w, "Error al obtener documentos", err)
 		return
 	}
 
@@ -117,7 +116,7 @@ func (h *DocumentosProyectoHandler) GetByID(w http.ResponseWriter, r *http.Reque
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de documento inválido", http.StatusBadRequest)
 		return
@@ -126,11 +125,11 @@ func (h *DocumentosProyectoHandler) GetByID(w http.ResponseWriter, r *http.Reque
 	doc, err := h.Repo.GetByID(r.Context(), id, userID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			http.Error(w, "Documento no encontrado", http.StatusNotFound)
+			dbError(w, "Documento no encontrado", err)
 			return
 		}
 		log.Printf("[HANDLER:Documentos.GetByID] Error: %v", err)
-		http.Error(w, "Error al obtener documento", http.StatusInternalServerError)
+		dbError(w, "Error al obtener documento", err)
 		return
 	}
 
@@ -147,7 +146,7 @@ func (h *DocumentosProyectoHandler) Update(w http.ResponseWriter, r *http.Reques
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de documento inválido", http.StatusBadRequest)
 		return
@@ -171,11 +170,11 @@ func (h *DocumentosProyectoHandler) Update(w http.ResponseWriter, r *http.Reques
 	doc, err := h.Repo.Update(r.Context(), id, userID, &req)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			http.Error(w, "Documento no encontrado", http.StatusNotFound)
+			dbError(w, "Documento no encontrado", err)
 			return
 		}
 		log.Printf("[HANDLER:Documentos.Update] Error: %v", err)
-		http.Error(w, "Error al actualizar documento", http.StatusInternalServerError)
+		dbError(w, "Error al actualizar documento", err)
 		return
 	}
 
@@ -192,7 +191,7 @@ func (h *DocumentosProyectoHandler) Delete(w http.ResponseWriter, r *http.Reques
 	}
 
 	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
+	id, err := atoi32(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "ID de documento inválido", http.StatusBadRequest)
 		return
@@ -200,7 +199,7 @@ func (h *DocumentosProyectoHandler) Delete(w http.ResponseWriter, r *http.Reques
 
 	if err := h.Repo.Delete(r.Context(), id, userID); err != nil {
 		log.Printf("[HANDLER:Documentos.Delete] Error: %v", err)
-		http.Error(w, "Error al eliminar documento", http.StatusInternalServerError)
+		dbError(w, "Error al eliminar documento", err)
 		return
 	}
 

@@ -187,7 +187,7 @@ func (r *LogsRepository) Delete(ctx context.Context, userID int, id int) error {
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:Logs.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("no se encontró el log con id: %d o no tiene permisos", id)
+		return fmt.Errorf("%w: no se encontró el log con id: %d o no tiene permisos", ErrNoEncontrado, id)
 	}
 
 	return nil
