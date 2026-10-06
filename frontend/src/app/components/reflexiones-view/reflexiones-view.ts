@@ -1,3 +1,4 @@
+import { LoadingDirective } from '../../directives/loading.directive';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ import { getErrorMessage } from '../../utils/http-error.util';
 @Component({
   selector: 'app-reflexiones-view',
   imports: [
+    LoadingDirective,
     CommonModule,
     FormsModule,
     ReflexionModal,
@@ -76,7 +78,7 @@ export class ReflexionesView {
 
   // Calculate statistics from current items
   stats = computed(() => {
-    const items = this.reflexionesResource?.value() || [];
+    const items = this.reflexionesResource?.error() ? [] : (this.reflexionesResource?.value() || []);
     return {
       total: items.length,
       reflexiones: items.filter((i) => i.tipo === 'reflexion').length,

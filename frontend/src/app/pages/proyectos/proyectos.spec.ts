@@ -83,6 +83,15 @@ describe('Proyectos', () => {
 
   afterEach(() => vi.useRealTimers());
 
+  it('does not read a failed resource while rendering the retry state', () => {
+    service.proyectResource.error.set(new Error('Sin conexión'));
+    const value = vi.spyOn(service.proyectResource, 'value').mockImplementation(() => {
+      throw new Error('A failed resource has no readable value');
+    });
+    expect(component.potentialParents()).toEqual([]);
+    expect(value).not.toHaveBeenCalled();
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

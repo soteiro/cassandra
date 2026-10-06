@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div [appLoading]="tasksResource?.isLoading() || false" loadingLabel="Cargando tareas…" class="space-y-4">
   <!-- HEADER COMPACTO DEL DASHBOARD -->
   <div class="flex items-center justify-between gap-3 pb-2 border-b border-surface-border">
     <div class="flex items-center gap-2">
@@ -34,7 +34,7 @@
           <h2 class="text-xs sm:text-sm font-bold text-text-main truncate">
             Tareas & Foco
           </h2>
-          @if (tasksResource?.value(); as tareas) {
+          @if (!tasksResource?.error() && tasksResource?.value(); as tareas) {
             <span class="px-1.5 py-0.5 bg-background border border-surface-border rounded-md text-[10px] font-mono text-text-muted">
               {{ tareas.length }}
             </span>
@@ -68,6 +68,11 @@
               <div class="w-16 h-3 bg-background rounded-md"></div>
             </div>
           }
+        } @else if (tasksResource?.error()) {
+          <div class="p-4 space-y-3" role="alert">
+            <p class="text-sm text-danger">No se pudieron cargar las tareas.</p>
+            <button type="button" (click)="reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
+          </div>
         } @else if (tasksResource?.value(); as tareas) {
           @for (tarea of sortedTasks(); track tarea.id) {
             <div

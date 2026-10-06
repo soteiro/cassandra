@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto space-y-6">
+<div [appLoading]="(activeTab() === 'movimientos' && (isLoading() || isLoadingResumen())) || (activeTab() === 'catalogos' && pendingCatalogs() > 0)" loadingLabel="Cargando finanzas…" class="max-w-7xl mx-auto space-y-6">
   <!-- 1. ENCABEZADO PRINCIPAL Y ACCIONES -->
   <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-surface-border">
     <div class="space-y-1">
