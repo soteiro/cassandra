@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div [appLoading]="reflexionesResource?.isLoading() || false" loadingLabel="Cargando reflexiones…" class="space-y-6">
   <!-- CABECERA DE PERFIL PERSONAL & ESTADÍSTICAS -->
   <div class="p-6 bg-linear-to-br from-surface via-surface to-primary/5 border border-primary/25 rounded-2xl shadow-sm space-y-5">
     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -223,6 +223,11 @@
             <div class="w-full h-12 bg-background rounded-lg"></div>
           </div>
         }
+      </div>
+    } @else if (reflexionesResource?.error()) {
+      <div role="alert" class="p-4 space-y-3">
+        <p class="text-sm text-danger">No se pudieron cargar las reflexiones.</p>
+        <button type="button" (click)="reflexionesResource?.reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
       </div>
     } @else if (reflexionesResource?.value(); as items) {
       <div class="space-y-3">

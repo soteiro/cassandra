@@ -1,4 +1,4 @@
-<div class="max-w-5xl mx-auto space-y-6">
+<div [appLoading]="isViewLoading()" loadingLabel="Cargando proyecto…" class="max-w-5xl mx-auto space-y-6">
   @if (projectResource?.isLoading() && !projectResource?.value()) {
     <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl">
       <p class="text-text-muted animate-pulse">Cargando detalles del proyecto...</p>
@@ -6,6 +6,7 @@
   } @else if (projectResource?.error()) {
     <div class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
       <p class="text-danger font-medium">Error al cargar el proyecto.</p>
+      <button type="button" (click)="projectResource?.reload()" class="mt-3 text-sm text-primary underline cursor-pointer">Reintentar</button>
     </div>
   } @else if (projectResource?.value(); as project) {
     <!-- CABECERA Y METADATOS DEL PROYECTO -->
@@ -35,19 +36,19 @@
             <svg lucideBookOpen class="w-4 h-4" />
           }
           {{ tab.label }}
-          @if (tab.id === 'subproyectos' && subproyectosResource?.value(); as subs) {
+          @if (tab.id === 'subproyectos' && !subproyectosResource?.error() && subproyectosResource?.value(); as subs) {
             <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
               {{ subs.length }}
             </span>
-          } @else if (tab.id === 'tareas' && tasksResource?.value(); as tareas) {
+          } @else if (tab.id === 'tareas' && !tasksResource?.error() && tasksResource?.value(); as tareas) {
             <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
               {{ tareas.length }}
             </span>
-          } @else if (tab.id === 'notas' && notasResource?.value(); as notas) {
+          } @else if (tab.id === 'notas' && !notasResource?.error() && notasResource?.value(); as notas) {
             <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
               {{ notas.length }}
             </span>
-          } @else if (tab.id === 'documentos' && documentosResource?.value(); as docs) {
+          } @else if (tab.id === 'documentos' && !documentosResource?.error() && documentosResource?.value(); as docs) {
             <span class="text-xs px-2 py-0.5 rounded-full bg-surface-border/60 text-text-muted">
               {{ docs.length }}
             </span>
@@ -57,7 +58,12 @@
     </section>
 
     <!-- CONTENIDO SEGÚN PESTAÑA ACTIVA -->
-    @if (activeTab() === 'subproyectos') {
+    @if (activeTabError()) {
+      <div role="alert" class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
+        <p class="text-danger font-medium">No se pudieron cargar los datos de esta pestaña.</p>
+        <button type="button" (click)="retryActiveTab()" class="mt-3 text-sm text-primary underline cursor-pointer">Reintentar</button>
+      </div>
+    } @else if (activeTab() === 'subproyectos') {
       <app-subprojects-tab
         [subproyectos]="subproyectosResource?.value() || []"
         [isLoading]="subproyectosResource?.isLoading() || false"

@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto space-y-6">
+<div [appLoading]="(personaResource?.isLoading() || false) || (!personaResource?.error() && !personaResource?.value()?.es_yo && (interaccionesResource?.isLoading() || false))" loadingLabel="Cargando perfil…" class="max-w-4xl mx-auto space-y-6">
   <!-- BREADCRUMB / VOLVER -->
   <div>
     <a
@@ -215,6 +215,11 @@
                 <div class="w-20 h-3 bg-background rounded-lg"></div>
               </div>
             }
+          </div>
+        } @else if (interaccionesResource?.error()) {
+          <div role="alert" class="p-4 space-y-3">
+            <p class="text-sm text-danger">No se pudieron cargar las interacciones.</p>
+            <button type="button" (click)="interaccionesResource?.reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
           </div>
         } @else if (interaccionesResource?.value(); as interacciones) {
           <!-- LISTA SIMPLE DE INTERACCIONES -->

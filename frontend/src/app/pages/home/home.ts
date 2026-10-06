@@ -1,3 +1,4 @@
+import { LoadingDirective } from '../../directives/loading.directive';
 import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
 @Component({
   selector: 'app-home',
   imports: [
+    LoadingDirective,
     CommonModule,
     FormsModule,
     RouterLink,

@@ -1,3 +1,4 @@
+import { LoadingDirective } from '../../../../directives/loading.directive';
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ import {
 @Component({
   selector: 'app-deseos-tab',
   imports: [
+    LoadingDirective,
     CommonModule,
     FormsModule,
     ConfirmModal,
