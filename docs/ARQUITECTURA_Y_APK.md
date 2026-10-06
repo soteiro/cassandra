@@ -118,3 +118,36 @@ export default config;
    npx cap open android
    # En Android Studio: Build > Build Bundle(s) / APK(s) > Build APK(s)
    ```
+
+## 5. Descarga e instalación de actualizaciones
+
+El botón de actualizaciones consulta la última release de GitHub y busca el asset
+`cassandra.apk`. En Android, `AppUpdateService` llama al plugin local
+`ApkUpdaterPlugin`, registrado en `MainActivity`, en lugar de abrir el APK en Brave
+u otro navegador.
+
+El plugin usa `DownloadManager` para descargar en el directorio externo privado
+de Cassandra (`Download/`). No requiere permisos generales de almacenamiento.
+Guarda el identificador de descarga y el nombre del archivo en preferencias para
+recuperar el estado al volver a abrir la app. El menú muestra el porcentaje, las
+pausas y el botón **Instalar actualización**; los fallos se notifican y permiten
+volver a descargar. Al finalizar, valida que el archivo sea un APK de Cassandra
+con un código de versión superior al instalado.
+
+La instalación comparte el APK mediante `FileProvider`. En Android 8 o superior,
+si falta autorización para instalar desde Cassandra, abre los ajustes de esa
+autorización. El usuario debe habilitarla, volver a la app y pulsar de nuevo
+**Instalar actualización**. Android muestra su confirmación de instalación y
+verifica la firma: las actualizaciones deben conservar la misma keystore de release.
+La descarga anterior se elimina cuando comienza otra, y el archivo usado para
+actualizar se limpia al abrir la app una vez instalada la nueva versión.
+
+La web y las releases que todavía no tienen un APK conservan la navegación a la
+URL de descarga o a la página de la release, respectivamente. El plugin solo
+acepta URLs HTTPS de los APK publicados en las releases de `soteiro/cassandra`.
+
+Para probar una actualización completa en Android, instalar primero un APK firmado
+con este flujo y un código de versión inferior al de la release siguiente. Revisar
+descarga, pausa por desconexión, cierre y reapertura, archivo eliminado, falta de
+espacio, autorización de instalación y cancelación del instalador. La primera
+actualización que incorpora este flujo se instala manualmente desde el navegador.

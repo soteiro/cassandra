@@ -18,6 +18,10 @@ describe('Sidebar', () => {
     isNative: boolean;
     currentVersion: ReturnType<typeof signal<string | null>>;
     checking: ReturnType<typeof signal<boolean>>;
+    downloading: ReturnType<typeof signal<boolean>>;
+    download: ReturnType<typeof signal<{ status: string; progress?: number }>>;
+    installing: ReturnType<typeof signal<boolean>>;
+    installUpdate: ReturnType<typeof vi.fn>;
     loadCurrentVersion: ReturnType<typeof vi.fn>;
     checkForUpdate: ReturnType<typeof vi.fn>;
     openDownload: ReturnType<typeof vi.fn>;
@@ -36,6 +40,10 @@ describe('Sidebar', () => {
       isNative,
       currentVersion: signal<string | null>(isNative ? '0.2.1' : null),
       checking: signal(false),
+      downloading: signal(false),
+      download: signal({ status: 'idle' }),
+      installing: signal(false),
+      installUpdate: vi.fn(),
       loadCurrentVersion: vi.fn().mockResolvedValue(undefined),
       checkForUpdate: vi.fn(),
       openDownload: vi.fn(),
@@ -105,6 +113,30 @@ describe('Sidebar', () => {
       await fixture.whenStable();
       expect(updateButton()?.disabled).toBe(true);
       expect(updateButton()?.textContent).toContain('Buscando...');
+    });
+
+    it('should show native progress and prevent another update check during download', async () => {
+      updates.downloading.set(true);
+      updates.download.set({ status: 'downloading', progress: 42 });
+      await fixture.whenStable();
+      expect(updateButton()?.disabled).toBe(true);
+      expect((fixture.nativeElement as HTMLElement).querySelector('[role="status"]')?.textContent).toContain('42 %');
+      updates.download.set({ status: 'paused', progress: 42 });
+      await fixture.whenStable();
+      expect((fixture.nativeElement as HTMLElement).textContent).toContain('Descarga en pausa');
+    });
+
+    it('should let the user open the installer again after cancelling it', async () => {
+      updates.download.set({ status: 'ready' });
+      await fixture.whenStable();
+      const button = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))
+        .find(b => b.textContent?.includes('Instalar actualización'));
+      expect(button).toBeDefined();
+      button!.click();
+      expect(updates.installUpdate).toHaveBeenCalledOnce();
+      updates.installing.set(true);
+      await fixture.whenStable();
+      expect(button!.disabled).toBe(true);
     });
 
     it('should offer the download when there is a new version', async () => {
