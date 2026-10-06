@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/soteiro/cassandra/compare/v0.5.1...v0.5.2) (2026-10-06)
+
+
+### Bug Fixes
+
+* **frontend:** improve responsiveness of filters and buttons in various components ([9fbb779](https://github.com/soteiro/cassandra/commit/9fbb779b92eb7e00538675628221fa6b7ef156da))
+
 ## [0.5.1](https://github.com/soteiro/cassandra/compare/v0.5.0...v0.5.1) (2026-10-05)
 
 
