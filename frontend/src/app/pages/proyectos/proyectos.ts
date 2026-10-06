@@ -1,3 +1,4 @@
+import { LoadingDirective } from '../../directives/loading.directive';
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +19,7 @@ import { getErrorMessage } from '../../utils/http-error.util';
 @Component({
   selector: 'app-proyectos',
   imports: [
+    LoadingDirective,
     CommonModule,
     FormsModule,
     ProjectCard,
@@ -59,6 +61,7 @@ export class Proyectos {
   }
 
   potentialParents(): ProjectResponse[] {
+    if (this.proyectsResource.error()) return [];
     const list = this.proyectsResource.value() || [];
     return list.filter((p) => !p.proyecto_padre_id);
   }

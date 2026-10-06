@@ -1,3 +1,4 @@
+import { LoadingDirective } from '../../directives/loading.directive';
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -29,6 +30,7 @@ import { getErrorMessage } from '../../utils/http-error.util';
 @Component({
   selector: 'app-persona-details',
   imports: [
+    LoadingDirective,
     CommonModule,
     RouterLink,
     FormsModule,

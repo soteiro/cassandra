@@ -1,3 +1,4 @@
+import { LoadingDirective } from '../../directives/loading.directive';
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +23,7 @@ import { getErrorMessage } from '../../utils/http-error.util';
 @Component({
   selector: 'app-crm',
   imports: [
+    LoadingDirective,
     CommonModule,
     FormsModule,
     RouterLink,

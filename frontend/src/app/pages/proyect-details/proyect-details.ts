@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { LoadingDirective } from '../../directives/loading.directive';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -31,6 +32,7 @@ interface Tab {
 @Component({
   selector: 'app-proyect-details',
   imports: [
+    LoadingDirective,
     CommonModule,
     ProjectHeader,
     SubprojectsTab,
@@ -76,6 +78,35 @@ export class ProyectDetails {
   ];
 
   activeTab = signal<string>('tareas');
+
+  protected readonly isViewLoading = computed(() => {
+    if (this.projectResource?.isLoading()) return true;
+    if (this.projectResource?.error()) return false;
+    switch (this.activeTab()) {
+      case 'subproyectos': return this.subproyectosResource?.isLoading() ?? false;
+      case 'notas': return (this.notasResource?.isLoading() ?? false) || (this.tasksResource?.isLoading() ?? false);
+      case 'documentos': return this.documentosResource?.isLoading() ?? false;
+      default: return this.tasksResource?.isLoading() ?? false;
+    }
+  });
+
+  protected readonly activeTabError = computed(() => {
+    switch (this.activeTab()) {
+      case 'subproyectos': return this.subproyectosResource?.error();
+      case 'notas': return this.notasResource?.error() || this.tasksResource?.error();
+      case 'documentos': return this.documentosResource?.error();
+      default: return this.tasksResource?.error();
+    }
+  });
+
+  protected retryActiveTab(): void {
+    switch (this.activeTab()) {
+      case 'subproyectos': this.subproyectosResource?.reload(); break;
+      case 'notas': this.notasResource?.reload(); this.tasksResource?.reload(); break;
+      case 'documentos': this.documentosResource?.reload(); break;
+      default: this.tasksResource?.reload();
+    }
+  }
 
   selectedTab(tabId: string): void {
     this.activeTab.set(tabId);

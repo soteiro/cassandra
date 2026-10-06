@@ -1,7 +1,8 @@
+import { LoadingDirective } from '../../directives/loading.directive';
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { FinanzasService } from '../../services/finanzas.service';
 import { ToastService } from '../../services/toast.service';
 import {
@@ -33,6 +34,7 @@ import { CatalogosTab } from './components/catalogos-tab/catalogos-tab';
 @Component({
   selector: 'app-finanzas',
   imports: [
+    LoadingDirective,
     CommonModule,
     FormsModule,
     LucideWallet,
@@ -98,6 +100,8 @@ export class Finanzas implements OnInit {
 
   // Estados de carga y navegación
   isLoading = signal<boolean>(false);
+  isLoadingResumen = signal(false);
+  pendingCatalogs = signal(0);
   isRotating = signal<boolean>(false);
   activeTab = signal<'movimientos' | 'deseos' | 'catalogos'>('movimientos');
   searchQuery = signal<string>('');
@@ -130,17 +134,19 @@ export class Finanzas implements OnInit {
   }
 
   loadCatalogs(): void {
-    this.finanzasService.getBancos().subscribe({
+    this.pendingCatalogs.update((count) => count + 3);
+    const catalogLoaded = () => this.pendingCatalogs.update((count) => count - 1);
+    this.finanzasService.getBancos().pipe(finalize(catalogLoaded)).subscribe({
       next: (b) => this.bancos.set(b || []),
       error: (err) => console.error('Error cargando bancos:', err),
     });
 
-    this.finanzasService.getGrupos().subscribe({
+    this.finanzasService.getGrupos().pipe(finalize(catalogLoaded)).subscribe({
       next: (g) => this.grupos.set(g || []),
       error: (err) => console.error('Error cargando categorías:', err),
     });
 
-    this.finanzasService.getMovimientosEsperados().subscribe({
+    this.finanzasService.getMovimientosEsperados().pipe(finalize(catalogLoaded)).subscribe({
       next: (m) => this.movimientosEsperados.set(m || []),
       error: (err) => console.error('Error cargando movimientos esperados:', err),
     });
@@ -157,6 +163,7 @@ export class Finanzas implements OnInit {
 
     this.periodoSub?.unsubscribe();
     this.periodoSub = new Subscription();
+    this.isLoadingResumen.set(true);
 
     this.periodoSub.add(this.finanzasService.getPlantilla(anio, mes).subscribe({
       next: (items) => {
@@ -170,7 +177,9 @@ export class Finanzas implements OnInit {
       },
     }));
 
-    this.periodoSub.add(this.finanzasService.getResumen(anio, mes).subscribe({
+    this.periodoSub.add(this.finanzasService.getResumen(anio, mes).pipe(
+      finalize(() => this.isLoadingResumen.set(false))
+    ).subscribe({
       next: (res) => {
         this.resumen.set(
           res || {
