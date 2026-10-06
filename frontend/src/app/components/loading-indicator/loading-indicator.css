@@ -5,7 +5,7 @@
 .loading-track {
   position: fixed;
   inset: 0 0 auto;
-  height: 3px;
+  height: 0.1rem;
   z-index: 120;
   overflow: hidden;
   background: var(--color-surface-border);
@@ -13,9 +13,9 @@
 
 .loading-fill {
   height: 100%;
-  width: 40%;
+  width: 35%;
   background: var(--color-primary);
-  animation: loading-travel 1.4s ease-in-out infinite;
+  animation: loading-travel 2s forwards infinite;
 }
 
 .loading-status {
@@ -27,7 +27,7 @@
   padding: 0;
   color: var(--color-text-main);
   background: var(--color-surface);
-  border-radius: 8px;
+  border-radius: 0.25rem;
   font-size: 0.75rem;
 }
 
@@ -41,13 +41,16 @@
     transform: translateX(-100%);
   }
   to {
-    transform: translateX(350%);
+    transform: translateX(300%);
   }
 }
 
 @media (min-width: 768px) {
   .loading-status {
     bottom: 1rem;
+  }
+  .loading-fill {
+    animation: loading-travel 3s forwards infinite;
   }
 }
 
