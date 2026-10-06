@@ -92,12 +92,12 @@
       </div>
 
       <!-- FILTROS POR ESTADO / PRIORIDAD -->
-      <div class="flex items-center gap-1 bg-background p-1 rounded-xl border border-surface-border text-xs">
+      <div class="grid w-full min-w-0 grid-cols-2 items-center gap-1 bg-background p-1 rounded-xl border border-surface-border text-xs sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
         <button
           type="button"
           (click)="statusFilter.set('all')"
           [class]="statusFilter() === 'all' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
-          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+          class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Todos ({{ getStats(proyectos).total }})
         </button>
@@ -105,7 +105,7 @@
           type="button"
           (click)="statusFilter.set('active')"
           [class]="statusFilter() === 'active' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
-          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+          class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Activos ({{ getStats(proyectos).active }})
         </button>
@@ -113,7 +113,7 @@
           type="button"
           (click)="statusFilter.set('completed')"
           [class]="statusFilter() === 'completed' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
-          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+          class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Terminados ({{ getStats(proyectos).completed }})
         </button>
@@ -121,7 +121,7 @@
           type="button"
           (click)="statusFilter.set('critical')"
           [class]="statusFilter() === 'critical' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
-          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+          class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Alta Prioridad ({{ getStats(proyectos).critical }})
         </button>
