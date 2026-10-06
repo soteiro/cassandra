@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/soteiro/cassandra/compare/v0.5.3...v0.6.0) (2026-10-06)
+
+
+### Features
+
+* añadir indicadores visibles de carga durante navegación y solicitudes de datos ([7f29fa8](https://github.com/soteiro/cassandra/commit/7f29fa83cf5f9e5b58fe43f0dbfa0e5a62766b97))
+
+## [0.5.3](https://github.com/soteiro/cassandra/compare/v0.5.2...v0.5.3) (2026-10-06)
+
+
+### Bug Fixes
+
+* add APK updater plugin for native Android app updates ([2e5e779](https://github.com/soteiro/cassandra/commit/2e5e7795fb87f1cbeb923b53e51490b740ddb208))
+
 ## [0.5.2](https://github.com/soteiro/cassandra/compare/v0.5.1...v0.5.2) (2026-10-06)
 
 
