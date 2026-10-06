@@ -50,7 +50,7 @@
     bottom: 1rem;
   }
   .loading-fill {
-    animation: loading-travel 3s forwards infinite;
+    animation-duration: 3s;
   }
 }
 
