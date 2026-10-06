@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.1](https://github.com/soteiro/cassandra/compare/v0.5.0...v0.5.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **backend:** aislamiento entre usuarios en recursos referenciados ([140672c](https://github.com/soteiro/cassandra/commit/140672c5229eceef61b150902b6fb16d0ba4c728))
+* **backend:** aislamiento entre usuarios en recursos referenciados ([5940e8d](https://github.com/soteiro/cassandra/commit/5940e8d2189244e54502bf7dd3ccf691f945009a))
+* **backend:** códigos HTTP correctos para errores de la base y validaciones pendientes ([b88243c](https://github.com/soteiro/cassandra/commit/b88243cb14ac5a4e5fe20f0a6b7437987925adcd))
+* **backend:** IP real solo desde proxies de confianza, errores sin SQL y unicidad por usuario ([e56a1cd](https://github.com/soteiro/cassandra/commit/e56a1cda26465fe2a42e108837534493b165784f))
+* **backend:** sesión de usuarios eliminados y campos protegidos ([b636ccb](https://github.com/soteiro/cassandra/commit/b636ccb7000b3b7551a8def2189f2c2f8cb94ff6))
+
 ## [0.5.0](https://github.com/soteiro/cassandra/compare/v0.4.0...v0.5.0) (2026-10-04)
 
 

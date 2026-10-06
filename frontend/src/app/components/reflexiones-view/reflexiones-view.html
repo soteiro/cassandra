@@ -166,12 +166,12 @@
       </div>
 
       <!-- BOTONES DE FILTRO -->
-      <div class="flex items-center gap-1 bg-surface border border-surface-border p-1 rounded-xl text-xs">
+      <div class="grid w-full min-w-0 grid-cols-2 items-center gap-1 bg-surface border border-surface-border p-1 rounded-xl text-xs sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
         <button
           type="button"
           (click)="setFilter('todas')"
           [class]="
-            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
             (activeFilter() === 'todas' ? 'bg-primary text-background font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
@@ -181,7 +181,7 @@
           type="button"
           (click)="setFilter('reflexion')"
           [class]="
-            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
             (activeFilter() === 'reflexion' ? 'bg-purple-500/20 text-purple-300 font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
@@ -191,7 +191,7 @@
           type="button"
           (click)="setFilter('memoria')"
           [class]="
-            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
             (activeFilter() === 'memoria' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
@@ -201,7 +201,7 @@
           type="button"
           (click)="setFilter('evento')"
           [class]="
-            'px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
+            'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
             (activeFilter() === 'evento' ? 'bg-blue-500/20 text-blue-300 font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
