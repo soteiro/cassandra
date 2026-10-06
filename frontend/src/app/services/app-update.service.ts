@@ -1,9 +1,11 @@
-import { DOCUMENT, Injectable, inject, signal } from '@angular/core';
+import { DOCUMENT, DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { isNewerVersion } from '../utils/version.util';
 import { APP_PLATFORM } from './app-platform';
+import { APK_UPDATER, ApkDownloadStatus } from './apk-updater';
+import { ToastService } from './toast.service';
 
 export { APP_PLATFORM, type AppPlatform } from './app-platform';
 
@@ -26,6 +28,11 @@ export const APK_ASSET_NAME = 'cassandra.apk';
 export class AppUpdateService {
   private readonly platform = inject(APP_PLATFORM);
   private readonly document = inject(DOCUMENT);
+  private readonly updater = inject(APK_UPDATER);
+  private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+  private pollTimer?: ReturnType<typeof setTimeout>;
+  private destroyed = false;
   // HttpBackend directo: sin el interceptor de auth, que añade withCredentials
   // (no deben viajar cookies a GitHub y CORS lo rechazaría).
   private readonly http = new HttpClient(inject(HttpBackend));
@@ -33,6 +40,19 @@ export class AppUpdateService {
   readonly isNative = this.platform.isNative();
   readonly currentVersion = signal<string | null>(null);
   readonly checking = signal(false);
+  readonly download = signal<ApkDownloadStatus>({ status: 'idle' });
+  readonly startingDownload = signal(false);
+  readonly installing = signal(false);
+  readonly downloading = computed(() => this.startingDownload() ||
+    this.download().status === 'downloading' || this.download().status === 'paused');
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.destroyed = true;
+      clearTimeout(this.pollTimer);
+    });
+    if (this.isNative) void this.refreshDownload();
+  }
 
   async loadCurrentVersion(): Promise<void> {
     if (!this.isNative || this.currentVersion()) return;
@@ -70,11 +90,74 @@ export class AppUpdateService {
     }
   }
 
-  /**
-   * Abre la descarga. En Android, Capacitor deriva las URLs externas al navegador
-   * del sistema, que descarga el APK y ofrece instalarlo.
-   */
+  /** En Android el APK se descarga con DownloadManager; la web conserva la navegación. */
   openDownload(url: string): void {
-    this.document.location.assign(url);
+    if (!this.isNative || !new URL(url).pathname.endsWith(`/${APK_ASSET_NAME}`)) {
+      this.document.location.assign(url);
+      return;
+    }
+    if (!this.downloading()) void this.startNativeDownload(url);
+  }
+
+  private async startNativeDownload(url: string): Promise<void> {
+    this.startingDownload.set(true);
+    clearTimeout(this.pollTimer);
+    try {
+      const status = await this.updater.startDownload({ url });
+      if (this.destroyed) return;
+      this.updateDownload(status);
+      this.toast.info('Android está descargando la actualización. Puedes seguir usando Cassandra.');
+    } catch {
+      this.updateDownload({ status: 'failed', error: 'No se pudo iniciar la descarga. Revisa tu conexión y vuelve a intentarlo.' });
+    } finally {
+      this.startingDownload.set(false);
+    }
+  }
+
+  private async refreshDownload(): Promise<void> {
+    try {
+      const status = await this.updater.getDownloadStatus();
+      if (!this.destroyed && !this.startingDownload()) this.updateDownload(status);
+    } catch {
+      if (!this.destroyed && this.downloading()) {
+        this.updateDownload({ status: 'failed', error: 'No se pudo consultar la descarga. Vuelve a buscar actualizaciones.' });
+      }
+    }
+  }
+
+  private updateDownload(status: ApkDownloadStatus): void {
+    if (this.destroyed) return;
+    const previous = this.download().status;
+    this.download.set(status);
+    clearTimeout(this.pollTimer);
+    if (status.status === 'downloading' || status.status === 'paused') {
+      this.pollTimer = setTimeout(() => void this.refreshDownload(), 1000);
+    } else if (status.status === 'ready' && previous !== 'ready') {
+      this.toast.success('El APK está listo. Confirma la instalación para actualizar Cassandra.', {
+        duration: 0,
+        action: { label: 'Instalar actualización', onClick: () => void this.installUpdate() },
+      });
+    } else if (status.status === 'failed' && previous !== 'failed') {
+      this.toast.error(status.error ?? 'No se pudo descargar la actualización.', { duration: 0 });
+    }
+  }
+
+  async installUpdate(): Promise<void> {
+    if (this.installing() || this.download().status !== 'ready') return;
+    this.installing.set(true);
+    try {
+      const result = await this.updater.install();
+      if (result.permissionRequired) {
+        this.toast.info('Activa “Permitir desde esta fuente” para Cassandra en Android. Al volver, pulsa “Instalar actualización”.', {
+          duration: 0,
+          action: { label: 'Instalar actualización', onClick: () => void this.installUpdate() },
+        });
+      }
+    } catch {
+      this.toast.error('No se pudo abrir el instalador. Comprueba que el APK siga disponible y vuelve a intentarlo.');
+      await this.refreshDownload();
+    } finally {
+      this.installing.set(false);
+    }
   }
 }

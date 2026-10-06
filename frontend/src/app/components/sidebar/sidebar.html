@@ -112,7 +112,7 @@
       <button
         type="button"
         (click)="checkForUpdates()"
-        [disabled]="updates.checking()"
+        [disabled]="updates.checking() || updates.downloading()"
         class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-text-muted hover:text-text-main hover:bg-surface-border/60 border border-surface-border transition-all cursor-pointer disabled:opacity-60 disabled:cursor-wait"
       >
         <span class="flex items-center gap-2">
@@ -123,6 +123,26 @@
           <span class="font-mono text-[10px] text-text-muted/80">v{{ version }}</span>
         }
       </button>
+      @if (updates.downloading()) {
+        <p role="status" class="px-3 text-xs text-text-muted">
+          @if (updates.download().status === 'paused') {
+            Descarga en pausa. Android la reanudará cuando sea posible.
+          } @else {
+            Descargando actualización@if (updates.download().progress !== undefined) {:
+              {{ updates.download().progress }} %
+            } @else {…}
+          }
+        </p>
+      } @else if (updates.download().status === 'ready') {
+        <button
+          type="button"
+          (click)="updates.installUpdate()"
+          [disabled]="updates.installing()"
+          class="w-full min-h-11 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-background bg-primary hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-60"
+        >
+          {{ updates.installing() ? 'Abriendo instalador…' : 'Instalar actualización' }}
+        </button>
+      }
     }
     <!-- SERVIDOR CONECTADO (solo app Android) -->
     @if (serverConfig.isNative && serverConfig.serverUrl(); as server) {
