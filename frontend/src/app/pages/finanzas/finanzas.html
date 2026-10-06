@@ -20,7 +20,7 @@
     </div>
 
     <!-- BOTONES DE ACCIÓN SUPERIOR -->
-    <div class="flex flex-wrap items-center gap-2.5">
+    <div class="flex w-full min-w-0 flex-wrap items-center gap-2.5 lg:w-auto">
       <!-- BOTÓN RECARGAR -->
       <button
         type="button"
@@ -33,7 +33,7 @@
       </button>
 
       <!-- SWITCH DE PESTAÑAS (PRESUPUESTO VS DESEOS VS CATÁLOGOS) -->
-      <div class="flex items-center bg-surface border border-surface-border rounded-xl p-1 text-xs">
+      <div class="order-first grid w-full min-w-0 grid-cols-1 gap-1 bg-surface border border-surface-border rounded-xl p-1 text-xs sm:order-none sm:flex sm:w-auto sm:max-w-full sm:flex-wrap sm:items-center">
         <button
           type="button"
           (click)="activeTab.set('movimientos')"
@@ -42,7 +42,7 @@
               ? 'bg-primary/20 text-primary font-semibold shadow-xs'
               : 'text-text-muted hover:text-text-main'
           "
-          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+          class="min-h-11 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 sm:min-h-0"
         >
           <svg lucideScale class="w-3.5 h-3.5" />
           <span>Presupuesto</span>
@@ -55,7 +55,7 @@
               ? 'bg-primary/20 text-primary font-semibold shadow-xs'
               : 'text-text-muted hover:text-text-main'
           "
-          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+          class="min-h-11 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 sm:min-h-0"
         >
           <svg lucideSparkles class="w-3.5 h-3.5" />
           <span>Lista de Deseos</span>
@@ -73,7 +73,7 @@
               ? 'bg-primary/20 text-primary font-semibold shadow-xs'
               : 'text-text-muted hover:text-text-main'
           "
-          class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+          class="min-h-11 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 sm:min-h-0"
         >
           <svg lucideSettings class="w-3.5 h-3.5" />
           <span>Cuentas & Categorías</span>
