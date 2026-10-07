@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.2](https://github.com/soteiro/cassandra/compare/v0.6.1...v0.6.2) (2026-10-06)
+
+
+### Bug Fixes
+
+* please ([93d2ae9](https://github.com/soteiro/cassandra/commit/93d2ae97518237913420481eaa9d05abb778202d))
+
+## [0.6.1](https://github.com/soteiro/cassandra/compare/v0.6.0...v0.6.1) (2026-10-06)
+
+
+### Bug Fixes
+
+* qa ([fe57c7a](https://github.com/soteiro/cassandra/commit/fe57c7a350724d6941922871259c8f61342d02d5))
+
 ## [0.6.0](https://github.com/soteiro/cassandra/compare/v0.5.3...v0.6.0) (2026-10-06)
 
 
