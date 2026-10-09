@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/soteiro/cassandra/compare/v0.6.3...v0.7.0) (2026-10-09)
+
+
+### Features
+
+* **backend:** registro de eventos y fecha de actualización ([61c409f](https://github.com/soteiro/cassandra/commit/61c409f547fc24f8d1c50903203f26b77d61e427))
+
 ## [0.6.3](https://github.com/soteiro/cassandra/compare/v0.6.2...v0.6.3) (2026-10-09)
 
 
