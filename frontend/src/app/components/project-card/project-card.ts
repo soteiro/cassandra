@@ -2,6 +2,7 @@ import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../models/proyect.model';
+import { haceCuanto } from '../../utils/actividad.util';
 import {
   LucideFolder,
   LucideTarget,
@@ -30,6 +31,10 @@ import {
 export class ProjectCard {
   project = input.required<ProjectResponse>();
   isSubproject = input<boolean>(false);
+
+  haceCuanto(fecha?: string): string {
+    return haceCuanto(fecha);
+  }
 
   getPriorityClass(priority?: string): string {
     switch (priority) {

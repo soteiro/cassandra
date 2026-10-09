@@ -176,6 +176,16 @@ describe('Home', () => {
     expect(resource.reload).toHaveBeenCalled();
   });
 
+  it('completar una tarea recarga también «Esta semana»', () => {
+    fixture.detectChanges();
+    const semana = fixture.debugElement.query((d) => d.name === 'app-semana-widget').componentInstance;
+    const recargar = vi.spyOn(semana, 'recargar');
+    const t = task({ id: 4, estado: 'En Curso' });
+    resource.value.set([t]);
+    component.toggleTaskComplete(t);
+    expect(recargar).toHaveBeenCalled();
+  });
+
   it('changeTaskStatus rolls back on error', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     taskService.updateTask.mockReturnValue(throwError(() => new Error('x')));

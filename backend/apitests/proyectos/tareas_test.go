@@ -1,6 +1,7 @@
 package proyectos
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -262,5 +263,42 @@ func TestTareaFiltroEstado(t *testing.T) {
 	res := api.Do(ana, http.MethodGet, "/api/tareas?estado=Pendiente", nil).Expect(t, http.StatusOK)
 	if string(res.Body) != "[]\n" && string(res.Body) != "[]" {
 		t.Errorf("filtro sin resultados = %s, se esperaba []", res.Body)
+	}
+}
+
+// Completar una tarea completa sus subtareas pendientes; reabrirla no las reabre.
+func TestCompletarPadreCompletaSubtareas(t *testing.T) {
+	api, ana, _ := setup(t)
+	p := crearProyecto(t, api, ana, "Proyecto", nil)
+	padre := crearTarea(t, api, ana, p.ID, "Padre", nil)
+	abierta := crearTarea(t, api, ana, p.ID, "Abierta", map[string]any{"tarea_padre_id": padre.ID})
+	hecha := crearTarea(t, api, ana, p.ID, "Ya hecha", map[string]any{"tarea_padre_id": padre.ID, "estado": "Terminado"})
+	borrada := crearTarea(t, api, ana, p.ID, "Borrada", map[string]any{"tarea_padre_id": padre.ID})
+	api.Do(ana, http.MethodDelete, apitest.Path("/api/tareas/%d", borrada.ID), nil).Expect(t, http.StatusNoContent)
+	fechaHecha := getTarea(t, api, ana, hecha.ID).FechaTerminado
+
+	api.Do(ana, http.MethodPut, apitest.Path("/api/tareas/%d", padre.ID), map[string]any{"estado": "Terminado"}).
+		Expect(t, http.StatusOK)
+
+	got := getTarea(t, api, ana, abierta.ID)
+	if got.Estado == nil || *got.Estado != "Terminado" || got.FechaTerminado == nil {
+		t.Errorf("la subtarea abierta debe quedar terminada: estado=%v fecha=%v", got.Estado, got.FechaTerminado)
+	}
+	if f := getTarea(t, api, ana, hecha.ID).FechaTerminado; f == nil || !f.Equal(*fechaHecha) {
+		t.Errorf("la subtarea ya terminada conserva su fecha: %v → %v", fechaHecha, f)
+	}
+	var estadoBorrada string
+	if err := api.DB.QueryRow(context.Background(), "SELECT estado FROM tareas_proyectos WHERE id = $1", borrada.ID).Scan(&estadoBorrada); err != nil {
+		t.Fatal(err)
+	}
+	if estadoBorrada == "Terminado" {
+		t.Error("una subtarea borrada no debe tocarse")
+	}
+
+	// Reabrir el padre deja las subtareas como estaban.
+	api.Do(ana, http.MethodPut, apitest.Path("/api/tareas/%d", padre.ID), map[string]any{"estado": "Abierto"}).
+		Expect(t, http.StatusOK)
+	if got := getTarea(t, api, ana, abierta.ID); got.Estado == nil || *got.Estado != "Terminado" {
+		t.Errorf("reabrir el padre no debe reabrir subtareas: %v", got.Estado)
 	}
 }

@@ -13,6 +13,7 @@ export interface Task {
   proyecto_nombre?: string;
   fecha_creacion: string;
   fecha_terminado?: string | null;
+  fecha_actualizacion?: string;
   tarea_padre_id?: number | null;
   subtareas?: Task[];
 }

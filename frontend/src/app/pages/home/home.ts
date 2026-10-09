@@ -1,5 +1,5 @@
 import { LoadingDirective } from '../../directives/loading.directive';
-import { Component, signal, inject, computed } from '@angular/core';
+import { Component, signal, inject, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,6 +8,7 @@ import { ToastService } from '../../services/toast.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
 import { TaskStatusSelect } from '../../components/task-status-select/task-status-select';
+import { SemanaWidget } from '../../components/semana-widget/semana-widget';
 import {
   getTaskPriorityBadgeClass,
   getTaskPriorityBorderClass,
@@ -23,6 +24,7 @@ import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
     RouterLink,
     TaskDetailModal,
     TaskStatusSelect,
+    SemanaWidget,
     LucideListTodo,
     LucideRefreshCcw,
     LucideCheck,
@@ -54,9 +56,17 @@ export class Home {
   // Task resource
   protected readonly tasksResource = this.taskService.getAllTasks(this.selectedEstado);
 
+  private readonly semana = viewChild(SemanaWidget);
+
+  /** Recarga las tareas y "Esta semana" (lo terminado debe aparecer sin cambiar de semana). */
+  recargarTareas() {
+    this.tasksResource?.reload();
+    this.semana()?.recargar();
+  }
+
   reload() {
     this.isRotating.set(true);
-    this.tasksResource?.reload();
+    this.recargarTareas();
     setTimeout(() => this.isRotating.set(false), 600);
   }
 
@@ -79,7 +89,7 @@ export class Home {
         if (nextEstado === 'Terminado') {
           this.toastService.success('Tarea completada');
         }
-        this.tasksResource?.reload();
+        this.recargarTareas();
       },
       error: (err) => {
         this.setTaskEstado(task.id, prev);
@@ -96,7 +106,7 @@ export class Home {
     this.taskService.updateTask(task.id, { estado: nextEstado }).subscribe({
       next: () => {
         this.toastService.success(`Tarea: ${nextEstado}`);
-        this.tasksResource?.reload();
+        this.recargarTareas();
       },
       error: (err) => {
         this.setTaskEstado(task.id, prev);

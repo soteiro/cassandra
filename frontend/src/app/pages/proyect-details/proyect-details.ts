@@ -7,6 +7,7 @@ import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { NotaService } from '../../services/nota.service';
 import { DocumentoService } from '../../services/documento.service';
+import { ActividadService } from '../../services/actividad.service';
 import { ToastService } from '../../services/toast.service';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
 import { ProjectHeader } from './components/project-header/project-header';
@@ -14,6 +15,7 @@ import { SubprojectsTab } from './components/subprojects-tab/subprojects-tab';
 import { TasksTab } from './components/tasks-tab/tasks-tab';
 import { NotesTab } from './components/notes-tab/notes-tab';
 import { DocumentsTab } from './components/documents-tab/documents-tab';
+import { ActivityTab } from './components/activity-tab/activity-tab';
 import { ProjectModal } from '../../components/project-modal/project-modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import {
@@ -21,6 +23,7 @@ import {
   LucideFileText,
   LucideLayers,
   LucideBookOpen,
+  LucideHistory,
 } from '@lucide/angular';
 import { getErrorMessage } from '../../utils/http-error.util';
 
@@ -39,12 +42,14 @@ interface Tab {
     TasksTab,
     NotesTab,
     DocumentsTab,
+    ActivityTab,
     ProjectModal,
     ConfirmModal,
     LucideListTodo,
     LucideFileText,
     LucideLayers,
     LucideBookOpen,
+    LucideHistory,
   ],
   templateUrl: './proyect-details.html',
   styleUrl: './proyect-details.css',
@@ -56,6 +61,7 @@ export class ProyectDetails {
   private readonly taskService = inject(TaskService);
   private readonly notaService = inject(NotaService);
   private readonly documentoService = inject(DocumentoService);
+  private readonly actividadService = inject(ActividadService);
   private readonly toast = inject(ToastService);
 
   private readonly paramMap = toSignal(this.route.paramMap);
@@ -68,6 +74,12 @@ export class ProyectDetails {
   protected readonly tasksResource = this.taskService.getTasksByProyectoId(this.id);
   protected readonly notasResource = this.notaService.getNotasByProyectoId(this.id);
   protected readonly documentosResource = this.documentoService.getDocumentosByProyectoId(this.id);
+  protected readonly actividadLimit = signal(30);
+  protected readonly actividadResource = this.actividadService.getActividadProyecto(this.id, this.actividadLimit);
+  /** Si llegó el límite completo puede haber más (el backend acepta hasta 100). */
+  protected readonly hayMasActividad = computed(
+    () => (this.actividadResource?.value()?.length ?? 0) >= this.actividadLimit() && this.actividadLimit() < 100,
+  );
 
   // Tabs
   tabs: Tab[] = [
@@ -75,6 +87,7 @@ export class ProyectDetails {
     { id: 'tareas', label: 'Tareas' },
     { id: 'notas', label: 'Notas' },
     { id: 'documentos', label: 'Documentos' },
+    { id: 'actividad', label: 'Actividad' },
   ];
 
   activeTab = signal<string>('tareas');
@@ -86,6 +99,7 @@ export class ProyectDetails {
       case 'subproyectos': return this.subproyectosResource?.isLoading() ?? false;
       case 'notas': return (this.notasResource?.isLoading() ?? false) || (this.tasksResource?.isLoading() ?? false);
       case 'documentos': return this.documentosResource?.isLoading() ?? false;
+      case 'actividad': return this.actividadResource?.isLoading() ?? false;
       default: return this.tasksResource?.isLoading() ?? false;
     }
   });
@@ -95,6 +109,7 @@ export class ProyectDetails {
       case 'subproyectos': return this.subproyectosResource?.error();
       case 'notas': return this.notasResource?.error() || this.tasksResource?.error();
       case 'documentos': return this.documentosResource?.error();
+      case 'actividad': return this.actividadResource?.error();
       default: return this.tasksResource?.error();
     }
   });
@@ -104,12 +119,19 @@ export class ProyectDetails {
       case 'subproyectos': this.subproyectosResource?.reload(); break;
       case 'notas': this.notasResource?.reload(); this.tasksResource?.reload(); break;
       case 'documentos': this.documentosResource?.reload(); break;
+      case 'actividad': this.actividadResource?.reload(); break;
       default: this.tasksResource?.reload();
     }
   }
 
   selectedTab(tabId: string): void {
     this.activeTab.set(tabId);
+    // Lo que se hizo en otras pestañas ya está en el registro: se recarga al entrar.
+    if (tabId === 'actividad') this.actividadResource?.reload();
+  }
+
+  verMasActividad(): void {
+    this.actividadLimit.update((l) => Math.min(l + 30, 100));
   }
 
   // --- EDIT PROJECT MODAL STATE ---

@@ -150,6 +150,9 @@
         }
       </div>
     </div>
+
+    <!-- WIDGET: LO QUE HICISTE -->
+    <app-semana-widget />
   </div>
 
   <!-- MODAL DRAWER LATERAL DERECHO PARA EDITAR TAREA -->
@@ -158,6 +161,6 @@
     [task]="selectedTask()"
     [proyectId]="selectedTask()?.proyect_id || 0"
     (closeModal)="selectedTask.set(null)"
-    (taskUpdated)="tasksResource?.reload()"
+    (taskUpdated)="recargarTareas()"
   />
 </div>
