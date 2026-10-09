@@ -5,6 +5,7 @@
       <p class="text-[11px] text-text-muted">Unos 15 minutos para cerrar lo que se acumuló sin decidir.</p>
     </div>
     @if (preferencias.value(); as pref) {
+      <div class="flex flex-wrap items-center gap-3">
       <label class="flex items-center gap-1.5 text-[11px] text-text-muted">
         Revisar cada
         <select
@@ -17,6 +18,18 @@
           }
         </select>
       </label>
+      <label class="flex items-center gap-1.5 text-[11px] text-text-muted" title="Aviso suave al pasar de este número de tareas En Curso">
+        Máximo en curso
+        <input
+          type="number"
+          min="1"
+          max="50"
+          [ngModel]="pref.limite_en_curso"
+          (change)="cambiarLimite($any($event.target).value)"
+          class="w-14 bg-background border border-surface-border text-text-main rounded-lg px-2 py-1 outline-none"
+        />
+      </label>
+      </div>
     }
   </header>
 

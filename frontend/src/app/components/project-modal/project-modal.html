@@ -139,6 +139,12 @@
           />
         </div>
 
+        @if (proyectosEnMarcha() > 0) {
+          <p class="text-[11px] text-text-muted">
+            Tienes {{ proyectosEnMarcha() }} {{ proyectosEnMarcha() === 1 ? 'proyecto' : 'proyectos' }} en proceso. Si este entra en marcha, ¿alguno puede esperar?
+          </p>
+        }
+
         <!-- PRE-MORTEM (OPCIONAL) -->
         <div>
           <label class="block text-text-main font-medium mb-1">

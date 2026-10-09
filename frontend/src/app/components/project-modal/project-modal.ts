@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
 import { BackButtonService } from '../../services/back-button.service';
 import { PronosticoService } from '../../services/pronostico.service';
+import { proyectService } from '../../services/proyect.service';
 import { fechaProbable, formatoFactor } from '../../utils/actividad.util';
 import {
   LucideSparkles,
@@ -27,6 +28,7 @@ import {
 export class ProjectModal {
   private readonly backButtonService = inject(BackButtonService);
   private readonly pronosticoService = inject(PronosticoService);
+  private readonly proyectos = inject(proyectService);
 
   isOpen = input<boolean>(false);
   mode = input<'create' | 'edit' | 'create-subproject'>('create');
@@ -66,6 +68,12 @@ export class ProjectModal {
    * Al elegir fecha límite: cuánto suelen tardar tus proyectos frente a lo que estimas,
    * y qué fecha sería con ese ritmo. null sin fecha o sin historia suficiente.
    */
+  /** Al crear: cuántos proyectos tienes en marcha (para decidir si sumar otro). */
+  readonly proyectosEnMarcha = computed(() => {
+    if (this.mode() === 'edit') return 0;
+    return (this.proyectos.proyectResource.value() ?? []).filter((p) => p.estado === 'En Proceso').length;
+  });
+
   /** Se está cerrando el proyecto en esta edición: toca la retrospectiva. */
   readonly cerrandoProyecto = computed(() => {
     const cerrado = (e?: string) => e === 'Completado' || e === 'Cancelado';
