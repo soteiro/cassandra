@@ -100,6 +100,9 @@
         @if (otros().length) {
           <p>También: {{ otros().join(' · ') }}</p>
         }
+        @if (conEnlaceRevision()) {
+          <a routerLink="/revision" class="inline-block pt-1 text-primary hover:underline">Hacer la revisión semanal →</a>
+        }
       </div>
     }
   </div>

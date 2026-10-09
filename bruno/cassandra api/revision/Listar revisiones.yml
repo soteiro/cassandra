@@ -1,0 +1,17 @@
+info:
+  name: Listar revisiones
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://localhost:8080/api/revisiones?limit=10
+  body:
+    type: none
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
