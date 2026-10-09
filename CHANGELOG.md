@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/soteiro/cassandra/compare/v0.7.0...v0.8.0) (2026-10-09)
+
+
+### Features
+
+* ([#48](https://github.com/soteiro/cassandra/issues/48)) ([8de9313](https://github.com/soteiro/cassandra/commit/8de93138fb5ae937cdd71c2e12c7b18a3e6834ca))
+
 ## [0.7.0](https://github.com/soteiro/cassandra/compare/v0.6.3...v0.7.0) (2026-10-09)
 
 
