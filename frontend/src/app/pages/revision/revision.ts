@@ -100,6 +100,18 @@ export class Revision {
     });
   }
 
+  cambiarLimite(valor: string): void {
+    const n = Number(valor);
+    if (!Number.isInteger(n) || n < 1 || n > 50) {
+      this.toast.error('El máximo debe ser un número entre 1 y 50');
+      return;
+    }
+    this.revisionService.actualizarPreferencias({ limite_en_curso: n }).subscribe({
+      next: () => this.preferencias.reload(),
+      error: (err) => this.toast.error(getErrorMessage(err, 'No se pudo guardar el máximo')),
+    });
+  }
+
   decidirTarea(t: TareaEstancada, decision: DecisionTarea): void {
     if (decision === 'sigue') {
       this.marcarTarea(t.id, decision);

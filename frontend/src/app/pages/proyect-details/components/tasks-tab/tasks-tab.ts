@@ -152,7 +152,8 @@ export class TasksTab {
   }
 
   // Create top-level task inline (Zero friction)
-  createQuickTask() {
+  /** yaHecha: registra algo que ya hiciste (se crea terminada). */
+  createQuickTask(yaHecha = false) {
     const title = this.quickTaskTitle().trim();
     const comment = this.quickComment().trim();
     const pId = this.projectId();
@@ -165,13 +166,13 @@ export class TasksTab {
         nombre: title,
         descripcion: '',
         comentario: comment,
-        estado: 'Abierto',
+        estado: yaHecha ? 'Terminado' : 'Abierto',
         prioridad: this.quickPriority(),
         proyect_id: pId,
       })
       .subscribe({
         next: () => {
-          this.toastService.success('Tarea Creada');
+          this.toastService.success(yaHecha ? 'Registrada como hecha' : 'Tarea Creada');
           this.quickTaskTitle.set('');
           this.quickComment.set('');
           this.quickPriority.set('normal');
