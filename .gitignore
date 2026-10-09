@@ -31,3 +31,7 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 AGENT_HARNESS_GO.md
+# Notas y diseños locales (no se versionan)
+CONTEXT.md
+docs/CHATBOT_SCOPE.md
+docs/MCP_DESIGN.md
