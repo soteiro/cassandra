@@ -26,7 +26,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
 	`
 
 	if req.Prioridad == "" {
@@ -53,6 +53,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		&proyect.Comentario,
 		&proyect.FechaCreacion,
 		&proyect.FechaTerminado,
+		&proyect.FechaActualizacion,
 		&proyect.Estado,
 		&proyect.PorQue,
 		&proyect.ParaQue,
@@ -78,6 +79,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		p.comentario,
 		p.fecha_creacion,
 		p.fecha_terminado,
+		p.fecha_actualizacion,
 		p.estado,
 		p.por_que,
 		p.para_que,
@@ -116,6 +118,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.Comentario,
 			&p.FechaCreacion,
 			&p.FechaTerminado,
+			&p.FechaActualizacion,
 			&p.Estado,
 			&p.PorQue,
 			&p.ParaQue,
@@ -149,6 +152,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 		p.comentario,
 		p.fecha_creacion,
 		p.fecha_terminado,
+		p.fecha_actualizacion,
 		p.estado,
 		p.por_que,
 		p.para_que,
@@ -189,6 +193,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 			&p.Comentario,
 			&p.FechaCreacion,
 			&p.FechaTerminado,
+			&p.FechaActualizacion,
 			&p.Estado,
 			&p.PorQue,
 			&p.ParaQue,
@@ -244,6 +249,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		p.comentario, 
 		p.fecha_creacion, 
 		p.fecha_terminado,
+		p.fecha_actualizacion,
 		p.estado, 
 		p.por_que, 
 		p.para_que, 
@@ -271,6 +277,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.Comentario,
 		&p.FechaCreacion,
 		&p.FechaTerminado,
+		&p.FechaActualizacion,
 		&p.Estado,
 		&p.PorQue,
 		&p.ParaQue,

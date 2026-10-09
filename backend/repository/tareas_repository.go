@@ -53,7 +53,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 			fecha_terminado
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, prioridad, user_id, proyecto_id, tarea_padre_id
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id
 	`
 
 	err := r.db.QueryRow(
@@ -75,6 +75,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		&tarea.Comentario,
 		&tarea.FechaCreacion,
 		&tarea.FechaTerminado,
+		&tarea.FechaActualizacion,
 		&tarea.Estado,
 		&tarea.Prioridad,
 		&tarea.UserID,
@@ -97,7 +98,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 	if estadoFilter != "" {
 		query = `
 			SELECT 
-				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id,
+				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.fecha_actualizacion, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id,
 				COALESCE(p.nombre, '') AS proyecto_nombre
 			FROM tareas_proyectos t
 			LEFT JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id
@@ -110,7 +111,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 	} else {
 		query = `
 			SELECT 
-				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id,
+				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.fecha_actualizacion, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id,
 				COALESCE(p.nombre, '') AS proyecto_nombre
 			FROM tareas_proyectos t
 			LEFT JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id
@@ -139,6 +140,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 			&tarea.Comentario,
 			&tarea.FechaCreacion,
 			&tarea.FechaTerminado,
+			&tarea.FechaActualizacion,
 			&tarea.Estado,
 			&tarea.Prioridad,
 			&tarea.UserID,
@@ -164,7 +166,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 // GetByProyectoID obtiene las tareas de un proyecto pertenecientes a un usuario agrupadas jerárquicamente con sus subtareas
 func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, userID int) ([]models.TareaResponse, error) {
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, prioridad, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE proyecto_id = $1
 		AND user_id = $2
@@ -190,6 +192,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 			&tarea.Comentario,
 			&tarea.FechaCreacion,
 			&tarea.FechaTerminado,
+			&tarea.FechaActualizacion,
 			&tarea.Estado,
 			&tarea.Prioridad,
 			&tarea.UserID,
@@ -242,7 +245,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, prioridad, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE id = $1
 		AND user_id = $2
@@ -256,6 +259,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 		&tarea.Comentario,
 		&tarea.FechaCreacion,
 		&tarea.FechaTerminado,
+		&tarea.FechaActualizacion,
 		&tarea.Estado,
 		&tarea.Prioridad,
 		&tarea.UserID,
@@ -270,7 +274,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 
 	// Buscar subtareas directas
 	subQuery := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, estado, prioridad, user_id, proyecto_id, tarea_padre_id
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id
 		FROM tareas_proyectos
 		WHERE tarea_padre_id = $1
 		AND user_id = $2
@@ -292,6 +296,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 				&sub.Comentario,
 				&sub.FechaCreacion,
 				&sub.FechaTerminado,
+				&sub.FechaActualizacion,
 				&sub.Estado,
 				&sub.Prioridad,
 				&sub.UserID,
