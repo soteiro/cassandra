@@ -1,16 +1,21 @@
 name: CI
 
-# Solo PRs hacia qa/main y merges a qa/main. Las ramas personales no disparan nada.
+# Solo PRs hacia qa/main. Las ramas personales no disparan nada.
 # Los PRs desde forks no reciben secrets; en Settings → Actions conviene exigir
 # aprobación manual para colaboradores externos.
+#
+# No hay trigger de push: el código ya se testeó en el PR, y el gate previo a producción
+# es el que release-please.yml ejecuta (workflow_call) al mergear el PR de release.
+# Tampoco corre en el PR de release-please, que solo toca el changelog y el manifest.
 on:
   pull_request:
     branches: [main, qa]
-  # qa no está aquí: deploy-qa.yml ejecuta este mismo CI antes de desplegar.
-  push:
-    branches: [main]
+    paths-ignore:
+      - CHANGELOG.md
+      - .release-please-manifest.json
   workflow_dispatch:
-  # Reutilizado por release-please.yml para volver a testear antes del build de release.
+  # Reutilizado por deploy-qa.yml (antes del deploy a QA) y por release-please.yml
+  # (antes del build de release).
   workflow_call:
 
 # Un push nuevo al mismo PR o rama cancela la ejecución anterior. github.workflow
