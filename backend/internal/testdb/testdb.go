@@ -49,49 +49,76 @@ func New(t *testing.T, name string) *pgxpool.Pool {
 }
 
 func setup(name string) {
-	baseURL := os.Getenv("TEST_DATABASE_URL")
-	if baseURL == "" {
-		env, err := godotenv.Read(filepath.Join(moduleRoot(), ".env"))
-		if err != nil || env["DATABASE_URL_LOCAL"] == "" {
-			skipMsg = "sin base de datos de test: define TEST_DATABASE_URL o DATABASE_URL_LOCAL en backend/.env"
-			return
-		}
-		baseURL = env["DATABASE_URL_LOCAL"]
-	}
-
-	dbName := "cassandra_test_" + name
-	if !safeName.MatchString(dbName) {
-		initErr = fmt.Errorf("nombre de base de datos no permitido: %q", dbName)
+	baseURL, msg := baseURL()
+	if msg != "" {
+		skipMsg = msg
 		return
 	}
-	testURL, err := withDatabase(baseURL, dbName)
+	testURL, err := recreate(baseURL, name)
 	if err != nil {
 		initErr = err
 		return
+	}
+	if err = database.RunMigrations(testURL); err != nil {
+		initErr = err
+		return
+	}
+	pool, initErr = pgxpool.New(context.Background(), testURL)
+}
+
+// NewEmpty crea (o recrea) la base cassandra_test_<name> vacía, sin migraciones, y
+// devuelve su URL. Sirve para probar las migraciones en sí (p. ej. migrar hasta una
+// versión, cargar datos y seguir). Usa un nombre distinto del de New.
+func NewEmpty(t *testing.T, name string) string {
+	t.Helper()
+	base, msg := baseURL()
+	if msg != "" {
+		t.Skip(msg)
+	}
+	u, err := recreate(base, name)
+	if err != nil {
+		t.Fatalf("testdb: %v", err)
+	}
+	return u
+}
+
+// baseURL devuelve la URL del servidor de test, o un mensaje para saltar los tests.
+func baseURL() (string, string) {
+	if u := os.Getenv("TEST_DATABASE_URL"); u != "" {
+		return u, ""
+	}
+	env, err := godotenv.Read(filepath.Join(moduleRoot(), ".env"))
+	if err != nil || env["DATABASE_URL_LOCAL"] == "" {
+		return "", "sin base de datos de test: define TEST_DATABASE_URL o DATABASE_URL_LOCAL en backend/.env"
+	}
+	return env["DATABASE_URL_LOCAL"], ""
+}
+
+// recreate borra y crea la base cassandra_test_<name> y devuelve su URL.
+func recreate(baseURL, name string) (string, error) {
+	dbName := "cassandra_test_" + name
+	if !safeName.MatchString(dbName) {
+		return "", fmt.Errorf("nombre de base de datos no permitido: %q", dbName)
+	}
+	testURL, err := withDatabase(baseURL, dbName)
+	if err != nil {
+		return "", err
 	}
 	adminURL, _ := withDatabase(baseURL, "postgres")
 
 	ctx := context.Background()
 	admin, err := pgx.Connect(ctx, adminURL)
 	if err != nil {
-		initErr = fmt.Errorf("conectando a postgres: %w", err)
-		return
+		return "", fmt.Errorf("conectando a postgres: %w", err)
 	}
 	defer admin.Close(ctx)
 	if _, err = admin.Exec(ctx, fmt.Sprintf("DROP DATABASE IF EXISTS %s WITH (FORCE)", dbName)); err != nil {
-		initErr = err
-		return
+		return "", err
 	}
 	if _, err = admin.Exec(ctx, "CREATE DATABASE "+dbName); err != nil {
-		initErr = err
-		return
+		return "", err
 	}
-
-	if err = database.RunMigrations(testURL); err != nil {
-		initErr = err
-		return
-	}
-	pool, initErr = pgxpool.New(ctx, testURL)
+	return testURL, nil
 }
 
 // truncateAll vacía todas las tablas de la aplicación (no las de migraciones).
