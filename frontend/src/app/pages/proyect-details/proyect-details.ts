@@ -8,6 +8,7 @@ import { TaskService } from '../../services/task.service';
 import { NotaService } from '../../services/nota.service';
 import { DocumentoService } from '../../services/documento.service';
 import { ActividadService } from '../../services/actividad.service';
+import { PronosticoService } from '../../services/pronostico.service';
 import { ToastService } from '../../services/toast.service';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
 import { ProjectHeader } from './components/project-header/project-header';
@@ -62,6 +63,7 @@ export class ProyectDetails {
   private readonly notaService = inject(NotaService);
   private readonly documentoService = inject(DocumentoService);
   private readonly actividadService = inject(ActividadService);
+  private readonly pronosticoService = inject(PronosticoService);
   private readonly toast = inject(ToastService);
 
   private readonly paramMap = toSignal(this.route.paramMap);
@@ -74,6 +76,7 @@ export class ProyectDetails {
   protected readonly tasksResource = this.taskService.getTasksByProyectoId(this.id);
   protected readonly notasResource = this.notaService.getNotasByProyectoId(this.id);
   protected readonly documentosResource = this.documentoService.getDocumentosByProyectoId(this.id);
+  protected readonly pronosticoResource = this.pronosticoService.getPronosticoProyecto(this.id);
   protected readonly actividadLimit = signal(30);
   protected readonly actividadResource = this.actividadService.getActividadProyecto(this.id, this.actividadLimit);
   /** Si llegó el límite completo puede haber más (el backend acepta hasta 100). */
@@ -159,6 +162,8 @@ export class ProyectDetails {
         this.isSubmittingEditProject.set(false);
         this.closeEditProjectModal();
         this.projectResource?.reload();
+        this.pronosticoResource?.reload();
+        this.pronosticoService.planificacionResource.reload();
         // La lista global de proyectos es un recurso compartido: hay que refrescarla.
         this.proyectService.reload();
       },
@@ -235,6 +240,7 @@ export class ProyectDetails {
 
   reloadTasks() {
     this.tasksResource?.reload();
+    this.pronosticoResource?.reload();
   }
 
   reloadNotas() {

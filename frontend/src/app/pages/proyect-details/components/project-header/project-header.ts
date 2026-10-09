@@ -2,6 +2,7 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../../../models/proyect.model';
+import { PronosticoProyecto } from '../../../../models/pronostico.model';
 import {
   LucideCornerDownRight,
   LucideLayers,
@@ -10,7 +11,7 @@ import {
   LucideTarget,
   LucideChevronDown,
 } from '@lucide/angular';
-import { haceCuanto } from '../../../../utils/actividad.util';
+import { haceCuanto, rangoSemanas } from '../../../../utils/actividad.util';
 
 // Preferencia de este navegador: el propósito se muestra plegado salvo que lo abras.
 const CLAVE_PROPOSITO = 'cassandra.proyecto.mostrarProposito';
@@ -31,6 +32,7 @@ const CLAVE_PROPOSITO = 'cassandra.proyecto.mostrarProposito';
 })
 export class ProjectHeader {
   project = input.required<ProjectResponse>();
+  pronostico = input<PronosticoProyecto | null | undefined>(null);
 
   edit = output<void>();
   delete = output<void>();
@@ -49,6 +51,23 @@ export class ProjectHeader {
       // Sin almacenamiento (modo privado): la preferencia dura lo que la página.
     }
   }
+
+  /**
+   * "Al ritmo actual, entre 3 y 6 semanas" y si se pasa de la fecha límite. Sin datos
+   * suficientes no hay texto: mejor callar que inventar.
+   */
+  readonly textoPronostico = computed(() => {
+    const p = this.pronostico();
+    if (p?.semanas_min == null || p.semanas_max == null) return null;
+    let texto = `Al ritmo actual, ${rangoSemanas(p.semanas_min, p.semanas_max)} para las ${p.tareas_abiertas} tareas abiertas`;
+    const limite = this.project().fecha_limite;
+    if (limite) {
+      const finProbable = new Date();
+      finProbable.setDate(finProbable.getDate() + p.semanas_max * 7);
+      if (finProbable > new Date(limite)) texto += ' (la fecha límite cae antes)';
+    }
+    return texto;
+  });
 
   haceCuanto(fecha?: string): string {
     return haceCuanto(fecha);

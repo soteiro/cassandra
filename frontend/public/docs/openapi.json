@@ -49,6 +49,10 @@
       "description": "Operaciones de Personas"
     },
     {
+      "name": "Pronosticos",
+      "description": "Operaciones de Pronosticos"
+    },
+    {
       "name": "Proyects",
       "description": "Operaciones de Proyects"
     },
@@ -2260,6 +2264,88 @@
               "example": 1
             },
             "description": "ID numérico de persona"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/pronosticos/planificacion": {
+      "get": {
+        "tags": [
+          "Pronosticos"
+        ],
+        "summary": "Planificacion",
+        "operationId": "get__api_pronosticos_planificacion",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/proyects/{proyect_id}/pronostico": {
+      "get": {
+        "tags": [
+          "Pronosticos"
+        ],
+        "summary": "Pronostico de un proyecto",
+        "operationId": "get__api_proyects__proyect_id__pronostico",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de proyect"
           }
         ],
         "responses": {

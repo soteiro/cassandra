@@ -12,6 +12,7 @@
     <!-- CABECERA Y METADATOS DEL PROYECTO -->
     <app-project-header
       [project]="project"
+      [pronostico]="pronosticoResource?.value()"
       (edit)="openEditProjectModal()"
       (delete)="openDeleteProjectModal(project)"
     />

@@ -1,8 +1,10 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
 import { BackButtonService } from '../../services/back-button.service';
+import { PronosticoService } from '../../services/pronostico.service';
+import { fechaProbable, formatoFactor } from '../../utils/actividad.util';
 import {
   LucideSparkles,
   LucidePencil,
@@ -24,6 +26,7 @@ import {
 })
 export class ProjectModal {
   private readonly backButtonService = inject(BackButtonService);
+  private readonly pronosticoService = inject(PronosticoService);
 
   isOpen = input<boolean>(false);
   mode = input<'create' | 'edit' | 'create-subproject'>('create');
@@ -55,10 +58,31 @@ export class ProjectModal {
 
   errorMessage = signal('');
 
+  /**
+   * Al elegir fecha límite: cuánto suelen tardar tus proyectos frente a lo que estimas,
+   * y qué fecha sería con ese ritmo. null sin fecha o sin historia suficiente.
+   */
+  readonly pistaFechaLimite = computed(() => {
+    const plan = this.pronosticoService.planificacionResource.value();
+    const fecha = this.fecha_limite();
+    if (!plan?.factor || !fecha) return null;
+    const inicio = this.mode() === 'edit' && this.initialData() ? new Date(this.initialData()!.fecha_creacion) : new Date();
+    const limite = new Date(fecha + 'T00:00:00');
+    if (plan.factor < 1.1) {
+      return { texto: `Sueles cumplir tus fechas (mediana de ${plan.proyectos} proyectos).`, fecha: null };
+    }
+    return {
+      texto: `Tus proyectos suelen tardar ${formatoFactor(plan.factor)}× lo estimado (mediana de ${plan.proyectos}). A ese ritmo terminaría cerca del`,
+      fecha: fechaProbable(inicio, limite, plan.factor),
+    };
+  });
+
   constructor() {
     effect(() => {
       if (this.isOpen()) {
         this.errorMessage.set('');
+        // Por si completaste un proyecto desde otra página desde la última vez.
+        untracked(() => this.pronosticoService.planificacionResource.reload());
         const data = this.initialData();
         const parent = this.parentProject();
         const m = this.mode();

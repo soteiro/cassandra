@@ -185,6 +185,14 @@
               name="fecha_limite"
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
             />
+            @if (pistaFechaLimite(); as pista) {
+              <p class="mt-1.5 text-[11px] text-text-muted leading-snug">
+                {{ pista.texto }}
+                @if (pista.fecha) {
+                  <strong class="text-text-main font-medium">{{ pista.fecha | date: 'dd/MM/yyyy' }}</strong>.
+                }
+              </p>
+            }
           </div>
         </div>
 

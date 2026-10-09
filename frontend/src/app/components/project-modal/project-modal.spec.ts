@@ -1,6 +1,9 @@
 import type { Mock } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { PronosticoService } from '../../services/pronostico.service';
 
 import { ProjectModal } from './project-modal';
 import { ProjectResponse } from '../../models/proyect.model';
@@ -47,7 +50,7 @@ describe('ProjectModal', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProjectModal],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProjectModal);
@@ -194,5 +197,35 @@ describe('ProjectModal', () => {
     await setInputs({ isOpen: true });
     await TestBed.inject(BackButtonService).handleBackButton();
     expect(closeSpy).toHaveBeenCalledTimes(1);
+  });
+
+  describe('pista de fecha límite', () => {
+    const conPlanificacion = (plan: object | undefined) => {
+      const servicio = TestBed.inject(PronosticoService);
+      vi.spyOn(servicio.planificacionResource, 'value').mockReturnValue(plan as never);
+    };
+
+    it('con historia muestra cuánto sueles tardar y la fecha probable', () => {
+      conPlanificacion({ proyectos: 4, a_tiempo: 1, factor: 2.5 });
+      component.fecha_limite.set('2099-01-01');
+      const pista = component.pistaFechaLimite();
+      expect(pista?.texto).toContain('2,5× lo estimado (mediana de 4)');
+      expect(pista?.fecha).toBeInstanceOf(Date);
+    });
+
+    it('si sueles cumplir lo dice sin fecha', () => {
+      conPlanificacion({ proyectos: 3, a_tiempo: 3, factor: 1 });
+      component.fecha_limite.set('2099-01-01');
+      expect(component.pistaFechaLimite()?.texto).toContain('Sueles cumplir tus fechas');
+    });
+
+    it('sin factor o sin fecha no hay pista', () => {
+      conPlanificacion({ proyectos: 2, a_tiempo: 1 });
+      component.fecha_limite.set('2099-01-01');
+      expect(component.pistaFechaLimite()).toBeNull();
+      conPlanificacion({ proyectos: 4, a_tiempo: 1, factor: 2 });
+      component.fecha_limite.set('');
+      expect(component.pistaFechaLimite()).toBeNull();
+    });
   });
 });
