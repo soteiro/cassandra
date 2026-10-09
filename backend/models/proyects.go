@@ -16,9 +16,11 @@ type Proyects struct {
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
-	Prioridad            string     `json:"prioridad"`
-	FechaLimite          *time.Time `json:"fecha_limite"`
-	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
+	// Pre-mortem: "¿por qué podría fracasar?", escrito al crear el proyecto.
+	Premortem       string     `json:"premortem"`
+	Prioridad       string     `json:"prioridad"`
+	FechaLimite     *time.Time `json:"fecha_limite"`
+	ProyectoPadreID *int       `json:"proyecto_padre_id"`
 }
 
 // definir los datos que se espera recibir la creacion de un proyecto
@@ -30,6 +32,7 @@ type ProyectRequest struct {
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
+	Premortem            string     `json:"premortem"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
@@ -48,6 +51,7 @@ type ProyectResponse struct {
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
+	Premortem            string     `json:"premortem"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
@@ -66,6 +70,7 @@ type ProyectUpdateRequest struct {
 	PorQue               *string    `json:"por_que"`
 	ParaQue              *string    `json:"para_que"`
 	CriterioFinalizacion *string    `json:"criterio_finalizacion"`
+	Premortem            *string    `json:"premortem"`
 	Prioridad            *string    `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
@@ -81,6 +86,7 @@ type ProyectUpdateResponse struct {
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
 	CriterioFinalizacion string     `json:"criterio_finalizacion"`
+	Premortem            string     `json:"premortem"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
