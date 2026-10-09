@@ -137,6 +137,16 @@
               </p>
             </div>
           }
+          @if (project().premortem) {
+            <div>
+              <h4 class="font-semibold text-text-muted uppercase tracking-wider mb-1">
+                ¿Por qué podría fracasar?
+              </h4>
+              <p class="text-text-main bg-background/60 p-3 rounded-xl border border-surface-border leading-relaxed">
+                {{ project().premortem }}
+              </p>
+            </div>
+          }
           @if (project().descripcion) {
             <div>
               <h4 class="font-semibold text-text-muted uppercase tracking-wider mb-1">

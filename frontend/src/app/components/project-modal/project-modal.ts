@@ -51,6 +51,10 @@ export class ProjectModal {
   por_que = signal('');
   para_que = signal('');
   criterio_finalizacion = signal('');
+  premortem = signal('');
+  // Retrospectiva: se pregunta al pasar el proyecto a Completado o Cancelado.
+  retroParaQue = signal('');
+  retroAprendizaje = signal('');
   prioridad = signal('Media');
   estado = signal('No Listado');
   fecha_limite = signal('');
@@ -62,6 +66,12 @@ export class ProjectModal {
    * Al elegir fecha límite: cuánto suelen tardar tus proyectos frente a lo que estimas,
    * y qué fecha sería con ese ritmo. null sin fecha o sin historia suficiente.
    */
+  /** Se está cerrando el proyecto en esta edición: toca la retrospectiva. */
+  readonly cerrandoProyecto = computed(() => {
+    const cerrado = (e?: string) => e === 'Completado' || e === 'Cancelado';
+    return this.mode() === 'edit' && cerrado(this.estado()) && !cerrado(this.initialData()?.estado);
+  });
+
   readonly pistaFechaLimite = computed(() => {
     const plan = this.pronosticoService.planificacionResource.value();
     const fecha = this.fecha_limite();
@@ -81,6 +91,8 @@ export class ProjectModal {
     effect(() => {
       if (this.isOpen()) {
         this.errorMessage.set('');
+        this.retroParaQue.set('');
+        this.retroAprendizaje.set('');
         // Por si completaste un proyecto desde otra página desde la última vez.
         untracked(() => this.pronosticoService.planificacionResource.reload());
         const data = this.initialData();
@@ -94,6 +106,7 @@ export class ProjectModal {
           this.por_que.set(data.por_que || '');
           this.para_que.set(data.para_que || '');
           this.criterio_finalizacion.set(data.criterio_finalizacion || '');
+          this.premortem.set(data.premortem || '');
           this.prioridad.set(data.prioridad || 'Media');
           this.estado.set(data.estado || 'No Listado');
           this.fecha_limite.set(data.fecha_limite ? data.fecha_limite.split('T')[0] : '');
@@ -105,6 +118,7 @@ export class ProjectModal {
           this.por_que.set('');
           this.para_que.set('');
           this.criterio_finalizacion.set('');
+          this.premortem.set('');
           this.prioridad.set('Media');
           this.estado.set('No Listado');
           this.fecha_limite.set('');
@@ -117,6 +131,7 @@ export class ProjectModal {
           this.por_que.set('');
           this.para_que.set('');
           this.criterio_finalizacion.set('');
+          this.premortem.set('');
           this.prioridad.set('Media');
           this.estado.set('No Listado');
           this.fecha_limite.set('');
@@ -151,12 +166,19 @@ export class ProjectModal {
       por_que: this.por_que().trim(),
       para_que: this.para_que().trim(),
       criterio_finalizacion: this.criterio_finalizacion().trim(),
+      premortem: this.premortem().trim(),
       prioridad: this.prioridad(),
       fecha_limite: this.fecha_limite() ? new Date(this.fecha_limite()).toISOString() : undefined,
     };
 
     if (this.mode() === 'edit') {
       payload.estado = this.estado();
+      const cumplido = this.retroParaQue().trim();
+      const aprendido = this.retroAprendizaje().trim();
+      if (this.cerrandoProyecto() && (cumplido || aprendido)) {
+        // No va a la API de proyectos: la página la guarda como documento del proyecto.
+        payload.retrospectiva = { cumplido, aprendido };
+      }
     }
 
     if (this.mode() === 'create' || this.mode() === 'create-subproject') {

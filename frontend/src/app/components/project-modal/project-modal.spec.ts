@@ -158,6 +158,46 @@ describe('ProjectModal', () => {
     expect(payload).not.toHaveProperty('proyecto_padre_id');
   });
 
+  it('incluye el pre-mortem en el payload', async () => {
+    await setInputs({ isOpen: true });
+    fillRequired();
+    component.premortem.set('  me quedo sin tiempo  ');
+    component.onSubmit();
+    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)['premortem']).toBe('me quedo sin tiempo');
+  });
+
+  describe('retrospectiva al cerrar', () => {
+    it('aparece solo al pasar a Completado o Cancelado', async () => {
+      await setInputs({ isOpen: true, mode: 'edit', initialData: makeProject({ premortem: 'Sin tiempo' }) });
+      expect(component.cerrandoProyecto()).toBe(false);
+      component.estado.set('Cancelado');
+      fixture.detectChanges();
+      expect(component.cerrandoProyecto()).toBe(true);
+      expect(el.textContent).toContain('¿Qué aprendiste?');
+      expect(el.textContent).toContain('Tu pre-mortem decía: Sin tiempo');
+    });
+
+    it('no aparece si el proyecto ya estaba cerrado', async () => {
+      await setInputs({ isOpen: true, mode: 'edit', initialData: makeProject({ estado: 'Completado' }) });
+      component.estado.set('Completado');
+      expect(component.cerrandoProyecto()).toBe(false);
+    });
+
+    it('va en el payload solo si se respondió algo', async () => {
+      await setInputs({ isOpen: true, mode: 'edit', initialData: makeProject() });
+      component.estado.set('Completado');
+      component.onSubmit();
+      expect(saveSpy.mock.calls[0][0]).not.toHaveProperty('retrospectiva');
+
+      component.retroAprendizaje.set(' Cotizar antes ');
+      component.onSubmit();
+      expect((saveSpy.mock.calls[1][0] as Record<string, unknown>)['retrospectiva']).toEqual({
+        cumplido: '',
+        aprendido: 'Cotizar antes',
+      });
+    });
+  });
+
   it('should list potential parents only in create mode', async () => {
     await setInputs({
       isOpen: true,

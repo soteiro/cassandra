@@ -27,6 +27,7 @@ import {
   LucideHistory,
 } from '@lucide/angular';
 import { getErrorMessage } from '../../utils/http-error.util';
+import { contenidoRetrospectiva, RespuestasRetrospectiva } from '../../utils/retrospectiva.util';
 
 interface Tab {
   id: string;
@@ -155,10 +156,15 @@ export class ProyectDetails {
 
   saveEditProject(payload: any) {
     this.isSubmittingEditProject.set(true);
+    const { retrospectiva, ...cambios } = payload as ProjectUpdateRequest & { retrospectiva?: RespuestasRetrospectiva };
+    const proyecto = this.projectResource?.value();
 
-    this.proyectService.updateProyect(this.projectIdNumber(), payload as ProjectUpdateRequest).subscribe({
+    this.proyectService.updateProyect(this.projectIdNumber(), cambios).subscribe({
       next: () => {
         this.toast.success('Proyecto actualizado');
+        if (retrospectiva && proyecto) {
+          this.guardarRetrospectiva(proyecto, cambios.estado ?? proyecto.estado, retrospectiva);
+        }
         this.isSubmittingEditProject.set(false);
         this.closeEditProjectModal();
         this.projectResource?.reload();
@@ -172,6 +178,20 @@ export class ProyectDetails {
         this.isSubmittingEditProject.set(false);
       },
     });
+  }
+
+  /** La retrospectiva se guarda como documento del proyecto, después del cambio de estado. */
+  private guardarRetrospectiva(proyecto: ProjectResponse, estado: string, respuestas: RespuestasRetrospectiva) {
+    this.documentoService
+      .createDocumento(proyecto.id, {
+        titulo: `Retrospectiva: ${proyecto.nombre}`.slice(0, 200),
+        contenido: contenidoRetrospectiva(proyecto, estado, respuestas, new Date()),
+        tipo: 'retrospectiva',
+      })
+      .subscribe({
+        next: () => this.documentosResource?.reload(),
+        error: (err) => this.toast.error(getErrorMessage(err, 'El proyecto se actualizó, pero no se pudo guardar la retrospectiva')),
+      });
   }
 
   // --- DELETE PROJECT STATE ---

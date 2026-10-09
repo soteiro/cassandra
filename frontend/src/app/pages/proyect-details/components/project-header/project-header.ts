@@ -39,7 +39,7 @@ export class ProjectHeader {
 
   readonly tieneProposito = computed(() => {
     const p = this.project();
-    return !!(p.por_que || p.para_que || p.descripcion || p.comentario);
+    return !!(p.por_que || p.para_que || p.premortem || p.descripcion || p.comentario);
   });
   readonly mostrarProposito = signal(leerPreferencia());
 

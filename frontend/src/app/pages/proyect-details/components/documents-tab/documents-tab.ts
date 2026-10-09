@@ -73,6 +73,11 @@ export const CATEGORIES: CategoryMeta[] = [
     badgeClass: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30',
   },
   {
+    id: 'retrospectiva',
+    label: 'Retrospectiva',
+    badgeClass: 'bg-teal-500/10 text-teal-400 border-teal-500/30',
+  },
+  {
     id: 'general',
     label: 'General',
     badgeClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
