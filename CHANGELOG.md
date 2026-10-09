@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/soteiro/cassandra/compare/v0.6.2...v0.6.3) (2026-10-09)
+
+
+### Bug Fixes
+
+* **backend:** el rollback del deploy funciona con releases que migran la base ([#40](https://github.com/soteiro/cassandra/issues/40)) ([9c414a5](https://github.com/soteiro/cassandra/commit/9c414a594eb7dbc34130f5eb7aa9f21b4a0683c5))
+
 ## [0.6.2](https://github.com/soteiro/cassandra/compare/v0.6.1...v0.6.2) (2026-10-06)
 
 
