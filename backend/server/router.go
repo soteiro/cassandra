@@ -54,6 +54,7 @@ func NewRouter(opts Options) http.Handler {
 	finanzasHandler := handlers.NewFinanzasHandler(repository.NewFinanzasRepository(db), owner)
 	listaDeseosHandler := handlers.NewListaDeseosHandler(repository.NewListaDeseosRepository(db), owner)
 	documentosProyectoHandler := handlers.NewDocumentosProyectoHandler(repository.NewDocumentosProyectoRepository(db), owner)
+	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
 
 	r := chi.NewRouter()
 
@@ -108,6 +109,10 @@ func NewRouter(opts Options) http.Handler {
 		r.Put("/api/tareas/{id}", tareasHandler.UpdateTarea)
 		r.Delete("/api/tareas/{id}", tareasHandler.DeleteTarea)
 		r.Get("/api/proyects/{proyect_id}/tareas", tareasHandler.GetTareasByProyecto)
+
+		// Actividad: "Lo que hiciste" y "En qué quedaste"
+		r.Get("/api/actividad/resumen", actividadHandler.Resumen)
+		r.Get("/api/proyects/{proyect_id}/actividad", actividadHandler.PorProyecto)
 
 		// Rutas de Logs en Crudo de Proyectos
 		r.Post("/api/proyects/{proyect_id}/logs", logsHandler.CreateLog)

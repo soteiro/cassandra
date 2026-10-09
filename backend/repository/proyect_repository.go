@@ -88,7 +88,8 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		p.fecha_limite,
 		p.proyecto_padre_id,
 		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count,
-		padre.nombre as nombre_padre
+		padre.nombre as nombre_padre,
+		(SELECT max(e.ocurrido_en) FROM eventos e WHERE e.user_id = p.user_id AND e.proyecto_id = p.id) as ultima_actividad
 	FROM proyectos p
 	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id AND padre.user_id = p.user_id
 	WHERE p.user_id = $1
@@ -128,6 +129,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.ProyectoPadreID,
 			&p.SubproyectosCount,
 			&p.NombrePadre,
+			&p.UltimaActividad,
 		)
 		if err != nil {
 			log.Printf("[REPO:Proyect.GetAll] Error al escanear fila: %v | user_id=%d", err, UserID)
@@ -161,7 +163,8 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 		p.fecha_limite,
 		p.proyecto_padre_id,
 		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count,
-		padre.nombre as nombre_padre
+		padre.nombre as nombre_padre,
+		(SELECT max(e.ocurrido_en) FROM eventos e WHERE e.user_id = p.user_id AND e.proyecto_id = p.id) as ultima_actividad
 	FROM proyectos p
 	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id AND padre.user_id = p.user_id
 	WHERE p.proyecto_padre_id = $1
@@ -203,6 +206,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 			&p.ProyectoPadreID,
 			&p.SubproyectosCount,
 			&p.NombrePadre,
+			&p.UltimaActividad,
 		)
 		if err != nil {
 			log.Printf("[REPO:Proyect.GetSubproyectos] Error al escanear fila: %v | parent_id=%d user_id=%d", err, parentID, userID)
@@ -258,7 +262,8 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		p.fecha_limite, 
 		p.proyecto_padre_id, 
 		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count, 
-		padre.nombre as nombre_padre
+		padre.nombre as nombre_padre,
+		(SELECT max(e.ocurrido_en) FROM eventos e WHERE e.user_id = p.user_id AND e.proyecto_id = p.id) as ultima_actividad
 	FROM proyectos p
 	LEFT JOIN proyectos padre ON p.proyecto_padre_id = padre.id AND padre.user_id = p.user_id
 	WHERE p.id = $1
@@ -287,6 +292,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.ProyectoPadreID,
 		&p.SubproyectosCount,
 		&p.NombrePadre,
+		&p.UltimaActividad,
 	)
 
 	if err != nil {

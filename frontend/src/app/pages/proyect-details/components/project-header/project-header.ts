@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../../../models/proyect.model';
@@ -8,7 +8,12 @@ import {
   LucidePencil,
   LucideTrash2,
   LucideTarget,
+  LucideChevronDown,
 } from '@lucide/angular';
+import { haceCuanto } from '../../../../utils/actividad.util';
+
+// Preferencia de este navegador: el propósito se muestra plegado salvo que lo abras.
+const CLAVE_PROPOSITO = 'cassandra.proyecto.mostrarProposito';
 
 @Component({
   selector: 'app-project-header',
@@ -20,6 +25,7 @@ import {
     LucidePencil,
     LucideTrash2,
     LucideTarget,
+    LucideChevronDown,
   ],
   templateUrl: './project-header.html',
 })
@@ -28,6 +34,25 @@ export class ProjectHeader {
 
   edit = output<void>();
   delete = output<void>();
+
+  readonly tieneProposito = computed(() => {
+    const p = this.project();
+    return !!(p.por_que || p.para_que || p.descripcion || p.comentario);
+  });
+  readonly mostrarProposito = signal(leerPreferencia());
+
+  alternarProposito(): void {
+    this.mostrarProposito.update((v) => !v);
+    try {
+      localStorage.setItem(CLAVE_PROPOSITO, String(this.mostrarProposito()));
+    } catch {
+      // Sin almacenamiento (modo privado): la preferencia dura lo que la página.
+    }
+  }
+
+  haceCuanto(fecha?: string): string {
+    return haceCuanto(fecha);
+  }
 
   getPriorityClass(priority?: string): string {
     switch (priority) {
@@ -63,5 +88,13 @@ export class ProjectHeader {
       default:
         return 'bg-surface-border/50 text-text-muted border border-surface-border';
     }
+  }
+}
+
+function leerPreferencia(): boolean {
+  try {
+    return localStorage.getItem(CLAVE_PROPOSITO) === 'true';
+  } catch {
+    return false;
   }
 }

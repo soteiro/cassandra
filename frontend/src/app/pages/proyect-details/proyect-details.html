@@ -34,6 +34,8 @@
             <svg lucideFileText class="w-4 h-4" />
           } @else if (tab.id === 'documentos') {
             <svg lucideBookOpen class="w-4 h-4" />
+          } @else if (tab.id === 'actividad') {
+            <svg lucideHistory class="w-4 h-4" />
           }
           {{ tab.label }}
           @if (tab.id === 'subproyectos' && !subproyectosResource?.error() && subproyectosResource?.value(); as subs) {
@@ -90,6 +92,13 @@
         [documentos]="documentosResource?.value() || []"
         [isLoading]="documentosResource?.isLoading() || false"
         (reload)="reloadDocumentos()"
+      />
+    } @else if (activeTab() === 'actividad') {
+      <app-activity-tab
+        [eventos]="actividadResource?.value() || []"
+        [isLoading]="actividadResource?.isLoading() || false"
+        [hayMas]="hayMasActividad()"
+        (verMas)="verMasActividad()"
       />
     }
 

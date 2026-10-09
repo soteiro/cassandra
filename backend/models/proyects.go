@@ -53,6 +53,8 @@ type ProyectResponse struct {
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 	SubproyectosCount    int        `json:"subproyectos_count"`
 	NombrePadre          *string    `json:"nombre_padre,omitempty"`
+	// Último evento del proyecto o de lo que cuelga de él (tareas, notas, documentos, logs).
+	UltimaActividad *time.Time `json:"ultima_actividad,omitempty"`
 }
 
 // el * hace opcional el parametro

@@ -1,0 +1,22 @@
+info:
+  name: Actividad de un proyecto
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://localhost:8080/api/proyects/1/actividad?limit=20
+  params:
+    - name: limit
+      value: "20"
+      type: query
+      enabled: true
+  body:
+    type: none
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
