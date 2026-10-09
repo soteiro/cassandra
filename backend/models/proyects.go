@@ -43,6 +43,7 @@ type ProyectResponse struct {
 	Comentario           string     `json:"comentario"`
 	FechaCreacion        time.Time  `json:"fecha_creacion"`
 	FechaTerminado       *time.Time `json:"fecha_terminado,omitempty"`
+	FechaActualizacion   *time.Time `json:"fecha_actualizacion,omitempty"`
 	Estado               string     `json:"estado"`
 	PorQue               string     `json:"por_que"`
 	ParaQue              string     `json:"para_que"`
@@ -82,6 +83,3 @@ type ProyectUpdateResponse struct {
 	FechaLimite          *time.Time `json:"fecha_limite"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
-
-
-
