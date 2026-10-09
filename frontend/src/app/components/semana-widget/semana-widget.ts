@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideCalendarCheck, LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
@@ -20,6 +20,8 @@ interface GrupoProyecto {
 })
 export class SemanaWidget {
   private readonly actividadService = inject(ActividadService);
+  /** En la propia página de revisión el enlace sobra. */
+  readonly conEnlaceRevision = input(true);
   private readonly semanaActual = inicioDeSemana(new Date());
 
   readonly desde = signal(this.semanaActual);
