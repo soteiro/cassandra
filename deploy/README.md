@@ -77,4 +77,9 @@ Después borra la clave privada de tu máquina (o guárdala en tu gestor de cont
 - Volver a una versión anterior: Actions → Release Please → *Run workflow* → tag `vX.Y.Z`.
   Las migraciones no se revierten: si la versión nueva migró la base, restaura el
   respaldo de `/var/backups/cassandra` antes.
+- Migraciones y rollback: una versión anterior arranca sobre una base con migraciones
+  más nuevas (avisa en el log), y una migración que falla se deshace entera y deja la
+  base en la versión previa. Por eso las migraciones deben ser **aditivas**: no borrar
+  ni renombrar tablas o columnas que use la versión anterior (eso va en una release
+  posterior), y sin `COMMIT` ni `CONCURRENTLY` (un test lo comprueba).
 - Revocar el acceso de GitHub: borra la línea de `/home/cassandra-deploy/.ssh/authorized_keys`.
