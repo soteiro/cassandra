@@ -343,7 +343,14 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		RETURNING id, nombre, descripcion, comentario, estado, prioridad, fecha_terminado, eliminado, tarea_padre_id
 	`
 
-	err := r.db.QueryRow(
+	// La tarea y, si se completa, sus subtareas cambian juntas o no cambia nada.
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error al iniciar transacción: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	err = tx.QueryRow(
 		ctx,
 		query,
 		req.Nombre,
@@ -370,6 +377,25 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 
 	if err != nil {
 		log.Printf("[REPO:Tareas.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
+		return nil, err
+	}
+
+	// Completar una tarea completa sus subtareas pendientes. Reabrirla no las reabre:
+	// lo que ya estaba hecho sigue hecho.
+	if modoFechaTerminado == 1 {
+		_, err = tx.Exec(ctx, `
+			UPDATE tareas_proyectos
+			SET estado = $1, fecha_terminado = COALESCE(fecha_terminado, NOW())
+			WHERE tarea_padre_id = $2 AND user_id = $3 AND eliminado = false
+			  AND estado NOT IN ('Terminado', 'Completado')`,
+			*tarea.Estado, id, userID)
+		if err != nil {
+			log.Printf("[REPO:Tareas.Update] Error al completar subtareas: %v | id=%d user_id=%d", err, id, userID)
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
 
