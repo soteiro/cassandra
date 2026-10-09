@@ -161,6 +161,6 @@
     [task]="selectedTask()"
     [proyectId]="selectedTask()?.proyect_id || 0"
     (closeModal)="selectedTask.set(null)"
-    (taskUpdated)="tasksResource?.reload()"
+    (taskUpdated)="recargarTareas()"
   />
 </div>

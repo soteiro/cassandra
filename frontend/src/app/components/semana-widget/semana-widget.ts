@@ -61,6 +61,11 @@ export class SemanaWidget {
     return partes;
   });
 
+  /** El inicio lo llama al cambiar una tarea, para que lo terminado aparezca al tiro. */
+  recargar(): void {
+    this.resumen?.reload();
+  }
+
   anterior(): void {
     this.desde.update((d) => sumarSemanas(d, -1));
   }
