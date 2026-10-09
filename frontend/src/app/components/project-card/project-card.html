@@ -71,6 +71,10 @@
         <div class="flex items-center gap-1.5 text-[11px]">
           <svg lucideCalendar class="w-3 h-3 text-text-muted/70" />
           <span>{{ project().fecha_creacion | date: 'dd/MM/yyyy' }}</span>
+          @if (project().ultima_actividad) {
+            <span class="text-text-muted/40">·</span>
+            <span title="Última actividad">{{ haceCuanto(project().ultima_actividad) }}</span>
+          }
           @if (project().fecha_limite) {
             <span class="text-text-muted/40">·</span>
             <span class="text-amber-400/90 flex items-center gap-1">

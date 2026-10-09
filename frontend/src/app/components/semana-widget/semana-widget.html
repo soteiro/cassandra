@@ -1,0 +1,106 @@
+<div class="bg-surface border border-surface-border rounded-2xl shadow-xs overflow-hidden flex flex-col">
+  <div class="p-3 sm:px-4 sm:py-3 border-b border-surface-border flex items-center justify-between gap-3 bg-surface/80">
+    <div class="flex items-center gap-2 min-w-0">
+      <div class="w-6 h-6 rounded-lg bg-success/15 border border-success/30 text-success flex items-center justify-center shrink-0">
+        <svg lucideCalendarCheck class="w-3.5 h-3.5" />
+      </div>
+      <h2 class="text-xs sm:text-sm font-bold text-text-main truncate">
+        @if (esSemanaActual()) {
+          Esta semana
+        } @else {
+          Semana del {{ desde() | date: 'd/M' }} al {{ domingo() | date: 'd/M' }}
+        }
+      </h2>
+    </div>
+
+    <div class="flex items-center gap-1 shrink-0">
+      <button
+        type="button"
+        (click)="anterior()"
+        class="p-1 text-text-muted hover:text-primary border border-surface-border rounded-lg cursor-pointer"
+        title="Semana anterior"
+        aria-label="Semana anterior"
+      >
+        <svg lucideChevronLeft class="w-3.5 h-3.5" />
+      </button>
+      <button
+        type="button"
+        (click)="siguiente()"
+        [disabled]="esSemanaActual()"
+        class="p-1 text-text-muted hover:text-primary border border-surface-border rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-default"
+        title="Semana siguiente"
+        aria-label="Semana siguiente"
+      >
+        <svg lucideChevronRight class="w-3.5 h-3.5" />
+      </button>
+    </div>
+  </div>
+
+  <div class="p-3 sm:p-4 space-y-3 max-h-95 overflow-y-auto">
+    @if (resumen?.isLoading() && !resumen?.value()) {
+      <div class="space-y-2 animate-pulse">
+        <div class="w-40 h-3 bg-background rounded-md"></div>
+        <div class="w-56 h-3 bg-background rounded-md"></div>
+      </div>
+    } @else if (resumen?.error()) {
+      <div class="space-y-2" role="alert">
+        <p class="text-sm text-danger">No se pudo cargar el resumen.</p>
+        <button type="button" (click)="resumen?.reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
+      </div>
+    } @else if (resumen?.value(); as r) {
+      @if (r.tareas_terminadas.length || r.proyectos_completados.length) {
+        <p class="text-xs text-text-main">
+          Terminaste
+          <strong>{{ r.tareas_terminadas.length }} {{ r.tareas_terminadas.length === 1 ? 'tarea' : 'tareas' }}</strong>
+          @if (r.proyectos_completados.length) {
+            y completaste
+            <strong>{{ r.proyectos_completados.length }} {{ r.proyectos_completados.length === 1 ? 'proyecto' : 'proyectos' }}</strong>
+          }
+        </p>
+
+        @for (p of r.proyectos_completados; track p.id) {
+          <a
+            [routerLink]="['/proyectos', p.id]"
+            class="block px-2.5 py-1.5 text-xs rounded-lg bg-success/10 border border-success/30 text-success hover:underline truncate"
+          >
+            ✓ {{ p.nombre }}
+          </a>
+        }
+
+        <div class="space-y-2.5">
+          @for (g of porProyecto(); track g.proyectoId) {
+            <div>
+              <a [routerLink]="['/proyectos', g.proyectoId]" class="text-[11px] font-semibold text-text-muted hover:text-primary hover:underline">
+                {{ g.proyectoNombre || 'Proyecto #' + g.proyectoId }}
+              </a>
+              <ul class="mt-1 space-y-1">
+                @for (t of g.tareas; track t.id) {
+                  <li class="text-xs text-text-main flex items-baseline gap-1.5 min-w-0">
+                    <span class="text-success shrink-0">✓</span>
+                    <span class="truncate">{{ t.nombre }}</span>
+                    @if (t.tarea_padre_id) {
+                      <span class="text-[10px] text-text-muted shrink-0">(subtarea)</span>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-xs text-text-muted">
+          {{ esSemanaActual() ? 'Todavía no hay nada terminado esta semana.' : 'No terminaste tareas esa semana.' }}
+        </p>
+      }
+
+      <div class="pt-2 border-t border-surface-border/60 space-y-1 text-[11px] text-text-muted">
+        <p title="Tareas creadas y tareas terminadas en la semana">
+          Entraron {{ r.flujo.creadas }} · salieron {{ r.flujo.terminadas }}
+        </p>
+        @if (otros().length) {
+          <p>También: {{ otros().join(' · ') }}</p>
+        }
+      </div>
+    }
+  </div>
+</div>

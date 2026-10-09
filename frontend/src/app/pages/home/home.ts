@@ -8,6 +8,7 @@ import { ToastService } from '../../services/toast.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
 import { TaskStatusSelect } from '../../components/task-status-select/task-status-select';
+import { SemanaWidget } from '../../components/semana-widget/semana-widget';
 import {
   getTaskPriorityBadgeClass,
   getTaskPriorityBorderClass,
@@ -23,6 +24,7 @@ import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
     RouterLink,
     TaskDetailModal,
     TaskStatusSelect,
+    SemanaWidget,
     LucideListTodo,
     LucideRefreshCcw,
     LucideCheck,

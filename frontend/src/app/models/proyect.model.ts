@@ -26,6 +26,9 @@ export interface Project {
   proyecto_padre_id?: number | null;
   subproyectos_count?: number;
   nombre_padre?: string;
+  fecha_actualizacion?: string;
+  /** Último evento del proyecto o de lo que cuelga de él. */
+  ultima_actividad?: string;
 }
 
 export interface ProjectRequest {
@@ -57,6 +60,9 @@ export interface ProjectResponse {
   proyecto_padre_id?: number | null;
   subproyectos_count?: number;
   nombre_padre?: string;
+  fecha_actualizacion?: string;
+  /** Último evento del proyecto o de lo que cuelga de él. */
+  ultima_actividad?: string;
 }
 
 export interface ProjectUpdateRequest {

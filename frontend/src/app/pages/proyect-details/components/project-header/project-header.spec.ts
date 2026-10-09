@@ -116,4 +116,37 @@ describe('ProjectHeader', () => {
     expect(component.getStatusClass('No Listado')).toContain('text-text-muted');
     expect(component.getStatusClass('desconocido')).toContain('text-text-muted');
   });
+
+  describe('propósito plegable', () => {
+    beforeEach(() => localStorage.removeItem('cassandra.proyecto.mostrarProposito'));
+
+    const boton = () =>
+      [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('propósito')) as HTMLButtonElement;
+
+    it('viene plegado y se abre y cierra con un click', async () => {
+      await render({ por_que: 'Porque sí', para_que: 'Para algo' });
+      expect(el.textContent).not.toContain('Porque sí');
+      expect(boton().getAttribute('aria-expanded')).toBe('false');
+
+      boton().click();
+      fixture.detectChanges();
+      expect(el.textContent).toContain('Porque sí');
+      expect(el.textContent).toContain('Para algo');
+      expect(localStorage.getItem('cassandra.proyecto.mostrarProposito')).toBe('true');
+
+      boton().click();
+      fixture.detectChanges();
+      expect(el.textContent).not.toContain('Porque sí');
+    });
+
+    it('sin propósito ni descripción no muestra el botón', async () => {
+      await render();
+      expect(boton()).toBeUndefined();
+    });
+  });
+
+  it('muestra la última actividad cuando existe', async () => {
+    await render({ ultima_actividad: new Date().toISOString() });
+    expect(el.textContent).toContain('Última actividad hoy');
+  });
 });
