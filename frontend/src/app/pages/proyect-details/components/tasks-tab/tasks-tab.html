@@ -164,6 +164,15 @@
             <svg lucidePlus class="w-3.5 h-3.5" />
             <span>↵ Enter</span>
           </button>
+          <button
+            type="button"
+            (click)="createQuickTask(true)"
+            [disabled]="isSubmittingQuickTask() || !quickTaskTitle().trim()"
+            title="Registrar algo que ya hiciste: se crea como terminada"
+            class="text-xs text-text-muted hover:text-success border border-surface-border hover:border-success/40 font-medium px-3 py-2.5 rounded-xl transition-all disabled:opacity-30 cursor-pointer shrink-0"
+          >
+            ✓ Ya lo hice
+          </button>
         </div>
       </form>
     </div>

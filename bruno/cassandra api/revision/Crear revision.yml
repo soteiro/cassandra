@@ -1,0 +1,19 @@
+info:
+  name: Crear revision
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:8080/api/revisiones
+  body:
+    type: json
+    data: |-
+      {"nota": "Semana tranquila", "resumen": {"terminadas": 4}}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

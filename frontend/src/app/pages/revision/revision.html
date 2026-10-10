@@ -1,0 +1,203 @@
+<div class="max-w-3xl mx-auto space-y-5">
+  <header class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-surface-border">
+    <div>
+      <h1 class="text-lg font-bold text-text-main tracking-tight">Revisión semanal</h1>
+      <p class="text-[11px] text-text-muted">Unos 15 minutos para cerrar lo que se acumuló sin decidir.</p>
+    </div>
+    @if (preferencias.value(); as pref) {
+      <div class="flex flex-wrap items-center gap-3">
+      <label class="flex items-center gap-1.5 text-[11px] text-text-muted">
+        Revisar cada
+        <select
+          [ngModel]="pref.dia_revision"
+          (ngModelChange)="cambiarDia($event)"
+          class="bg-background border border-surface-border text-text-main rounded-lg px-2 py-1 outline-none cursor-pointer"
+        >
+          @for (d of diasSemana; track $index) {
+            <option [ngValue]="$index">{{ d.toLowerCase() }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex items-center gap-1.5 text-[11px] text-text-muted" title="Aviso suave al pasar de este número de tareas En Curso">
+        Máximo en curso
+        <input
+          type="number"
+          min="1"
+          max="50"
+          [ngModel]="pref.limite_en_curso"
+          (change)="cambiarLimite($any($event.target).value)"
+          class="w-14 bg-background border border-surface-border text-text-main rounded-lg px-2 py-1 outline-none"
+        />
+      </label>
+      </div>
+    }
+  </header>
+
+  <!-- PASOS -->
+  <ol class="flex gap-1.5 text-[11px]" aria-label="Pasos de la revisión">
+    @for (p of pasos; track $index) {
+      <li class="flex-1">
+        <button
+          type="button"
+          (click)="paso.set($index)"
+          [attr.aria-current]="paso() === $index ? 'step' : null"
+          class="w-full px-2 py-1.5 rounded-lg border cursor-pointer truncate"
+          [class]="paso() === $index ? 'border-primary text-primary font-semibold bg-primary/10' : 'border-surface-border text-text-muted'"
+        >
+          {{ $index + 1 }}. {{ p }}
+        </button>
+      </li>
+    }
+  </ol>
+
+  <section class="space-y-3">
+    @switch (paso()) {
+      @case (0) {
+        <p class="text-xs text-text-muted">Empieza por lo que sí hiciste.</p>
+        <app-semana-widget [conEnlaceRevision]="false" />
+      }
+
+      @case (1) {
+        <p class="text-xs text-text-muted">
+          Tareas abiertas sin cambios hace {{ diasEstancada }} días o más, de proyectos en marcha. Decide qué pasa con cada una.
+        </p>
+        @if (estancadasResource?.isLoading() && !estancadasResource?.value()) {
+          <p class="text-xs text-text-muted animate-pulse">Buscando tareas estancadas…</p>
+        } @else if (estancadasResource?.error()) {
+          <p class="text-sm text-danger" role="alert">No se pudieron cargar las tareas estancadas.</p>
+        } @else {
+          @for (t of pendientes(); track t.id) {
+            <div class="p-3 bg-surface border border-surface-border rounded-xl space-y-2">
+              <div class="min-w-0">
+                <p class="text-xs font-medium text-text-main truncate">{{ t.nombre }}</p>
+                <p class="text-[11px] text-text-muted truncate">
+                  <a [routerLink]="['/proyectos', t.proyecto_id]" class="hover:text-primary hover:underline">{{ t.proyecto_nombre }}</a>
+                  · {{ t.estado }} · sin cambios hace {{ t.dias_sin_cambios }} días
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                @for (a of acciones; track a.decision) {
+                  <button
+                    type="button"
+                    (click)="decidirTarea(t, a.decision)"
+                    [disabled]="procesando() === t.id"
+                    class="px-2 py-1 text-[11px] rounded-lg border border-surface-border text-text-muted hover:text-primary hover:border-primary/50 cursor-pointer disabled:opacity-50"
+                  >
+                    {{ a.label }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="py-6 text-center text-xs text-text-muted">
+              {{ (estancadasResource?.value()?.length ?? 0) ? 'Listo: decidiste sobre todas.' : 'No hay tareas estancadas.' }}
+            </p>
+          }
+          @if (pendientes().length > 1) {
+            <button type="button" (click)="pausarTodas()" class="text-xs text-primary hover:underline cursor-pointer">
+              Pasar las {{ pendientes().length }} que quedan a pausa
+            </button>
+          }
+        }
+      }
+
+      @case (2) {
+        <p class="text-xs text-text-muted">¿Sigue vigente el para qué de cada proyecto en marcha? Para completarlo, ábrelo y cámbialo de estado.</p>
+        @for (p of proyectosActivos(); track p.id) {
+          <div class="p-3 bg-surface border border-surface-border rounded-xl space-y-2" [class.opacity-60]="decisionesProyectos()[p.id]">
+            <div class="min-w-0 space-y-0.5">
+              <a [routerLink]="['/proyectos', p.id]" class="text-xs font-medium text-text-main hover:text-primary hover:underline">{{ p.nombre }}</a>
+              @if (p.para_que) {
+                <p class="text-[11px] text-text-muted"><strong class="font-medium">Para qué:</strong> {{ p.para_que }}</p>
+              }
+              @if (p.criterio_finalizacion) {
+                <p class="text-[11px] text-text-muted"><strong class="font-medium">Terminado cuando:</strong> {{ p.criterio_finalizacion }}</p>
+              }
+              <p class="text-[11px] text-text-muted">
+                {{ p.estado }}
+                @if (p.ultima_actividad) {
+                  · última actividad {{ haceCuanto(p.ultima_actividad) }}
+                }
+              </p>
+            </div>
+            @if (decisionesProyectos()[p.id]; as d) {
+              <p class="text-[11px] text-text-muted">{{ d === 'pausado' ? 'Pausado.' : 'Sigue.' }}</p>
+            } @else {
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" (click)="decidirProyecto(p, 'sigue')" class="px-2 py-1 text-[11px] rounded-lg border border-surface-border text-text-muted hover:text-primary hover:border-primary/50 cursor-pointer">Sigue vigente</button>
+                <button type="button" (click)="decidirProyecto(p, 'pausado')" [disabled]="procesando() === p.id" class="px-2 py-1 text-[11px] rounded-lg border border-surface-border text-text-muted hover:text-primary hover:border-primary/50 cursor-pointer disabled:opacity-50">Pausar</button>
+              </div>
+            }
+          </div>
+        } @empty {
+          <p class="py-6 text-center text-xs text-text-muted">No hay proyectos en marcha.</p>
+        }
+      }
+
+      @case (3) {
+        <p class="text-xs text-text-muted">Una nota para tu yo de la próxima semana (opcional).</p>
+        <textarea
+          rows="4"
+          [ngModel]="nota()"
+          (ngModelChange)="nota.set($event)"
+          placeholder="¿Qué te llevas de esta semana? ¿Qué quieres cuidar la próxima?"
+          class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 text-sm outline-none transition-colors resize-none"
+        ></textarea>
+        <p class="text-[11px] text-text-muted">
+          Terminaste {{ resumen().terminadas }} · entraron {{ resumen().creadas }}
+          @if (decisionesTexto(resumen().decisiones); as d) {
+            · estancadas: {{ d }}
+          }
+          @if (resumen().proyectos_pausados) {
+            · {{ resumen().proyectos_pausados }} proyecto(s) pausado(s)
+          }
+        </p>
+        <button
+          type="button"
+          (click)="guardar()"
+          [disabled]="guardando()"
+          class="px-4 py-2 text-sm font-semibold rounded-xl bg-primary text-background hover:opacity-90 cursor-pointer disabled:opacity-50"
+        >
+          {{ guardando() ? 'Guardando…' : 'Guardar revisión' }}
+        </button>
+      }
+    }
+  </section>
+
+  <nav class="flex justify-between pt-2">
+    <button type="button" (click)="anterior()" [disabled]="paso() === 0" class="text-xs text-text-muted hover:text-primary cursor-pointer disabled:opacity-30 disabled:cursor-default">← Anterior</button>
+    @if (paso() < pasos.length - 1) {
+      <button type="button" (click)="siguiente()" class="text-xs font-semibold text-primary hover:underline cursor-pointer">Siguiente →</button>
+    }
+  </nav>
+
+  <!-- REVISIONES ANTERIORES (plegado) -->
+  @if (revisiones.value()?.length) {
+    <section class="pt-3 border-t border-surface-border space-y-2">
+      <button
+        type="button"
+        (click)="mostrarAnteriores.set(!mostrarAnteriores())"
+        [attr.aria-expanded]="mostrarAnteriores()"
+        class="text-xs font-medium text-text-muted hover:text-primary cursor-pointer"
+      >
+        {{ mostrarAnteriores() ? 'Ocultar' : 'Ver' }} revisiones anteriores ({{ revisiones.value()!.length }})
+      </button>
+      @if (mostrarAnteriores()) {
+        @for (r of revisiones.value(); track r.id) {
+          <article class="p-3 bg-surface border border-surface-border rounded-xl space-y-1">
+            <p class="text-[11px] text-text-muted">
+              {{ r.fecha_creacion | date: 'EEEE d MMM y' }}
+              · terminaste {{ r.resumen.terminadas ?? 0 }} · entraron {{ r.resumen.creadas ?? 0 }}
+              @if (decisionesTexto(r.resumen.decisiones); as d) {
+                · {{ d }}
+              }
+            </p>
+            @if (r.nota) {
+              <p class="text-xs text-text-main whitespace-pre-line">{{ r.nota }}</p>
+            }
+          </article>
+        }
+      }
+    </section>
+  }
+</div>

@@ -5,7 +5,8 @@ export type DocumentoTipo =
   | 'guia'
   | 'idea'
   | 'pajas mentales'
-  | 'general';
+  | 'general'
+  | 'retrospectiva';
 
 export interface DocumentoProyecto {
   id: number;

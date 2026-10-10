@@ -18,6 +18,7 @@ export interface Project {
   por_que: string;
   para_que: string;
   criterio_finalizacion: string;
+  premortem?: string;
   prioridad: ProjectPrioridad | string;
   fecha_limite?: string;
   user_id: number;
@@ -38,6 +39,7 @@ export interface ProjectRequest {
   por_que: string;
   para_que: string;
   criterio_finalizacion: string;
+  premortem?: string;
   prioridad: string;
   fecha_limite?: string;
   user_id?: number;
@@ -55,6 +57,7 @@ export interface ProjectResponse {
   por_que: string;
   para_que: string;
   criterio_finalizacion: string;
+  premortem?: string;
   prioridad: string;
   fecha_limite?: string;
   proyecto_padre_id?: number | null;
@@ -73,6 +76,7 @@ export interface ProjectUpdateRequest {
   por_que?: string;
   para_que?: string;
   criterio_finalizacion?: string;
+  premortem?: string;
   prioridad?: string;
   fecha_limite?: string;
   proyecto_padre_id?: number | null;

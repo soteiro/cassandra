@@ -49,12 +49,20 @@
       "description": "Operaciones de Personas"
     },
     {
+      "name": "Pronosticos",
+      "description": "Operaciones de Pronosticos"
+    },
+    {
       "name": "Proyects",
       "description": "Operaciones de Proyects"
     },
     {
       "name": "Reflexiones",
       "description": "Operaciones de Reflexiones"
+    },
+    {
+      "name": "Revision",
+      "description": "Operaciones de Revision"
     },
     {
       "name": "Tareas",
@@ -2290,6 +2298,88 @@
         ]
       }
     },
+    "/api/pronosticos/planificacion": {
+      "get": {
+        "tags": [
+          "Pronosticos"
+        ],
+        "summary": "Planificacion",
+        "operationId": "get__api_pronosticos_planificacion",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/proyects/{proyect_id}/pronostico": {
+      "get": {
+        "tags": [
+          "Pronosticos"
+        ],
+        "summary": "Pronostico de un proyecto",
+        "operationId": "get__api_proyects__proyect_id__pronostico",
+        "parameters": [
+          {
+            "name": "proyect_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de proyect"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/proyects/{proyect_id}": {
       "delete": {
         "tags": [
@@ -2672,6 +2762,177 @@
             "description": "ID numérico de reflexione"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/preferencias": {
+      "put": {
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Actualizar preferencias",
+        "operationId": "put__api_preferencias",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Obtener preferencias",
+        "operationId": "get__api_preferencias",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/revisiones": {
+      "post": {
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Crear revision",
+        "operationId": "post__api_revisiones",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Listar revisiones",
+        "operationId": "get__api_revisiones",
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/revision/estancadas": {
+      "get": {
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Tareas estancadas",
+        "operationId": "get__api_revision_estancadas",
         "responses": {
           "200": {
             "description": "Operación exitosa",

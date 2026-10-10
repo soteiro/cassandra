@@ -55,6 +55,8 @@ func NewRouter(opts Options) http.Handler {
 	listaDeseosHandler := handlers.NewListaDeseosHandler(repository.NewListaDeseosRepository(db), owner)
 	documentosProyectoHandler := handlers.NewDocumentosProyectoHandler(repository.NewDocumentosProyectoRepository(db), owner)
 	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
+	pronosticosHandler := handlers.NewPronosticosHandler(repository.NewPronosticosRepository(db), owner)
+	revisionHandler := handlers.NewRevisionHandler(repository.NewRevisionRepository(db))
 
 	r := chi.NewRouter()
 
@@ -113,6 +115,17 @@ func NewRouter(opts Options) http.Handler {
 		// Actividad: "Lo que hiciste" y "En qué quedaste"
 		r.Get("/api/actividad/resumen", actividadHandler.Resumen)
 		r.Get("/api/proyects/{proyect_id}/actividad", actividadHandler.PorProyecto)
+
+		// Pronósticos: cuánto te demoras de verdad y cuándo terminaría un proyecto
+		r.Get("/api/pronosticos/planificacion", pronosticosHandler.Planificacion)
+		r.Get("/api/proyects/{proyect_id}/pronostico", pronosticosHandler.Proyecto)
+
+		// Revisión semanal y preferencias del usuario
+		r.Get("/api/revision/estancadas", revisionHandler.Estancadas)
+		r.Get("/api/revisiones", revisionHandler.List)
+		r.Post("/api/revisiones", revisionHandler.Create)
+		r.Get("/api/preferencias", revisionHandler.Preferencias)
+		r.Put("/api/preferencias", revisionHandler.UpdatePreferencias)
 
 		// Rutas de Logs en Crudo de Proyectos
 		r.Post("/api/proyects/{proyect_id}/logs", logsHandler.CreateLog)

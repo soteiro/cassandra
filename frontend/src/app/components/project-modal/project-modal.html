@@ -139,6 +139,27 @@
           />
         </div>
 
+        @if (proyectosEnMarcha() > 0) {
+          <p class="text-[11px] text-text-muted">
+            Tienes {{ proyectosEnMarcha() }} {{ proyectosEnMarcha() === 1 ? 'proyecto' : 'proyectos' }} en proceso. Si este entra en marcha, ¿alguno puede esperar?
+          </p>
+        }
+
+        <!-- PRE-MORTEM (OPCIONAL) -->
+        <div>
+          <label class="block text-text-main font-medium mb-1">
+            ¿Por qué podría fracasar? <span class="text-text-muted font-normal">(Opcional: imagina que fracasó, ¿qué pasó?)</span>
+          </label>
+          <textarea
+            rows="2"
+            [ngModel]="premortem()"
+            (ngModelChange)="premortem.set($event)"
+            name="premortem"
+            placeholder="Ej: Me quedo sin tiempo los fines de semana y lo dejo a medias."
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors resize-none"
+          ></textarea>
+        </div>
+
         <!-- PRIORIDAD, ESTADO Y FECHA LÍMITE -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -185,8 +206,50 @@
               name="fecha_limite"
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
             />
+            @if (pistaFechaLimite(); as pista) {
+              <p class="mt-1.5 text-[11px] text-text-muted leading-snug">
+                {{ pista.texto }}
+                @if (pista.fecha) {
+                  <strong class="text-text-main font-medium">{{ pista.fecha | date: 'dd/MM/yyyy' }}</strong>.
+                }
+              </p>
+            }
           </div>
         </div>
+
+        <!-- RETROSPECTIVA: SOLO AL CERRAR EL PROYECTO -->
+        @if (cerrandoProyecto()) {
+          <div class="p-3 rounded-xl border border-primary/30 bg-primary/5 space-y-3">
+            <p class="text-xs text-text-muted">
+              Antes de cerrarlo, dos preguntas opcionales. Se guardan como documento «Retrospectiva» del proyecto.
+            </p>
+            @if (initialData()?.premortem) {
+              <p class="text-xs text-text-muted">
+                <strong class="text-text-main font-medium">Tu pre-mortem decía:</strong> {{ initialData()?.premortem }}
+              </p>
+            }
+            <div>
+              <label class="block text-text-main font-medium mb-1">¿Se cumplió el para qué?</label>
+              <textarea
+                rows="2"
+                [ngModel]="retroParaQue()"
+                (ngModelChange)="retroParaQue.set($event)"
+                name="retro_para_que"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors resize-none"
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-text-main font-medium mb-1">¿Qué aprendiste?</label>
+              <textarea
+                rows="2"
+                [ngModel]="retroAprendizaje()"
+                (ngModelChange)="retroAprendizaje.set($event)"
+                name="retro_aprendizaje"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors resize-none"
+              ></textarea>
+            </div>
+          </div>
+        }
 
         <!-- DESCRIPCIÓN ADICIONAL -->
         <div>

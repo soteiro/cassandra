@@ -23,10 +23,10 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 	var proyect models.ProyectResponse
 	query := `
 		INSERT INTO proyectos (
-			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
+			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id, premortem
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NULLIF($11, ''))
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, por_que, para_que, criterio_finalizacion, COALESCE(premortem, ''), prioridad, fecha_limite, proyecto_padre_id
 	`
 
 	if req.Prioridad == "" {
@@ -46,6 +46,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		req.Prioridad,
 		req.FechaLimite,
 		req.ProyectoPadreID,
+		req.Premortem,
 	).Scan(
 		&proyect.ID,
 		&proyect.Nombre,
@@ -58,6 +59,7 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		&proyect.PorQue,
 		&proyect.ParaQue,
 		&proyect.CriterioFinalizacion,
+		&proyect.Premortem,
 		&proyect.Prioridad,
 		&proyect.FechaLimite,
 		&proyect.ProyectoPadreID,
@@ -84,6 +86,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		p.por_que,
 		p.para_que,
 		p.criterio_finalizacion,
+		COALESCE(p.premortem, ''),
 		p.prioridad,
 		p.fecha_limite,
 		p.proyecto_padre_id,
@@ -124,6 +127,7 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.PorQue,
 			&p.ParaQue,
 			&p.CriterioFinalizacion,
+			&p.Premortem,
 			&p.Prioridad,
 			&p.FechaLimite,
 			&p.ProyectoPadreID,
@@ -159,6 +163,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 		p.por_que,
 		p.para_que,
 		p.criterio_finalizacion,
+		COALESCE(p.premortem, ''),
 		p.prioridad,
 		p.fecha_limite,
 		p.proyecto_padre_id,
@@ -201,6 +206,7 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 			&p.PorQue,
 			&p.ParaQue,
 			&p.CriterioFinalizacion,
+			&p.Premortem,
 			&p.Prioridad,
 			&p.FechaLimite,
 			&p.ProyectoPadreID,
@@ -257,7 +263,8 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		p.estado, 
 		p.por_que, 
 		p.para_que, 
-		p.criterio_finalizacion, 
+		p.criterio_finalizacion,
+		COALESCE(p.premortem, ''),
 		p.prioridad, 
 		p.fecha_limite, 
 		p.proyecto_padre_id, 
@@ -287,6 +294,7 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.PorQue,
 		&p.ParaQue,
 		&p.CriterioFinalizacion,
+		&p.Premortem,
 		&p.Prioridad,
 		&p.FechaLimite,
 		&p.ProyectoPadreID,
@@ -328,6 +336,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 			prioridad = COALESCE($8, prioridad),
 			fecha_limite = COALESCE($9, fecha_limite),
 			proyecto_padre_id = COALESCE($10, proyecto_padre_id),
+			premortem = COALESCE($14, premortem),
 			fecha_terminado = CASE
 				WHEN $11 = 1 THEN COALESCE(fecha_terminado, NOW())
 				WHEN $11 = 2 THEN NULL
@@ -336,7 +345,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		WHERE id = $12
 		AND user_id = $13
 		AND eliminado = false
-		RETURNING id, nombre, descripcion, comentario, estado, fecha_terminado, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id
+		RETURNING id, nombre, descripcion, comentario, estado, fecha_terminado, por_que, para_que, criterio_finalizacion, COALESCE(premortem, ''), prioridad, fecha_limite, proyecto_padre_id
 	`
 	err := r.db.QueryRow(
 		ctx,
@@ -354,6 +363,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		modoFechaTerminado,
 		id,
 		userID,
+		req.Premortem,
 	).Scan(
 		&p.ID,
 		&p.Nombre,
@@ -364,6 +374,7 @@ func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req 
 		&p.PorQue,
 		&p.ParaQue,
 		&p.CriterioFinalizacion,
+		&p.Premortem,
 		&p.Prioridad,
 		&p.FechaLimite,
 		&p.ProyectoPadreID,

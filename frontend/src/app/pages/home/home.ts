@@ -9,6 +9,7 @@ import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
 import { TaskStatusSelect } from '../../components/task-status-select/task-status-select';
 import { SemanaWidget } from '../../components/semana-widget/semana-widget';
+import { RevisionCard } from '../../components/revision-card/revision-card';
 import {
   getTaskPriorityBadgeClass,
   getTaskPriorityBorderClass,
@@ -25,6 +26,7 @@ import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
     TaskDetailModal,
     TaskStatusSelect,
     SemanaWidget,
+    RevisionCard,
     LucideListTodo,
     LucideRefreshCcw,
     LucideCheck,

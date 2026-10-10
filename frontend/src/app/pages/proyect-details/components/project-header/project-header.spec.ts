@@ -149,4 +149,35 @@ describe('ProjectHeader', () => {
     await render({ ultima_actividad: new Date().toISOString() });
     expect(el.textContent).toContain('Última actividad hoy');
   });
+
+  describe('pronóstico', () => {
+    const conPronostico = async (pronostico: object, overrides: Partial<ProjectResponse> = {}) => {
+      fixture.componentRef.setInput('pronostico', {
+        tareas_abiertas: 8, terminadas_ventana: 8, semanas_ventana: 8, cambios_fecha_limite: 0, ...pronostico,
+      });
+      await render(overrides);
+    };
+
+    it('muestra el rango cuando hay datos', async () => {
+      await conPronostico({ semanas_min: 3, semanas_max: 6 });
+      expect(el.textContent).toContain('Al ritmo actual, entre 3 y 6 semanas para las 8 tareas abiertas');
+    });
+
+    it('avisa si la fecha límite cae antes del rango', async () => {
+      const pronto = new Date();
+      pronto.setDate(pronto.getDate() + 7);
+      await conPronostico({ semanas_min: 3, semanas_max: 6 }, { fecha_limite: pronto.toISOString() });
+      expect(el.textContent).toContain('la fecha límite cae antes');
+    });
+
+    it('sin datos no muestra nada', async () => {
+      await conPronostico({});
+      expect(el.textContent).not.toContain('Al ritmo actual');
+    });
+
+    it('cuenta las veces que se movió la fecha límite', async () => {
+      await conPronostico({ cambios_fecha_limite: 2 });
+      expect(el.textContent).toContain('Moviste la fecha límite 2 veces');
+    });
+  });
 });
