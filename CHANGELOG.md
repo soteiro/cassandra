@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.9.0](https://github.com/soteiro/cassandra/compare/v0.8.0...v0.9.0) (2026-10-10)
+
+
+### Features
+
+* **backend:** pre-mortem en proyectos y documentos de retrospectiva ([889dbe2](https://github.com/soteiro/cassandra/commit/889dbe2913d8ef5a5b40b0cbf8ba891d1a7fb4cc))
+* **backend:** revisión semanal y preferencias del usuario ([43e28b9](https://github.com/soteiro/cassandra/commit/43e28b94aa830a02e0d6be37e935c3a89c6ce5c1))
+* **frontend:** límite de tareas en curso y «Ya lo hice» ([ba664f9](https://github.com/soteiro/cassandra/commit/ba664f9bb02cef360a6eb9f5dc677de72fbfa240))
+* **frontend:** pre-mortem al crear proyectos y retrospectiva al cerrarlos ([ac41f1b](https://github.com/soteiro/cassandra/commit/ac41f1b3a7bbab1f67323340bdc1138e08c67070))
+* **frontend:** revisión semanal guiada ([2344183](https://github.com/soteiro/cassandra/commit/23441831f31ba296797a49071b41b9b00e6e22b0))
+* límite de tareas en curso y «Ya lo hice» ([11f058b](https://github.com/soteiro/cassandra/commit/11f058b62eacd6c50ab982b0fcd71d180ae525f9))
+* pre-mortem al crear proyectos y retrospectiva al cerrarlos ([6e9423f](https://github.com/soteiro/cassandra/commit/6e9423fc18e13d5f2c0f47a516b74fd6e1f41670))
+* pronósticos de proyectos y de planificación ([d21a274](https://github.com/soteiro/cassandra/commit/d21a274e29726d48fdd7b6a397c31b0aebbbb483))
+* pronósticos de proyectos y de planificación ([1a935e9](https://github.com/soteiro/cassandra/commit/1a935e918b394665bdb104a37620bf1948a1b72c))
+* revisión semanal guiada ([cc53259](https://github.com/soteiro/cassandra/commit/cc532599ecdf1c00a1fe69e2f1691472ece23856))
+
 ## [0.8.0](https://github.com/soteiro/cassandra/compare/v0.7.0...v0.8.0) (2026-10-09)
 
 
