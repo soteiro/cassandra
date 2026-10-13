@@ -54,8 +54,10 @@ export function parseMarkdown(markdown: string): string {
     if (codeMatch) {
       const idx = parseInt(codeMatch[1], 10);
       const { lang, code } = codeBlocks[idx];
+      // Los bloques ```mermaid se marcan para que MermaidDirective los convierta en diagramas.
+      const mermaidClass = lang.toLowerCase() === 'mermaid' ? 'mermaid-block ' : '';
       outputBlocks.push(`
-        <div class="my-4 rounded-xl border border-surface-border bg-background overflow-hidden text-xs">
+        <div class="${mermaidClass}my-4 rounded-xl border border-surface-border bg-background overflow-hidden text-xs">
           ${
             lang
               ? `<div class="px-3 py-1.5 bg-surface-border/40 text-text-muted font-mono font-medium border-b border-surface-border flex justify-between items-center">
