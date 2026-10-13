@@ -17,6 +17,7 @@ import {
   DocumentoTipo,
 } from '../../../../models/documento.model';
 import { parseMarkdown } from '../../../../utils/markdown.util';
+import { MermaidDirective } from '../../../../directives/mermaid.directive';
 import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
 import {
   LucideBookOpen,
@@ -91,6 +92,7 @@ export const CATEGORIES: CategoryMeta[] = [
     CommonModule,
     FormsModule,
     ConfirmModal,
+    MermaidDirective,
     LucideBookOpen,
     LucideFileText,
     LucideSearch,

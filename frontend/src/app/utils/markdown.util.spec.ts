@@ -102,6 +102,18 @@ describe('parseMarkdown', () => {
       expect(el.textContent).toContain('go');
     });
 
+    it('should mark mermaid code blocks so they can be rendered as diagrams', () => {
+      const el = render('```mermaid\ngraph TD\n  A[<b>x</b>] --> B\n```');
+      const block = el.querySelector('.mermaid-block');
+      expect(block).toBeTruthy();
+      expect(block?.querySelector('pre code')?.textContent).toBe('graph TD\n  A[<b>x</b>] --> B');
+      expect(el.querySelector('b')).toBeNull();
+    });
+
+    it('should not mark other code blocks as mermaid', () => {
+      expect(render('```go\nfunc main() {}\n```').querySelector('.mermaid-block')).toBeNull();
+    });
+
     it('should not apply inline formatting inside code blocks', () => {
       const el = render('```\n**no negrita**\n# no título\n```');
       expect(el.querySelector('strong')).toBeNull();

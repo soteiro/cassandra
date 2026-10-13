@@ -143,4 +143,44 @@ test.describe('documentos de proyecto', () => {
     await expect(page.getByText('Documento eliminado')).toBeVisible();
     await expect(page.getByRole('heading', { level: 4, name: 'ADR 001 · aceptado' })).toHaveCount(0);
   });
+
+  test('renderiza diagramas Mermaid y conserva el código si son inválidos', async ({ page, request }, testInfo) => {
+    const proyecto = await createProject(request, uniqueName('Mermaid', testInfo));
+    await page.goto(`/proyectos/${proyecto.id}`);
+    await page.getByRole('tab', { name: /Documentos/ }).click();
+
+    await page.getByRole('button', { name: 'Nuevo Documento' }).click();
+    await page.getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...').fill('Flujo de despliegue');
+    await page.getByPlaceholder(/^Escribe el contenido del documento en Markdown aquí/).fill(
+      [
+        '# Flujo',
+        '',
+        '```mermaid',
+        'graph TD',
+        '  Commit --> Build',
+        '  Build --> Deploy',
+        '```',
+        '',
+        '```mermaid',
+        'esto no es un diagrama',
+        '```',
+      ].join('\n'),
+    );
+
+    // La vista previa muestra el diagrama válido como SVG y el inválido con su código y el error.
+    await page.getByRole('button', { name: 'Vista Previa' }).click();
+    const preview = page.locator('.prose-container');
+    await expect(preview.getByRole('img', { name: 'Diagrama Mermaid' }).locator('svg')).toHaveCount(1);
+    await expect(preview.locator('.mermaid-error')).toContainText('Diagrama inválido');
+    await expect(preview.locator('.mermaid-error + pre code')).toContainText('esto no es un diagrama');
+
+    await page.getByRole('button', { name: 'Crear Documento' }).click();
+    await expect(page.getByText('Documento creado con éxito')).toBeVisible();
+
+    const contenido = page.locator('.prose-container');
+    const diagrama = contenido.getByRole('img', { name: 'Diagrama Mermaid' });
+    await expect(diagrama.locator('svg')).toHaveCount(1);
+    await expect(diagrama).toContainText('Commit');
+    await expect(diagrama).toContainText('Deploy');
+  });
 });
