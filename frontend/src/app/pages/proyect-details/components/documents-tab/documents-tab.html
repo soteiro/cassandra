@@ -295,6 +295,7 @@
       <div
         class="prose-container max-w-none pt-2 text-text-main border-t border-surface-border/60"
         [innerHTML]="detailPreviewHtml()"
+        [appMermaid]="detailPreviewHtml()"
       ></div>
     </div>
   }
@@ -548,6 +549,8 @@ Detalla la investigación, diseño de arquitectura o ideas.
           <div
             class="p-6 min-h-[420px] max-h-[600px] overflow-y-auto prose-container bg-surface/30"
             [innerHTML]="editorPreviewHtml()"
+            [appMermaid]="editorPreviewHtml()"
+            [appMermaidDebounce]="300"
           ></div>
         } @else if (editorTab() === 'split') {
           <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-surface-border min-h-[420px]">
@@ -562,6 +565,8 @@ Detalla la investigación, diseño de arquitectura o ideas.
             <div
               class="p-6 max-h-[500px] overflow-y-auto prose-container bg-surface/30"
               [innerHTML]="editorPreviewHtml()"
+              [appMermaid]="editorPreviewHtml()"
+              [appMermaidDebounce]="300"
             ></div>
           </div>
         }
