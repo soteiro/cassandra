@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.0](https://github.com/soteiro/cassandra/compare/v0.10.0...v0.11.0) (2026-10-15)
+
+
+### Features
+
+* added lista deseos ui ([5d6bb6a](https://github.com/soteiro/cassandra/commit/5d6bb6a360857158d5cf4390f3e18aa3bea8d30e))
+* added migration database to wish list, added column gasto real ([4368e08](https://github.com/soteiro/cassandra/commit/4368e088c156dbd3ae45de5474be86841ea90ae7))
+
 ## [0.10.0](https://github.com/soteiro/cassandra/compare/v0.9.0...v0.10.0) (2026-10-13)
 
 
