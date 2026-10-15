@@ -3,12 +3,3 @@
     <div class="loading-fill"></div>
   </div>
 }
-<div
-  role="status"
-  aria-live="polite"
-  aria-atomic="true"
-  class="loading-status"
-  [class.is-visible]="loading.isLoading()"
->
-  {{ loading.label() }}
-</div>

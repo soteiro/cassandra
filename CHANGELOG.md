@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0](https://github.com/soteiro/cassandra/compare/v0.9.0...v0.10.0) (2026-10-13)
+
+
+### Features
+
+* diagramas Mermaid en los documentos de proyecto ([b2384a1](https://github.com/soteiro/cassandra/commit/b2384a13c91d17828355dbfb5b54c9c066a8777f))
+* **frontend:** diagramas Mermaid en los documentos de proyecto ([f6c3f35](https://github.com/soteiro/cassandra/commit/f6c3f35dcf3b38430d064ab0b844a9c63e4e8447))
+
 ## [0.9.0](https://github.com/soteiro/cassandra/compare/v0.8.0...v0.9.0) (2026-10-10)
 
 
