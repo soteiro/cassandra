@@ -73,6 +73,7 @@ export class DeseosTab implements OnInit {
   formDeseoNombre = signal<string>('');
   formDeseoPresupuesto = signal<number | null>(null);
   formDeseoValorEstimado = signal<number | null>(null);
+  formDeseoGastoReal = signal<number | null>(null);
   formDeseoJustificacion = signal<string>('');
   formDeseoGrupoId = signal<number | null>(null);
   formDeseoComprado = signal<boolean>(false);
@@ -114,9 +115,18 @@ export class DeseosTab implements OnInit {
     this.listaDeseos().filter((d) => !d.comprado).reduce((acc, d) => acc + (d.valor_estimado || 0), 0)
   );
 
-  totalEstimadoCompradoDeseos = computed(() =>
-    this.listaDeseos().filter((d) => d.comprado).reduce((acc, d) => acc + (d.valor_estimado || 0), 0)
+  totalGastoRealCompradoDeseos = computed(() =>
+    this.listaDeseos().filter((d) => d.comprado).reduce((acc, d) => acc + (d.gasto_real ?? 0), 0)
   );
+
+  deseosCompradosSinGastoCount = computed(() =>
+    this.listaDeseos().filter((d) => d.comprado && d.gasto_real == null).length
+  );
+
+  gastoRealInvalido = computed(() => {
+    const gasto = this.formDeseoGastoReal();
+    return gasto !== null && (!Number.isInteger(gasto) || gasto < -2147483648 || gasto > 2147483647);
+  });
 
   deseosPendientesCount = computed(
     () => this.listaDeseos().filter((d) => !d.comprado).length
@@ -152,6 +162,7 @@ export class DeseosTab implements OnInit {
     this.formDeseoNombre.set('');
     this.formDeseoPresupuesto.set(null);
     this.formDeseoValorEstimado.set(null);
+    this.formDeseoGastoReal.set(null);
     this.formDeseoJustificacion.set('');
     this.formDeseoGrupoId.set(null);
     this.formDeseoComprado.set(false);
@@ -165,6 +176,7 @@ export class DeseosTab implements OnInit {
     this.formDeseoNombre.set(item.nombre);
     this.formDeseoPresupuesto.set(item.presupuesto);
     this.formDeseoValorEstimado.set(item.valor_estimado);
+    this.formDeseoGastoReal.set(item.gasto_real ?? null);
     this.formDeseoJustificacion.set(item.justificacion || '');
     this.formDeseoGrupoId.set(item.grupo_item_finanzas_id || null);
     this.formDeseoComprado.set(item.comprado);
@@ -182,6 +194,11 @@ export class DeseosTab implements OnInit {
       return;
     }
 
+    if (this.gastoRealInvalido()) {
+      this.toastService.error('Ingresa un gasto real entero válido en pesos chilenos');
+      return;
+    }
+
     this.isSubmittingDeseo.set(true);
     if (this.isEditingDeseo() && this.editingDeseoId()) {
       const id = this.editingDeseoId()!;
@@ -190,6 +207,7 @@ export class DeseosTab implements OnInit {
           nombre,
           presupuesto: this.formDeseoPresupuesto() || 0,
           valor_estimado: this.formDeseoValorEstimado() || 0,
+          gasto_real: this.formDeseoGastoReal(),
           comprado: this.formDeseoComprado(),
           justificacion: this.formDeseoJustificacion().trim() || null,
           grupo_item_finanzas_id: this.formDeseoGrupoId() ? Number(this.formDeseoGrupoId()) : null,
@@ -216,6 +234,7 @@ export class DeseosTab implements OnInit {
           nombre,
           presupuesto: this.formDeseoPresupuesto() || 0,
           valor_estimado: this.formDeseoValorEstimado() || 0,
+          gasto_real: this.formDeseoGastoReal(),
           comprado: this.formDeseoComprado(),
           justificacion: this.formDeseoJustificacion().trim() || null,
           grupo_item_finanzas_id: this.formDeseoGrupoId() ? Number(this.formDeseoGrupoId()) : null,

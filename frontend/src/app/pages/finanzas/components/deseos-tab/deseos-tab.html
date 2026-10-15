@@ -1,4 +1,5 @@
 <div [appLoading]="isLoadingDeseos()" loadingLabel="Cargando deseos…" class="space-y-6">
+  <h2 class="sr-only">Lista de deseos</h2>
   <!-- 1. RESUMEN DE MÉTRICAS DE DESEOS -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <!-- PENDIENTES -->
@@ -13,7 +14,7 @@
         <span class="text-xl font-bold text-text-main font-mono">
           {{ formatCurrency(totalEstimadoPendienteDeseos()) }}
         </span>
-        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/15 text-text-main">
           {{ deseosPendientesCount() }} ítems
         </span>
       </div>
@@ -30,13 +31,18 @@
       </div>
       <div class="flex items-baseline justify-between">
         <span class="text-xl font-bold text-emerald-500 font-mono">
-          {{ formatCurrency(totalEstimadoCompradoDeseos()) }}
+          {{ formatCurrency(totalGastoRealCompradoDeseos()) }}
         </span>
         <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500">
           {{ deseosCompradosCount() }} comprados
         </span>
       </div>
-      <p class="text-[11px] text-text-muted">Total invertido en deseos</p>
+      <p class="text-[11px] text-text-muted">
+        Gasto real registrado
+        @if (deseosCompradosSinGastoCount() > 0) {
+          <span> · {{ deseosCompradosSinGastoCount() }} sin registrar</span>
+        }
+      </p>
     </div>
 
     <!-- TOTAL PRESUPUESTADO -->
@@ -65,6 +71,7 @@
     <div class="relative w-full sm:w-64">
       <input
         type="text"
+        aria-label="Buscar deseos"
         [ngModel]="busquedaDeseos()"
         (ngModelChange)="busquedaDeseos.set($event)"
         placeholder="Buscar deseo o justificación..."
@@ -74,6 +81,7 @@
         <button
           type="button"
           (click)="busquedaDeseos.set('')"
+          aria-label="Limpiar búsqueda de deseos"
           class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main cursor-pointer"
         >
           <svg lucideX class="w-3.5 h-3.5" />
@@ -124,6 +132,7 @@
     <!-- FILTRO POR CATEGORÍA Y BOTÓN AGREGAR -->
     <div class="flex items-center gap-2">
       <select
+        aria-label="Filtrar deseos por categoría"
         [ngModel]="filtroDeseosGrupo()"
         (ngModelChange)="filtroDeseosGrupo.set($event)"
         class="bg-background border border-surface-border text-text-main rounded-xl px-2.5 py-1.5 text-xs outline-none cursor-pointer"
@@ -200,13 +209,13 @@
                   <svg lucideCheck class="w-3.5 h-3.5 stroke-[3]" />
                 </button>
                 <div class="min-w-0 flex-1">
-                  <h4
+                  <h3
                     [class]="d.comprado ? 'line-through text-text-muted' : 'text-text-main'"
                     class="text-sm font-bold tracking-tight truncate"
                     title="{{ d.nombre }}"
                   >
                     {{ d.nombre }}
-                  </h4>
+                  </h3>
                   @if (d.grupo_item_finanzas_nombre) {
                     <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-accent uppercase tracking-wider mt-0.5">
                       <svg lucideTag class="w-2.5 h-2.5" />
@@ -262,6 +271,14 @@
                   <span class="font-mono">{{ formatCurrency(d.presupuesto) }}</span>
                 </div>
               }
+              <div class="flex flex-wrap items-center gap-x-1.5 text-[11px] text-text-muted">
+                <span>Gasto real:</span>
+                @if (d.gasto_real != null) {
+                  <span class="font-mono text-text-main">{{ formatCurrency(d.gasto_real) }}</span>
+                } @else {
+                  <span>Sin registrar</span>
+                }
+              </div>
             </div>
 
             <div>
@@ -287,19 +304,25 @@
 <!-- MODAL CREAR / EDITAR DESEO -->
 @if (showDeseoModal()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-    <div class="bg-surface border border-surface-border rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deseo-modal-title"
+      class="bg-surface border border-surface-border rounded-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 shadow-2xl space-y-4"
+    >
       <div class="flex items-center justify-between pb-3 border-b border-surface-border">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
             <svg lucideSparkles class="w-4 h-4" />
           </div>
-          <h2 class="text-base font-bold text-text-main">
+          <h2 id="deseo-modal-title" class="text-base font-bold text-text-main">
             {{ isEditingDeseo() ? 'Editar Deseo' : 'Nuevo Deseo' }}
           </h2>
         </div>
         <button
           type="button"
           (click)="closeDeseoModal()"
+          aria-label="Cerrar formulario de deseo"
           class="text-text-muted hover:text-text-main p-1 rounded-lg transition-colors cursor-pointer"
         >
           <svg lucideX class="w-4 h-4" />
@@ -309,8 +332,9 @@
       <form (ngSubmit)="saveDeseo()" class="space-y-4 text-xs">
         <!-- NOMBRE -->
         <div class="space-y-1.5">
-          <label class="font-semibold text-text-main">Nombre del Deseo / Objeto *</label>
+          <label for="deseo-nombre" class="font-semibold text-text-main">Nombre del Deseo / Objeto *</label>
           <input
+            id="deseo-nombre"
             type="text"
             [ngModel]="formDeseoNombre()"
             (ngModelChange)="formDeseoNombre.set($event)"
@@ -324,8 +348,9 @@
         <!-- PRECIOS: PRESUPUESTO & VALOR ESTIMADO -->
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-1.5">
-            <label class="font-semibold text-text-muted">Presupuesto ($ CLP)</label>
+            <label for="deseo-presupuesto" class="font-semibold text-text-muted">Presupuesto ($ CLP)</label>
             <input
+              id="deseo-presupuesto"
               type="number"
               [ngModel]="formDeseoPresupuesto()"
               (ngModelChange)="formDeseoPresupuesto.set($event)"
@@ -335,8 +360,9 @@
             />
           </div>
           <div class="space-y-1.5">
-            <label class="font-semibold text-text-muted">Valor Estimado ($ CLP)</label>
+            <label for="deseo-valor-estimado" class="font-semibold text-text-muted">Valor Estimado ($ CLP)</label>
             <input
+              id="deseo-valor-estimado"
               type="number"
               [ngModel]="formDeseoValorEstimado()"
               (ngModelChange)="formDeseoValorEstimado.set($event)"
@@ -347,10 +373,40 @@
           </div>
         </div>
 
+        <!-- GASTO REAL -->
+        <div class="space-y-1.5">
+          <label for="deseo-gasto-real" class="font-semibold text-text-muted">Gasto real ($ CLP)</label>
+          <input
+            id="deseo-gasto-real"
+            type="number"
+            step="1"
+            min="-2147483648"
+            max="2147483647"
+            inputmode="numeric"
+            [ngModel]="formDeseoGastoReal()"
+            (ngModelChange)="formDeseoGastoReal.set($event)"
+            name="formDeseoGastoReal"
+            placeholder="Sin registrar"
+            aria-describedby="deseo-gasto-real-help"
+            [attr.aria-invalid]="gastoRealInvalido()"
+            class="w-full bg-background border border-surface-border focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 text-text-main placeholder:text-text-muted rounded-xl p-2.5 outline-none font-mono"
+          />
+          <p id="deseo-gasto-real-help" class="text-[11px] text-text-muted">
+            @if (gastoRealInvalido()) {
+              <span class="text-danger">Ingresa un gasto real entero válido en pesos chilenos.</span>
+            } @else if (isEditingDeseo()) {
+              Déjalo vacío para conservar el monto registrado. Usa 0 si no tuvo costo.
+            } @else {
+              Opcional. Déjalo vacío si aún no conoces el monto; usa 0 si no tuvo costo.
+            }
+          </p>
+        </div>
+
         <!-- CATEGORÍA / GRUPO -->
         <div class="space-y-1.5">
-          <label class="font-semibold text-text-muted">Categoría de Finanzas</label>
+          <label for="deseo-grupo" class="font-semibold text-text-muted">Categoría de Finanzas</label>
           <select
+            id="deseo-grupo"
             [ngModel]="formDeseoGrupoId()"
             (ngModelChange)="formDeseoGrupoId.set($event)"
             name="formDeseoGrupoId"
@@ -365,8 +421,9 @@
 
         <!-- JUSTIFICACIÓN -->
         <div class="space-y-1.5">
-          <label class="font-semibold text-text-muted">Justificación / Motivo</label>
+          <label for="deseo-justificacion" class="font-semibold text-text-muted">Justificación / Motivo</label>
           <textarea
+            id="deseo-justificacion"
             [ngModel]="formDeseoJustificacion()"
             (ngModelChange)="formDeseoJustificacion.set($event)"
             name="formDeseoJustificacion"
@@ -399,7 +456,7 @@
           </button>
           <button
             type="submit"
-            [disabled]="isSubmittingDeseo() || !formDeseoNombre().trim()"
+            [disabled]="isSubmittingDeseo() || !formDeseoNombre().trim() || gastoRealInvalido()"
             class="bg-primary hover:bg-primary/90 text-background px-5 py-2 rounded-xl font-medium transition-all disabled:opacity-40 cursor-pointer flex items-center gap-1.5"
           >
             <svg lucideCheck class="w-4 h-4" />

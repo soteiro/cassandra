@@ -105,6 +105,7 @@ export interface ListaDeseosItem {
   nombre: string;
   presupuesto: number;
   valor_estimado: number;
+  gasto_real?: number | null;
   comprado: boolean;
   justificacion?: string | null;
   fecha_creacion: string;
@@ -119,6 +120,7 @@ export interface CreateListaDeseosRequest {
   nombre: string;
   presupuesto: number;
   valor_estimado: number;
+  gasto_real?: number | null;
   comprado?: boolean;
   justificacion?: string | null;
   fecha_compra?: string | null;
@@ -129,6 +131,7 @@ export interface UpdateListaDeseosRequest {
   nombre?: string;
   presupuesto?: number;
   valor_estimado?: number;
+  gasto_real?: number | null;
   comprado?: boolean;
   justificacion?: string | null;
   fecha_compra?: string | null;
