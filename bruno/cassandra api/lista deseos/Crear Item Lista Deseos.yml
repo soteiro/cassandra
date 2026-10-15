@@ -6,6 +6,8 @@ info:
 http:
   method: POST
   url: http://localhost:8080/api/lista-deseos
+  # gasto_real es opcional; omitirlo o enviar null deja el monto pendiente.
+  # Enviar 0 registra un gasto real de cero.
   body:
     type: json
     data: |-
@@ -13,6 +15,7 @@ http:
         "nombre": "Monitor Curvo 34''",
         "presupuesto": 350000,
         "valor_estimado": 320000,
+        "gasto_real": null,
         "comprado": false,
         "justificacion": "Mejora ergonómica y mayor productividad para desarrollo y enfoque.",
         "grupo_item_finanzas_id": 3
