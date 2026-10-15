@@ -6,6 +6,8 @@ info:
 http:
   method: PUT
   url: http://localhost:8080/api/lista-deseos/4
+  # gasto_real es opcional; omitirlo o enviar null conserva el valor actual.
+  # Enviar 0 actualiza el gasto real a cero.
   body:
     type: json
     data: |-
@@ -13,6 +15,7 @@ http:
         "nombre": "Monitor Curvo 34''",
         "presupuesto": 350000,
         "valor_estimado": 310000,
+        "gasto_real": 310000,
         "comprado": true,
         "justificacion": "Comprado en oferta CyberDay.",
         "grupo_item_finanzas_id": 3

@@ -37,17 +37,17 @@ func (r *ListaDeseosRepository) Create(ctx context.Context, req *models.CreateLi
 		WITH inserted AS (
 			INSERT INTO lista_deseos (
 				user_id, nombre, presupuesto, valor_estimado, comprado,
-				justificacion, fecha_compra, grupo_item_finanzas_id
+				justificacion, fecha_compra, grupo_item_finanzas_id, gasto_real
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING id, user_id, nombre, presupuesto, valor_estimado, comprado,
 			          justificacion, fecha_creacion, fecha_actualizacion, fecha_compra,
-			          grupo_item_finanzas_id, eliminado
+			          grupo_item_finanzas_id, eliminado, gasto_real
 		)
 		SELECT 
 			i.id, i.user_id, i.nombre, i.presupuesto, i.valor_estimado, i.comprado,
 			i.justificacion, i.fecha_creacion, i.fecha_actualizacion, i.fecha_compra,
-			i.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, i.eliminado
+			i.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, i.eliminado, i.gasto_real
 		FROM inserted i
 		LEFT JOIN grupo_item_finanzas g ON g.id = i.grupo_item_finanzas_id AND g.user_id = i.user_id;
 	`
@@ -64,6 +64,7 @@ func (r *ListaDeseosRepository) Create(ctx context.Context, req *models.CreateLi
 		req.Justificacion,
 		fechaCompra,
 		req.GrupoItemFinanzasID,
+		req.GastoReal,
 	).Scan(
 		&item.ID,
 		&item.UserID,
@@ -78,6 +79,7 @@ func (r *ListaDeseosRepository) Create(ctx context.Context, req *models.CreateLi
 		&item.GrupoItemFinanzasID,
 		&item.GrupoItemFinanzasNombre,
 		&item.Eliminado,
+		&item.GastoReal,
 	)
 
 	if err != nil {
@@ -94,7 +96,7 @@ func (r *ListaDeseosRepository) GetAll(ctx context.Context, userID int, comprado
 		SELECT 
 			l.id, l.user_id, l.nombre, l.presupuesto, l.valor_estimado, l.comprado,
 			l.justificacion, l.fecha_creacion, l.fecha_actualizacion, l.fecha_compra,
-			l.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, l.eliminado
+			l.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, l.eliminado, l.gasto_real
 		FROM lista_deseos l
 		LEFT JOIN grupo_item_finanzas g ON g.id = l.grupo_item_finanzas_id AND g.user_id = l.user_id
 		WHERE l.user_id = $1
@@ -141,6 +143,7 @@ func (r *ListaDeseosRepository) GetAll(ctx context.Context, userID int, comprado
 			&item.GrupoItemFinanzasID,
 			&item.GrupoItemFinanzasNombre,
 			&item.Eliminado,
+			&item.GastoReal,
 		)
 		if err != nil {
 			log.Printf("[REPO:ListaDeseos.GetAll] Error al escanear fila: %v | user_id=%d", err, userID)
@@ -163,7 +166,7 @@ func (r *ListaDeseosRepository) GetByID(ctx context.Context, id int, userID int)
 		SELECT 
 			l.id, l.user_id, l.nombre, l.presupuesto, l.valor_estimado, l.comprado,
 			l.justificacion, l.fecha_creacion, l.fecha_actualizacion, l.fecha_compra,
-			l.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, l.eliminado
+			l.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, l.eliminado, l.gasto_real
 		FROM lista_deseos l
 		LEFT JOIN grupo_item_finanzas g ON g.id = l.grupo_item_finanzas_id AND g.user_id = l.user_id
 		WHERE l.id = $1
@@ -186,6 +189,7 @@ func (r *ListaDeseosRepository) GetByID(ctx context.Context, id int, userID int)
 		&item.GrupoItemFinanzasID,
 		&item.GrupoItemFinanzasNombre,
 		&item.Eliminado,
+		&item.GastoReal,
 	)
 
 	if err != nil {
@@ -234,16 +238,17 @@ func (r *ListaDeseosRepository) Update(ctx context.Context, id int, userID int, 
 				END,
 				grupo_item_finanzas_id = COALESCE($8, grupo_item_finanzas_id),
 				eliminado = COALESCE($9, eliminado),
+				gasto_real = COALESCE($10, gasto_real),
 				fecha_actualizacion = CURRENT_TIMESTAMP
-			WHERE id = $10 AND user_id = $11 AND eliminado = false
+			WHERE id = $11 AND user_id = $12 AND eliminado = false
 			RETURNING id, user_id, nombre, presupuesto, valor_estimado, comprado,
 			          justificacion, fecha_creacion, fecha_actualizacion, fecha_compra,
-			          grupo_item_finanzas_id, eliminado
+			          grupo_item_finanzas_id, eliminado, gasto_real
 		)
 		SELECT 
 			u.id, u.user_id, u.nombre, u.presupuesto, u.valor_estimado, u.comprado,
 			u.justificacion, u.fecha_creacion, u.fecha_actualizacion, u.fecha_compra,
-			u.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, u.eliminado
+			u.grupo_item_finanzas_id, g.nombre AS grupo_item_finanzas_nombre, u.eliminado, u.gasto_real
 		FROM updated u
 		LEFT JOIN grupo_item_finanzas g ON g.id = u.grupo_item_finanzas_id AND g.user_id = u.user_id;
 	`
@@ -261,6 +266,7 @@ func (r *ListaDeseosRepository) Update(ctx context.Context, id int, userID int, 
 		fechaCompraVal,
 		req.GrupoItemFinanzasID,
 		req.Eliminado,
+		req.GastoReal,
 		id,
 		userID,
 	).Scan(
@@ -277,6 +283,7 @@ func (r *ListaDeseosRepository) Update(ctx context.Context, id int, userID int, 
 		&item.GrupoItemFinanzasID,
 		&item.GrupoItemFinanzasNombre,
 		&item.Eliminado,
+		&item.GastoReal,
 	)
 
 	if err != nil {

@@ -16,6 +16,7 @@ type ListaDeseos struct {
 	FechaCompra         *time.Time `json:"fecha_compra,omitempty"`
 	GrupoItemFinanzasID *int       `json:"grupo_item_finanzas_id,omitempty"`
 	Eliminado           bool       `json:"eliminado"`
+	GastoReal           *int       `json:"gasto_real,omitempty"`
 }
 
 // CreateListaDeseosRequest define el payload para crear un ítem en lista de deseos
@@ -28,6 +29,7 @@ type CreateListaDeseosRequest struct {
 	Justificacion       *string    `json:"justificacion,omitempty"`
 	FechaCompra         *time.Time `json:"fecha_compra,omitempty"`
 	GrupoItemFinanzasID *int       `json:"grupo_item_finanzas_id,omitempty"`
+	GastoReal           *int       `json:"gasto_real,omitempty"`
 }
 
 // ListaDeseosResponse representa la respuesta entregada al cliente (con datos enriquecidos)
@@ -45,6 +47,7 @@ type ListaDeseosResponse struct {
 	GrupoItemFinanzasID     *int       `json:"grupo_item_finanzas_id,omitempty"`
 	GrupoItemFinanzasNombre *string    `json:"grupo_item_finanzas_nombre,omitempty"`
 	Eliminado               bool       `json:"eliminado"`
+	GastoReal               *int       `json:"gasto_real,omitempty"`
 }
 
 // UpdateListaDeseosRequest define el payload para actualizar un ítem
@@ -57,4 +60,5 @@ type UpdateListaDeseosRequest struct {
 	FechaCompra         *time.Time `json:"fecha_compra,omitempty"`
 	GrupoItemFinanzasID *int       `json:"grupo_item_finanzas_id,omitempty"`
 	Eliminado           *bool      `json:"eliminado,omitempty"`
+	GastoReal           *int       `json:"gasto_real,omitempty"`
 }

@@ -34,7 +34,7 @@ describe('DeseosTab', () => {
 
   const initial: ListaDeseosItem[] = [
     deseo({ id: 1, nombre: 'Bicicleta', presupuesto: 300, valor_estimado: 250, comprado: false, grupo_item_finanzas_id: 10, grupo_item_finanzas_nombre: 'Deporte' }),
-    deseo({ id: 2, nombre: 'Monitor', presupuesto: 200, valor_estimado: 180, comprado: true, justificacion: 'Para trabajar', grupo_item_finanzas_id: 20 }),
+    deseo({ id: 2, nombre: 'Monitor', presupuesto: 200, valor_estimado: 180, gasto_real: 160, comprado: true, justificacion: 'Para trabajar', grupo_item_finanzas_id: 20 }),
     deseo({ id: 3, nombre: 'Libro', presupuesto: 20, valor_estimado: 15, comprado: false, grupo_item_finanzas_id: 20 }),
   ];
 
@@ -77,9 +77,37 @@ describe('DeseosTab', () => {
     it('should compute totals and counts', () => {
       expect(component.totalPresupuestoDeseos()).toBe(520);
       expect(component.totalEstimadoPendienteDeseos()).toBe(265);
-      expect(component.totalEstimadoCompradoDeseos()).toBe(180);
+      expect(component.totalGastoRealCompradoDeseos()).toBe(160);
+      expect(component.deseosCompradosSinGastoCount()).toBe(0);
       expect(component.deseosPendientesCount()).toBe(2);
       expect(component.deseosCompradosCount()).toBe(1);
+    });
+
+    it('should sum only recorded expenses for purchased items, preserving zero', () => {
+      component.listaDeseos.set([
+        deseo({ id: 1, comprado: true, valor_estimado: 100, gasto_real: 80 }),
+        deseo({ id: 2, comprado: true, valor_estimado: 200, gasto_real: 0 }),
+        deseo({ id: 3, comprado: true, valor_estimado: 300, gasto_real: null }),
+        deseo({ id: 4, comprado: true, valor_estimado: 400 }),
+        deseo({ id: 5, comprado: false, gasto_real: 500 }),
+      ]);
+
+      expect(component.totalGastoRealCompradoDeseos()).toBe(80);
+      expect(component.deseosCompradosSinGastoCount()).toBe(2);
+    });
+
+    it('should display zero separately from an unrecorded expense', async () => {
+      component.listaDeseos.set([
+        deseo({ id: 1, nombre: 'Gratis', comprado: true, gasto_real: 0 }),
+        deseo({ id: 2, nombre: 'Sin monto', comprado: true }),
+      ]);
+      await fixture.whenStable();
+      const host = fixture.nativeElement as HTMLElement;
+      const cards = [...host.querySelectorAll('h3[title]')].map((heading) => heading.closest('.flex-col')!);
+
+      expect(cards[0].textContent).toMatch(/Gasto real:\s*\$\s*0/);
+      expect(cards[1].textContent).toMatch(/Gasto real:\s*Sin registrar/);
+      expect(host.textContent).toContain('1 sin registrar');
     });
 
     it('should filter by estado', () => {
@@ -114,6 +142,7 @@ describe('DeseosTab', () => {
     it('openCreateDeseoModal should reset the form', () => {
       component.formDeseoNombre.set('x');
       component.formDeseoComprado.set(true);
+      component.formDeseoGastoReal.set(100);
       component.openCreateDeseoModal();
       expect(component.showDeseoModal()).toBe(true);
       expect(component.isEditingDeseo()).toBe(false);
@@ -121,6 +150,7 @@ describe('DeseosTab', () => {
       expect(component.formDeseoNombre()).toBe('');
       expect(component.formDeseoComprado()).toBe(false);
       expect(component.formDeseoPresupuesto()).toBeNull();
+      expect(component.formDeseoGastoReal()).toBeNull();
     });
 
     it('openEditDeseoModal should populate the form and stop propagation', () => {
@@ -132,10 +162,34 @@ describe('DeseosTab', () => {
       expect(component.formDeseoNombre()).toBe('Monitor');
       expect(component.formDeseoPresupuesto()).toBe(200);
       expect(component.formDeseoValorEstimado()).toBe(180);
+      expect(component.formDeseoGastoReal()).toBe(160);
       expect(component.formDeseoJustificacion()).toBe('Para trabajar');
       expect(component.formDeseoGrupoId()).toBe(20);
       expect(component.formDeseoComprado()).toBe(true);
       expect(component.showDeseoModal()).toBe(true);
+    });
+
+    it('should populate an expense of zero and leave missing expenses blank', () => {
+      component.openEditDeseoModal(deseo({ gasto_real: 0 }));
+      expect(component.formDeseoGastoReal()).toBe(0);
+      component.openEditDeseoModal(initial[0]);
+      expect(component.formDeseoGastoReal()).toBeNull();
+    });
+
+    it('should distinguish an empty expense input from zero', async () => {
+      component.openCreateDeseoModal();
+      await fixture.whenStable();
+      const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#deseo-gasto-real')!;
+
+      input.value = '0';
+      input.dispatchEvent(new Event('input'));
+      await fixture.whenStable();
+      expect(component.formDeseoGastoReal()).toBe(0);
+
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      await fixture.whenStable();
+      expect(component.formDeseoGastoReal()).toBeNull();
     });
 
     it('closeDeseoModal should hide the modal', () => {
@@ -169,6 +223,7 @@ describe('DeseosTab', () => {
           nombre: 'Cámara',
           presupuesto: 500,
           valor_estimado: 0,
+          gasto_real: null,
           comprado: false,
           justificacion: null,
           grupo_item_finanzas_id: 10,
@@ -178,6 +233,31 @@ describe('DeseosTab', () => {
         expect(component.showDeseoModal()).toBe(false);
         expect(component.isSubmittingDeseo()).toBe(false);
         expect(pendingSpy).toHaveBeenCalledWith(3);
+      });
+
+      it.each([0, 75_000])('should create a deseo with an expense of %d', (gasto) => {
+        const created = deseo({ id: 99, nombre: 'Compra', gasto_real: gasto });
+        finanzas['createListaDeseos'].mockReturnValue(of(created));
+        component.openCreateDeseoModal();
+        component.formDeseoNombre.set('Compra');
+        component.formDeseoGastoReal.set(gasto);
+
+        component.saveDeseo();
+
+        expect(finanzas['createListaDeseos']).toHaveBeenCalledWith(expect.objectContaining({ gasto_real: gasto }));
+        expect(component.listaDeseos()[0].gasto_real).toBe(gasto);
+      });
+
+      it.each([1.5, 2147483648, -2147483649, Number.NaN])('should reject an invalid expense of %s', (gasto) => {
+        component.openCreateDeseoModal();
+        component.formDeseoNombre.set('Compra');
+        component.formDeseoGastoReal.set(gasto);
+
+        component.saveDeseo();
+
+        expect(toast.error).toHaveBeenCalledWith('Ingresa un gasto real entero válido en pesos chilenos');
+        expect(finanzas['createListaDeseos']).not.toHaveBeenCalled();
+        expect(component.isSubmittingDeseo()).toBe(false);
       });
 
       it('should show an error toast when creation fails', () => {
@@ -192,11 +272,12 @@ describe('DeseosTab', () => {
       });
 
       it('should update an existing deseo in place', () => {
-        const updated = { ...initial[0], nombre: 'Bici nueva', comprado: true };
+        const updated = { ...initial[0], nombre: 'Bici nueva', comprado: true, gasto_real: 240 };
         finanzas['updateListaDeseos'].mockReturnValue(of(updated));
         component.openEditDeseoModal(initial[0]);
         component.formDeseoNombre.set('Bici nueva');
         component.formDeseoComprado.set(true);
+        component.formDeseoGastoReal.set(240);
         pendingSpy.mockClear();
 
         component.saveDeseo();
@@ -205,6 +286,7 @@ describe('DeseosTab', () => {
           nombre: 'Bici nueva',
           presupuesto: 300,
           valor_estimado: 250,
+          gasto_real: 240,
           comprado: true,
           justificacion: null,
           grupo_item_finanzas_id: 10,
@@ -213,6 +295,29 @@ describe('DeseosTab', () => {
         expect(toast.success).toHaveBeenCalledWith('Deseo actualizado correctamente');
         expect(component.showDeseoModal()).toBe(false);
         expect(pendingSpy).toHaveBeenCalledWith(1);
+      });
+
+      it('should update an existing expense to zero', () => {
+        const updated = { ...initial[1], gasto_real: 0 };
+        finanzas['updateListaDeseos'].mockReturnValue(of(updated));
+        component.openEditDeseoModal(initial[1]);
+        component.formDeseoGastoReal.set(0);
+
+        component.saveDeseo();
+
+        expect(finanzas['updateListaDeseos']).toHaveBeenCalledWith(2, expect.objectContaining({ gasto_real: 0 }));
+        expect(component.totalGastoRealCompradoDeseos()).toBe(0);
+      });
+
+      it('should preserve the expense returned by the API when the input is cleared', () => {
+        finanzas['updateListaDeseos'].mockReturnValue(of(initial[1]));
+        component.openEditDeseoModal(initial[1]);
+        component.formDeseoGastoReal.set(null);
+
+        component.saveDeseo();
+
+        expect(finanzas['updateListaDeseos']).toHaveBeenCalledWith(2, expect.objectContaining({ gasto_real: null }));
+        expect(component.listaDeseos().find((item) => item.id === 2)?.gasto_real).toBe(160);
       });
 
       it('should show an error toast when update fails', () => {
