@@ -1,25 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ToastService } from '../../services/toast.service';
 import { Toast, ToastType } from '../../models/toast.model';
-import {
-  LucideCircleCheck,
-  LucideCircleX,
-  LucideTriangleAlert,
-  LucideInfo,
-  LucideX,
-} from '@lucide/angular';
 
 @Component({
   selector: 'app-toast-container',
-  imports: [
-    CommonModule,
-    LucideCircleCheck,
-    LucideCircleX,
-    LucideTriangleAlert,
-    LucideInfo,
-    LucideX,
-  ],
   templateUrl: './toast-container.html',
   styleUrl: './toast-container.css',
 })

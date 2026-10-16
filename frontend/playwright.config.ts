@@ -9,6 +9,8 @@ export default defineConfig({
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   workers: process.env['CI'] ? 2 : undefined,
+  // En CI, ng serve (modo dev) con dos workers puede tardar más de 5 s en pintar una página fría.
+  expect: { timeout: process.env['CI'] ? 15_000 : 5_000 },
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: BASE_URL,
