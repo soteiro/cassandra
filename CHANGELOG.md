@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/soteiro/cassandra/compare/v0.11.0...v0.12.0) (2026-10-16)
+
+
+### Features
+
+* integrate Lucide icons into toast notifications and add license file ([3610e5f](https://github.com/soteiro/cassandra/commit/3610e5f4ad9a289845484321c6c3dff74514c2ca))
+
+
+### Bug Fixes
+
+* integrate Lucide icons into toast notifications and add license… ([20b595a](https://github.com/soteiro/cassandra/commit/20b595a6546c7801f0da1962a1bd51c59d618e0a))
+
 ## [0.11.0](https://github.com/soteiro/cassandra/compare/v0.10.0...v0.11.0) (2026-10-15)
 
 
