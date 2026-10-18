@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/lista-deseos/4
+  url: http://localhost:8080/api/lista-deseos/7
   auth: inherit
 
 settings:

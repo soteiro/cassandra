@@ -1,0 +1,11 @@
+interface:
+  display_name: "Memoria de Cassandra"
+  short_description: "Retoma proyectos y conserva decisiones breves"
+  default_prompt: "Usa $cassandra-memory para recuperar el contexto del proyecto y guardar sus avances relevantes."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "cassandra-memory"
+      description: "Conector local de memoria de proyectos de Cassandra"
+policy:
+  allow_implicit_invocation: true

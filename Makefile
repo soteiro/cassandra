@@ -6,13 +6,14 @@ APK_MOBILE = cassandra-mobile.apk
 # JDK para Gradle (fallback si JAVA_HOME no existe o es inválido)
 JAVA_FALLBACK = $(HOME)/.jdks/jbr-21.0.11
 
-.PHONY: help migration build run dev-backend dev-frontend test test-frontend test-e2e test-all docs mobile mobile-sync mobile-install mobile-clean all
+.PHONY: help migration build build-memory-mcp run dev-backend dev-frontend test test-frontend test-e2e test-all docs mobile mobile-sync mobile-install mobile-clean all
 
 help: ## Muestra la lista de comandos disponibles
 	@echo "Comandos disponibles:"
 	@echo "  make migration name=nombre  -> Crea un nuevo par de archivos de migración (.up y .down)"
 	@echo "  make docs                   -> Regenera la documentación OpenAPI desde las colecciones de Bruno"
 	@echo "  make build                  -> Compila Docs, Angular y Go en el binario ./cassandra-app"
+	@echo "  make build-memory-mcp       -> Compila el conector local de memoria de proyectos"
 	@echo "  make run                    -> Compila y ejecuta la aplicación completa"
 	@echo "  make dev-backend            -> Ejecuta el backend en modo desarrollo"
 	@echo "  make dev-frontend           -> Regenera docs y ejecuta el servidor de desarrollo de Angular"
@@ -45,6 +46,9 @@ docs: ## Regenera la documentación OpenAPI a partir de Bruno
 
 build: ## Compila Frontend y Backend usando build.sh
 	@bash build.sh
+
+build-memory-mcp: ## Compila el conector MCP stdio (sin PostgreSQL ni frontend)
+	@cd backend && go build -o ../cassandra-memory-mcp ./cmd/cassandra-memory-mcp
 
 run: build ## Compila todo y corre el binario ./cassandra-app
 	@./cassandra-app

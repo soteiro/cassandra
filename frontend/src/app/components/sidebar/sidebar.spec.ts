@@ -80,6 +80,14 @@ describe('Sidebar', () => {
       expect(component).toBeTruthy();
     });
 
+    it('opens API key management and closes the mobile menu', () => {
+      component.sidebar.open();
+      const link = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>('a[href="/claves-api"]');
+      expect(link?.textContent).toContain('Claves API');
+      link!.dispatchEvent(new MouseEvent('click', { ctrlKey: true }));
+      expect(component.sidebar.isOpen()).toBe(false);
+    });
+
     it('should navigate to /login after a successful logout', () => {
       (component as unknown as { chau: () => void }).chau();
       expect(authService.logout).toHaveBeenCalled();
