@@ -39,6 +39,10 @@ func isUniqueViolation(err error) bool {
 //	duplicado (UNIQUE)                                → 409
 //	cualquier otro                                    → 500
 func dbError(w http.ResponseWriter, msg string, err error) {
+	if errors.Is(err, repository.ErrManagedDocument) {
+		http.Error(w, err.Error(), http.StatusConflict)
+		return
+	}
 	if errors.Is(err, pgx.ErrNoRows) || errors.Is(err, repository.ErrNoEncontrado) {
 		notFound(w, "Recurso no encontrado", err)
 		return

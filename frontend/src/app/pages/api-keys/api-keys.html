@@ -1,0 +1,151 @@
+<div class="max-w-5xl mx-auto space-y-6">
+  <header>
+    <h1 class="text-2xl font-bold text-text-main">Claves API</h1>
+    <p class="mt-2 text-sm text-text-muted max-w-2xl">
+      Conecta tus asistentes con la memoria de tus proyectos. Cada clave tiene sus propios proyectos y permisos.
+    </p>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] items-start">
+    <section class="bg-surface border border-surface-border rounded-2xl p-5 md:p-6 min-w-0" aria-labelledby="create-title">
+      @if (issued(); as key) {
+        <h2 id="create-title" class="text-lg font-semibold text-text-main">Guarda tu nueva clave</h2>
+        <p class="text-sm text-text-muted mt-2 break-words">
+          La clave de <strong class="text-text-main">{{ key.nombre }}</strong> solo se muestra ahora.
+          Cópiala antes de salir de esta pantalla.
+        </p>
+        <div class="mt-5 space-y-3">
+          <label class="block text-sm font-medium text-text-main" for="issued-key">Clave API</label>
+          <input #secretInput id="issued-key" class="field font-mono text-sm" type="text" readonly
+            [value]="key.token" autocomplete="off" spellcheck="false" aria-describedby="secret-help" />
+          <p id="secret-help" class="text-xs text-text-muted">Guárdala en el entorno del conector, fuera del repositorio.</p>
+          <button class="button-primary w-full" type="button" (click)="copyKey()" [disabled]="copying()">
+            {{ copying() ? 'Copiando…' : 'Copiar clave' }}
+          </button>
+          <p role="status" class="text-sm" [class.text-danger]="copyFailed()" [class.text-success]="!copyFailed()">{{ copyStatus() }}</p>
+          <button class="button-secondary w-full" type="button" (click)="dismissSecret()" [disabled]="copying()">Ya la guardé</button>
+        </div>
+      } @else {
+        <h2 id="create-title" class="text-lg font-semibold text-text-main">Generar una clave</h2>
+        <form [formGroup]="form" (ngSubmit)="generate()" class="mt-5 space-y-5">
+          <fieldset [disabled]="saving()" class="space-y-5 min-w-0">
+            <div>
+              <label for="key-name" class="block text-sm font-medium mb-2">Nombre</label>
+              <input #nameInput id="key-name" formControlName="nombre" type="text" maxlength="100"
+                class="field" placeholder="Ej. Asistente de mi proyecto" autocomplete="off"
+                [attr.aria-invalid]="form.controls.nombre.touched && form.controls.nombre.invalid"
+                [attr.aria-describedby]="form.controls.nombre.touched && form.controls.nombre.invalid ? 'name-error' : null" />
+              @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+                <p id="name-error" class="mt-2 text-sm text-danger">Escribe un nombre de hasta 100 caracteres.</p>
+              }
+            </div>
+
+            <fieldset aria-describedby="projects-help">
+              <legend class="text-sm font-medium mb-2">Proyectos autorizados</legend>
+              <p id="projects-help" class="text-xs text-text-muted mb-3">Elige entre 1 y 50 proyectos. La clave solo accede a su memoria.</p>
+              @if (projectsResource.isLoading()) {
+                <p role="status" class="text-sm text-text-muted">Cargando proyectos…</p>
+              } @else if (projectsResource.error()) {
+                <p role="alert" class="text-sm text-danger">No se pudieron cargar los proyectos.</p>
+                <button type="button" class="button-secondary mt-2" (click)="projectsResource.reload()">Reintentar proyectos</button>
+              } @else if (projects().length === 0) {
+                <p class="text-sm text-text-muted">Necesitas un proyecto para generar una clave.</p>
+                <a routerLink="/proyectos" class="inline-flex min-h-11 items-center text-sm text-primary underline">Ir a Proyectos</a>
+              } @else {
+                <div class="max-h-56 overflow-y-auto rounded-xl border border-surface-border bg-background p-1">
+                  @for (project of projects(); track project.id) {
+                    <label class="flex gap-3 items-start min-h-11 p-3 text-sm cursor-pointer rounded-lg hover:bg-surface-border/50">
+                      <input type="checkbox" class="mt-0.5 size-4 shrink-0 accent-primary" [checked]="selectedProjects().includes(project.id)"
+                        [disabled]="selectedProjects().length >= 50 && !selectedProjects().includes(project.id)"
+                        (change)="toggleProject(project.id)" />
+                      <span class="min-w-0 break-words">{{ project.nombre }}</span>
+                    </label>
+                  }
+                </div>
+                <p class="mt-2 text-xs text-text-muted">{{ selectedProjects().length }} seleccionados</p>
+              }
+              @if (submitted() && selectedProjects().length === 0 && projects().length > 0) {
+                <p role="alert" class="mt-2 text-sm text-danger">Selecciona al menos un proyecto.</p>
+              }
+            </fieldset>
+
+            <div>
+              <label for="key-access" class="block text-sm font-medium mb-2">Permisos</label>
+              <select id="key-access" formControlName="acceso" class="field" aria-describedby="access-help">
+                <option value="read">Solo leer memoria</option>
+                <option value="write">Leer y guardar memoria</option>
+              </select>
+              <p id="access-help" class="text-xs text-text-muted mt-2">Para que un asistente registre avances y decisiones, permite leer y guardar.</p>
+            </div>
+            <div>
+              <label for="key-expiry" class="block text-sm font-medium mb-2">Vencimiento</label>
+              <select id="key-expiry" formControlName="dias" class="field">
+                <option value="30">En 30 días</option>
+                <option value="90">En 90 días</option>
+                <option value="365">En un año</option>
+                <option value="never">Sin vencimiento</option>
+              </select>
+            </div>
+          </fieldset>
+          @if (createError()) { <p role="alert" class="text-sm text-danger">{{ createError() }}</p> }
+          <button type="submit" class="button-primary w-full" [disabled]="saving() || loading() || projectsResource.isLoading() || !!projectsResource.error() || projects().length === 0">
+            {{ saving() ? 'Generando…' : 'Generar clave' }}
+          </button>
+        </form>
+      }
+    </section>
+
+    <section class="min-w-0" aria-labelledby="keys-title" [attr.aria-busy]="loading()">
+      <h2 id="keys-title" class="text-lg font-semibold text-text-main">Tus claves</h2>
+      <p class="text-sm text-text-muted mt-2 mb-5">Aquí solo se muestra el prefijo. Puedes revocar el acceso cuando quieras.</p>
+      <p role="status" class="text-sm text-success mb-3">{{ notice() }}</p>
+      @if (loading()) {
+        <p role="status" class="text-sm text-text-muted py-6">Cargando claves…</p>
+      } @else if (loadError()) {
+        <div class="bg-surface border border-surface-border rounded-xl p-5">
+          <p role="alert" class="text-sm text-danger">{{ loadError() }}</p>
+          <button type="button" class="button-secondary mt-3" (click)="loadKeys()">Reintentar claves</button>
+        </div>
+      } @else if (keys().length === 0) {
+        <div class="border border-dashed border-surface-border rounded-xl p-6">
+          <p class="font-medium text-text-main">Todavía no tienes claves</p>
+          <p class="text-sm text-text-muted mt-2">Genera una para conectar tu primer asistente.</p>
+        </div>
+      } @else {
+        <ul class="divide-y divide-surface-border border-y border-surface-border">
+          @for (key of keys(); track key.id) {
+            <li class="py-5 space-y-3">
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="font-semibold text-text-main break-words min-w-0">{{ key.nombre }}</h3>
+                <span class="text-xs shrink-0 border border-surface-border rounded-md px-2 py-1"
+                  [class.text-success]="keyStatus(key) === 'Activa'" [class.text-text-muted]="keyStatus(key) !== 'Activa'">{{ keyStatus(key) }}</span>
+              </div>
+              <p class="font-mono text-xs text-text-muted break-all">{{ key.prefijo }}…</p>
+              <dl class="text-sm space-y-2">
+                <div><dt class="text-text-muted">Proyectos</dt><dd class="break-words mt-0.5">{{ projectNames(key) }}</dd></div>
+                <div><dt class="sr-only">Permisos</dt><dd>{{ key.scopes.includes('memory:write') ? 'Leer y guardar memoria' : 'Solo leer memoria' }}</dd></div>
+                <div class="text-text-muted"><dt class="inline">Vence: </dt><dd class="inline">{{ key.expira_en ? (key.expira_en | date:'dd/MM/yyyy, HH:mm') : 'Sin vencimiento' }}</dd></div>
+                <div class="text-text-muted"><dt class="inline">Último uso: </dt><dd class="inline">{{ key.ultimo_uso ? (key.ultimo_uso | date:'dd/MM/yyyy, HH:mm') : 'Todavía sin uso' }}</dd></div>
+              </dl>
+              @if (pendingRevoke()?.id === key.id) {
+                <div class="rounded-xl border border-danger/40 p-4 space-y-3" role="group" [attr.aria-label]="'Confirmar revocación de ' + key.nombre">
+                  <p class="text-sm">¿Revocar «{{ key.nombre }}»? Los asistentes que la usen perderán el acceso.</p>
+                  @if (revokeError()) { <p role="alert" class="text-sm text-danger">{{ revokeError() }}</p> }
+                  <div class="flex flex-wrap gap-2">
+                    <button #revokeConfirm type="button" class="button-danger" (click)="confirmRevoke()" [disabled]="revoking()">{{ revoking() ? 'Revocando…' : 'Sí, revocar' }}</button>
+                    <button type="button" class="button-secondary" (click)="cancelRevoke()" [disabled]="revoking()">Cancelar</button>
+                  </div>
+                </div>
+              }
+              @if (!key.revocada_en) {
+                <button #revokeButton type="button" class="button-secondary" (click)="askRevoke(key, revokeButton)" [disabled]="revoking()"
+                  [hidden]="pendingRevoke()?.id === key.id"
+                  [attr.aria-label]="'Revocar clave ' + key.nombre">Revocar</button>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</div>

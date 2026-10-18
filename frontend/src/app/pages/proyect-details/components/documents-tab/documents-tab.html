@@ -161,22 +161,24 @@
                       <svg lucideCopy class="w-3.5 h-3.5" />
                     }
                   </button>
-                  <button
-                    type="button"
-                    (click)="startEdit(doc, $event)"
-                    title="Editar documento"
-                    class="p-1 rounded-lg hover:bg-surface-border text-text-muted hover:text-text-main transition-colors cursor-pointer"
-                  >
-                    <svg lucidePencil class="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    (click)="promptDelete(doc, $event)"
-                    title="Eliminar documento"
-                    class="p-1 rounded-lg hover:bg-danger/20 text-text-muted hover:text-danger transition-colors cursor-pointer"
-                  >
-                    <svg lucideTrash2 class="w-3.5 h-3.5" />
-                  </button>
+                  @if (!doc.gestionado) {
+                    <button
+                      type="button"
+                      (click)="startEdit(doc, $event)"
+                      title="Editar documento"
+                      class="p-1 rounded-lg hover:bg-surface-border text-text-muted hover:text-text-main transition-colors cursor-pointer"
+                    >
+                      <svg lucidePencil class="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      (click)="promptDelete(doc, $event)"
+                      title="Eliminar documento"
+                      class="p-1 rounded-lg hover:bg-danger/20 text-text-muted hover:text-danger transition-colors cursor-pointer"
+                    >
+                      <svg lucideTrash2 class="w-3.5 h-3.5" />
+                    </button>
+                  }
                 </div>
               </div>
 
@@ -243,25 +245,31 @@
             }
           </button>
 
-          <button
-            type="button"
-            (click)="startEdit(doc)"
-            class="px-3 py-1.5 text-xs font-semibold bg-primary text-background rounded-xl hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <svg lucidePencil class="w-3.5 h-3.5" />
-            <span>Editar</span>
-          </button>
+          @if (!doc.gestionado) {
+            <button
+              type="button"
+              (click)="startEdit(doc)"
+              class="px-3 py-1.5 text-xs font-semibold bg-primary text-background rounded-xl hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <svg lucidePencil class="w-3.5 h-3.5" />
+              <span>Editar</span>
+            </button>
 
-          <button
-            type="button"
-            (click)="promptDelete(doc)"
-            class="px-3 py-1.5 text-xs font-medium text-danger border border-danger/30 hover:bg-danger/10 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <svg lucideTrash2 class="w-3.5 h-3.5" />
-            <span>Eliminar</span>
-          </button>
+            <button
+              type="button"
+              (click)="promptDelete(doc)"
+              class="px-3 py-1.5 text-xs font-medium text-danger border border-danger/30 hover:bg-danger/10 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <svg lucideTrash2 class="w-3.5 h-3.5" />
+              <span>Eliminar</span>
+            </button>
+          }
         </div>
       </div>
+
+      @if (doc.gestionado) {
+        <p class="text-sm text-text-muted">Este documento se actualiza con la memoria del proyecto.</p>
+      }
 
       <!-- METADATOS DEL DOCUMENTO -->
       <div class="space-y-2">

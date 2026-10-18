@@ -99,6 +99,20 @@
   <div class="border-t border-surface-border pt-4 mt-auto space-y-3">
     <a
       (click)="sidebar.close()"
+      routerLink="/claves-api"
+      routerLinkActive="bg-primary font-semibold"
+      #keysLink="routerLinkActive"
+      [class.text-background]="keysLink.isActive"
+      [class.text-text-main]="!keysLink.isActive"
+      [class]="keysLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+      ariaCurrentWhenActive="page"
+      class="flex items-center gap-3 min-h-11 px-3.5 py-2.5 rounded-xl border border-transparent transition-colors text-sm font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      <svg lucideKeyRound class="w-4 h-4" aria-hidden="true" />
+      <span>Claves API</span>
+    </a>
+    <a
+      (click)="sidebar.close()"
       routerLink="/docs"
       routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
       [routerLinkActiveOptions]="{ exact: true }"

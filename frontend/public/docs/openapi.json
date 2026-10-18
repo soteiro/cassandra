@@ -1636,7 +1636,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "example": 4
+              "example": 7
             },
             "description": "ID numérico de lista-deseo"
           }
