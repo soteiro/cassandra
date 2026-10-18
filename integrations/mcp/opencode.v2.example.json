@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "cassandra-memory": {
+        "type": "local",
+        "command": ["/ruta/absoluta/cassandra-memory-mcp"],
+        "environment": {
+          "CASSANDRA_URL": "{env:CASSANDRA_URL}",
+          "CASSANDRA_API_KEY": "{env:CASSANDRA_API_KEY}"
+        }
+      }
+    }
+  }
+}

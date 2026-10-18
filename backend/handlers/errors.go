@@ -39,7 +39,7 @@ func isUniqueViolation(err error) bool {
 //	duplicado (UNIQUE)                                → 409
 //	cualquier otro                                    → 500
 func dbError(w http.ResponseWriter, msg string, err error) {
-	if errors.Is(err, repository.ErrManagedDocument) {
+	if errors.Is(err, repository.ErrManagedDocument) || errors.Is(err, repository.ErrManagedLog) {
 		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}

@@ -128,3 +128,29 @@ func TestLogProyectoInexistente(t *testing.T) {
 	expect4xx(t, api.Do(ana, http.MethodPost, apitest.Path("/api/proyects/%d/logs", inexistente), map[string]any{"contenido_raw": "x"}),
 		"POST log en proyecto inexistente")
 }
+
+func TestLogsSearchAndPagination(t *testing.T) {
+	api, ana, beto := setup(t)
+	p := crearProyecto(t, api, ana, "Bitácora", nil)
+	a := crearLog(t, api, ana, p.ID, "100% real", "Una decisión")
+	b := crearLog(t, api, ana, p.ID, "Otra sesión", "Un avance")
+	var logs []models.ProjectLog
+	api.Do(ana, http.MethodGet, apitest.Path("/api/proyects/%d/logs?limit=1&offset=1", p.ID), nil).Expect(t, http.StatusOK).JSON(t, &logs)
+	if len(logs) != 1 || logs[0].ID != a.ID {
+		t.Fatalf("página incorrecta: %+v", logs)
+	}
+	api.Do(ana, http.MethodGet, apitest.Path("/api/proyects/%d/logs?q=%%25&limit=31&offset=0", p.ID), nil).Expect(t, http.StatusOK).JSON(t, &logs)
+	if len(logs) != 1 || logs[0].ID != a.ID {
+		t.Fatalf("%% se trató como comodín: %+v", logs)
+	}
+	api.Do(beto, http.MethodGet, apitest.Path("/api/proyects/%d/logs?limit=31", p.ID), nil).Expect(t, http.StatusOK).JSON(t, &logs)
+	if len(logs) != 0 {
+		t.Fatal("se filtraron logs de otro usuario")
+	}
+	for _, query := range []string{"limit=0", "limit=101", "offset=-1", "offset=10001", "limit=abc"} {
+		api.Do(ana, http.MethodGet, apitest.Path("/api/proyects/%d/logs?%s", p.ID, query), nil).Expect(t, http.StatusBadRequest)
+	}
+	if b.Gestionado || b.FechaActualizacion.IsZero() {
+		t.Fatal("metadatos de log manual incorrectos")
+	}
+}

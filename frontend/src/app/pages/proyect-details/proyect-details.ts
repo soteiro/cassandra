@@ -15,7 +15,7 @@ import { ProjectHeader } from './components/project-header/project-header';
 import { SubprojectsTab } from './components/subprojects-tab/subprojects-tab';
 import { TasksTab } from './components/tasks-tab/tasks-tab';
 import { NotesTab } from './components/notes-tab/notes-tab';
-import { DocumentsTab } from './components/documents-tab/documents-tab';
+import { ProjectDocuments } from './components/project-documents/project-documents';
 import { ActivityTab } from './components/activity-tab/activity-tab';
 import { ProjectModal } from '../../components/project-modal/project-modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
@@ -43,7 +43,7 @@ interface Tab {
     SubprojectsTab,
     TasksTab,
     NotesTab,
-    DocumentsTab,
+    ProjectDocuments,
     ActivityTab,
     ProjectModal,
     ConfirmModal,
@@ -102,7 +102,7 @@ export class ProyectDetails {
     switch (this.activeTab()) {
       case 'subproyectos': return this.subproyectosResource?.isLoading() ?? false;
       case 'notas': return (this.notasResource?.isLoading() ?? false) || (this.tasksResource?.isLoading() ?? false);
-      case 'documentos': return this.documentosResource?.isLoading() ?? false;
+      case 'documentos': return false; // Cada subpestaña gestiona su carga y sus errores.
       case 'actividad': return this.actividadResource?.isLoading() ?? false;
       default: return this.tasksResource?.isLoading() ?? false;
     }
@@ -112,7 +112,7 @@ export class ProyectDetails {
     switch (this.activeTab()) {
       case 'subproyectos': return this.subproyectosResource?.error();
       case 'notas': return this.notasResource?.error() || this.tasksResource?.error();
-      case 'documentos': return this.documentosResource?.error();
+      case 'documentos': return undefined;
       case 'actividad': return this.actividadResource?.error();
       default: return this.tasksResource?.error();
     }

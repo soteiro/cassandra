@@ -2,16 +2,33 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"cassandra/models"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type LogsRepository struct {
 	db *pgxpool.Pool
+}
+
+var ErrManagedLog = errors.New("esta entrada se actualiza mediante la memoria del proyecto")
+
+func (r *LogsRepository) managedError(ctx context.Context, id, userID int, original error) error {
+	var managed bool
+	err := r.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM project_logs WHERE id=$1 AND user_id=$2 AND gestionado=true AND eliminado=false)`, id, userID).Scan(&managed)
+	if err != nil {
+		return err
+	}
+	if managed {
+		return ErrManagedLog
+	}
+	return original
 }
 
 func NewLogsRepository(db *pgxpool.Pool) *LogsRepository {
@@ -24,7 +41,7 @@ func (r *LogsRepository) Create(ctx context.Context, userID int, req *models.Cre
 	query := `
 		INSERT INTO project_logs (proyecto_id, user_id, titulo, contenido_raw)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id, proyecto_id, user_id, titulo, contenido_raw, fecha_creacion, eliminado
+		RETURNING id, proyecto_id, user_id, titulo, contenido_raw, fecha_creacion, eliminado, gestionado, fecha_actualizacion
 	`
 
 	err := r.db.QueryRow(
@@ -42,6 +59,8 @@ func (r *LogsRepository) Create(ctx context.Context, userID int, req *models.Cre
 		&l.ContenidoRaw,
 		&l.FechaCreacion,
 		&l.Eliminado,
+		&l.Gestionado,
+		&l.FechaActualizacion,
 	)
 
 	if err != nil {
@@ -54,16 +73,24 @@ func (r *LogsRepository) Create(ctx context.Context, userID int, req *models.Cre
 
 // Obtener todos los logs de un proyecto para el usuario autenticado
 func (r *LogsRepository) GetByProyectoID(ctx context.Context, userID int, proyectoID int) ([]models.ProjectLog, error) {
+	return r.SearchByProyectoID(ctx, userID, proyectoID, "", 0, 0)
+}
+
+// El listado existente conserva su contrato; la vista de bitácora usa búsqueda y páginas.
+func (r *LogsRepository) SearchByProyectoID(ctx context.Context, userID, proyectoID int, search string, limit, offset int) ([]models.ProjectLog, error) {
 	query := `
-		SELECT id, proyecto_id, user_id, titulo, contenido_raw, fecha_creacion, eliminado
+		SELECT id, proyecto_id, user_id, COALESCE(titulo,''), contenido_raw, fecha_creacion, eliminado, gestionado, fecha_actualizacion
 		FROM project_logs
 		WHERE proyecto_id = $1
 		  AND user_id = $2
 		  AND eliminado IS false
-		ORDER BY fecha_creacion DESC
+		  AND (COALESCE(titulo,'') ILIKE $3 OR contenido_raw ILIKE $3)
+		ORDER BY fecha_creacion DESC, id DESC
+		LIMIT NULLIF($4,0) OFFSET $5
 	`
 
-	rows, err := r.db.Query(ctx, query, proyectoID, userID)
+	pattern := "%" + strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(strings.TrimSpace(search)) + "%"
+	rows, err := r.db.Query(ctx, query, proyectoID, userID, pattern, limit, offset)
 	if err != nil {
 		log.Printf("[REPO:Logs.GetByProyectoID] Error en SQL SELECT: %v | user_id=%d proyecto_id=%d", err, userID, proyectoID)
 		return nil, err
@@ -81,6 +108,8 @@ func (r *LogsRepository) GetByProyectoID(ctx context.Context, userID int, proyec
 			&l.ContenidoRaw,
 			&l.FechaCreacion,
 			&l.Eliminado,
+			&l.Gestionado,
+			&l.FechaActualizacion,
 		)
 		if err != nil {
 			log.Printf("[REPO:Logs.GetByProyectoID] Error al escanear fila: %v | user_id=%d proyecto_id=%d", err, userID, proyectoID)
@@ -105,7 +134,7 @@ func (r *LogsRepository) GetByProyectoID(ctx context.Context, userID int, proyec
 func (r *LogsRepository) GetByID(ctx context.Context, userID int, id int) (*models.ProjectLog, error) {
 	var l models.ProjectLog
 	query := `
-		SELECT id, proyecto_id, user_id, titulo, contenido_raw, fecha_creacion, eliminado
+		SELECT id, proyecto_id, user_id, COALESCE(titulo,''), contenido_raw, fecha_creacion, eliminado, gestionado, fecha_actualizacion
 		FROM project_logs
 		WHERE id = $1
 		  AND user_id = $2
@@ -120,6 +149,8 @@ func (r *LogsRepository) GetByID(ctx context.Context, userID int, id int) (*mode
 		&l.ContenidoRaw,
 		&l.FechaCreacion,
 		&l.Eliminado,
+		&l.Gestionado,
+		&l.FechaActualizacion,
 	)
 
 	if err != nil {
@@ -137,11 +168,13 @@ func (r *LogsRepository) Update(ctx context.Context, userID int, id int, req *mo
 		UPDATE project_logs
 		SET 
 			titulo = COALESCE($1, titulo),
-			contenido_raw = COALESCE($2, contenido_raw)
+			contenido_raw = COALESCE($2, contenido_raw),
+			fecha_actualizacion = CURRENT_TIMESTAMP
 		WHERE id = $3
 		  AND user_id = $4
 		  AND eliminado = false
-		RETURNING id, proyecto_id, user_id, titulo, contenido_raw, fecha_creacion, eliminado
+		  AND gestionado = false
+		RETURNING id, proyecto_id, user_id, COALESCE(titulo,''), contenido_raw, fecha_creacion, eliminado, gestionado, fecha_actualizacion
 	`
 
 	err := r.db.QueryRow(
@@ -159,9 +192,14 @@ func (r *LogsRepository) Update(ctx context.Context, userID int, id int, req *mo
 		&l.ContenidoRaw,
 		&l.FechaCreacion,
 		&l.Eliminado,
+		&l.Gestionado,
+		&l.FechaActualizacion,
 	)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, r.managedError(ctx, id, userID, err)
+		}
 		log.Printf("[REPO:Logs.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
@@ -173,10 +211,11 @@ func (r *LogsRepository) Update(ctx context.Context, userID int, id int, req *mo
 func (r *LogsRepository) Delete(ctx context.Context, userID int, id int) error {
 	query := `
 		UPDATE project_logs
-		SET eliminado = true
+		SET eliminado = true, fecha_actualizacion = CURRENT_TIMESTAMP
 		WHERE id = $1
 		  AND user_id = $2
 		  AND eliminado = false
+		  AND gestionado = false
 	`
 
 	res, err := r.db.Exec(ctx, query, id, userID)
@@ -187,9 +226,8 @@ func (r *LogsRepository) Delete(ctx context.Context, userID int, id int) error {
 
 	if res.RowsAffected() == 0 {
 		log.Printf("[REPO:Logs.Delete] Registro no encontrado o sin permisos | id=%d user_id=%d", id, userID)
-		return fmt.Errorf("%w: no se encontró el log con id: %d o no tiene permisos", ErrNoEncontrado, id)
+		return r.managedError(ctx, id, userID, fmt.Errorf("%w: no se encontró el log con id: %d o no tiene permisos", ErrNoEncontrado, id))
 	}
 
 	return nil
 }
-

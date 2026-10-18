@@ -65,7 +65,7 @@ export function parseMarkdown(markdown: string): string {
                 </div>`
               : ''
           }
-          <pre class="p-4 overflow-x-auto font-mono leading-relaxed text-text-main"><code>${code}</code></pre>
+          <pre tabindex="0" role="region" aria-label="Bloque de código${lang ? ' ' + lang : ''}" class="p-4 overflow-x-auto font-mono leading-relaxed text-text-main focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2"><code>${code}</code></pre>
         </div>
       `);
       i++;

@@ -131,12 +131,12 @@ func TestMemoryWritesAreAtomicIdempotentAndVersioned(t *testing.T) {
 	body.Fichas = []models.MemoryEntryInput{entry("Elegir memoria breve")}
 	var first models.MemoryWriteResult
 	a.Do(agent, http.MethodPost, path(p)+"/advances", body).Expect(t, http.StatusOK).JSON(t, &first)
-	if first.Revision != 1 || first.DocumentoID == nil || len(first.FichaIDs) != 1 {
+	if first.Revision != 1 || first.LogID == nil || first.DocumentoID != nil || len(first.FichaIDs) != 1 {
 		t.Fatalf("resultado: %+v", first)
 	}
 	var replay models.MemoryWriteResult
 	a.Do(agent, http.MethodPost, path(p)+"/advances", body).Expect(t, http.StatusOK).JSON(t, &replay)
-	if replay.Revision != first.Revision || *replay.DocumentoID != *first.DocumentoID || replay.FichaIDs[0] != first.FichaIDs[0] {
+	if replay.Revision != first.Revision || *replay.LogID != *first.LogID || replay.FichaIDs[0] != first.FichaIDs[0] {
 		t.Fatal("el reintento no devolvió el resultado original")
 	}
 	changed := advance("first-operation", 0)
@@ -160,30 +160,33 @@ func TestMemoryWritesAreAtomicIdempotentAndVersioned(t *testing.T) {
 	if current.Revision != 1 || current.Memoria.EnQueQuede != body.Memoria.EnQueQuede || current.FichasVigentesTotal != 1 {
 		t.Fatalf("guardado parcial: %+v", current)
 	}
-	var doc models.DocumentoResponse
-	a.Do(u, http.MethodGet, apitest.Path("/api/documentos/%d", *first.DocumentoID), nil).Expect(t, http.StatusOK).JSON(t, &doc)
-	if !strings.Contains(doc.Contenido, body.Memoria.EnQueQuede) || strings.Contains(doc.Contenido, "debe revertirse") {
-		t.Fatal("el documento no refleja la transacción")
+	var log models.ProjectLog
+	a.Do(u, http.MethodGet, apitest.Path("/api/logs/%d", *first.LogID), nil).Expect(t, http.StatusOK).JSON(t, &log)
+	if !strings.Contains(log.ContenidoRaw, body.Memoria.EnQueQuede) || strings.Contains(log.ContenidoRaw, "debe revertirse") {
+		t.Fatal("la bitácora no refleja la transacción")
 	}
-	if !doc.Gestionado {
-		t.Fatal("la memoria no está marcada como documento gestionado")
+	if !log.Gestionado {
+		t.Fatal("la memoria no está marcada como log gestionado")
 	}
-	a.Do(u, http.MethodPut, apitest.Path("/api/documentos/%d", *first.DocumentoID), map[string]any{"contenido": "evitar revisión"}).Expect(t, http.StatusConflict)
-	a.Do(u, http.MethodDelete, apitest.Path("/api/documentos/%d", *first.DocumentoID), nil).Expect(t, http.StatusConflict)
-	// Actualizar reutiliza el documento, sin crear una nueva copia de memoria.
+	a.Do(u, http.MethodPut, apitest.Path("/api/logs/%d", *first.LogID), map[string]any{"contenido_raw": "evitar revisión"}).Expect(t, http.StatusConflict)
+	a.Do(u, http.MethodDelete, apitest.Path("/api/logs/%d", *first.LogID), nil).Expect(t, http.StatusConflict)
+	// Actualizar reutiliza la síntesis en la bitácora.
 	update := advance("second-operation", 1)
 	update.Memoria.EnQueQuede = "Segunda sesión comprobada"
 	var next models.MemoryWriteResult
 	a.Do(agent, http.MethodPost, path(p)+"/advances", update).Expect(t, http.StatusOK).JSON(t, &next)
-	if next.Revision != 2 || *next.DocumentoID != *first.DocumentoID {
+	if next.Revision != 2 || *next.LogID != *first.LogID {
 		t.Fatalf("actualización: %+v", next)
 	}
 	var count int
 	if err := a.DB.QueryRow(context.Background(), `SELECT count(*) FROM documentos_proyecto WHERE proyecto_id=$1`, p).Scan(&count); err != nil {
 		t.Fatal(err)
 	}
-	if count != 2 {
-		t.Fatalf("documentos duplicados o parciales: %d", count)
+	if count != 0 {
+		t.Fatalf("la memoria creó documentos: %d", count)
+	}
+	if err := a.DB.QueryRow(context.Background(), `SELECT count(*) FROM project_logs WHERE proyecto_id=$1`, p).Scan(&count); err != nil || count != 2 {
+		t.Fatalf("logs duplicados o parciales: %d, %v", count, err)
 	}
 }
 
@@ -245,6 +248,14 @@ func TestMemorySearchAndSupersededDecisions(t *testing.T) {
 	if len(found.Fichas) != 1 || found.Fichas[0].Estado != "sustituida" {
 		t.Fatalf("historial: %+v", found)
 	}
+	if found.Fichas[0].LogID == nil {
+		t.Fatal("ficha histórica sin referencia a la bitácora")
+	}
+	var historicalLog models.ProjectLog
+	a.Do(u, http.MethodGet, apitest.Path("/api/logs/%d", *found.Fichas[0].LogID), nil).Expect(t, http.StatusOK).JSON(t, &historicalLog)
+	if !strings.Contains(historicalLog.ContenidoRaw, "Estado: **sustituida**") || !strings.Contains(historicalLog.ContenidoRaw, body.Fichas[0].Contenido) {
+		t.Fatal("la bitácora debe conservar el contenido anterior e indicar que fue sustituido")
+	}
 	a.Do(u, http.MethodGet, path(p)+"/entries?q=%25", nil).Expect(t, http.StatusOK).JSON(t, &found)
 	if len(found.Fichas) != 1 || found.Fichas[0].Titulo != "100% literal" {
 		t.Fatal("la búsqueda no trató % como literal")
@@ -253,9 +264,12 @@ func TestMemorySearchAndSupersededDecisions(t *testing.T) {
 	if len(found.Fichas) != 2 || !found.HayMas {
 		t.Fatal("paginación incorrecta")
 	}
-	var oldDoc models.DocumentoResponse
-	a.Do(u, http.MethodGet, apitest.Path("/api/documentos/%d", found.Fichas[0].DocumentoID), nil).Expect(t, http.StatusOK).JSON(t, &oldDoc)
-	if !strings.Contains(oldDoc.Contenido, "Estado:") {
+	var oldLog models.ProjectLog
+	if found.Fichas[0].LogID == nil {
+		t.Fatal("ficha sin referencia a la bitácora")
+	}
+	a.Do(u, http.MethodGet, apitest.Path("/api/logs/%d", *found.Fichas[0].LogID), nil).Expect(t, http.StatusOK).JSON(t, &oldLog)
+	if !strings.Contains(oldLog.ContenidoRaw, "Estado:") {
 		t.Fatal("ficha sin estado legible")
 	}
 }

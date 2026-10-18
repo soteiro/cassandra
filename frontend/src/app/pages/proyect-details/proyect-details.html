@@ -18,7 +18,7 @@
     />
 
     <!-- BARRA DE PESTAÑAS (TABS) -->
-    <section class="grid grid-cols-1 pt-2 pb-4 md:flex md:flex-wrap border-b border-surface-border gap-2">
+    <section role="tablist" aria-label="Secciones del proyecto" class="grid grid-cols-1 pt-2 pb-4 md:flex md:flex-wrap border-b border-surface-border gap-2">
       @for (tab of tabs; track tab.id) {
         <button
           role="tab"
@@ -88,10 +88,11 @@
         (reload)="reloadNotas()"
       />
     } @else if (activeTab() === 'documentos') {
-      <app-documents-tab
+      <app-project-documents
         [projectId]="project.id"
-        [documentos]="documentosResource?.value() || []"
+        [documentos]="documentosResource?.error() ? [] : (documentosResource?.value() || [])"
         [isLoading]="documentosResource?.isLoading() || false"
+        [hasError]="!!documentosResource?.error()"
         (reload)="reloadDocumentos()"
       />
     } @else if (activeTab() === 'actividad') {
