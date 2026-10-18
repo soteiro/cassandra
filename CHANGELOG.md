@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/soteiro/cassandra/compare/v0.13.0...v0.14.0) (2026-10-18)
+
+
+### Features
+
+* **project-logs:** separar la bitácora de los documentos ([4c6bddd](https://github.com/soteiro/cassandra/commit/4c6bdddbb41c99473e60cf46414e9308d9b64f15))
+* **project-logs:** separar la bitácora de los documentos ([cde654c](https://github.com/soteiro/cassandra/commit/cde654c3fe8518f64c748eeaf05c64efcad089cf))
+
 ## [0.13.0](https://github.com/soteiro/cassandra/compare/v0.12.0...v0.13.0) (2026-10-18)
 
 
