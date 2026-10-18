@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.13.0](https://github.com/soteiro/cassandra/compare/v0.12.0...v0.13.0) (2026-10-18)
+
+
+### Features
+
+* **api-keys:** add API key management functionality ([21f11db](https://github.com/soteiro/cassandra/commit/21f11dbe022eb7999f500ce7ac3688c8a57237a7))
+* **api-keys:** add API key management functionality ([a4e761e](https://github.com/soteiro/cassandra/commit/a4e761e52da66e926340e4f680f28afe70c0ebaf))
+
 ## [0.12.0](https://github.com/soteiro/cassandra/compare/v0.11.0...v0.12.0) (2026-10-16)
 
 
