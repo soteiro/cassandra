@@ -37,7 +37,8 @@ type MemoryEntryInput struct {
 type MemoryEntry struct {
 	ID int64 `json:"id"`
 	MemoryEntryInput
-	DocumentoID   int       `json:"documento_id"`
+	DocumentoID   *int      `json:"documento_id"` // Referencia anterior; nuevas entradas usan log_id.
+	LogID         *int      `json:"log_id"`
 	FechaCreacion time.Time `json:"fecha_creacion"`
 }
 
@@ -51,6 +52,7 @@ type MemoryWriteRequest struct {
 type MemoryWriteResult struct {
 	Revision    int64   `json:"revision"`
 	DocumentoID *int    `json:"documento_id"`
+	LogID       *int    `json:"log_id"`
 	FichaIDs    []int64 `json:"ficha_ids"`
 }
 
@@ -68,6 +70,7 @@ type MemoryContext struct {
 	Revision            int64             `json:"revision"`
 	Memoria             *ProjectMemory    `json:"memoria"`
 	DocumentoID         *int              `json:"documento_id"`
+	LogID               *int              `json:"log_id"`
 	FechaActualizacion  *time.Time        `json:"fecha_actualizacion"`
 	Fichas              []MemoryEntry     `json:"fichas"`
 	FichasVigentesTotal int               `json:"fichas_vigentes_total"`

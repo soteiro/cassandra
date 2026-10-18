@@ -72,7 +72,8 @@ sobrescribas el avance ajeno. Ante un fallo ambiguo de red, reintenta una vez co
 los argumentos originales; si persiste, informa que no pudiste confirmar el guardado.
 
 Para guardar solo una conclusión usa `registrar_decision`; también incrementa la
-revisión. Nunca edites las copias gestionadas desde el CRUD de documentos.
+revisión. Las copias se leen en Documentos → Project logs; modifícalas mediante
+las operaciones de memoria para conservar su revisión y contenido estructurado.
 
 Informa brevemente del resultado confirmado (proyecto y revisión). No afirmes que
 guardaste algo hasta recibir éxito. No muestres keys, cookies ni credenciales;

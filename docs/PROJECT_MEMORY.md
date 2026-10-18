@@ -8,8 +8,10 @@ el servidor, no se ingieren chats automáticamente y no se publica un MCP remoto
 ## 1. Publicar y generar una clave desde la interfaz
 
 Integrar la rama mediante el flujo habitual de QA/release descrito en
-[deploy/README.md](../deploy/README.md). La migración 29 añade tablas y una columna
-de documentos; no elimina datos existentes. El despliegue a producción crea su
+[deploy/README.md](../deploy/README.md). La migración 29 añade las tablas de memoria
+y claves. La 30 traslada las copias gestionadas de memoria a `project_logs`,
+conserva sus fechas y referencias, y oculta los documentos originales sin borrarlos.
+Los documentos y logs manuales se conservan. El despliegue a producción crea su
 respaldo normal. Esta entrega de desarrollo no despliega ni genera keys de prod.
 
 Desplegar también el frontend de esta rama. Con la sesión iniciada, abrir
@@ -58,6 +60,9 @@ Si se usa cookie, quitar un header Authorization heredado vacío o incorrecto:
 el backend lo considera autoritativo y no cae a la cookie.
 
 ## 2. Compilar e iniciar el conector local
+
+Para configurar por proyecto Codex, Claude Code u OpenCode, seguir la
+[guía de clientes MCP](MCP_CLIENT_SETUP.md), con plantillas sin secretos.
 
 ```bash
 make build-memory-mcp
@@ -157,14 +162,23 @@ Ejemplo de avance; en MCP añadir `proyecto_id: 12` a estos argumentos:
   revisión leída. Un 409 exige reconciliar; nunca forzar la escritura.
 - Reintentar con el mismo `operacion_id` y el mismo cuerpo devuelve el resultado
   original. Reusar el ID con otro cuerpo se rechaza. Validación, revisión,
-  documentos, fichas e idempotencia se guardan en una transacción por proyecto.
+  logs, fichas e idempotencia se guardan en una transacción por proyecto.
+- Las lecturas y escrituras nuevas devuelven `log_id` como referencia visible.
+  `documento_id` se conserva por compatibilidad con resultados antiguos; reintentar
+  una operación anterior a la migración devuelve su resultado original.
 
 ## 5. Lectura en Cassandra y límites de la entrega
 
-La síntesis aparece como **Memoria actual** en Documentos. Las fichas se muestran
-como decisiones/investigaciones. Son documentos gestionados: su modificación pasa
-por la operación de memoria para mantener revisión y contenido estructurado
-consistentes. Los documentos manuales mantienen su editor normal.
+Dentro de **Documentos** hay dos pestañas: **Documentos** para los documentos que
+redactas y **Project logs** para la bitácora. La síntesis aparece como **Memoria
+actual** en Project logs, junto con las fichas de decisiones y exploraciones.
+La lista permite buscar por título o contenido y recorrer páginas de 30 entradas.
+Al abrir una entrada se renderiza Markdown, incluidos los diagramas Mermaid, y se
+puede copiar el texto original.
+
+Las entradas gestionadas se modifican mediante la operación de memoria para
+mantener revisión y contenido estructurado consistentes. El CRUD normal de logs
+rechaza su edición o borrado con 409. Los documentos manuales mantienen su editor.
 
 La captura depende del agente y de las fuentes a las que tenga acceso. La skill no
 garantiza ejecución al cerrar abruptamente ni instala hooks. No hay búsqueda

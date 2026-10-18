@@ -4,13 +4,15 @@ import "time"
 
 // Entidad principal para los logs en crudo de un proyecto
 type ProjectLog struct {
-	ID            int       `json:"id"`
-	ProyectoID    int       `json:"proyecto_id"`
-	UserID        int       `json:"user_id"`
-	Titulo        string    `json:"titulo"`
-	ContenidoRaw  string    `json:"contenido_raw"`
-	FechaCreacion time.Time `json:"fecha_creacion"`
-	Eliminado     bool      `json:"eliminado"`
+	ID                 int       `json:"id"`
+	ProyectoID         int       `json:"proyecto_id"`
+	UserID             int       `json:"user_id"`
+	Titulo             string    `json:"titulo"`
+	ContenidoRaw       string    `json:"contenido_raw"`
+	FechaCreacion      time.Time `json:"fecha_creacion"`
+	FechaActualizacion time.Time `json:"fecha_actualizacion"`
+	Eliminado          bool      `json:"eliminado"`
+	Gestionado         bool      `json:"gestionado"`
 }
 
 // Datos necesarios para la creación de un log en crudo

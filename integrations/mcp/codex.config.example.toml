@@ -1,0 +1,3 @@
+[mcp_servers.cassandra-memory]
+command = "/ruta/absoluta/cassandra-memory-mcp"
+env_vars = ["CASSANDRA_URL", "CASSANDRA_API_KEY"]
