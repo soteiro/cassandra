@@ -1,0 +1,34 @@
+<div class="space-y-5">
+  <div role="tablist" aria-label="Documentos y bitácora" class="flex gap-2 border-b border-surface-border">
+    <button #documentsButton type="button" role="tab" [id]="'documents-subtab-' + projectId()"
+      [attr.aria-controls]="'documents-panel-' + projectId()" [attr.aria-selected]="section() === 'documentos'"
+      [attr.tabindex]="section() === 'documentos' ? 0 : -1" (click)="select('documentos')"
+      (keydown.arrowleft)="navigate($event, 'logs', logsButton)" (keydown.arrowright)="navigate($event, 'logs', logsButton)"
+      (keydown.home)="navigate($event, 'documentos', documentsButton)" (keydown.end)="navigate($event, 'logs', logsButton)"
+      class="min-h-11 px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-main aria-selected:text-primary aria-selected:border-primary cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+      Documentos
+    </button>
+    <button #logsButton type="button" role="tab" [id]="'logs-subtab-' + projectId()"
+      [attr.aria-controls]="'logs-panel-' + projectId()" [attr.aria-selected]="section() === 'logs'"
+      [attr.tabindex]="section() === 'logs' ? 0 : -1" (click)="select('logs')"
+      (keydown.arrowleft)="navigate($event, 'documentos', documentsButton)" (keydown.arrowright)="navigate($event, 'documentos', documentsButton)"
+      (keydown.home)="navigate($event, 'documentos', documentsButton)" (keydown.end)="navigate($event, 'logs', logsButton)"
+      class="min-h-11 px-4 py-2 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-main aria-selected:text-primary aria-selected:border-primary cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+      Project logs
+    </button>
+  </div>
+
+  <div role="tabpanel" [id]="'documents-panel-' + projectId()" [attr.aria-labelledby]="'documents-subtab-' + projectId()" [hidden]="section() !== 'documentos'">
+    @if (hasError()) {
+      <div role="alert" class="p-5 rounded-xl border border-surface-border bg-surface">
+        <p class="text-sm text-text-main">No se pudieron cargar los documentos.</p>
+        <button type="button" (click)="reload.emit()" class="min-h-11 mt-2 text-sm text-primary underline cursor-pointer">Reintentar documentos</button>
+      </div>
+    } @else {
+      <app-documents-tab [projectId]="projectId()" [documentos]="documentos()" [isLoading]="isLoading()" (reload)="reload.emit()" />
+    }
+  </div>
+  <div role="tabpanel" [id]="'logs-panel-' + projectId()" [attr.aria-labelledby]="'logs-subtab-' + projectId()" [hidden]="section() !== 'logs'">
+    @if (logsVisited()) { <app-project-logs-tab [projectId]="projectId()" /> }
+  </div>
+</div>

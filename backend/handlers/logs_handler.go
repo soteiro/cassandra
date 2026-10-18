@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -14,7 +15,7 @@ import (
 )
 
 type LogsHandler struct {
-	repo *repository.LogsRepository
+	repo  *repository.LogsRepository
 	owner *repository.Ownership
 }
 
@@ -95,7 +96,27 @@ func (h *LogsHandler) GetLogsByProyecto(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	logsList, err := h.repo.GetByProyectoID(r.Context(), userID, proyectID)
+	limit, offset := 0, 0
+	if raw := r.URL.Query().Get("limit"); raw != "" {
+		limit, err = strconv.Atoi(raw)
+		if err != nil || limit < 1 || limit > 100 {
+			http.Error(w, "limit debe estar entre 1 y 100", http.StatusBadRequest)
+			return
+		}
+	}
+	if raw := r.URL.Query().Get("offset"); raw != "" {
+		offset, err = strconv.Atoi(raw)
+		if err != nil || offset < 0 || offset > 10000 {
+			http.Error(w, "offset inválido", http.StatusBadRequest)
+			return
+		}
+	}
+	search := r.URL.Query().Get("q")
+	if len(search) > 300 {
+		http.Error(w, "Búsqueda demasiado larga", http.StatusBadRequest)
+		return
+	}
+	logsList, err := h.repo.SearchByProyectoID(r.Context(), userID, proyectID, search, limit, offset)
 	if err != nil {
 		log.Printf("[HANDLER:Logs.GetLogsByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
 		dbError(w, "error al obtener logs", err)
@@ -208,4 +229,3 @@ func (h *LogsHandler) DeleteLog(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[HANDLER:Logs.DeleteLog] Éxito: log eliminado | id=%d user_id=%d", id, userID)
 	w.WriteHeader(http.StatusNoContent)
 }
-

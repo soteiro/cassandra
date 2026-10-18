@@ -1,0 +1,65 @@
+@if (selected(); as log) {
+  <article class="bg-surface border border-surface-border rounded-2xl p-5 md:p-6 min-w-0 space-y-5">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-surface-border pb-4">
+      <button type="button" (click)="back()" class="min-h-11 px-3 text-sm text-text-muted hover:text-text-main cursor-pointer rounded-lg focus-visible:outline-2 focus-visible:outline-primary">Volver a Project logs</button>
+      <button type="button" (click)="copy(log)" [disabled]="copying()" class="min-h-11 px-3 text-sm font-medium border border-surface-border rounded-lg hover:bg-surface-border/50 cursor-pointer disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary">{{ copying() ? 'Copiando…' : 'Copiar Markdown' }}</button>
+    </div>
+    <header class="space-y-2">
+      <h2 #detailTitle tabindex="-1" class="text-xl font-bold text-text-main break-words">{{ log.titulo || 'Log sin título' }}</h2>
+      <p class="text-sm text-text-muted">{{ log.fecha_creacion | date:'dd/MM/yyyy, HH:mm' }}</p>
+      @if (log.fecha_actualizacion !== log.fecha_creacion) {
+        <p class="text-xs text-text-muted">Actualizado: {{ log.fecha_actualizacion | date:'dd/MM/yyyy, HH:mm' }}</p>
+      }
+      @if (log.gestionado) { <p class="text-xs text-text-muted">Esta entrada se actualiza con la memoria del proyecto.</p> }
+    </header>
+    <p role="status" class="text-sm text-text-muted">{{ copyStatus() }}</p>
+    <div class="prose-container max-w-none text-text-main min-w-0 break-words overflow-x-auto" [innerHTML]="html()" [appMermaid]="html()"></div>
+  </article>
+} @else {
+  <section class="space-y-5" aria-label="Bitácora del proyecto" [attr.aria-busy]="resource.isLoading()">
+    <header class="flex flex-wrap gap-4 items-start justify-between">
+      <div>
+        <h2 class="text-lg font-bold text-text-main">Project logs</h2>
+        <p class="text-sm text-text-muted mt-1">Avances, decisiones y exploraciones del proyecto.</p>
+      </div>
+      <button type="button" (click)="resource.reload()" [disabled]="resource.isLoading()" class="min-h-11 px-3 text-sm border border-surface-border rounded-lg hover:bg-surface-border/50 cursor-pointer disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary">Actualizar</button>
+    </header>
+    <div>
+      <label [for]="'log-search-' + projectId()" class="block text-sm font-medium text-text-main mb-2">Buscar en Project logs</label>
+      <input #searchInput [id]="'log-search-' + projectId()" type="search" [value]="query()" (input)="search(searchInput.value)"
+        maxlength="100" placeholder="Título o contenido" class="w-full min-h-11 bg-background border border-surface-border rounded-xl px-3 py-2 text-text-main placeholder:text-text-muted focus-visible:outline-2 focus-visible:outline-primary" />
+    </div>
+    @if (resource.isLoading()) {
+      <p role="status" class="py-6 text-sm text-text-muted">Cargando Project logs…</p>
+    } @else if (resource.error()) {
+      <div role="alert" class="p-5 bg-surface border border-surface-border rounded-xl">
+        <p class="text-sm text-text-main">No se pudo cargar la bitácora.</p>
+        <button type="button" (click)="resource.reload()" class="min-h-11 mt-2 text-sm text-primary underline cursor-pointer focus-visible:outline-2 focus-visible:outline-primary">Reintentar Project logs</button>
+      </div>
+    } @else if (logs().length === 0) {
+      <div class="py-8 text-center border border-dashed border-surface-border rounded-xl">
+        <p class="text-sm font-medium text-text-main">{{ query().trim() ? 'No hay logs que coincidan con la búsqueda.' : 'Todavía no hay logs en este proyecto.' }}</p>
+        <p class="mt-2 text-sm text-text-muted">{{ query().trim() ? 'Prueba con otro título o palabra del contenido.' : 'Los avances que registres en la bitácora aparecerán aquí.' }}</p>
+      </div>
+    } @else {
+      <ol class="divide-y divide-surface-border border-y border-surface-border">
+        @for (log of logs(); track log.id) {
+          <li>
+            <button #logButton type="button" [attr.data-log-id]="log.id" (click)="open(log)"
+              class="w-full min-h-16 text-left py-4 px-2 rounded-lg hover:bg-surface-border/30 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              <span class="block font-semibold text-sm text-text-main break-words">{{ log.titulo || 'Log sin título' }}</span>
+              <span class="block mt-2 text-xs text-text-muted">{{ log.fecha_creacion | date:'dd/MM/yyyy, HH:mm' }}@if (log.gestionado) { · Memoria del proyecto }</span>
+            </button>
+          </li>
+        }
+      </ol>
+    }
+    @if (offset() > 0 || hasMore()) {
+      <nav aria-label="Páginas de Project logs" class="flex items-center justify-between gap-3">
+        <button type="button" (click)="page(-1)" [disabled]="offset() === 0 || resource.isLoading()" class="min-h-11 px-3 text-sm border border-surface-border rounded-lg cursor-pointer disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary">Anterior</button>
+        <span class="text-xs text-text-muted" role="status">Desde la entrada {{ offset() + 1 }}</span>
+        <button type="button" (click)="page(1)" [disabled]="!hasMore() || resource.isLoading()" class="min-h-11 px-3 text-sm border border-surface-border rounded-lg cursor-pointer disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary">Siguiente</button>
+      </nav>
+    }
+  </section>
+}

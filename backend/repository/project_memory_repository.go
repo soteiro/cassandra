@@ -35,7 +35,7 @@ func (r *ProjectMemoryRepository) Context(ctx context.Context, userID, projectID
 		return nil, err
 	}
 	var content []byte
-	err = tx.QueryRow(ctx, `SELECT revision,contenido,documento_id,fecha_actualizacion FROM memoria_proyectos WHERE proyecto_id=$1 AND user_id=$2`, projectID, userID).Scan(&out.Revision, &content, &out.DocumentoID, &out.FechaActualizacion)
+	err = tx.QueryRow(ctx, `SELECT revision,contenido,log_id,fecha_actualizacion FROM memoria_proyectos WHERE proyecto_id=$1 AND user_id=$2`, projectID, userID).Scan(&out.Revision, &content, &out.LogID, &out.FechaActualizacion)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
@@ -59,14 +59,14 @@ func (r *ProjectMemoryRepository) Context(ctx context.Context, userID, projectID
 	return out, tx.Commit(ctx)
 }
 
-const entryColumns = `SELECT id,titulo,contenido,tipo,estado,fuentes,sustituye_id,documento_id,fecha_creacion FROM memoria_fichas`
+const entryColumns = `SELECT id,titulo,contenido,tipo,estado,fuentes,sustituye_id,log_id,fecha_creacion FROM memoria_fichas`
 
 func readMemoryEntries(rows pgx.Rows) ([]models.MemoryEntry, error) {
 	out := []models.MemoryEntry{}
 	for rows.Next() {
 		var e models.MemoryEntry
 		var sources []byte
-		if err := rows.Scan(&e.ID, &e.Titulo, &e.Contenido, &e.Tipo, &e.Estado, &sources, &e.SustituyeID, &e.DocumentoID, &e.FechaCreacion); err != nil {
+		if err := rows.Scan(&e.ID, &e.Titulo, &e.Contenido, &e.Tipo, &e.Estado, &sources, &e.SustituyeID, &e.LogID, &e.FechaCreacion); err != nil {
 			return nil, err
 		}
 		if err := json.Unmarshal(sources, &e.Fuentes); err != nil {
@@ -109,7 +109,7 @@ func (r *ProjectMemoryRepository) Search(ctx context.Context, userID, projectID 
 }
 
 // Write es la operación compartida para REST y MCP: bloqueo por proyecto,
-// idempotencia, comparación de revisión y documentos en una sola transacción.
+// idempotencia, comparación de revisión y bitácora en una sola transacción.
 func (r *ProjectMemoryRepository) Write(ctx context.Context, userID, projectID int, keyID int64, req models.MemoryWriteRequest) (*models.MemoryWriteResult, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ func (r *ProjectMemoryRepository) Write(ctx context.Context, userID, projectID i
 		return nil, err
 	}
 	result := &models.MemoryWriteResult{FichaIDs: []int64{}}
-	if err := tx.QueryRow(ctx, `SELECT revision,documento_id FROM memoria_proyectos WHERE proyecto_id=$1 AND user_id=$2`, projectID, userID).Scan(&result.Revision, &result.DocumentoID); err != nil {
+	if err := tx.QueryRow(ctx, `SELECT revision,log_id FROM memoria_proyectos WHERE proyecto_id=$1 AND user_id=$2`, projectID, userID).Scan(&result.Revision, &result.LogID); err != nil {
 		return nil, err
 	}
 	if result.Revision != *req.RevisionEsperada {
@@ -165,33 +165,29 @@ func (r *ProjectMemoryRepository) Write(ctx context.Context, userID, projectID i
 			return nil, err
 		}
 		content = data
-		docID, err := writeMemoryDocument(ctx, tx, userID, projectID, result.DocumentoID, "Memoria actual", req.Memoria.Markdown(), "general")
+		logID, err := writeMemoryLog(ctx, tx, userID, projectID, result.LogID, "Memoria actual", req.Memoria.Markdown())
 		if err != nil {
 			return nil, err
 		}
-		result.DocumentoID = &docID
+		result.LogID = &logID
 	}
 	for _, entry := range req.Fichas {
 		if entry.SustituyeID != nil {
-			var oldDocID *int
+			var oldLogID *int
 			err := tx.QueryRow(ctx, `UPDATE memoria_fichas SET estado='sustituida'
 				WHERE id=$1 AND proyecto_id=$2 AND user_id=$3 AND estado<>'sustituida'
-				RETURNING documento_id`, *entry.SustituyeID, projectID, userID).Scan(&oldDocID)
+				RETURNING log_id`, *entry.SustituyeID, projectID, userID).Scan(&oldLogID)
 			if err != nil {
 				return nil, err
 			}
-			if oldDocID != nil {
-				// Preservar fuentes y contenido del documento anterior, solo indicar el estado.
-				if _, err := tx.Exec(ctx, `UPDATE documentos_proyecto SET contenido=regexp_replace(contenido,'^Estado: \*\*[^\n]+','Estado: **sustituida**'),fecha_actualizacion=CURRENT_TIMESTAMP WHERE id=$1 AND user_id=$2 AND proyecto_id=$3`, *oldDocID, userID, projectID); err != nil {
+			if oldLogID != nil {
+				// Preservar fuentes y contenido de la entrada anterior, solo indicar el estado.
+				if _, err := tx.Exec(ctx, `UPDATE project_logs SET contenido_raw=regexp_replace(contenido_raw,'^Estado: \*\*[^\n]+','Estado: **sustituida**'),fecha_actualizacion=CURRENT_TIMESTAMP WHERE id=$1 AND user_id=$2 AND proyecto_id=$3`, *oldLogID, userID, projectID); err != nil {
 					return nil, err
 				}
 			}
 		}
-		docType := "decision"
-		if entry.Tipo == "exploracion" {
-			docType = "investigacion"
-		}
-		docID, err := writeMemoryDocument(ctx, tx, userID, projectID, nil, entry.Titulo, entry.Markdown(), docType)
+		logID, err := writeMemoryLog(ctx, tx, userID, projectID, nil, entry.Titulo, entry.Markdown())
 		if err != nil {
 			return nil, err
 		}
@@ -200,15 +196,15 @@ func (r *ProjectMemoryRepository) Write(ctx context.Context, userID, projectID i
 			return nil, err
 		}
 		var entryID int64
-		err = tx.QueryRow(ctx, `INSERT INTO memoria_fichas(proyecto_id,user_id,titulo,contenido,tipo,estado,fuentes,sustituye_id,documento_id)
-			VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`, projectID, userID, entry.Titulo, entry.Contenido, entry.Tipo, entry.Estado, sources, entry.SustituyeID, docID).Scan(&entryID)
+		err = tx.QueryRow(ctx, `INSERT INTO memoria_fichas(proyecto_id,user_id,titulo,contenido,tipo,estado,fuentes,sustituye_id,log_id)
+			VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`, projectID, userID, entry.Titulo, entry.Contenido, entry.Tipo, entry.Estado, sources, entry.SustituyeID, logID).Scan(&entryID)
 		if err != nil {
 			return nil, err
 		}
 		result.FichaIDs = append(result.FichaIDs, entryID)
 	}
 	result.Revision++
-	if _, err := tx.Exec(ctx, `UPDATE memoria_proyectos SET revision=$1,contenido=COALESCE($2::jsonb,contenido),documento_id=$3,fecha_actualizacion=CURRENT_TIMESTAMP WHERE proyecto_id=$4 AND user_id=$5`, result.Revision, content, result.DocumentoID, projectID, userID); err != nil {
+	if _, err := tx.Exec(ctx, `UPDATE memoria_proyectos SET revision=$1,contenido=COALESCE($2::jsonb,contenido),log_id=$3,fecha_actualizacion=CURRENT_TIMESTAMP WHERE proyecto_id=$4 AND user_id=$5`, result.Revision, content, result.LogID, projectID, userID); err != nil {
 		return nil, err
 	}
 	resultJSON, err := json.Marshal(result)
@@ -228,16 +224,16 @@ func (r *ProjectMemoryRepository) Write(ctx context.Context, userID, projectID i
 	return result, nil
 }
 
-func writeMemoryDocument(ctx context.Context, tx pgx.Tx, userID, projectID int, existing *int, title, content, kind string) (int, error) {
+func writeMemoryLog(ctx context.Context, tx pgx.Tx, userID, projectID int, existing *int, title, content string) (int, error) {
 	var id int
 	if existing != nil {
-		err := tx.QueryRow(ctx, `UPDATE documentos_proyecto SET titulo=$1,contenido=$2,tipo=$3,tags='memoria,gestionado-por-agente',gestionado=true,eliminado=false,fecha_actualizacion=CURRENT_TIMESTAMP
-			WHERE id=$4 AND user_id=$5 AND proyecto_id=$6 RETURNING id`, title, content, kind, *existing, userID, projectID).Scan(&id)
+		err := tx.QueryRow(ctx, `UPDATE project_logs SET titulo=$1,contenido_raw=$2,gestionado=true,eliminado=false,fecha_actualizacion=CURRENT_TIMESTAMP
+			WHERE id=$3 AND user_id=$4 AND proyecto_id=$5 AND gestionado=true RETURNING id`, title, content, *existing, userID, projectID).Scan(&id)
 		if !errors.Is(err, pgx.ErrNoRows) {
 			return id, err
 		}
 	}
-	err := tx.QueryRow(ctx, `INSERT INTO documentos_proyecto(proyecto_id,user_id,titulo,contenido,tipo,tags,gestionado)
-		VALUES($1,$2,$3,$4,$5,'memoria,gestionado-por-agente',true) RETURNING id`, projectID, userID, title, content, kind).Scan(&id)
+	err := tx.QueryRow(ctx, `INSERT INTO project_logs(proyecto_id,user_id,titulo,contenido_raw,gestionado)
+		VALUES($1,$2,$3,$4,true) RETURNING id`, projectID, userID, title, content).Scan(&id)
 	return id, err
 }

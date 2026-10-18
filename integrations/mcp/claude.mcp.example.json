@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "cassandra-memory": {
+      "type": "stdio",
+      "command": "/ruta/absoluta/cassandra-memory-mcp",
+      "env": {
+        "CASSANDRA_URL": "${CASSANDRA_URL}",
+        "CASSANDRA_API_KEY": "${CASSANDRA_API_KEY}"
+      }
+    }
+  }
+}

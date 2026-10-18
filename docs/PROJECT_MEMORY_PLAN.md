@@ -19,7 +19,7 @@ fuentes. La memoria se actualiza; el historial se consulta por demanda.
    revocación, proyectos autorizados y permisos `memory:read` / `memory:write`.
 4. [x] Implementar operaciones compartidas de contexto, búsqueda y guardado atómico.
    Validar longitudes, estados y fuentes; usar revisión esperada contra escrituras
-   concurrentes. Mostrar la memoria y fichas como documentos en la interfaz existente.
+   concurrentes. Mostrar la memoria y fichas en la bitácora del proyecto.
 5. [x] Exponer REST de memoria con autenticación acotada. Una key de memoria no
    permite acceder a finanzas, CRM, administración de keys ni REST general.
 6. [x] Crear un conector MCP local stdio con el SDK oficial Go. Se conecta por HTTPS
@@ -34,6 +34,9 @@ fuentes. La memoria se actualiza; el historial se consulta por demanda.
    mediante el proceso de release existente.
 10. [x] Añadir **Claves API** a la web y al menú móvil: generación con proyectos,
     permisos y vencimiento; copia del secreto una sola vez, listado y revocación.
+11. [x] Separar **Documentos** y **Project logs** dentro de Documentos. Renderizar
+    la bitácora con Markdown/Mermaid, búsqueda y paginación. Persistir las copias de
+    memoria en `project_logs` y migrar las anteriores conservando los datos manuales.
 
 ## Decisiones de esta entrega
 
@@ -48,8 +51,10 @@ fuentes. La memoria se actualiza; el historial se consulta por demanda.
   HTTP ni se implementa OAuth en esta entrega.
 - Las fichas sustituidas conservan su contenido y fuentes. Los reintentos con el
   mismo identificador y otro contenido se rechazan.
-- Los documentos reflejan la memoria para leerla en la web actual; la versión
-  estructurada es la fuente de las operaciones del agente.
+- Los logs reflejan la memoria para leerla en la web; la versión estructurada es
+  la fuente de las operaciones del agente. Los documentos quedan para el contenido
+  que redacta el usuario. La migración 30 oculta las copias gestionadas anteriores
+  después de trasladarlas, y conserva las referencias y resultados idempotentes.
 - La skill se versiona en `integrations/skills/cassandra-memory/` para poder
   instalarla en cada agente. No se modifican configuraciones personales del usuario.
 - El diseño local previo en `docs/MCP_DESIGN.md` describe otro flujo de tareas.
@@ -58,14 +63,14 @@ fuentes. La memoria se actualiza; el historial se consulta por demanda.
 ## Aceptación
 
 - Un agente puede leer contexto y guardar un avance y una decisión usando una key
-  limitada a un proyecto propio. La memoria es visible en Documentos del proyecto.
+  limitada a un proyecto propio. La memoria es visible en Documentos → Project logs.
 - Otro usuario/proyecto o un permiso insuficiente nunca permite leer ni escribir.
 - Una key revocada/vencida o de un usuario eliminado deja de servir; los listados
   de keys no revelan el secreto ni su huella.
 - Se puede generar una key desde la interfaz, copiarla o seleccionarla manualmente,
   descartar el secreto y revocar con confirmación. Los errores permiten reintentar.
 - Un reintento devuelve el resultado original; una revisión obsoleta no pisa un
-  avance de otro agente. Un fallo no deja documentos/fichas parcialmente escritos.
+  avance de otro agente. Un fallo no deja logs/fichas parcialmente escritos.
 - El servidor rechaza memoria/fichas demasiado largas y el contexto/búsqueda están
   acotados. La exploración no se presenta como trabajo ya implementado.
 - Pruebas y migraciones se ejecutan contra una base desechable. Publicación y
@@ -79,13 +84,16 @@ fuentes. La memoria se actualiza; el historial se consulta por demanda.
 - Recorrido de cliente MCP real a REST y PostgreSQL: las cuatro herramientas
   funcionan. Prueba adicional del ejecutable por stdin/stdout: inicialización y
   descubrimiento de herramientas correctos, sin exponer el secreto.
-- Límites, referencias cruzadas, expiración, revocación, aislamiento, documentos
-  gestionados, rollback e idempotencia cubiertos por integración. Último ajuste
-  de campos vacíos/truncados comprobado con pruebas focalizadas.
-- Componente Documentos: 29 pruebas correctas. Build de producción de Angular
-  correcto. Chromium a 390 y 1280 px con API simulada: memoria de solo lectura,
-  copia disponible, documentos manuales editables y sin desbordamiento horizontal.
-  Capturas temporales: `/tmp/cassandra-memory-ui/`.
+- Límites, referencias cruzadas, expiración, revocación, aislamiento, logs
+  gestionados, rollback e idempotencia cubiertos por integración. La migración 30
+  se prueba desde la versión 29 y al revertirse: conserva contenido, documentos y
+  logs manuales, títulos de 160 caracteres y resultados de reintentos anteriores.
+- Documentos, subpestañas, Project logs, servicio y renderizador Markdown: 82
+  pruebas correctas. Chromium a 390 y 1280 px con API simulada: Markdown/Mermaid,
+  portapapeles real, búsqueda, paginación, errores recuperables y navegación por
+  teclado correctos. El borrador de documentos se conserva al cambiar de pestaña.
+  AXE sin infracciones y sin desbordamiento horizontal. Los bloques de código
+  admiten desplazamiento mediante teclado. Capturas: `/tmp/cassandra-logs-ui/`.
 - Gestión de claves: 29 pruebas correctas entre pantalla, servicio y barra lateral.
   Chromium a 390 y 1280 px con API simulada: generación, portapapeles real,
   descarte del secreto, recarga sin recuperarlo y revocación correctos, sin
