@@ -54,6 +54,9 @@ func NewRouter(opts Options) http.Handler {
 	finanzasHandler := handlers.NewFinanzasHandler(repository.NewFinanzasRepository(db), owner)
 	listaDeseosHandler := handlers.NewListaDeseosHandler(repository.NewListaDeseosRepository(db), owner)
 	documentosProyectoHandler := handlers.NewDocumentosProyectoHandler(repository.NewDocumentosProyectoRepository(db), owner)
+	apiKeysRepo := repository.NewAPIKeyRepository(db)
+	apiKeysHandler := handlers.NewAPIKeysHandler(apiKeysRepo)
+	memoryHandler := handlers.NewProjectMemoryHandler(repository.NewProjectMemoryRepository(db))
 	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
 	pronosticosHandler := handlers.NewPronosticosHandler(repository.NewPronosticosRepository(db), owner)
 	revisionHandler := handlers.NewRevisionHandler(repository.NewRevisionRepository(db))
@@ -89,8 +92,19 @@ func NewRouter(opts Options) http.Handler {
 	})
 
 	// Grupo de rutas protegidas
+	// Las keys se aceptan exclusivamente aquí, con permisos por operación/proyecto.
+	r.Route("/api/memory", func(r chi.Router) {
+		r.Use(middleware.MemoryAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
+		r.Get("/projects/{project_id}", memoryHandler.Context)
+		r.Get("/projects/{project_id}/entries", memoryHandler.Search)
+		r.Post("/projects/{project_id}/advances", memoryHandler.Write)
+	})
+
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware(cfg.JwtSecret, userRepo))
+		r.Get("/api/api-keys", apiKeysHandler.List)
+		r.Post("/api/api-keys", apiKeysHandler.Create)
+		r.Delete("/api/api-keys/{key_id}", apiKeysHandler.Revoke)
 
 		// Las cuentas se crean desde la terminal del servidor (cassandra-app create-user).
 		r.Get("/api/users/{id}", userHandler.GetUser)

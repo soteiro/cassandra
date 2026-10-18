@@ -2,16 +2,32 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
 	"cassandra/models"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DocumentosProyectoRepository struct {
 	db *pgxpool.Pool
+}
+
+var ErrManagedDocument = errors.New("este documento se actualiza mediante la memoria del proyecto")
+
+func (r *DocumentosProyectoRepository) managedError(ctx context.Context, id, userID int, original error) error {
+	var managed bool
+	err := r.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM documentos_proyecto WHERE id=$1 AND user_id=$2 AND gestionado=true AND eliminado=false)`, id, userID).Scan(&managed)
+	if err != nil {
+		return err
+	}
+	if managed {
+		return ErrManagedDocument
+	}
+	return original
 }
 
 func NewDocumentosProyectoRepository(db *pgxpool.Pool) *DocumentosProyectoRepository {
@@ -28,7 +44,7 @@ func (r *DocumentosProyectoRepository) Create(ctx context.Context, req *models.C
 	query := `
 	INSERT INTO documentos_proyecto (proyecto_id, user_id, titulo, contenido, tipo, tags)
 	VALUES ($1, $2, $3, $4, $5, $6)
-	RETURNING id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado
+	RETURNING id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado, gestionado
 	`
 
 	err := r.db.QueryRow(
@@ -51,6 +67,7 @@ func (r *DocumentosProyectoRepository) Create(ctx context.Context, req *models.C
 		&doc.FechaCreacion,
 		&doc.FechaActualizacion,
 		&doc.Eliminado,
+		&doc.Gestionado,
 	)
 
 	if err != nil {
@@ -67,7 +84,7 @@ func (r *DocumentosProyectoRepository) GetByProyectoID(ctx context.Context, proy
 
 	if tipoFilter != "" && tipoFilter != "todas" && tipoFilter != "todos" {
 		query = `
-		SELECT id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado
+		SELECT id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado, gestionado
 		FROM documentos_proyecto
 		WHERE proyecto_id = $1
 		  AND user_id = $2
@@ -78,7 +95,7 @@ func (r *DocumentosProyectoRepository) GetByProyectoID(ctx context.Context, proy
 		args = []interface{}{proyectoID, userID, tipoFilter}
 	} else {
 		query = `
-		SELECT id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado
+		SELECT id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado, gestionado
 		FROM documentos_proyecto
 		WHERE proyecto_id = $1
 		  AND user_id = $2
@@ -109,6 +126,7 @@ func (r *DocumentosProyectoRepository) GetByProyectoID(ctx context.Context, proy
 			&doc.FechaCreacion,
 			&doc.FechaActualizacion,
 			&doc.Eliminado,
+			&doc.Gestionado,
 		)
 		if err != nil {
 			log.Printf("[REPO:DocumentosProyecto.GetByProyectoID] Error al escanear fila: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
@@ -127,7 +145,7 @@ func (r *DocumentosProyectoRepository) GetByProyectoID(ctx context.Context, proy
 func (r *DocumentosProyectoRepository) GetByID(ctx context.Context, id int, userID int) (*models.DocumentoResponse, error) {
 	var doc models.DocumentoResponse
 	query := `
-	SELECT id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado
+	SELECT id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado, gestionado
 	FROM documentos_proyecto
 	WHERE id = $1
 	  AND user_id = $2
@@ -145,6 +163,7 @@ func (r *DocumentosProyectoRepository) GetByID(ctx context.Context, id int, user
 		&doc.FechaCreacion,
 		&doc.FechaActualizacion,
 		&doc.Eliminado,
+		&doc.Gestionado,
 	)
 
 	if err != nil {
@@ -170,7 +189,8 @@ func (r *DocumentosProyectoRepository) Update(ctx context.Context, id int, userI
 	WHERE id = $6
 	  AND user_id = $7
 	  AND eliminado = false
-	RETURNING id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado
+	  AND gestionado = false
+	RETURNING id, proyecto_id, user_id, titulo, contenido, tipo, tags, fecha_creacion, fecha_actualizacion, eliminado, gestionado
 	`
 
 	err := r.db.QueryRow(
@@ -194,9 +214,13 @@ func (r *DocumentosProyectoRepository) Update(ctx context.Context, id int, userI
 		&doc.FechaCreacion,
 		&doc.FechaActualizacion,
 		&doc.Eliminado,
+		&doc.Gestionado,
 	)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, r.managedError(ctx, id, userID, err)
+		}
 		log.Printf("[REPO:DocumentosProyecto.Update] Error en SQL UPDATE: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
 	}
@@ -208,7 +232,7 @@ func (r *DocumentosProyectoRepository) Delete(ctx context.Context, id int, userI
 	query := `
 	UPDATE documentos_proyecto
 	SET eliminado = true, fecha_actualizacion = CURRENT_TIMESTAMP
-	WHERE id = $1 AND user_id = $2 AND eliminado = false
+	WHERE id = $1 AND user_id = $2 AND eliminado = false AND gestionado = false
 	`
 
 	res, err := r.db.Exec(ctx, query, id, userID)
@@ -218,7 +242,7 @@ func (r *DocumentosProyectoRepository) Delete(ctx context.Context, id int, userI
 	}
 
 	if res.RowsAffected() == 0 {
-		return fmt.Errorf("%w: documento no encontrado o sin permisos", ErrNoEncontrado)
+		return r.managedError(ctx, id, userID, fmt.Errorf("%w: documento no encontrado o sin permisos", ErrNoEncontrado))
 	}
 
 	return nil

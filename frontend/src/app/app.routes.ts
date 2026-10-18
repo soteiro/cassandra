@@ -55,6 +55,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/revision/revision').then((m) => m.Revision),
       },
       {
+        path: 'claves-api',
+        loadComponent: () => import('./pages/api-keys/api-keys').then((m) => m.ApiKeys),
+      },
+      {
         path: 'docs',
         loadComponent: () => import('./pages/docs/docs').then((m) => m.Docs),
       },

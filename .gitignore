@@ -5,6 +5,7 @@
 
 # Compiled binaries
 cassandra-app
+/cassandra-memory-mcp
 cassandra-mobile.apk
 *.exe
 

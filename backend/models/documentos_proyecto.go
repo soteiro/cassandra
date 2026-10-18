@@ -13,6 +13,7 @@ type DocumentoProyecto struct {
 	FechaCreacion      time.Time `json:"fecha_creacion"`
 	FechaActualizacion time.Time `json:"fecha_actualizacion"`
 	Eliminado          bool      `json:"eliminado"`
+	Gestionado         bool      `json:"gestionado"`
 }
 
 type CreateDocumentoRequest struct {

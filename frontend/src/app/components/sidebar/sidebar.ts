@@ -16,6 +16,7 @@ import {
   LucideBookOpen,
   LucideWalletMinimal,
   LucideRefreshCw,
+  LucideKeyRound,
 } from '@lucide/angular';
 
 @Component({
@@ -32,6 +33,7 @@ import {
     LucideBookOpen,
     LucideWalletMinimal,
     LucideRefreshCw,
+    LucideKeyRound,
   ],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',

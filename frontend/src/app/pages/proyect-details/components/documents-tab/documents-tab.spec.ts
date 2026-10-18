@@ -69,6 +69,22 @@ describe('DocumentsTab', () => {
     fixture.detectChanges();
   };
 
+  it('keeps managed memory readable and copyable without an independent editor', async () => {
+    const managed = makeDoc({ titulo: 'Memoria actual', gestionado: true });
+    fixture.componentRef.setInput('documentos', [managed]);
+    await render();
+    expect(el.querySelector('button[title="Editar documento"]')).toBeNull();
+    expect(el.querySelector('button[title="Eliminar documento"]')).toBeNull();
+    expect(el.querySelector('button[title="Copiar Markdown"]')).not.toBeNull();
+    component.openDetail(managed);
+    await render();
+    const actions = Array.from(el.querySelectorAll('button')).map((b) => b.textContent?.trim());
+    expect(actions).not.toContain('Editar');
+    expect(actions).not.toContain('Eliminar');
+    expect(actions).toContain('Copiar Markdown');
+    expect(el.textContent).toContain('Este documento se actualiza con la memoria del proyecto.');
+  });
+
   describe('list mode rendering', () => {
     it('should show loading state', async () => {
       fixture.componentRef.setInput('isLoading', true);

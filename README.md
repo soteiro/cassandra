@@ -7,6 +7,7 @@ con Capacitor.
 - **Autoalojar tu instancia:** [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md)
 - **Descargas** (binario del servidor y APK): [Releases](https://github.com/soteiro/cassandra/releases)
 - **Cambios por versión:** [CHANGELOG.md](CHANGELOG.md)
+- **Memoria de proyectos y MCP:** [docs/PROJECT_MEMORY.md](docs/PROJECT_MEMORY.md)
 
 ## Desarrollo
 

@@ -19,6 +19,7 @@ export interface DocumentoProyecto {
   fecha_creacion: string;
   fecha_actualizacion: string;
   eliminado: boolean;
+  gestionado?: boolean;
 }
 
 export interface CreateDocumentoRequest {
