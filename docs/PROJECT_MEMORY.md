@@ -69,7 +69,9 @@ make build-memory-mcp
 ```
 
 Produce `./cassandra-memory-mcp`, independiente del binario del servidor. El
-conector requiere `CASSANDRA_URL` y `CASSANDRA_API_KEY` en su entorno. HTTPS es
+conector requiere `CASSANDRA_URL` y `CASSANDRA_API_KEY` en su entorno; sin
+`CASSANDRA_API_KEY` usa la key guardada del proyecto vinculado (ver
+[guía de clientes MCP](MCP_CLIENT_SETUP.md#alternativa-un-mcp-global-con-una-key-por-proyecto)). HTTPS es
 obligatorio salvo `localhost`, `127.0.0.1` o `::1` para pruebas. No sigue
 redirecciones. stdout está reservado al protocolo MCP; los diagnósticos van a stderr.
 

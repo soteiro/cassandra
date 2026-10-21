@@ -62,6 +62,42 @@ Reemplazar el ID de ejemplo por el del proyecto de QA y el dominio por su URL.
 Este archivo orienta al agente; el conector se conecta a `CASSANDRA_URL`.
 Mantener ambas URL iguales. La API key determina los proyectos permitidos.
 
+### Alternativa: un MCP global con una key por proyecto
+
+Si registras el conector una sola vez para todo tu usuario, no definas
+`CASSANDRA_API_KEY`. Sin esa variable, el conector toma el `proyecto_id` de
+`.cassandra-memory.json` (en el directorio de trabajo o hasta la raíz del repositorio)
+y lee la key de `~/.config/cassandra-memory/<servidor>/<proyecto_id>.key`.
+
+1. Registrar el conector sin key (el cliente lo inicia en el directorio del repo):
+
+   ```bash
+   claude mcp add --scope user cassandra-memory \
+     -e CASSANDRA_URL=https://qa.ejemplo.com -- /ruta/absoluta/cassandra-memory-mcp
+   ```
+
+   Si ya lo registraste con `CASSANDRA_API_KEY`, quítala (`claude mcp remove` y volver
+   a añadirlo): esa variable tiene prioridad y fijaría la misma key para todos.
+   En Codex, `env_vars = ["CASSANDRA_URL"]`; en OpenCode, solo `CASSANDRA_URL`.
+
+2. Guardar la key de cada proyecto. `<servidor>` es el host de `CASSANDRA_URL` en
+   minúsculas, con `_` en lugar de `:` si lleva puerto (`localhost_8080`):
+
+   ```bash
+   dir=~/.config/cassandra-memory/qa.ejemplo.com
+   mkdir -p -m 700 "$dir"
+   (umask 077; read -rsp 'Clave del proyecto 12: ' k; printf '%s\n' "$k" > "$dir/12.key"); echo
+   ```
+
+3. Vincular el repositorio con `.cassandra-memory.json`, como en el paso 3.
+
+Detalles: el archivo de la key debe ser regular y sin permisos para grupo/otros
+(`chmod 600`), y la key se busca por el host de `CASSANDRA_URL`, no por el `servidor`
+del repositorio, así que un repo ajeno no puede redirigirla. `CASSANDRA_KEYS_DIR`
+cambia la carpeta de keys. Si falta el vínculo o la key, el conector arranca igual y
+cada herramienta explica qué falta, sin contactar con Cassandra. Hay que reiniciar el
+cliente tras actualizar el conector.
+
 ## 4. Instalar la skill para retomar y guardar contexto
 
 Copiar la carpeta [cassandra-memory](../integrations/skills/cassandra-memory/SKILL.md)
