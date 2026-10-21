@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.0](https://github.com/soteiro/cassandra/compare/v0.14.0...v0.15.0) (2026-10-21)
+
+
+### Features
+
+* **memory-mcp:** resolver la key por proyecto con un MCP global ([7e59d99](https://github.com/soteiro/cassandra/commit/7e59d994f14bf26fc84255b9c17aa5e653e0a9a5))
+* **memory-mcp:** resolver la key por proyecto con un MCP global ([bf7e09c](https://github.com/soteiro/cassandra/commit/bf7e09c39fd0d78b03e434f95345f38be35e840e))
+
 ## [0.14.0](https://github.com/soteiro/cassandra/compare/v0.13.0...v0.14.0) (2026-10-18)
 
 
