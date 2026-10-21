@@ -24,12 +24,12 @@ import (
 type Client struct {
 	baseURL string
 	token   string
-	http    *http.Client
+	// unavailable explica por qué no hay key; las herramientas lo devuelven sin contactar al servidor.
+	unavailable error
+	http        *http.Client
 }
 
-// La key se mantiene fuera de argumentos/resultados MCP. No seguir redirecciones:
-// un endpoint mal configurado no debe recibir credenciales en otro destino.
-func NewClient(baseURL, token string) (*Client, error) {
+func parseBaseURL(baseURL string) (*url.URL, error) {
 	u, err := url.Parse(strings.TrimSpace(baseURL))
 	if err != nil || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
 		return nil, errors.New("CASSANDRA_URL debe ser una URL de servidor sin credenciales, query ni fragmento")
@@ -38,13 +38,40 @@ func NewClient(baseURL, token string) (*Client, error) {
 	if u.Scheme != "https" && !(u.Scheme == "http" && local) {
 		return nil, errors.New("se requiere HTTPS; HTTP solo se permite para pruebas en loopback")
 	}
+	return u, nil
+}
+
+func newHTTPClient() *http.Client {
+	return &http.Client{Timeout: 20 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+}
+
+// La key se mantiene fuera de argumentos/resultados MCP. No seguir redirecciones:
+// un endpoint mal configurado no debe recibir credenciales en otro destino.
+func NewClient(baseURL, token string) (*Client, error) {
+	u, err := parseBaseURL(baseURL)
+	if err != nil {
+		return nil, err
+	}
 	if !strings.HasPrefix(token, "cass_mem_") || len(token) != len("cass_mem_")+43 {
 		return nil, errors.New("CASSANDRA_API_KEY no tiene el formato de una key de memoria")
 	}
-	return &Client{baseURL: strings.TrimRight(u.String(), "/"), token: token, http: &http.Client{Timeout: 20 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &Client{baseURL: strings.TrimRight(u.String(), "/"), token: token, http: newHTTPClient()}, nil
+}
+
+// NewUnavailableClient permite iniciar el conector sin key (p. ej. un MCP global en un
+// repositorio sin vincular): las herramientas responden con el motivo en vez de fallar al arrancar.
+func NewUnavailableClient(baseURL string, reason error) (*Client, error) {
+	u, err := parseBaseURL(baseURL)
+	if err != nil {
+		return nil, err
+	}
+	return &Client{baseURL: strings.TrimRight(u.String(), "/"), unavailable: reason, http: newHTTPClient()}, nil
 }
 
 func (c *Client) request(ctx context.Context, method, path string, body any, out any) error {
+	if c.unavailable != nil {
+		return c.unavailable
+	}
 	var reader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
