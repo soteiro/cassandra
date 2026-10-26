@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://github.com/soteiro/cassandra/compare/v0.15.0...v0.16.0) (2026-10-26)
+
+
+### Features
+
+* semantic color tokens ([1512a87](https://github.com/soteiro/cassandra/commit/1512a8797dc85948b8b1dedb43d738116ed7e0d2))
+
 ## [0.15.0](https://github.com/soteiro/cassandra/compare/v0.14.0...v0.15.0) (2026-10-21)
 
 
