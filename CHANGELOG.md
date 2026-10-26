@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/soteiro/cassandra/compare/v0.16.0...v0.16.1) (2026-10-26)
+
+
+### Bug Fixes
+
+* update color tokens and theme variables for improved access… ([cc486aa](https://github.com/soteiro/cassandra/commit/cc486aa42a52430acfb3e3a9daf8f82d52609dbf))
+
 ## [0.16.0](https://github.com/soteiro/cassandra/compare/v0.15.0...v0.16.0) (2026-10-26)
 
 
