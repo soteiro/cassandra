@@ -1,7 +1,7 @@
 @if (shouldRender() && currentTask(); as t) {
   <!-- OVERLAY / BACKDROP -->
   <div
-    class="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs transition-opacity duration-300 ease-in-out cursor-pointer"
+    class="fixed inset-0 z-50 flex justify-end bg-overlay/60 backdrop-blur-xs transition-opacity duration-300 ease-in-out cursor-pointer"
     [class]="isVisible() ? 'opacity-100' : 'opacity-0 pointer-events-none'"
     (click)="onClose()"
   >
@@ -116,7 +116,7 @@
                 </span>
               </h4>
               @if (totalSubtareas() > 0) {
-                <span class="text-xs font-bold text-primary">{{ porcentajeProgreso() }}%</span>
+                <span class="text-xs font-bold text-primary-text">{{ porcentajeProgreso() }}%</span>
               }
             </div>
 
@@ -145,7 +145,7 @@
                       (click)="toggleSubtareaStatus(sub)"
                       [class]="
                         sub.estado === 'Terminado'
-                          ? 'bg-success border-success text-background'
+                          ? 'bg-success border-success text-on-success'
                           : 'border-surface-border hover:border-primary text-transparent bg-surface'
                       "
                       class="w-4 h-4 rounded border flex items-center justify-center transition-all cursor-pointer shrink-0"
@@ -180,7 +180,7 @@
 
             <!-- FORMULARIO RÁPIDO PARA AGREGAR SUBTAREA DENTRO DEL MODAL -->
             <div class="flex gap-2 items-center pt-1">
-              <span class="text-primary/70">
+              <span class="text-primary-text/70">
                 <svg lucideCornerDownRight class="w-3.5 h-3.5" />
               </span>
               <input
@@ -196,7 +196,7 @@
                 type="button"
                 (click)="addSubtarea()"
                 [disabled]="isSubmittingSubtarea() || !nuevaSubtareaNombre().trim()"
-                class="text-xs bg-primary/20 hover:bg-primary/30 text-primary px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-20 cursor-pointer flex items-center gap-1 font-medium shrink-0"
+                class="text-xs bg-primary/20 hover:bg-primary/30 text-primary-text px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-20 cursor-pointer flex items-center gap-1 font-medium shrink-0"
               >
                 <svg lucidePlus class="w-3 h-3" />
                 <span>Añadir</span>
@@ -209,9 +209,9 @@
         <div class="pt-4 border-t border-surface-border space-y-3">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-bold text-text-main uppercase tracking-wider flex items-center gap-1.5">
-              <svg lucideFileText class="w-3.5 h-3.5 text-primary" />
+              <svg lucideFileText class="w-3.5 h-3.5 text-primary-text" />
               <span>Notas y Soluciones Asociadas</span>
-              <span class="text-[10px] bg-primary/20 text-primary font-bold px-2 py-0.5 rounded-full border border-primary/30">
+              <span class="text-[10px] bg-primary/20 text-primary-text font-bold px-2 py-0.5 rounded-full border border-primary/30">
                 {{ taskNotas().length }}
               </span>
             </h4>
@@ -233,7 +233,7 @@
                 type="button"
                 (click)="addTaskNota()"
                 [disabled]="isSavingNota() || !newNotaTexto().trim()"
-                class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-3 py-1.5 rounded-lg transition-all disabled:opacity-30 cursor-pointer flex items-center gap-1"
+                class="text-xs bg-primary/20 hover:bg-primary/30 text-primary-text border border-primary/30 font-medium px-3 py-1.5 rounded-lg transition-all disabled:opacity-30 cursor-pointer flex items-center gap-1"
               >
                 <svg lucidePlus class="w-3 h-3" />
                 <span>{{ isSavingNota() ? 'Guardando...' : 'Añadir nota' }}</span>
@@ -250,7 +250,7 @@
                 <div class="p-3.5 rounded-xl border border-surface-border bg-background/60 shadow-xs space-y-2 text-xs">
                   <div class="flex items-center justify-between text-[11px] text-text-muted">
                     <span class="flex items-center gap-1">
-                      <svg lucideFileText class="w-3 h-3 text-primary/70" />
+                      <svg lucideFileText class="w-3 h-3 text-primary-text/70" />
                       {{ n.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}
                     </span>
                     <div class="flex items-center gap-1">
@@ -311,7 +311,7 @@
             type="submit"
             form="taskEditForm"
             [disabled]="isSaving() || !nombre().trim()"
-            class="text-xs bg-primary hover:bg-primary/90 text-background font-semibold px-4 py-2 rounded-xl transition-all shadow-md shadow-primary/20 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+            class="text-xs bg-primary hover:bg-primary-hover text-on-primary font-semibold px-4 py-2 rounded-xl transition-all shadow-md shadow-primary/20 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
           >
             <svg lucideSave class="w-3.5 h-3.5" />
             <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>

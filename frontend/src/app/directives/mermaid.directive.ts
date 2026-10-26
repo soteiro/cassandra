@@ -1,5 +1,6 @@
 import { afterRenderEffect, Directive, ElementRef, inject, input } from '@angular/core';
 import { MermaidService } from '../services/mermaid.service';
+import { AppearanceService } from '../services/appearance.service';
 
 /**
  * Convierte en diagramas los bloques ```mermaid de un contenedor cuyo HTML sale de `parseMarkdown`
@@ -17,16 +18,20 @@ export class MermaidDirective {
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly mermaid = inject(MermaidService);
+  private readonly appearance = inject(AppearanceService);
+  private readonly sources = new WeakMap<HTMLElement, string>();
 
   constructor() {
     afterRenderEffect((onCleanup) => {
       this.appMermaid();
+      this.appearance.themeKey();
       const debounce = this.appMermaidDebounce();
 
       const pending: { block: HTMLElement; source: string }[] = [];
       for (const block of this.host.querySelectorAll<HTMLElement>('.mermaid-block')) {
-        const source = block.querySelector('pre code')?.textContent;
+        const source = block.querySelector('pre code')?.textContent ?? this.sources.get(block);
         if (!source) continue;
+        this.sources.set(block, source);
         const svg = this.mermaid.cached(source);
         if (svg) showDiagram(block, svg);
         else pending.push({ block, source });
@@ -52,12 +57,12 @@ export class MermaidDirective {
 
 function showDiagram(block: HTMLElement, svg: string) {
   const figure = document.createElement('div');
-  figure.className = 'p-4 overflow-x-auto flex justify-center';
+  figure.className = 'mermaid-diagram p-4 overflow-x-auto flex justify-center';
   figure.setAttribute('role', 'img');
   figure.setAttribute('aria-label', 'Diagrama Mermaid');
   // El SVG lo genera mermaid con securityLevel 'strict' (saneado con DOMPurify).
   figure.innerHTML = svg;
-  block.querySelector('pre')?.replaceWith(figure);
+  block.querySelector('pre, .mermaid-diagram')?.replaceWith(figure);
 }
 
 function showError(block: HTMLElement, err: unknown) {
@@ -66,5 +71,5 @@ function showError(block: HTMLElement, err: unknown) {
   message.className =
     'mermaid-error px-4 py-2 border-b border-surface-border text-danger font-mono whitespace-pre-wrap';
   message.textContent = `Diagrama inválido: ${err instanceof Error ? err.message : String(err)}`;
-  block.querySelector('pre')?.before(message);
+  block.querySelector('pre, .mermaid-diagram')?.before(message);
 }

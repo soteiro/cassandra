@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MermaidDirective } from './mermaid.directive';
 import { MermaidService } from '../services/mermaid.service';
+import { AppearanceService } from '../services/appearance.service';
 import { parseMarkdown } from '../utils/markdown.util';
 
 @Component({
@@ -28,6 +29,7 @@ describe('MermaidDirective', () => {
   };
 
   beforeEach(() => {
+    localStorage.removeItem('cassandra.appearance');
     mermaid = { cached: vi.fn().mockReturnValue(undefined), render: vi.fn() };
     TestBed.configureTestingModule({
       imports: [Host],
@@ -37,6 +39,8 @@ describe('MermaidDirective', () => {
     host = fixture.componentInstance;
     el = fixture.nativeElement;
   });
+
+  afterEach(() => localStorage.removeItem('cassandra.appearance'));
 
   it('should replace the source with the rendered diagram', async () => {
     mermaid.render.mockResolvedValue('<svg id="diagrama"></svg>');
@@ -75,6 +79,22 @@ describe('MermaidDirective', () => {
 
     expect(mermaid.render).not.toHaveBeenCalled();
     expect(el.querySelector('pre code')?.textContent).toBe('func main() {}');
+  });
+
+  it('redraws an existing diagram when appearance changes without losing its source', async () => {
+    mermaid.render.mockResolvedValueOnce('<svg id="first-palette"></svg>')
+      .mockResolvedValueOnce('<svg id="second-palette"></svg>');
+    host.html.set(doc('graph TD; A-->B'));
+    fixture.detectChanges();
+    await settle();
+
+    TestBed.inject(AppearanceService).setPalette('ocean');
+    await settle();
+
+    expect(mermaid.render).toHaveBeenLastCalledWith('graph TD; A-->B');
+    expect(el.querySelector('svg#first-palette')).toBeNull();
+    expect(el.querySelector('svg#second-palette')).not.toBeNull();
+    localStorage.removeItem('cassandra.appearance');
   });
 
   it('should debounce renders and drop the stale one when the content changes', async () => {

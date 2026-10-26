@@ -54,7 +54,7 @@ describe('ProjectCard', () => {
     await render();
     const html = el.innerHTML;
     expect(html).toContain('text-danger');
-    expect(html).toContain('text-amber-300');
+    expect(html).toContain('text-warning-emphasis');
   });
 
   it('should prefer para_que over descripcion', async () => {
@@ -91,9 +91,9 @@ describe('ProjectCard', () => {
   });
 
   it('should map priority and status helpers', () => {
-    expect(component.getPriorityClass('Media')).toContain('text-blue-300');
+    expect(component.getPriorityClass('Media')).toContain('text-info-emphasis');
     expect(component.getPriorityClass('otra')).toContain('text-text-muted');
     expect(component.getStatusClass('Activo')).toContain('text-accent');
-    expect(component.getStatusClass('Idea')).toContain('text-purple-300');
+    expect(component.getStatusClass('Idea')).toContain('text-insight-emphasis');
   });
 });

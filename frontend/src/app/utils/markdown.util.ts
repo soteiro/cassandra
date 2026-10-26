@@ -249,7 +249,7 @@ export function parseMarkdown(markdown: string): string {
   // 5. Reinsertar tokens de código inline
   html = html.replace(/%%INLINECODE(\d+)%%/g, (_, idx) => {
     const code = inlineCodes[parseInt(idx, 10)] || '';
-    return `<code class="px-1.5 py-0.5 rounded bg-surface-border/50 text-primary font-mono text-xs font-semibold">${code}</code>`;
+    return `<code class="px-1.5 py-0.5 rounded bg-surface-border/50 text-primary-text font-mono text-xs font-semibold">${code}</code>`;
   });
 
   return html;
@@ -270,7 +270,7 @@ function parseInline(text: string): string {
   // Enlaces: [texto](url)
   result = result.replace(
     /\[(.*?)\]\((.*?)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline underline-offset-2 font-medium">$1</a>'
+    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary-text hover:underline underline-offset-2 font-medium">$1</a>'
   );
 
   // Negrita: **texto** o __texto__

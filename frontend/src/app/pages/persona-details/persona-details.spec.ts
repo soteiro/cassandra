@@ -130,12 +130,12 @@ describe('PersonaDetails', () => {
 
   it('getEntornoBadgeClass maps entornos to colours', () => {
     expect(component.getEntornoBadgeClass(undefined)).toContain('text-text-muted');
-    expect(component.getEntornoBadgeClass(' Trabajo ')).toContain('blue');
-    expect(component.getEntornoBadgeClass('Cliente')).toContain('purple');
-    expect(component.getEntornoBadgeClass('Familia')).toContain('rose');
-    expect(component.getEntornoBadgeClass('Amigos')).toContain('emerald');
-    expect(component.getEntornoBadgeClass('Inversión')).toContain('amber');
-    expect(component.getEntornoBadgeClass('Mentor')).toContain('cyan');
+    expect(component.getEntornoBadgeClass(' Trabajo ')).toContain('info');
+    expect(component.getEntornoBadgeClass('Cliente')).toContain('insight');
+    expect(component.getEntornoBadgeClass('Familia')).toContain('personal');
+    expect(component.getEntornoBadgeClass('Amigos')).toContain('positive');
+    expect(component.getEntornoBadgeClass('Inversión')).toContain('warning');
+    expect(component.getEntornoBadgeClass('Mentor')).toContain('learning');
     expect(component.getEntornoBadgeClass('Otro')).toContain('primary');
   });
 

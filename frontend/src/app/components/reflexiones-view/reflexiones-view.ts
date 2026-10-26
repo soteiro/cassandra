@@ -202,13 +202,13 @@ export class ReflexionesView {
   getBadgeClass(tipo: ReflexionTipo): string {
     switch (tipo) {
       case 'reflexion':
-        return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
+        return 'bg-insight/15 text-insight-text border-insight/30';
       case 'memoria':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+        return 'bg-warning/15 text-warning-text border-warning/30';
       case 'evento':
-        return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
+        return 'bg-info/15 text-info-text border-info/30';
       default:
-        return 'bg-primary/15 text-primary border-primary/30';
+        return 'bg-primary/15 text-primary-text border-primary/30';
     }
   }
 

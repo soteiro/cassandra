@@ -6,7 +6,7 @@ Cassandra guarda la memoria del proyecto indicado en cada operación.
 
 ## 1. Preparar Cassandra QA y el conector
 
-En **QA → Claves API**, generar una clave para el proyecto con **Leer y guardar
+En **QA → Configuración → Conexiones → Claves API**, generar una clave para el proyecto con **Leer y guardar
 memoria**. Obtener el ID desde su URL: `/proyectos/123` significa ID `123`.
 La clave y el ID deben pertenecer a QA: los probados en local son independientes.
 

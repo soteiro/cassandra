@@ -64,7 +64,7 @@ describe('BottomNav', () => {
     menuButton().click();
     await fixture.whenStable();
     expect(sidebar.isOpen()).toBe(true);
-    expect(iconWrapper().classList.contains('text-primary')).toBe(true);
+    expect(iconWrapper().classList.contains('text-primary-text')).toBe(true);
 
     menuButton().click();
     await fixture.whenStable();
@@ -75,7 +75,7 @@ describe('BottomNav', () => {
     await TestBed.inject(Router).navigateByUrl('/crm');
     await fixture.whenStable();
     const wrappers = links().map((a) => a.querySelector('div') as HTMLElement);
-    expect(wrappers[2].classList.contains('text-primary')).toBe(true);
-    expect(wrappers[0].classList.contains('text-primary')).toBe(false);
+    expect(wrappers[2].classList.contains('text-primary-text')).toBe(true);
+    expect(wrappers[0].classList.contains('text-primary-text')).toBe(false);
   });
 });

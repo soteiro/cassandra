@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.16.1](https://github.com/soteiro/cassandra/compare/v0.16.0...v0.16.1) (2026-10-26)
+
+
+### Bug Fixes
+
+* update color tokens and theme variables for improved access… ([cc486aa](https://github.com/soteiro/cassandra/commit/cc486aa42a52430acfb3e3a9daf8f82d52609dbf))
+
+## [0.16.0](https://github.com/soteiro/cassandra/compare/v0.15.0...v0.16.0) (2026-10-26)
+
+
+### Features
+
+* semantic color tokens ([1512a87](https://github.com/soteiro/cassandra/commit/1512a8797dc85948b8b1dedb43d738116ed7e0d2))
+
+## [0.15.0](https://github.com/soteiro/cassandra/compare/v0.14.0...v0.15.0) (2026-10-21)
+
+
+### Features
+
+* **memory-mcp:** resolver la key por proyecto con un MCP global ([7e59d99](https://github.com/soteiro/cassandra/commit/7e59d994f14bf26fc84255b9c17aa5e653e0a9a5))
+* **memory-mcp:** resolver la key por proyecto con un MCP global ([bf7e09c](https://github.com/soteiro/cassandra/commit/bf7e09c39fd0d78b03e434f95345f38be35e840e))
+
+## [0.14.0](https://github.com/soteiro/cassandra/compare/v0.13.0...v0.14.0) (2026-10-18)
+
+
+### Features
+
+* **project-logs:** separar la bitácora de los documentos ([4c6bddd](https://github.com/soteiro/cassandra/commit/4c6bdddbb41c99473e60cf46414e9308d9b64f15))
+* **project-logs:** separar la bitácora de los documentos ([cde654c](https://github.com/soteiro/cassandra/commit/cde654c3fe8518f64c748eeaf05c64efcad089cf))
+
 ## [0.13.0](https://github.com/soteiro/cassandra/compare/v0.12.0...v0.13.0) (2026-10-18)
 
 

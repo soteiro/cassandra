@@ -708,30 +708,30 @@ export class PresupuestoTab {
       return 'bg-primary/10 border-primary/40 ring-1 ring-primary/30';
     }
     if (item.estado === 'completado') {
-      return 'bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/15';
+      return 'bg-positive/10 border-positive/30 hover:bg-positive/15';
     }
     if (item.estado === 'en proceso') {
-      return 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/15';
+      return 'bg-warning/10 border-warning/30 hover:bg-warning/15';
     }
     return 'bg-surface border-surface-border hover:bg-surface-border/40';
   }
 
   getStatusBadgeClass(item: FinanzasPlantillaItem): string {
     if (item.estado === 'completado') {
-      return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30';
+      return 'bg-positive/20 text-positive-text border-positive/40 hover:bg-positive/30';
     }
     if (item.estado === 'en proceso') {
-      return 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30';
+      return 'bg-warning/20 text-warning-text border-warning/40 hover:bg-warning/30';
     }
     return 'bg-surface-border/40 text-text-muted hover:text-text-main border-surface-border hover:bg-surface-border/60';
   }
 
   getMontoColorClass(item: FinanzasPlantillaItem): string {
     if (item.estado === 'completado') {
-      return 'text-emerald-400 font-bold font-mono';
+      return 'text-positive-text font-bold font-mono';
     }
     if (item.estado === 'en proceso') {
-      return 'text-amber-400 font-bold font-mono';
+      return 'text-warning-text font-bold font-mono';
     }
     return item.tipo === 'egreso'
       ? 'text-danger font-semibold font-mono'

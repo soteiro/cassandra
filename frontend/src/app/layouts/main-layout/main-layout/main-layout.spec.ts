@@ -10,7 +10,7 @@ describe('MainLayout', () => {
   let fixture: ComponentFixture<MainLayout>;
 
   const el = () => fixture.nativeElement as HTMLElement;
-  const overlay = () => el().querySelector('div.fixed.bg-black\\/50') as HTMLElement | null;
+  const overlay = () => el().querySelector('div.fixed.bg-overlay\\/50') as HTMLElement | null;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

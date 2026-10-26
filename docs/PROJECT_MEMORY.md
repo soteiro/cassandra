@@ -15,8 +15,9 @@ Los documentos y logs manuales se conservan. El despliegue a producción crea su
 respaldo normal. Esta entrega de desarrollo no despliega ni genera keys de prod.
 
 Desplegar también el frontend de esta rama. Con la sesión iniciada, abrir
-**Claves API** en la barra lateral; en móvil, abrir primero **Menú**.
-La dirección de la pantalla es `/claves-api`.
+**Configuración → Conexiones → Claves API** desde la barra lateral; en móvil, abrir primero **Menú**.
+La dirección de la pantalla es `/configuracion/claves-api`. La ruta anterior `/claves-api`
+redirige a esa pantalla.
 
 1. Escribir un nombre identificable para el asistente.
 2. Seleccionar entre uno y cincuenta proyectos propios.

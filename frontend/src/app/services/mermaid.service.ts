@@ -1,33 +1,6 @@
 import { Injectable } from '@angular/core';
 import type { Mermaid } from 'mermaid';
 
-// Paleta de la app (equivalente hex de los tokens de styles.css; mermaid no entiende oklch).
-const THEME_VARIABLES = {
-  darkMode: true,
-  background: '#18181b',
-  fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-  primaryColor: '#232428',
-  primaryBorderColor: '#d08700',
-  primaryTextColor: '#f1f1f4',
-  secondaryColor: '#232428',
-  tertiaryColor: '#18181b',
-  lineColor: '#a4a4ab',
-  textColor: '#f1f1f4',
-  mainBkg: '#232428',
-  nodeBorder: '#d08700',
-  clusterBkg: '#18181b',
-  clusterBorder: '#323238',
-  edgeLabelBackground: '#18181b',
-  noteBkgColor: '#323238',
-  noteTextColor: '#f1f1f4',
-  noteBorderColor: '#323238',
-  actorBkg: '#232428',
-  actorBorder: '#d08700',
-  actorTextColor: '#f1f1f4',
-  signalColor: '#a4a4ab',
-  signalTextColor: '#f1f1f4',
-};
-
 /**
  * Renderiza diagramas Mermaid a SVG.
  * La librería es pesada, así que se carga con `import()` la primera vez que un documento
@@ -39,15 +12,18 @@ export class MermaidService {
   private queue: Promise<unknown> = Promise.resolve();
   private counter = 0;
   private readonly cache = new Map<string, string>();
+  private cacheTheme = '';
+  private activeTheme = '';
 
   /** SVG ya renderizado para este código, si existe (permite pintar sin parpadeo). */
   cached(source: string): string | undefined {
+    this.prepareCache(JSON.stringify(this.themeVariables()));
     return this.cache.get(source);
   }
 
   /** Devuelve el SVG del diagrama o rechaza con el error de sintaxis de Mermaid. */
   render(source: string): Promise<string> {
-    const hit = this.cache.get(source);
+    const hit = this.cached(source);
     if (hit) return Promise.resolve(hit);
 
     // Mermaid no admite renders concurrentes sobre el mismo documento: se encolan.
@@ -57,28 +33,76 @@ export class MermaidService {
   }
 
   protected loadMermaid(): Promise<Mermaid> {
-    return import('mermaid').then(({ default: mermaid }) => {
-      mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: 'strict',
-        theme: 'base',
-        themeVariables: THEME_VARIABLES,
-      });
-      return mermaid;
-    });
+    return import('mermaid').then(({ default: mermaid }) => mermaid);
+  }
+
+  private themeVariables() {
+    // Mermaid recibe los valores resueltos, ya que no admite variables CSS ni oklch.
+    const styles = getComputedStyle(document.documentElement);
+    const color = (role: string) => styles.getPropertyValue(`--theme-diagram-${role}`).trim();
+    const background = color('background');
+    const surface = color('surface');
+    const primary = color('primary');
+    const text = color('text');
+    const muted = color('muted');
+    const border = color('border');
+
+    return {
+      darkMode: styles.getPropertyValue('--theme-color-scheme').trim() === 'dark',
+      fontFamily: styles.getPropertyValue('--font-sans').trim(),
+      background,
+      primaryColor: surface,
+      primaryBorderColor: primary,
+      primaryTextColor: text,
+      secondaryColor: surface,
+      tertiaryColor: background,
+      lineColor: muted,
+      textColor: text,
+      mainBkg: surface,
+      nodeBorder: primary,
+      clusterBkg: background,
+      clusterBorder: border,
+      edgeLabelBackground: background,
+      noteBkgColor: border,
+      noteTextColor: text,
+      noteBorderColor: border,
+      actorBkg: surface,
+      actorBorder: primary,
+      actorTextColor: text,
+      signalColor: muted,
+      signalTextColor: text,
+    };
   }
 
   private async renderNow(source: string): Promise<string> {
     this.mermaid ??= this.loadMermaid();
     const mermaid = await this.mermaid;
+    const variables = this.themeVariables();
+    const theme = JSON.stringify(variables);
+    this.prepareCache(theme);
+    if (theme !== this.activeTheme) {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: 'base',
+        themeVariables: variables,
+      });
+      this.activeTheme = theme;
+    }
     const id = `mermaid-diagram-${++this.counter}`;
     try {
       const { svg } = await mermaid.render(id, source);
-      this.cache.set(source, svg);
+      if (theme === JSON.stringify(this.themeVariables())) this.cache.set(source, svg);
       return svg;
     } finally {
       // Ante un error, mermaid deja un nodo temporal huérfano en el <body>.
       document.getElementById(`d${id}`)?.remove();
     }
+  }
+
+  private prepareCache(theme: string): void {
+    if (theme === this.cacheTheme) return;
+    this.cache.clear();
+    this.cacheTheme = theme;
   }
 }

@@ -1,0 +1,359 @@
+/* Presets adaptados de sistemas publicados, sin dependencias de sus componentes.
+ * Neutro: shadcn/ui. GitHub: Primer. VS Code: Modern. Catppuccin: Latte/Mocha.
+ * Synthwave ’84, Nord, Rosé Pine y Solarized amplían los presets publicados.
+ * Los identificadores anteriores conservan las preferencias guardadas.
+ * Fuentes y adaptación de roles: DESIGN.md.
+ */
+:root {
+  --theme-color-scheme: dark;
+  --theme-primary: #fafafa;
+  --theme-primary-text: #fafafa;
+  --theme-primary-hover: #e5e5e5;
+  --theme-background: #0a0a0a;
+  --theme-surface: #171717;
+  --theme-surface-border: #333333;
+  --theme-text-main: #fafafa;
+  --theme-text-muted: #a1a1a1;
+  --theme-text-default: var(--theme-text-main);
+  --theme-on-primary: #171717;
+  --theme-on-selected: var(--theme-on-primary);
+
+  /* Texto y fondo de una acción tienen roles distintos. */
+  --theme-accent: #58a6ff;
+  --theme-success: #3fb950;
+  --theme-danger: #ff7b72;
+  --theme-on-accent: #0d1117;
+  --theme-on-success: #0d1117;
+  --theme-on-positive: #0d1117;
+  --theme-on-danger: #0d1117;
+  --theme-on-solid: #ffffff;
+  --theme-overlay: #000000;
+  --theme-interaction-shade: var(--theme-overlay);
+  --theme-browser-background: var(--theme-background);
+  --theme-control-background: #0a0a0a;
+  --theme-control-border: #525252;
+  --theme-control-label: var(--theme-text-main);
+  --theme-control-muted: var(--theme-text-muted);
+  --theme-control-text: var(--theme-text-main);
+
+  /* Estados y categorías de Primer, independientes del preset. */
+  --theme-warning: #d29922;
+  --theme-warning-text: #e3b341;
+  --theme-warning-emphasis: #f2cc60;
+  --theme-warning-surface: #341a00;
+  --theme-warning-border: #9e6a03;
+  --theme-info: #388bfd;
+  --theme-info-text: #79c0ff;
+  --theme-info-emphasis: #a5d6ff;
+  --theme-info-surface: #0c2d6b;
+  --theme-info-border: #1f6feb;
+  --theme-insight: #a371f7;
+  --theme-insight-text: #d2a8ff;
+  --theme-insight-emphasis: #e2c5ff;
+  --theme-insight-surface: #3c1e70;
+  --theme-insight-border: #8957e5;
+  --theme-insight-solid: #8957e5;
+  --theme-insight-solid-hover: #6e40c9;
+  --theme-positive: #3fb950;
+  --theme-positive-text: #7ee787;
+  --theme-personal: #db61a2;
+  --theme-personal-text: #ff9bce;
+  --theme-learning: #39c5cf;
+  --theme-learning-text: #a5e9f0;
+  --theme-idea: #d29922;
+  --theme-idea-text: #f2cc60;
+  --theme-creative: #db61a2;
+  --theme-creative-text: #ffbedd;
+  --theme-retrospective: #39c5cf;
+  --theme-retrospective-text: #a5e9f0;
+  --theme-neutral: #6e7681;
+  --theme-neutral-text: #b1bac4;
+
+  --theme-diagram-background: var(--theme-background);
+  --theme-diagram-surface: var(--theme-surface);
+  --theme-diagram-primary: var(--theme-primary-text);
+  --theme-diagram-text: var(--theme-text-main);
+  --theme-diagram-muted: var(--theme-text-muted);
+  --theme-diagram-border: var(--theme-surface-border);
+  --theme-docs-background: var(--theme-background);
+  --theme-docs-scrollbar: rgb(255 255 255 / 20%);
+  --theme-docs-scrollbar-hover: rgb(255 255 255 / 40%);
+
+  color-scheme: var(--theme-color-scheme);
+}
+
+:root[data-mode='light'] {
+  --theme-color-scheme: light;
+  --theme-primary: #171717;
+  --theme-primary-text: #171717;
+  --theme-primary-hover: #262626;
+  --theme-background: #f5f5f5;
+  --theme-surface: #ffffff;
+  --theme-surface-border: #d4d4d4;
+  --theme-text-main: #171717;
+  --theme-text-muted: #525252;
+  --theme-on-primary: #ffffff;
+  --theme-on-accent: #ffffff;
+  --theme-on-success: #ffffff;
+  --theme-on-positive: #ffffff;
+  --theme-on-danger: #ffffff;
+  --theme-accent: #0969da;
+  --theme-success: #1a7f37;
+  --theme-danger: #cf222e;
+  --theme-control-background: #ffffff;
+  --theme-control-border: #a3a3a3;
+
+  --theme-warning: #9a6700;
+  --theme-warning-text: #7d4e00;
+  --theme-warning-emphasis: #633c01;
+  --theme-warning-surface: #fff8c5;
+  --theme-warning-border: #bf8700;
+  --theme-info: #0969da;
+  --theme-info-text: #0550ae;
+  --theme-info-emphasis: #033d8b;
+  --theme-info-surface: #ddf4ff;
+  --theme-info-border: #80ccff;
+  --theme-insight: #8250df;
+  --theme-insight-text: #6639ba;
+  --theme-insight-emphasis: #512a97;
+  --theme-insight-surface: #fbefff;
+  --theme-insight-border: #c297ff;
+  --theme-insight-solid: #8250df;
+  --theme-insight-solid-hover: #6639ba;
+  --theme-positive: #1a7f37;
+  --theme-positive-text: #116329;
+  --theme-personal: #bf3989;
+  --theme-personal-text: #99286e;
+  --theme-learning: #0e7079;
+  --theme-learning-text: #0e5660;
+  --theme-idea: #9a6700;
+  --theme-idea-text: #744500;
+  --theme-creative: #bf3989;
+  --theme-creative-text: #99286e;
+  --theme-retrospective: #0e7079;
+  --theme-retrospective-text: #0e5660;
+  --theme-neutral: #818b98;
+  --theme-neutral-text: #59636e;
+  --theme-docs-scrollbar: rgb(0 0 0 / 20%);
+  --theme-docs-scrollbar-hover: rgb(0 0 0 / 40%);
+}
+
+/* GitHub / Primer: canvas inset y superficies neutrales. */
+:root[data-palette='ocean'][data-mode='dark'] {
+  --theme-primary: #1f6feb;
+  --theme-primary-text: #58a6ff;
+  --theme-primary-hover: #1158c7;
+  --theme-background: #0d1117;
+  --theme-surface: #161b22;
+  --theme-surface-border: #30363d;
+  --theme-text-main: #e6edf3;
+  --theme-text-muted: #9da7b3;
+  --theme-on-primary: #ffffff;
+  --theme-control-background: #0d1117;
+  --theme-control-border: #484f58;
+}
+
+:root[data-palette='ocean'][data-mode='light'] {
+  --theme-primary: #0969da;
+  --theme-primary-text: #0969da;
+  --theme-primary-hover: #0550ae;
+  --theme-background: #f6f8fa;
+  --theme-surface: #ffffff;
+  --theme-surface-border: #d1d9e0;
+  --theme-text-main: #1f2328;
+  --theme-text-muted: #59636e;
+  --theme-control-border: #818b98;
+}
+
+/* VS Code Modern: grises neutros, controles diferenciados y acción azul. */
+:root[data-palette='forest'][data-mode='dark'] {
+  --theme-primary: #0078d4;
+  --theme-primary-text: #4daafc;
+  --theme-primary-hover: #026ec1;
+  --theme-background: #181818;
+  --theme-surface: #1f1f1f;
+  --theme-surface-border: #3c3c3c;
+  --theme-text-main: #e0e0e0;
+  --theme-text-muted: #adadad;
+  --theme-on-primary: #ffffff;
+  --theme-control-background: #313131;
+  --theme-control-border: #616161;
+}
+
+:root[data-palette='forest'][data-mode='light'] {
+  --theme-primary: #005fb8;
+  --theme-primary-text: #005fb8;
+  --theme-primary-hover: #0258a8;
+  --theme-background: #f8f8f8;
+  --theme-surface: #ffffff;
+  --theme-surface-border: #cecece;
+  --theme-text-main: #1f1f1f;
+  --theme-text-muted: #616161;
+  --theme-control-border: #8b8b8b;
+}
+
+/* Catppuccin Mocha / Latte: neutros azulados y acento mauve publicados. */
+:root[data-palette='violet'][data-mode='dark'] {
+  --theme-primary: #cba6f7;
+  --theme-primary-text: #cba6f7;
+  --theme-primary-hover: #b791e5;
+  --theme-background: #1e1e2e;
+  --theme-surface: #313244;
+  --theme-surface-border: #45475a;
+  --theme-text-main: #cdd6f4;
+  --theme-text-muted: #bac2de;
+  --theme-on-primary: #1e1e2e;
+  --theme-control-background: #181825;
+  --theme-control-border: #6c7086;
+}
+
+:root[data-palette='violet'][data-mode='light'] {
+  --theme-primary: #8839ef;
+  --theme-primary-text: #8839ef;
+  --theme-primary-hover: #7529d4;
+  --theme-background: #e6e9ef;
+  --theme-surface: #eff1f5;
+  --theme-surface-border: #bcc0cc;
+  --theme-text-main: #4c4f69;
+  --theme-text-muted: #5c5f77;
+  --theme-control-background: #eff1f5;
+  --theme-control-border: #9ca0b0;
+}
+
+/* Synthwave ’84: violeta profundo, rosa y cian del tema de Robb Owen. */
+:root[data-palette='synthwave'][data-mode='dark'] {
+  --theme-primary: #ff7edb;
+  --theme-primary-text: #ffa0e4;
+  --theme-primary-hover: #f97e72;
+  --theme-background: #262335;
+  --theme-surface: #2a2139;
+  --theme-surface-border: #495495;
+  --theme-text-main: #ffffff;
+  --theme-text-muted: #b6b1c7;
+  --theme-on-primary: #241b2f;
+  --theme-accent: #03edf9;
+  --theme-on-accent: #241b2f;
+  --theme-control-background: #241b2f;
+  --theme-control-border: #8672a6;
+}
+
+/* Adaptación clara de Cassandra: conserva rosa/cian con texto más oscuro. */
+:root[data-palette='synthwave'][data-mode='light'] {
+  --theme-primary: #9c247c;
+  --theme-primary-text: #881f6c;
+  --theme-primary-hover: #80165f;
+  --theme-background: #f5eef8;
+  --theme-surface: #fffafd;
+  --theme-surface-border: #d3bfdc;
+  --theme-text-main: #2a2139;
+  --theme-text-muted: #695477;
+  --theme-accent: #00636d;
+  --theme-success: #146c2e;
+  --theme-danger: #9e1c27;
+  --theme-control-background: #fffafd;
+  --theme-control-border: #947ba5;
+}
+
+/* Nord: Polar Night / Snow Storm, con Frost y texto adaptado a WCAG AA. */
+:root[data-palette='nord'][data-mode='dark'] {
+  --theme-primary: #88c0d0;
+  --theme-primary-text: #d2e7ed;
+  --theme-primary-hover: #8fbcbb;
+  --theme-background: #2e3440;
+  --theme-surface: #3b4252;
+  --theme-surface-border: #4c566a;
+  --theme-text-main: #eceff4;
+  --theme-text-muted: #d8dee9;
+  --theme-on-primary: #2e3440;
+  --theme-accent: #a3d5d2;
+  --theme-on-accent: #2e3440;
+  --theme-success: #b7d4a2;
+  --theme-danger: #ffc2ca;
+  --theme-warning-text: #f2cc60;
+  --theme-control-background: #2e3440;
+  --theme-control-border: #7b88a1;
+}
+
+:root[data-palette='nord'][data-mode='light'] {
+  --theme-primary: #476b93;
+  --theme-primary-text: #365170;
+  --theme-primary-hover: #3b597b;
+  --theme-background: #e5e9f0;
+  --theme-surface: #eceff4;
+  --theme-surface-border: #b4becd;
+  --theme-text-main: #2e3440;
+  --theme-text-muted: #4c566a;
+  --theme-accent: #365d68;
+  --theme-success: #3f642f;
+  --theme-danger: #9e1c27;
+  --theme-control-background: #eceff4;
+  --theme-control-border: #8490a5;
+}
+
+/* Rosé Pine: Main / Dawn, con rose/love para las acciones. */
+:root[data-palette='rose-pine'][data-mode='dark'] {
+  --theme-primary: #ebbcba;
+  --theme-primary-text: #ebbcba;
+  --theme-primary-hover: #dba8a6;
+  --theme-background: #191724;
+  --theme-surface: #1f1d2e;
+  --theme-surface-border: #403d52;
+  --theme-text-main: #e0def4;
+  --theme-text-muted: #908caa;
+  --theme-on-primary: #191724;
+  --theme-accent: #9ccfd8;
+  --theme-on-accent: #191724;
+  --theme-control-background: #191724;
+  --theme-control-border: #6e6a86;
+}
+
+:root[data-palette='rose-pine'][data-mode='light'] {
+  --theme-primary: #9e4865;
+  --theme-primary-text: #833c54;
+  --theme-primary-hover: #873b55;
+  --theme-background: #faf4ed;
+  --theme-surface: #fffaf3;
+  --theme-surface-border: #cecacd;
+  --theme-text-main: #575279;
+  --theme-text-muted: #706b86;
+  --theme-accent: #286983;
+  --theme-success: #146c2e;
+  --theme-danger: #9e1c27;
+  --theme-control-background: #fffaf3;
+  --theme-control-border: #9893a5;
+}
+
+/* Solarized: base03/base02 y base2/base3, con acento teal adaptado a AA. */
+:root[data-palette='solarized'][data-mode='dark'] {
+  --theme-primary: #2aa198;
+  --theme-primary-text: #79cfc5;
+  --theme-primary-hover: #55b6a8;
+  --theme-background: #002b36;
+  --theme-surface: #073642;
+  --theme-surface-border: #31535c;
+  --theme-text-main: #eee8d5;
+  --theme-text-muted: #93a1a1;
+  --theme-on-primary: #002b36;
+  --theme-accent: #86c3e9;
+  --theme-on-accent: #002b36;
+  --theme-success: #5ed170;
+  --theme-danger: #ff9088;
+  --theme-control-background: #002b36;
+  --theme-control-border: #657b83;
+}
+
+:root[data-palette='solarized'][data-mode='light'] {
+  --theme-primary: #006e68;
+  --theme-primary-text: #005550;
+  --theme-primary-hover: #005b56;
+  --theme-background: #eee8d5;
+  --theme-surface: #fdf6e3;
+  --theme-surface-border: #c7c0aa;
+  --theme-text-main: #073642;
+  --theme-text-muted: #50666d;
+  --theme-accent: #125c88;
+  --theme-success: #105b27;
+  --theme-danger: #9e1c27;
+  --theme-control-background: #fdf6e3;
+  --theme-control-border: #839496;
+}

@@ -55,8 +55,19 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/revision/revision').then((m) => m.Revision),
       },
       {
+        path: 'configuracion/claves-api',
+        loadComponent: () =>
+          import('./pages/configuracion/api-keys-page').then((m) => m.ApiKeysPage),
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./pages/configuracion/configuracion').then((m) => m.Configuracion),
+      },
+      {
         path: 'claves-api',
-        loadComponent: () => import('./pages/api-keys/api-keys').then((m) => m.ApiKeys),
+        redirectTo: 'configuracion/claves-api',
+        pathMatch: 'full',
       },
       {
         path: 'docs',

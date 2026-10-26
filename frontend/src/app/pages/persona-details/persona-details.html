@@ -77,7 +77,7 @@
               </div>
 
               @if (persona.alias) {
-                <p class="text-sm font-medium text-primary">
+                <p class="text-sm font-medium text-primary-text">
                   {{ '@' + persona.alias }}
                 </p>
               }
@@ -105,7 +105,7 @@
             <button
               type="button"
               (click)="openEditModal()"
-              class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <svg lucidePencil class="w-3.5 h-3.5" />
               <span>Editar Perfil</span>
@@ -125,7 +125,7 @@
         <!-- SECCIÓN DE NOTAS Y CONTEXTO DEL PERFIL -->
         <div class="p-4 bg-background/60 rounded-xl border border-surface-border/60 space-y-2">
           <div class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-muted/80">
-            <svg lucideInfo class="w-3.5 h-3.5 text-primary" />
+            <svg lucideInfo class="w-3.5 h-3.5 text-primary-text" />
             <span>Información de Contexto & Notas</span>
           </div>
           @if (persona.informacion) {
@@ -144,7 +144,7 @@
       <div class="p-6 bg-surface border border-surface-border rounded-2xl space-y-5">
         <div class="flex items-center justify-between gap-4 pb-3 border-b border-surface-border flex-wrap">
           <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
+            <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center">
               <svg lucideMessageSquare class="w-4 h-4" />
             </div>
             <div>
@@ -160,7 +160,7 @@
           <button
             type="button"
             (click)="showAddInteraccion.set(!showAddInteraccion())"
-            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-3.5 py-1.5 text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-3.5 py-1.5 text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <svg lucidePlus class="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{{ showAddInteraccion() ? 'Cerrar Formulario' : 'Nueva Interacción' }}</span>
@@ -193,7 +193,7 @@
                 type="button"
                 [disabled]="isSubmittingInteraccion() || !nuevaInteraccionTexto().trim()"
                 (click)="createInteraccion()"
-                class="bg-primary hover:bg-primary/90 text-background font-semibold px-4 py-1.5 rounded-xl text-xs transition-all shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                class="bg-primary hover:bg-primary-hover text-on-primary font-semibold px-4 py-1.5 rounded-xl text-xs transition-all shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
               >
                 @if (isSubmittingInteraccion()) {
                   <span class="animate-spin text-xs">⠋</span>
@@ -219,7 +219,7 @@
         } @else if (interaccionesResource?.error()) {
           <div role="alert" class="p-4 space-y-3">
             <p class="text-sm text-danger">No se pudieron cargar las interacciones.</p>
-            <button type="button" (click)="interaccionesResource?.reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
+            <button type="button" (click)="interaccionesResource?.reload()" class="text-sm text-primary-text underline cursor-pointer">Reintentar</button>
           </div>
         } @else if (interaccionesResource?.value(); as interacciones) {
           <!-- LISTA SIMPLE DE INTERACCIONES -->
@@ -232,7 +232,7 @@
                 <!-- TEXTO DE LA INTERACCIÓN -->
                 <div class="min-w-0 flex-1 flex items-center gap-3">
                   <div class="w-2 h-2 rounded-full bg-primary/70 shrink-0 group-hover:scale-125 transition-transform"></div>
-                  <p class="text-xs sm:text-sm text-text-main group-hover:text-primary transition-colors truncate">
+                  <p class="text-xs sm:text-sm text-text-main group-hover:text-primary-text transition-colors truncate">
                     {{ item.interaccion }}
                   </p>
                 </div>
@@ -244,7 +244,7 @@
                     <span>{{ item.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
                   </div>
 
-                  <span class="text-xs font-semibold text-primary/70 group-hover:text-primary group-hover:translate-x-1 transition-all flex items-center gap-1">
+                  <span class="text-xs font-semibold text-primary-text/70 group-hover:text-primary-text group-hover:translate-x-1 transition-all flex items-center gap-1">
                     <span class="hidden sm:inline text-[11px]">Ver</span>
                     <svg lucideArrowRight class="w-3.5 h-3.5" />
                   </span>
@@ -259,7 +259,7 @@
                 <button
                   type="button"
                   (click)="showAddInteraccion.set(true)"
-                  class="text-xs text-primary font-semibold hover:underline cursor-pointer inline-flex items-center gap-1"
+                  class="text-xs text-primary-text font-semibold hover:underline cursor-pointer inline-flex items-center gap-1"
                 >
                   <svg lucidePlus class="w-3.5 h-3.5" />
                   <span>Registrar primera interacción</span>
