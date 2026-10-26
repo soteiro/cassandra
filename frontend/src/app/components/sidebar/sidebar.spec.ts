@@ -80,10 +80,10 @@ describe('Sidebar', () => {
       expect(component).toBeTruthy();
     });
 
-    it('opens API key management and closes the mobile menu', () => {
+    it('opens settings and closes the mobile menu', () => {
       component.sidebar.open();
-      const link = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>('a[href="/claves-api"]');
-      expect(link?.textContent).toContain('Claves API');
+      const link = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>('a[href="/configuracion"]');
+      expect(link?.textContent).toContain('Configuración');
       link!.dispatchEvent(new MouseEvent('click', { ctrlKey: true }));
       expect(component.sidebar.isOpen()).toBe(false);
     });

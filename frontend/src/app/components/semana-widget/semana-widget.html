@@ -17,7 +17,7 @@
       <button
         type="button"
         (click)="anterior()"
-        class="p-1 text-text-muted hover:text-primary border border-surface-border rounded-lg cursor-pointer"
+        class="p-1 text-text-muted hover:text-primary-text border border-surface-border rounded-lg cursor-pointer"
         title="Semana anterior"
         aria-label="Semana anterior"
       >
@@ -27,7 +27,7 @@
         type="button"
         (click)="siguiente()"
         [disabled]="esSemanaActual()"
-        class="p-1 text-text-muted hover:text-primary border border-surface-border rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-default"
+        class="p-1 text-text-muted hover:text-primary-text border border-surface-border rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-default"
         title="Semana siguiente"
         aria-label="Semana siguiente"
       >
@@ -45,7 +45,7 @@
     } @else if (resumen?.error()) {
       <div class="space-y-2" role="alert">
         <p class="text-sm text-danger">No se pudo cargar el resumen.</p>
-        <button type="button" (click)="resumen?.reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
+        <button type="button" (click)="resumen?.reload()" class="text-sm text-primary-text underline cursor-pointer">Reintentar</button>
       </div>
     } @else if (resumen?.value(); as r) {
       @if (r.tareas_terminadas.length || r.proyectos_completados.length) {
@@ -70,7 +70,7 @@
         <div class="space-y-2.5">
           @for (g of porProyecto(); track g.proyectoId) {
             <div>
-              <a [routerLink]="['/proyectos', g.proyectoId]" class="text-[11px] font-semibold text-text-muted hover:text-primary hover:underline">
+              <a [routerLink]="['/proyectos', g.proyectoId]" class="text-[11px] font-semibold text-text-muted hover:text-primary-text hover:underline">
                 {{ g.proyectoNombre || 'Proyecto #' + g.proyectoId }}
               </a>
               <ul class="mt-1 space-y-1">
@@ -101,7 +101,7 @@
           <p>También: {{ otros().join(' · ') }}</p>
         }
         @if (conEnlaceRevision()) {
-          <a routerLink="/revision" class="inline-block pt-1 text-primary hover:underline">Hacer la revisión semanal →</a>
+          <a routerLink="/revision" class="inline-block pt-1 text-primary-text hover:underline">Hacer la revisión semanal →</a>
         }
       </div>
     }

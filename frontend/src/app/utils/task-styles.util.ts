@@ -52,8 +52,8 @@ export const TASK_PRIORITY_OPTIONS: SelectOptionConfig<TaskPrioridad>[] = [
   {
     value: 'alta',
     label: 'Alta',
-    badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    optionClass: 'text-amber-400',
+    badgeClass: 'bg-warning/15 text-warning-text border-warning/30',
+    optionClass: 'text-warning-text',
   },
   {
     value: 'urgente',
@@ -86,7 +86,7 @@ export function getTaskPriorityBadgeClass(prioridad?: string): string {
     case 'urgente':
       return 'bg-danger/15 text-danger border-danger/30';
     case 'alta':
-      return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+      return 'bg-warning/15 text-warning-text border-warning/30';
     case 'baja':
       return 'bg-surface-border/50 text-text-muted border-surface-border';
     case 'normal':
@@ -101,9 +101,9 @@ export function getTaskPriorityBorderClass(prioridad?: string, isSubtask = false
     case 'urgente':
       return `${width} border-l-danger`;
     case 'alta':
-      return `${width} border-l-amber-500`;
+      return `${width} border-l-warning`;
     case 'baja':
-      return `${width} border-l-slate-400`;
+      return `${width} border-l-neutral-text`;
     case 'normal':
     default:
       return `${width} border-l-accent`;

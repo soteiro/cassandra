@@ -6,7 +6,7 @@
   } @else if (projectResource?.error()) {
     <div class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
       <p class="text-danger font-medium">Error al cargar el proyecto.</p>
-      <button type="button" (click)="projectResource?.reload()" class="mt-3 text-sm text-primary underline cursor-pointer">Reintentar</button>
+      <button type="button" (click)="projectResource?.reload()" class="mt-3 text-sm text-primary-text underline cursor-pointer">Reintentar</button>
     </div>
   } @else if (projectResource?.value(); as project) {
     <!-- CABECERA Y METADATOS DEL PROYECTO -->
@@ -25,7 +25,7 @@
           type="button"
           [attr.aria-selected]="activeTab() === tab.id"
           (click)="selectedTab(tab.id)"
-          class="px-5 py-2.5 text-sm font-medium transition-all cursor-pointer border-b-2 border-transparent text-text-muted hover:text-text-main aria-selected:text-primary aria-selected:border-primary aria-selected:font-semibold flex items-center gap-2"
+          class="px-5 py-2.5 text-sm font-medium transition-all cursor-pointer border-b-2 border-transparent text-text-muted hover:text-text-main aria-selected:text-primary-text aria-selected:border-primary aria-selected:font-semibold flex items-center gap-2"
         >
           @if (tab.id === 'subproyectos') {
             <svg lucideLayers class="w-4 h-4" />
@@ -64,7 +64,7 @@
     @if (activeTabError()) {
       <div role="alert" class="p-6 bg-danger/20 border border-danger/40 rounded-2xl">
         <p class="text-danger font-medium">No se pudieron cargar los datos de esta pestaña.</p>
-        <button type="button" (click)="retryActiveTab()" class="mt-3 text-sm text-primary underline cursor-pointer">Reintentar</button>
+        <button type="button" (click)="retryActiveTab()" class="mt-3 text-sm text-primary-text underline cursor-pointer">Reintentar</button>
       </div>
     } @else if (activeTab() === 'subproyectos') {
       <app-subprojects-tab

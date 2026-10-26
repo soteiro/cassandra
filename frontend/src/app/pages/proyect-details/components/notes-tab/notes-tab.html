@@ -4,7 +4,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-          <svg lucideFileText class="w-5 h-5 text-primary" />
+          <svg lucideFileText class="w-5 h-5 text-primary-text" />
           Notas y Bitácora del Proyecto
         </h3>
         <p class="text-xs text-text-muted mt-0.5">
@@ -48,7 +48,7 @@
           (click)="filterTipo.set('todas')"
           [class]="
             filterTipo() === 'todas'
-              ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+              ? 'bg-primary/20 text-primary-text font-semibold border-primary/30'
               : 'text-text-muted hover:text-text-main bg-background border-surface-border'
           "
           class="px-3 py-1 rounded-lg border transition-colors cursor-pointer"
@@ -60,7 +60,7 @@
           (click)="filterTipo.set('generales')"
           [class]="
             filterTipo() === 'generales'
-              ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+              ? 'bg-primary/20 text-primary-text font-semibold border-primary/30'
               : 'text-text-muted hover:text-text-main bg-background border-surface-border'
           "
           class="px-3 py-1 rounded-lg border transition-colors cursor-pointer"
@@ -72,7 +72,7 @@
           (click)="filterTipo.set('tareas')"
           [class]="
             filterTipo() === 'tareas'
-              ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+              ? 'bg-primary/20 text-primary-text font-semibold border-primary/30'
               : 'text-text-muted hover:text-text-main bg-background border-surface-border'
           "
           class="px-3 py-1 rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5"
@@ -100,7 +100,7 @@
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           <span class="text-xs text-text-muted flex items-center gap-1">
-            <svg lucideListTodo class="w-3.5 h-3.5 text-primary/70" />
+            <svg lucideListTodo class="w-3.5 h-3.5 text-primary-text/70" />
             <span>Vincular tarea:</span>
           </span>
           <select
@@ -126,7 +126,7 @@
           <button
             type="submit"
             [disabled]="isSubmittingNota() || !newNotaText().trim()"
-            class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5"
+            class="text-xs bg-primary/20 hover:bg-primary/30 text-primary-text border border-primary/30 font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5"
           >
             @if (isSubmittingNota()) {
               <span class="animate-spin text-xs">⏳</span>
@@ -150,7 +150,7 @@
     @if (notas().length === 0) {
       <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-3">
         <div
-          class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto"
+          class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary-text flex items-center justify-center mx-auto"
         >
           <svg lucideFileText class="w-6 h-6" />
         </div>
@@ -176,7 +176,7 @@
               <div class="flex items-center justify-between gap-2">
                 <div class="flex flex-wrap items-center gap-2 text-xs text-text-muted">
                   <div class="flex items-center gap-1.5">
-                    <svg lucideClock class="w-3.5 h-3.5 text-primary/70" />
+                    <svg lucideClock class="w-3.5 h-3.5 text-primary-text/70" />
                     <span>{{ n.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
                   </div>
 
@@ -185,7 +185,7 @@
                     <button
                       type="button"
                       (click)="openTaskModal(n.tarea_id)"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25 hover:border-primary/40 transition-all cursor-pointer shadow-xs active:scale-95"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-primary/10 hover:bg-primary/20 text-primary-text border border-primary/25 hover:border-primary/40 transition-all cursor-pointer shadow-xs active:scale-95"
                       title="Abrir detalles de la tarea #{{ n.tarea_id }}"
                     >
                       <svg lucideListTodo class="w-3 h-3" />
@@ -212,7 +212,7 @@
                   <button
                     type="button"
                     (click)="startEditNota(n)"
-                    class="p-1.5 text-text-muted hover:text-primary hover:bg-background border border-surface-border rounded-lg transition-colors cursor-pointer"
+                    class="p-1.5 text-text-muted hover:text-primary-text hover:bg-background border border-surface-border rounded-lg transition-colors cursor-pointer"
                     title="Editar nota"
                   >
                     <svg lucidePencil class="w-3.5 h-3.5" />
@@ -266,7 +266,7 @@
                         type="button"
                         (click)="saveEditNota(n)"
                         [disabled]="isUpdatingNota() || !editingNotaText().trim()"
-                        class="bg-primary hover:bg-primary/90 disabled:opacity-50 text-background font-semibold text-xs px-4 py-1.5 rounded-xl transition-all shadow-md cursor-pointer inline-flex items-center gap-1"
+                        class="bg-primary hover:bg-primary-hover disabled:opacity-50 text-on-primary font-semibold text-xs px-4 py-1.5 rounded-xl transition-all shadow-md cursor-pointer inline-flex items-center gap-1"
                       >
                         @if (isUpdatingNota()) {
                           <span class="animate-spin text-xs">⏳</span>

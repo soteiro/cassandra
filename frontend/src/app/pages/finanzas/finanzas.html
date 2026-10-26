@@ -4,7 +4,7 @@
     <div class="space-y-1">
       <div class="flex items-center gap-2.5">
         <div
-          class="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shadow-xs"
+          class="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center shadow-xs"
         >
           <svg lucideWallet class="w-5 h-5" />
         </div>
@@ -26,7 +26,7 @@
         type="button"
         (click)="reload()"
         [class.animate-spin]="isRotating()"
-        class="p-2.5 bg-surface hover:bg-surface-border text-text-muted hover:text-primary border border-surface-border rounded-xl transition-all cursor-pointer shadow-xs"
+        class="p-2.5 bg-surface hover:bg-surface-border text-text-muted hover:text-primary-text border border-surface-border rounded-xl transition-all cursor-pointer shadow-xs"
         title="Recargar datos"
       >
         <svg lucideRefreshCcw class="w-4 h-4" />
@@ -39,7 +39,7 @@
           (click)="activeTab.set('movimientos')"
           [class]="
             activeTab() === 'movimientos'
-              ? 'bg-primary/20 text-primary font-semibold shadow-xs'
+              ? 'bg-primary/20 text-primary-text font-semibold shadow-xs'
               : 'text-text-muted hover:text-text-main'
           "
           class="min-h-11 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 sm:min-h-0"
@@ -52,7 +52,7 @@
           (click)="activeTab.set('deseos')"
           [class]="
             activeTab() === 'deseos'
-              ? 'bg-primary/20 text-primary font-semibold shadow-xs'
+              ? 'bg-primary/20 text-primary-text font-semibold shadow-xs'
               : 'text-text-muted hover:text-text-main'
           "
           class="min-h-11 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 sm:min-h-0"
@@ -60,7 +60,7 @@
           <svg lucideSparkles class="w-3.5 h-3.5" />
           <span>Lista de Deseos</span>
           @if (deseosPendientesCount() > 0) {
-            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-primary/20 text-primary">
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-primary/20 text-primary-text">
               {{ deseosPendientesCount() }}
             </span>
           }
@@ -70,7 +70,7 @@
           (click)="activeTab.set('catalogos')"
           [class]="
             activeTab() === 'catalogos'
-              ? 'bg-primary/20 text-primary font-semibold shadow-xs'
+              ? 'bg-primary/20 text-primary-text font-semibold shadow-xs'
               : 'text-text-muted hover:text-text-main'
           "
           class="min-h-11 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 sm:min-h-0"
@@ -97,7 +97,7 @@
         <button
           type="button"
           (click)="presupuestoTab()?.openCreateModal('egreso')"
-          class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
+          class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
           <span>Nuevo Movimiento</span>
@@ -109,7 +109,7 @@
         <button
           type="button"
           (click)="deseosTab()?.openCreateDeseoModal()"
-          class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
+          class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
           <span>Nuevo Deseo</span>
@@ -132,7 +132,7 @@
       </button>
 
       <div class="flex items-center gap-2 px-3 py-1.5 bg-background border border-surface-border rounded-xl">
-        <svg lucideCalendar class="w-4 h-4 text-primary" />
+        <svg lucideCalendar class="w-4 h-4 text-primary-text" />
         <span class="text-sm font-bold text-text-main">
           {{ mesNombre() }} {{ selectedAnio() }}
         </span>
@@ -150,7 +150,7 @@
       <button
         type="button"
         (click)="goToCurrentMonth()"
-        class="text-xs text-text-muted hover:text-primary px-2.5 py-1.5 rounded-lg hover:bg-background transition-colors cursor-pointer"
+        class="text-xs text-text-muted hover:text-primary-text px-2.5 py-1.5 rounded-lg hover:bg-background transition-colors cursor-pointer"
       >
         Mes actual
       </button>
@@ -260,7 +260,7 @@
       >
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
-            <svg lucideScale class="w-3.5 h-3.5 text-primary" />
+            <svg lucideScale class="w-3.5 h-3.5 text-primary-text" />
             Balance Neto
           </span>
           <span
@@ -276,7 +276,7 @@
         </div>
         <div class="flex items-baseline justify-between">
           <span
-            [class]="resumen().balance >= 0 ? 'text-primary' : 'text-danger'"
+            [class]="resumen().balance >= 0 ? 'text-primary-text' : 'text-danger'"
             class="text-2xl font-black tracking-tight"
           >
             {{ formatCurrency(resumen().balance) }}

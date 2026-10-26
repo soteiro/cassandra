@@ -1,6 +1,6 @@
 @if (isOpen()) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs backdrop-layer transition-opacity"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay/70 backdrop-blur-xs backdrop-layer transition-opacity"
     (click)="onBackdropClick($event)"
   >
     <div
@@ -14,7 +14,7 @@
               <svg lucideTrash2 class="w-5 h-5" />
             </div>
           } @else if (variant() === 'warning') {
-            <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-warning/15 border border-warning/30 text-warning-text flex items-center justify-center shrink-0">
               <svg lucideTriangleAlert class="w-5 h-5" />
             </div>
           }
@@ -46,7 +46,7 @@
           type="button"
           (click)="onConfirm()"
           [disabled]="isProcessing()"
-          [class]="variant() === 'danger' ? 'bg-danger/80 hover:bg-danger text-white shadow-danger/20' : 'bg-primary hover:bg-primary/90 text-background'"
+          [class]="variant() === 'danger' ? 'bg-danger hover:bg-danger/90 text-on-danger shadow-danger/20' : 'bg-primary hover:bg-primary-hover text-on-primary'"
           class="px-4 py-2 text-xs font-semibold rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
         >
           @if (isProcessing()) {

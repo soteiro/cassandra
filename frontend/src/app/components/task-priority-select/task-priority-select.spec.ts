@@ -66,7 +66,7 @@ describe('TaskPrioritySelect (inputs and classes)', () => {
     fixture.componentRef.setInput('value', 'alta');
     fixture.detectChanges();
     expect(select().value).toBe('alta');
-    expect(component.getBadgeClass()).toContain('text-amber-400');
+    expect(component.getBadgeClass()).toContain('text-warning-text');
   });
 
   it('falls back to "normal" when value is empty', () => {

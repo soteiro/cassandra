@@ -22,7 +22,7 @@ describe('task-styles.util', () => {
 
   it('should return correct badge class for task priority/urgency', () => {
     expect(getTaskPriorityBadgeClass('urgente')).toContain('bg-danger/15');
-    expect(getTaskPriorityBadgeClass('alta')).toContain('bg-amber-500/15');
+    expect(getTaskPriorityBadgeClass('alta')).toContain('bg-warning/15');
     expect(getTaskPriorityBadgeClass('baja')).toContain('bg-surface-border/50');
     expect(getTaskPriorityBadgeClass('normal')).toContain('bg-accent/15');
   });
@@ -30,8 +30,8 @@ describe('task-styles.util', () => {
   it('should return correct border class for task priority', () => {
     expect(getTaskPriorityBorderClass('urgente')).toBe('border-l-4 border-l-danger');
     expect(getTaskPriorityBorderClass('urgente', true)).toBe('border-l-[3px] border-l-danger');
-    expect(getTaskPriorityBorderClass('alta')).toBe('border-l-4 border-l-amber-500');
-    expect(getTaskPriorityBorderClass('baja')).toBe('border-l-4 border-l-slate-400');
+    expect(getTaskPriorityBorderClass('alta')).toBe('border-l-4 border-l-warning');
+    expect(getTaskPriorityBorderClass('baja')).toBe('border-l-4 border-l-neutral-text');
     expect(getTaskPriorityBorderClass('normal')).toBe('border-l-4 border-l-accent');
   });
 

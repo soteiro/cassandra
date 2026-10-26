@@ -44,7 +44,7 @@ fuentes. La memoria se actualiza; el historial se consulta por demanda.
   necesita proveedor de IA, API key de un modelo ni acceso a historiales externos.
 - Los secretos van en el entorno del conector; los archivos de proyecto contienen
   únicamente URL/identificador de proyecto. La key nunca es un argumento de herramienta.
-- La gestión de keys se ofrece desde **Claves API** en la interfaz y mediante
+- La gestión de keys se ofrece desde **Configuración → Conexiones → Claves API** en la interfaz y mediante
   REST autenticado (usable con Bruno/curl). La interfaz no persiste el secreto:
   solo permite copiarlo al emitirlo y conserva metadatos para listar/revocar.
 - El conector es local y la persistencia es remota. No se publica un endpoint MCP

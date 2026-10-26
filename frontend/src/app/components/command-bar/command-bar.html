@@ -1,6 +1,6 @@
 @if (commandBarService.state.isOpen()) {
   <div
-    class="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/65 backdrop-blur-xl backdrop-layer transition-opacity"
+    class="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-overlay/65 backdrop-blur-xl backdrop-layer transition-opacity"
     (click)="onBackdropClick($event)"
   >
     <div
@@ -37,7 +37,7 @@
               (mouseenter)="selectedIndex.set(i)"
               class="w-full rounded-xl flex items-center gap-3 px-4 py-2.5 text-left text-sm  transition-colors cursor-pointer"
               [class.bg-primary]="selectedIndex() === i"
-              [class.text-black]="selectedIndex() === i"
+              [class.text-on-selected]="selectedIndex() === i"
               [class.text-text-main]="selectedIndex() !== i"
               [class.hover:bg-surface-border]=""
             >

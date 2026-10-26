@@ -18,7 +18,7 @@ export class ToastContainer {
       case 'error':
         return 'border-danger/30 bg-surface/95 shadow-danger/10';
       case 'warning':
-        return 'border-amber-500/30 bg-surface/95 shadow-amber-500/10';
+        return 'border-warning/30 bg-surface/95 shadow-warning/10';
       case 'info':
       default:
         return 'border-accent/30 bg-surface/95 shadow-accent/10';
@@ -32,7 +32,7 @@ export class ToastContainer {
       case 'error':
         return 'text-danger bg-danger/15 border-danger/30';
       case 'warning':
-        return 'text-amber-400 bg-amber-500/15 border-amber-500/30';
+        return 'text-warning-text bg-warning/15 border-warning/30';
       case 'info':
       default:
         return 'text-accent bg-accent/15 border-accent/30';
@@ -46,7 +46,7 @@ export class ToastContainer {
       case 'error':
         return 'bg-danger';
       case 'warning':
-        return 'bg-amber-400';
+        return 'bg-warning-text';
       case 'info':
       default:
         return 'bg-accent';

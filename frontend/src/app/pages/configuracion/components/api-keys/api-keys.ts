@@ -6,10 +6,10 @@ import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { APIKey, CreateAPIKeyRequest } from '../../models/api-key.model';
-import { APIKeyService } from '../../services/api-key.service';
-import { proyectService } from '../../services/proyect.service';
-import { getErrorMessage } from '../../utils/http-error.util';
+import { APIKey, CreateAPIKeyRequest } from '../../../../models/api-key.model';
+import { APIKeyService } from '../../../../services/api-key.service';
+import { proyectService } from '../../../../services/proyect.service';
+import { getErrorMessage } from '../../../../utils/http-error.util';
 
 @Component({
   selector: 'app-api-keys',

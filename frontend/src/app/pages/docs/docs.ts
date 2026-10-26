@@ -1,4 +1,5 @@
-import { Component, ElementRef, effect, viewChild } from '@angular/core';
+import { Component, ElementRef, effect, inject, viewChild } from '@angular/core';
+import { AppearanceService } from '../../services/appearance.service';
 
 @Component({
   selector: 'app-docs',
@@ -7,6 +8,7 @@ import { Component, ElementRef, effect, viewChild } from '@angular/core';
   styleUrl: './docs.css',
 })
 export class Docs {
+  private readonly appearance = inject(AppearanceService);
   private readonly iframeRef = viewChild<ElementRef<HTMLIFrameElement>>('iframeRef');
 
   constructor() {
@@ -14,55 +16,13 @@ export class Docs {
       const iframe = this.iframeRef()?.nativeElement;
       if (iframe) {
         iframe.srcdoc = `<!doctype html>
-<html lang="es">
+<html lang="es" data-palette="${this.appearance.palette()}" data-mode="${this.appearance.resolvedMode()}">
   <head>
     <title>Cassandra API Reference</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <base href="/" />
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        min-height: 100%;
-        background-color: #0b0f19;
-        overflow-x: clip;
-      }
-      @media (min-width: 768px) {
-        aside,
-        .sidebar,
-        .scalar-sidebar,
-        [data-scalar-sidebar],
-        .t-doc__sidebar {
-          position: -webkit-sticky !important;
-          position: sticky !important;
-          top: 0 !important;
-          height: 100vh !important;
-          max-height: 100vh !important;
-          align-self: flex-start !important;
-          overflow-y: auto !important;
-          z-index: 10 !important;
-        }
-      }
-      * {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-      }
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 9999px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.4);
-      }
-    </style>
+    <link rel="stylesheet" href="/docs/styles.css" />
   </head>
   <body>
     <script
@@ -71,7 +31,7 @@ export class Docs {
       data-url="/docs/openapi.json"
       data-configuration='{
         "theme": "purple",
-        "darkMode": true,
+        "darkMode": ${this.appearance.resolvedMode() === 'dark'},
         "showSidebar": true,
         "layout": "modern",
         "customCss": "@media (min-width: 768px) { aside, .sidebar, .scalar-sidebar, [data-scalar-sidebar], .t-doc__sidebar { position: -webkit-sticky !important; position: sticky !important; top: 0 !important; height: 100vh !important; max-height: 100vh !important; align-self: flex-start !important; overflow-y: auto !important; z-index: 10 !important; } }"

@@ -1,0 +1,55 @@
+<div class="max-w-5xl mx-auto space-y-8">
+  <header class="border-b border-surface-border pb-6">
+    <h1 class="text-2xl font-bold text-text-main">Configuración</h1>
+    <p class="mt-2 text-sm text-text-muted">Personaliza la apariencia y administra tus conexiones.</p>
+  </header>
+
+  <section aria-labelledby="appearance-title" class="space-y-5">
+    <div>
+      <h2 id="appearance-title" class="text-xl font-semibold text-text-main">Apariencia</h2>
+      <p class="mt-2 text-sm text-text-muted">Elige cómo se ve Cassandra. Los cambios se aplican al momento.</p>
+    </div>
+
+    <div class="grid gap-6 rounded-2xl border border-surface-border bg-surface p-5 md:p-6 sm:grid-cols-2">
+      <div>
+        <label for="appearance-palette" class="block text-sm font-medium text-text-main mb-2">Tema</label>
+        <select #paletteSelect id="appearance-palette"
+          (change)="appearance.setPalette(paletteSelect.value)" aria-describedby="palette-help"
+          class="w-full min-h-11 rounded-lg border border-surface-border bg-background px-3 py-2 text-base text-text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          @for (palette of palettes; track palette.value) {
+            <option [value]="palette.value" [selected]="palette.value === appearance.palette()">{{ palette.label }}</option>
+          }
+        </select>
+        <p id="palette-help" class="mt-2 text-sm text-text-muted">Presets inspirados en interfaces conocidas.</p>
+      </div>
+      <div>
+        <label for="appearance-mode" class="block text-sm font-medium text-text-main mb-2">Modo</label>
+        <select #modeSelect id="appearance-mode"
+          (change)="appearance.setMode(modeSelect.value)" aria-describedby="mode-help"
+          class="w-full min-h-11 rounded-lg border border-surface-border bg-background px-3 py-2 text-base text-text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          @for (mode of modes; track mode.value) {
+            <option [value]="mode.value" [selected]="mode.value === appearance.mode()">{{ mode.label }}</option>
+          }
+        </select>
+        <p id="mode-help" class="mt-2 text-sm text-text-muted">Puedes seguir el modo claro u oscuro del sistema.</p>
+      </div>
+    </div>
+    <p class="text-sm text-text-muted">{{ appearance.stored() ? 'La elección se guarda en este dispositivo.' : 'La elección se aplicará durante esta sesión.' }}</p>
+    @if (!appearance.stored()) {
+      <p role="status" class="text-sm text-warning-text">El navegador no permite guardar la elección.</p>
+    }
+  </section>
+
+  <section aria-labelledby="connections-title" class="space-y-5">
+    <h2 id="connections-title" class="text-xl font-semibold text-text-main">Conexiones</h2>
+    <a routerLink="/configuracion/claves-api"
+      class="flex min-h-20 items-center gap-4 rounded-2xl border border-surface-border bg-surface p-5 md:p-6 text-text-main hover:bg-surface-border/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+      <svg lucideKeyRound class="size-5 shrink-0 text-text-muted" aria-hidden="true" />
+      <span class="flex-1 min-w-0">
+        <span class="block text-base font-semibold">Claves API</span>
+        <span class="mt-1 block text-sm text-text-muted">Conecta tus asistentes y administra sus permisos.</span>
+      </span>
+      <svg lucideArrowRight class="size-5 shrink-0 text-text-muted" aria-hidden="true" />
+    </a>
+  </section>
+</div>
