@@ -2,72 +2,75 @@
 name: Cassandra
 description: "Sistema visual existente para claridad, estructura y foco."
 colors:
-  primary: "oklch(68.1% 0.162 75.834)"
-  background: "oklch(21% 0.006 285.885)"
-  surface: "oklch(26% 0.008 285)"
-  surface-border: "oklch(32% 0.01 285)"
-  text-main: "oklch(96% 0.003 285)"
-  text-muted: "oklch(72% 0.01 285)"
-  accent: "oklch(70% 0.12 200)"
-  on-primary: "oklch(21% 0.006 285.885)"
+  primary: "#ffb020"
+  background: "#0b0804"
+  surface: "#3b2e20"
+  surface-border: "#78634a"
+  text-main: "#fff5e5"
+  text-muted: "#e0ceb0"
+  accent: "#50d7e2"
+  on-primary: "#241400"
   success: "oklch(72% 0.17 142)"
-  danger: "oklch(65% 0.20 25)"
+  danger: "oklch(75% 0.18 25)"
   warning: "oklch(76.9% 0.188 70.08)"
   warning-text: "oklch(82.8% 0.189 84.429)"
-  light-primary: "#8a5a00"
-  light-background: "#f7f8fa"
-  light-surface: "#fff"
-  light-surface-border: "#cbd2db"
-  light-text-main: "#20242b"
-  light-text-muted: "#586174"
-  light-accent: "#146c80"
+  light-primary: "#8a4b00"
+  light-background: "#e9d7b0"
+  light-surface: "#fffdf6"
+  light-surface-border: "#aa8950"
+  light-text-main: "#21170d"
+  light-text-muted: "#563c1f"
+  light-accent: "#075a78"
   light-on-primary: "#fff"
   light-success: "#236b39"
   light-danger: "#b12836"
-  light-warning: "#986000"
-  light-warning-text: "#895600"
-  ocean-dark-primary: "#78b8ff"
-  ocean-dark-background: "#111c29"
-  ocean-dark-surface: "#182737"
-  ocean-dark-surface-border: "#36536f"
-  ocean-dark-text-main: "#edf5ff"
-  ocean-dark-text-muted: "#a9bbcf"
-  ocean-dark-accent: "#66d5d1"
-  ocean-dark-on-primary: "#0a1928"
-  ocean-light-primary: "#245c9b"
-  ocean-light-background: "#f2f7fc"
-  ocean-light-surface-border: "#c5d5e5"
-  ocean-light-text-main: "#1e3146"
-  ocean-light-text-muted: "#51667b"
-  ocean-light-accent: "#126e73"
-  forest-dark-primary: "#8ed3a2"
-  forest-dark-background: "#142019"
-  forest-dark-surface: "#1e2e24"
-  forest-dark-surface-border: "#3e6248"
-  forest-dark-text-main: "#edf7ef"
-  forest-dark-text-muted: "#aac7b2"
-  forest-dark-accent: "#ddc56f"
-  forest-dark-on-primary: "#102317"
-  forest-light-primary: "#2c6b43"
-  forest-light-background: "#f3f8f2"
-  forest-light-surface-border: "#c6d8c7"
-  forest-light-text-main: "#21382b"
-  forest-light-text-muted: "#536b59"
-  forest-light-accent: "#796000"
-  violet-dark-primary: "#c4a1f5"
-  violet-dark-background: "#1c1828"
-  violet-dark-surface: "#292338"
-  violet-dark-surface-border: "#57456f"
-  violet-dark-text-main: "#f4efff"
-  violet-dark-text-muted: "#bfb1d5"
-  violet-dark-accent: "#76d4d0"
-  violet-dark-on-primary: "#23132f"
-  violet-light-primary: "#7544a2"
-  violet-light-background: "#f8f4fc"
-  violet-light-surface-border: "#d6cae5"
-  violet-light-text-main: "#30223e"
-  violet-light-text-muted: "#6b587d"
-  violet-light-accent: "#166b75"
+  light-warning: "#845000"
+  light-warning-text: "#764600"
+  ocean-dark-primary: "#4cb5ff"
+  ocean-dark-background: "#06111e"
+  ocean-dark-surface: "#183b59"
+  ocean-dark-surface-border: "#3d6285"
+  ocean-dark-text-main: "#f1f9ff"
+  ocean-dark-text-muted: "#c8e3fa"
+  ocean-dark-accent: "#39e0cc"
+  ocean-dark-on-primary: "#061b2b"
+  ocean-light-primary: "#075da8"
+  ocean-light-background: "#ccdfef"
+  ocean-light-surface: "#fff"
+  ocean-light-surface-border: "#789bbd"
+  ocean-light-text-main: "#102c43"
+  ocean-light-text-muted: "#35536e"
+  ocean-light-accent: "#006b66"
+  forest-dark-primary: "#45e38b"
+  forest-dark-background: "#07140c"
+  forest-dark-surface: "#1b3b29"
+  forest-dark-surface-border: "#3f634c"
+  forest-dark-text-main: "#effff3"
+  forest-dark-text-muted: "#c4e8d0"
+  forest-dark-accent: "#ffcf5a"
+  forest-dark-on-primary: "#062110"
+  forest-light-primary: "#21663a"
+  forest-light-background: "#cfe2d3"
+  forest-light-surface: "#fcfffc"
+  forest-light-surface-border: "#85a58e"
+  forest-light-text-main: "#163821"
+  forest-light-text-muted: "#3b5c44"
+  forest-light-accent: "#765700"
+  violet-dark-primary: "#ce8aff"
+  violet-dark-background: "#0d0618"
+  violet-dark-surface: "#402759"
+  violet-dark-surface-border: "#745595"
+  violet-dark-text-main: "#fcf4ff"
+  violet-dark-text-muted: "#e4cffa"
+  violet-dark-accent: "#57e1d3"
+  violet-dark-on-primary: "#240e36"
+  violet-light-primary: "#6a299c"
+  violet-light-background: "#e0d0ee"
+  violet-light-surface: "#fefbff"
+  violet-light-surface-border: "#a083ba"
+  violet-light-text-main: "#2c1640"
+  violet-light-text-muted: "#5d3d76"
+  violet-light-accent: "#006c70"
 typography:
   headline:
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif"
@@ -153,7 +156,7 @@ components:
 
 Cassandra conserva una interfaz de trabajo compacta y estructurada: fondos continuos, superficies delimitadas, tipografía legible y un acento reconocible para orientar la acción. La identidad vigente de PRODUCT.md exige claridad y poca distracción.
 
-Las cuatro paletas cambian los roles cromáticos y mantienen la misma jerarquía, geometría y navegación. Ámbar oscuro es la apariencia original y predeterminada; Océano, Bosque y Violeta amplían esa misma identidad. No se establece una nueva dirección artística.
+Las cuatro paletas cambian los roles cromáticos y mantienen la misma jerarquía, geometría y navegación. Ámbar oscuro es la apariencia predeterminada; Océano, Bosque y Violeta amplían esa misma identidad. No se establece una nueva dirección artística.
 
 **Key Characteristics:**
 
@@ -181,7 +184,7 @@ Los nombres sin prefijo representan Ámbar oscuro. `light-<rol>` registra la sob
 
 ### Neutral
 
-`background` es el lienzo y el interior de los campos; `surface` es la capa de tarjetas, navegación y diálogos. `surface-border` separa contenedores y listas. `text-main` comunica títulos y contenido; `text-muted` acompaña instrucciones y metadatos. Las tres paletas adicionales heredan la superficie blanca del modo claro.
+`background` es el lienzo y el interior de los campos; `surface` es la capa de tarjetas, navegación y diálogos. `surface-border` separa contenedores y listas. `text-main` comunica títulos y contenido; `text-muted` acompaña instrucciones y metadatos. El modo claro combina un lienzo teñido por la paleta con superficies casi blancas. El modo oscuro combina un lienzo profundo con superficies más luminosas y bordes visibles; los acentos intensos identifican acciones y selección.
 
 Los controles especiales mantienen roles propios `control-background`, `control-border`, `control-label`, `control-muted` y `control-text` en la fuente CSS. No deben sustituirse por colores fijos. Los colores de Mermaid y de la documentación API también se mantienen allí; Mermaid recibe valores hexadecimales resueltos porque no interpreta OKLCH ni `var()`.
 
@@ -193,7 +196,7 @@ Los controles especiales mantienen roles propios `control-background`, `control-
 
 **The Paired Foregrounds Rule.** Un fondo sólido primario usa on-primary; un fondo accent o success usa su correspondiente on-accent u on-success. La elección de tema no cambia este contrato.
 
-`on-accent` y `on-success` siguen a `on-primary`. `on-selected` sigue a `on-primary` en claro y en las paletas oscuras adicionales; Ámbar oscuro conserva su valor original. Los alias `text-default`, colores de controles, diagramas y documentación siguen las reglas de cascada de la fuente. El frontmatter conserva OKLCH, hex y `color-mix()` donde esos formatos son canónicos; no normalizarlos a una tabla hexadecimal paralela.
+`on-accent` y `on-success` siguen a `on-primary`. `on-selected` sigue a `on-primary` en las ocho variantes. Los alias `text-default`, colores de controles, diagramas y documentación siguen las reglas de cascada de la fuente. El frontmatter conserva OKLCH, hex y `color-mix()` donde esos formatos son canónicos; no normalizarlos a una tabla hexadecimal paralela.
 
 ## Typography
 
@@ -220,7 +223,7 @@ La página de claves conserva una columna hasta `lg` (64rem); después distribuy
 
 ## Elevation & Depth
 
-La profundidad combina capas tonales, bordes y sombras puntuales. Las tarjetas de Configuración permanecen sin sombra; la elevación fuerte se reserva para paneles móviles y diálogos. Las tarjetas de proyectos existentes añaden sombra y un desplazamiento vertical corto al pasar el puntero.
+La profundidad se apoya en una diferencia tonal marcada entre lienzo, superficies y bordes, con sombras puntuales. El contraste también distingue los campos, la selección y los estados de interacción. Las tarjetas de Configuración permanecen sin sombra; la elevación fuerte se reserva para paneles móviles y diálogos. Las tarjetas de proyectos existentes añaden sombra y un desplazamiento vertical corto al pasar el puntero.
 
 La escala usada de Tailwind incluye sombra tenue `xs`, sombra de acción `md`, sombra `xl` en hover de proyectos y sombra `2xl` para superposiciones. Los valores exactos se conservan en el sidecar. El fondo de diálogo combina overlay negro al 70 % con desenfoque (4px); el del panel móvil usa overlay al 50 %. El encabezado y la navegación inferior móviles tienen superficies translúcidas y desenfoque.
 
