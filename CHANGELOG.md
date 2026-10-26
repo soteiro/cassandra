@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.16.2](https://github.com/soteiro/cassandra/compare/v0.16.1...v0.16.2) (2026-10-26)
+
+
+### Bug Fixes
+
+* update dependencies ([9658dae](https://github.com/soteiro/cassandra/commit/9658daeea0b683f7341385c71cd56267a36e6620))
+* update dependencies ([68a301d](https://github.com/soteiro/cassandra/commit/68a301dda16375bc0db1aecece48ba17bf77e873))
+
 ## [0.16.1](https://github.com/soteiro/cassandra/compare/v0.16.0...v0.16.1) (2026-10-26)
 
 
