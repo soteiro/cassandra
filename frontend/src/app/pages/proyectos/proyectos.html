@@ -3,7 +3,7 @@
   <div class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-surface-border">
     <div class="space-y-1">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
+        <div class="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center">
           <svg lucideFolder class="w-4 h-4" />
         </div>
         <h1 class="text-2xl md:text-3xl font-bold text-text-main tracking-tight">
@@ -21,7 +21,7 @@
         type="button"
         (click)="reload()"
         [class.animate-spin]="isRotating()"
-        class="p-2.5 bg-surface hover:bg-surface-border text-text-muted hover:text-primary border border-surface-border rounded-xl transition-all cursor-pointer shadow-xs"
+        class="p-2.5 bg-surface hover:bg-surface-border text-text-muted hover:text-primary-text border border-surface-border rounded-xl transition-all cursor-pointer shadow-xs"
         title="Recargar proyectos"
       >
         <svg lucideRefreshCcw class="w-4 h-4" />
@@ -30,7 +30,7 @@
       <button
         type="button"
         (click)="openModal()"
-        class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-4 py-2.5 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
+        class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-4 py-2.5 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
       >
         <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
         <span>Nuevo Proyecto</span>
@@ -96,7 +96,7 @@
         <button
           type="button"
           (click)="statusFilter.set('all')"
-          [class]="statusFilter() === 'all' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="statusFilter() === 'all' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Todos ({{ getStats(proyectos).total }})
@@ -104,7 +104,7 @@
         <button
           type="button"
           (click)="statusFilter.set('active')"
-          [class]="statusFilter() === 'active' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="statusFilter() === 'active' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Activos ({{ getStats(proyectos).active }})
@@ -112,7 +112,7 @@
         <button
           type="button"
           (click)="statusFilter.set('completed')"
-          [class]="statusFilter() === 'completed' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="statusFilter() === 'completed' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Terminados ({{ getStats(proyectos).completed }})
@@ -120,7 +120,7 @@
         <button
           type="button"
           (click)="statusFilter.set('critical')"
-          [class]="statusFilter() === 'critical' ? 'bg-surface text-primary font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="statusFilter() === 'critical' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Alta Prioridad ({{ getStats(proyectos).critical }})
@@ -134,7 +134,7 @@
         <app-project-card [project]="p" />
       } @empty {
         <div class="col-span-full p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-4">
-          <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+          <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-text">
             <svg lucideFolderPlus class="w-6 h-6" />
           </div>
           <div>
@@ -148,7 +148,7 @@
           @if (!searchQuery() && statusFilter() === 'all') {
             <button
               type="button"
-              class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2.5 text-xs shadow-lg transition-all cursor-pointer inline-flex items-center gap-1.5"
+              class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-5 py-2.5 text-xs shadow-lg transition-all cursor-pointer inline-flex items-center gap-1.5"
               (click)="openModal()"
             >
               <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />

@@ -19,7 +19,7 @@
             <h1 class="text-xl sm:text-2xl font-bold text-text-main tracking-tight truncate">
               {{ persona()?.nombre || 'Mi Espacio' }}
             </h1>
-            <span class="text-[11px] font-semibold uppercase tracking-wider bg-primary/15 text-primary border border-primary/30 px-2.5 py-0.5 rounded-lg">
+            <span class="text-[11px] font-semibold uppercase tracking-wider bg-primary/15 text-primary-text border border-primary/30 px-2.5 py-0.5 rounded-lg">
               Bitácora Personal
             </span>
           </div>
@@ -56,7 +56,7 @@
   <div class="p-5 sm:p-6 bg-surface border border-surface-border rounded-2xl shadow-sm space-y-4">
     <div class="flex items-center justify-between gap-3 pb-3 border-b border-surface-border flex-wrap">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary flex items-center justify-center">
+        <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center">
           <svg lucideFeather class="w-4 h-4" />
         </div>
         <h2 class="text-sm sm:text-base font-bold text-text-main">
@@ -131,7 +131,7 @@
         <div class="text-[11px] text-text-muted flex items-center gap-2">
           <span>{{ wordCount() }} palabras</span>
           @if (nuevoTexto().trim()) {
-            <span class="text-primary font-medium">• Escritura activa</span>
+            <span class="text-primary-text font-medium">• Escritura activa</span>
           }
         </div>
 
@@ -139,7 +139,7 @@
           type="button"
           [disabled]="isSubmittingNuevo() || !nuevoTexto().trim()"
           (click)="createReflexion()"
-          class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+          class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
         >
           @if (isSubmittingNuevo()) {
             <span class="animate-spin text-xs">⠋</span>
@@ -227,7 +227,7 @@
     } @else if (reflexionesResource?.error()) {
       <div role="alert" class="p-4 space-y-3">
         <p class="text-sm text-danger">No se pudieron cargar las reflexiones.</p>
-        <button type="button" (click)="reflexionesResource?.reload()" class="text-sm text-primary underline cursor-pointer">Reintentar</button>
+        <button type="button" (click)="reflexionesResource?.reload()" class="text-sm text-primary-text underline cursor-pointer">Reintentar</button>
       </div>
     } @else if (reflexionesResource?.value(); as items) {
       <div class="space-y-3">
@@ -265,7 +265,7 @@
                 <button
                   type="button"
                   (click)="openEdit(item)"
-                  class="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                  class="p-1.5 rounded-lg text-text-muted hover:text-primary-text hover:bg-primary/10 transition-colors cursor-pointer"
                   title="Editar entrada"
                 >
                   <svg lucidePencil class="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@
         } @empty {
           <!-- ESTADO VACÍO -->
           <div class="p-12 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-3">
-            <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-xl">
+            <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-text text-xl">
               ✍️
             </div>
             <div>

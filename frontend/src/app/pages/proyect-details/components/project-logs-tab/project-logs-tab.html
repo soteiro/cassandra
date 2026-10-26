@@ -34,7 +34,7 @@
     } @else if (resource.error()) {
       <div role="alert" class="p-5 bg-surface border border-surface-border rounded-xl">
         <p class="text-sm text-text-main">No se pudo cargar la bitácora.</p>
-        <button type="button" (click)="resource.reload()" class="min-h-11 mt-2 text-sm text-primary underline cursor-pointer focus-visible:outline-2 focus-visible:outline-primary">Reintentar Project logs</button>
+        <button type="button" (click)="resource.reload()" class="min-h-11 mt-2 text-sm text-primary-text underline cursor-pointer focus-visible:outline-2 focus-visible:outline-primary">Reintentar Project logs</button>
       </div>
     } @else if (logs().length === 0) {
       <div class="py-8 text-center border border-dashed border-surface-border rounded-xl">

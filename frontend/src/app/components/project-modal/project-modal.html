@@ -10,7 +10,7 @@
       <!-- HEADER DEL MODAL -->
       <div class="flex justify-between items-start pb-4 border-b border-surface-border">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center shrink-0">
             @if (mode() === 'edit') {
               <svg lucidePencil class="w-5 h-5" />
             } @else if (mode() === 'create-subproject') {
@@ -31,7 +31,7 @@
             </h3>
             <p class="text-xs text-text-muted mt-0.5">
               @if (mode() === 'create-subproject' && parentProject()) {
-                Vinculado al proyecto padre: <strong class="text-primary">{{ parentProject()?.nombre }}</strong>
+                Vinculado al proyecto padre: <strong class="text-primary-text">{{ parentProject()?.nombre }}</strong>
               } @else if (mode() === 'edit') {
                 Ajusta objetivos, prioridades o estado de finalización.
               } @else {
@@ -276,7 +276,7 @@
           <button
             type="submit"
             [disabled]="isSubmitting()"
-            class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
             @if (isSubmitting()) {
               <span class="animate-spin text-xs">⠋</span>

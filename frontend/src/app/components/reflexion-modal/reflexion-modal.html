@@ -11,7 +11,7 @@
       <div class="p-5 border-b border-surface-border flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div
-            class="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center"
+            class="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center"
           >
             <svg lucidePencil class="w-4 h-4" />
           </div>
@@ -121,7 +121,7 @@
           type="button"
           [disabled]="isSubmitting() || !texto().trim()"
           (click)="onSubmit()"
-          class="bg-primary hover:bg-primary/90 text-on-primary font-semibold px-5 py-2 rounded-xl text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+          class="bg-primary hover:bg-primary-hover text-on-primary font-semibold px-5 py-2 rounded-xl text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
         >
           @if (isSubmitting()) {
             <span class="animate-spin text-xs">⠋</span>

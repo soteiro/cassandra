@@ -208,7 +208,7 @@ export class ReflexionesView {
       case 'evento':
         return 'bg-info/15 text-info-text border-info/30';
       default:
-        return 'bg-primary/15 text-primary border-primary/30';
+        return 'bg-primary/15 text-primary-text border-primary/30';
     }
   }
 

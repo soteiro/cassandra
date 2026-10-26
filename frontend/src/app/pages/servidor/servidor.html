@@ -40,7 +40,7 @@
     <button
       type="submit"
       [disabled]="connecting() || !address().trim()"
-      class="mt-2 py-2 px-4 bg-primary hover:bg-primary/90 text-on-primary font-bold rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+      class="mt-2 py-2 px-4 bg-primary hover:bg-primary-hover text-on-primary font-bold rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
     >
       {{ connecting() ? 'Conectando...' : 'Conectar' }}
     </button>

@@ -50,7 +50,7 @@
                 <button type="button" class="button-secondary mt-2" (click)="projectsResource.reload()">Reintentar proyectos</button>
               } @else if (projects().length === 0) {
                 <p class="text-sm text-text-muted">Necesitas un proyecto para generar una clave.</p>
-                <a routerLink="/proyectos" class="inline-flex min-h-11 items-center text-sm text-primary underline">Ir a Proyectos</a>
+                <a routerLink="/proyectos" class="inline-flex min-h-11 items-center text-sm text-primary-text underline">Ir a Proyectos</a>
               } @else {
                 <div class="max-h-56 overflow-y-auto rounded-xl border border-surface-border bg-background p-1">
                   @for (project of projects(); track project.id) {

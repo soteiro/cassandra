@@ -145,7 +145,7 @@ export class PersonaDetails {
       return 'bg-learning/15 text-learning-text border-learning/30';
     }
 
-    return 'bg-primary/15 text-primary border-primary/30';
+    return 'bg-primary/15 text-primary-text border-primary/30';
   }
 
   // --- EDIT PERSONA ---

@@ -9,7 +9,7 @@
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-            <svg lucideBookOpen class="w-5 h-5 text-primary" />
+            <svg lucideBookOpen class="w-5 h-5 text-primary-text" />
             Documentos del Proyecto
           </h3>
           <p class="text-xs text-text-muted mt-0.5">
@@ -65,7 +65,7 @@
             (click)="filterTipo.set('todas')"
             [class]="
               filterTipo() === 'todas'
-                ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+                ? 'bg-primary/20 text-primary-text font-semibold border-primary/30'
                 : 'text-text-muted hover:text-text-main bg-background border-surface-border'
             "
             class="px-2.5 py-1 rounded-lg border transition-colors cursor-pointer"
@@ -79,7 +79,7 @@
               (click)="filterTipo.set(cat.id)"
               [class]="
                 filterTipo() === cat.id
-                  ? 'bg-primary/20 text-primary font-semibold border-primary/30'
+                  ? 'bg-primary/20 text-primary-text font-semibold border-primary/30'
                   : 'text-text-muted hover:text-text-main bg-background border-surface-border'
               "
               class="px-2.5 py-1 rounded-lg border transition-colors cursor-pointer capitalize"
@@ -156,7 +156,7 @@
                     class="p-1 rounded-lg hover:bg-surface-border text-text-muted hover:text-text-main transition-colors cursor-pointer"
                   >
                     @if (copiedDocId() === doc.id) {
-                      <svg lucideCheck class="w-3.5 h-3.5 text-primary" />
+                      <svg lucideCheck class="w-3.5 h-3.5 text-primary-text" />
                     } @else {
                       <svg lucideCopy class="w-3.5 h-3.5" />
                     }
@@ -183,7 +183,7 @@
               </div>
 
               <!-- TÍTULO -->
-              <h4 class="text-sm font-bold text-text-main group-hover:text-primary transition-colors line-clamp-2">
+              <h4 class="text-sm font-bold text-text-main group-hover:text-primary-text transition-colors line-clamp-2">
                 {{ doc.titulo }}
               </h4>
 
@@ -201,7 +201,7 @@
               </span>
 
               @if (doc.tags) {
-                <span class="flex items-center gap-1 text-primary/80 font-mono text-[10px]">
+                <span class="flex items-center gap-1 text-primary-text/80 font-mono text-[10px]">
                   <svg lucideTag class="w-2.5 h-2.5" />
                   {{ doc.tags }}
                 </span>
@@ -237,8 +237,8 @@
             class="px-3 py-1.5 text-xs font-medium border border-surface-border rounded-xl text-text-muted hover:text-text-main hover:bg-surface-border/40 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             @if (copiedDocId() === doc.id) {
-              <svg lucideCheck class="w-3.5 h-3.5 text-primary" />
-              <span class="text-primary">Copiado</span>
+              <svg lucideCheck class="w-3.5 h-3.5 text-primary-text" />
+              <span class="text-primary-text">Copiado</span>
             } @else {
               <svg lucideCopy class="w-3.5 h-3.5" />
               <span>Copiar Markdown</span>
@@ -287,7 +287,7 @@
           </span>
 
           @if (doc.tags) {
-            <span class="text-xs text-primary/90 flex items-center gap-1 font-mono bg-primary/10 px-2 py-0.5 rounded-lg border border-primary/20">
+            <span class="text-xs text-primary-text/90 flex items-center gap-1 font-mono bg-primary/10 px-2 py-0.5 rounded-lg border border-primary/20">
               <svg lucideTag class="w-3 h-3" />
               {{ doc.tags }}
             </span>
@@ -412,7 +412,7 @@
               (click)="editorTab.set('write')"
               [class]="
                 editorTab() === 'write'
-                  ? 'bg-surface text-primary font-semibold shadow-sm'
+                  ? 'bg-surface text-primary-text font-semibold shadow-sm'
                   : 'text-text-muted hover:text-text-main'
               "
               class="px-3 py-1 rounded-lg text-xs transition-all flex items-center gap-1.5 cursor-pointer"
@@ -426,7 +426,7 @@
               (click)="editorTab.set('preview')"
               [class]="
                 editorTab() === 'preview'
-                  ? 'bg-surface text-primary font-semibold shadow-sm'
+                  ? 'bg-surface text-primary-text font-semibold shadow-sm'
                   : 'text-text-muted hover:text-text-main'
               "
               class="px-3 py-1 rounded-lg text-xs transition-all flex items-center gap-1.5 cursor-pointer"
@@ -440,7 +440,7 @@
               (click)="editorTab.set('split')"
               [class]="
                 editorTab() === 'split'
-                  ? 'bg-surface text-primary font-semibold shadow-sm'
+                  ? 'bg-surface text-primary-text font-semibold shadow-sm'
                   : 'text-text-muted hover:text-text-main'
               "
               class="hidden md:flex px-3 py-1 rounded-lg text-xs transition-all items-center gap-1.5 cursor-pointer"

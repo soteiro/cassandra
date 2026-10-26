@@ -4,6 +4,8 @@
 /* Expone los roles como utilidades Tailwind y variables --color-* existentes. */
 @theme inline {
   --color-primary: var(--theme-primary);
+  --color-primary-text: var(--theme-primary-text);
+  --color-primary-hover: var(--theme-primary-hover);
   --color-background: var(--theme-background);
   --color-surface: var(--theme-surface);
   --color-surface-border: var(--theme-surface-border);

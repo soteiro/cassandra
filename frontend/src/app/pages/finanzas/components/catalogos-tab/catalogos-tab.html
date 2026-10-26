@@ -3,7 +3,7 @@
   <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-sm space-y-4">
     <div class="flex items-center justify-between pb-2 border-b border-surface-border">
       <div class="flex items-center gap-2">
-        <svg lucideLandmark class="w-4 h-4 text-primary" />
+        <svg lucideLandmark class="w-4 h-4 text-primary-text" />
         <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
           Cuentas / Bancos
         </h3>
@@ -35,7 +35,7 @@
         <button
           type="submit"
           [disabled]="isSubmittingBanco() || !newBancoNombre().trim()"
-          class="bg-primary hover:bg-primary/90 text-on-primary px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
+          class="bg-primary hover:bg-primary-hover text-on-primary px-3 py-2 rounded-xl text-xs font-medium transition-all disabled:opacity-40 cursor-pointer"
         >
           + Agregar
         </button>

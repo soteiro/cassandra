@@ -4,7 +4,7 @@
   let mode = 'dark';
   try {
     const preference = JSON.parse(localStorage.getItem('cassandra.appearance') || 'null');
-    if (['amber', 'ocean', 'forest', 'violet'].includes(preference?.palette)) palette = preference.palette;
+    if (['amber', 'ocean', 'forest', 'violet', 'synthwave', 'nord', 'rose-pine', 'solarized'].includes(preference?.palette)) palette = preference.palette;
     if (['dark', 'light', 'system'].includes(preference?.mode)) mode = preference.mode;
   } catch {
     // Sin almacenamiento, conserva la apariencia actual de Cassandra.

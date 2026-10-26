@@ -1,8 +1,12 @@
 export const PALETTES = [
-  { value: 'amber', label: 'Ámbar' },
-  { value: 'ocean', label: 'Océano' },
-  { value: 'forest', label: 'Bosque' },
-  { value: 'violet', label: 'Violeta' },
+  { value: 'amber', label: 'Neutro · shadcn/ui' },
+  { value: 'ocean', label: 'GitHub' },
+  { value: 'forest', label: 'VS Code' },
+  { value: 'violet', label: 'Catppuccin' },
+  { value: 'synthwave', label: 'Synthwave ’84' },
+  { value: 'nord', label: 'Nord' },
+  { value: 'rose-pine', label: 'Rosé Pine' },
+  { value: 'solarized', label: 'Solarized' },
 ] as const;
 
 export const COLOR_MODES = [

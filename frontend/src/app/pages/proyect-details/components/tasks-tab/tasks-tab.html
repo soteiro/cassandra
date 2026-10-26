@@ -9,7 +9,7 @@
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
-            <svg lucideCheckCheck class="w-5 h-5 text-primary" />
+            <svg lucideCheckCheck class="w-5 h-5 text-primary-text" />
             Tareas del Proyecto
           </h3>
           <p class="text-xs text-text-muted mt-0.5">
@@ -26,7 +26,7 @@
             (click)="taskFilter.set('pending')"
             [class]="
               taskFilter() === 'pending'
-                ? 'bg-surface text-primary font-semibold shadow-xs'
+                ? 'bg-surface text-primary-text font-semibold shadow-xs'
                 : 'text-text-muted hover:text-text-main'
             "
             class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer "
@@ -89,7 +89,7 @@
             (click)="taskFilter.set('all')"
             [class]="
               taskFilter() === 'all'
-                ? 'bg-surface text-primary font-semibold shadow-xs'
+                ? 'bg-surface text-primary-text font-semibold shadow-xs'
                 : 'text-text-muted hover:text-text-main'
             "
             class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
@@ -108,7 +108,7 @@
               <strong class="text-text-main">{{ getOverallStats(tareas()).completed }}</strong>
               de {{ getOverallStats(tareas()).total }} tareas completadas
             </span>
-            <span class="font-bold text-primary">{{ getOverallStats(tareas()).percent }}%</span>
+            <span class="font-bold text-primary-text">{{ getOverallStats(tareas()).percent }}%</span>
           </div>
           <div
             class="w-full bg-background rounded-full h-2 overflow-hidden border border-surface-border"
@@ -128,7 +128,7 @@
             <span
               class="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted flex items-center pointer-events-none"
             >
-              <svg lucidePlus class="w-4 h-4 text-primary" />
+              <svg lucidePlus class="w-4 h-4 text-primary-text" />
             </span>
             <input
               type="text"
@@ -159,7 +159,7 @@
           <button
             type="submit"
             [disabled]="isSubmittingQuickTask() || !quickTaskTitle().trim()"
-            class="text-xs bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 font-medium px-4 py-2.5 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            class="text-xs bg-primary/20 hover:bg-primary/30 text-primary-text border border-primary/30 font-medium px-4 py-2.5 rounded-xl transition-all disabled:opacity-30 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
           >
             <svg lucidePlus class="w-3.5 h-3.5" />
             <span>↵ Enter</span>
@@ -198,7 +198,7 @@
                 [title]="isExpanded(t.id) ? 'Ocultar subtareas' : 'Mostrar subtareas'"
               >
                 @if (isExpanded(t.id)) {
-                  <svg lucideChevronDown class="w-4 h-4 text-primary transition-transform" />
+                  <svg lucideChevronDown class="w-4 h-4 text-primary-text transition-transform" />
                 } @else {
                   <svg
                     lucideChevronRight
@@ -235,7 +235,7 @@
                         ? 'line-through text-text-muted/60 font-normal'
                         : 'text-text-main font-semibold'
                     "
-                    class="text-sm tracking-tight truncate hover:text-primary transition-colors cursor-pointer"
+                    class="text-sm tracking-tight truncate hover:text-primary-text transition-colors cursor-pointer"
                     title="Haz clic para editar la tarea"
                   >
                     {{ t.nombre }}
@@ -246,7 +246,7 @@
                 }
                 @if (t.comentario) {
                   <p class="text-xs text-text-muted/80 truncate mt-0.5 flex items-center gap-1">
-                    <span class="text-primary/70"><svg lucideMessageCircleMore class="text-primary w-3.5 h-3.5" /></span>
+                    <span class="text-primary-text/70"><svg lucideMessageCircleMore class="text-primary-text w-3.5 h-3.5" /></span>
                     <span>{{ t.comentario }}</span>
                   </p>
                 }
@@ -296,7 +296,7 @@
               <button
                 type="button"
                 (click)="expandTask(t.id)"
-                class="text-xs text-text-muted hover:text-primary hover:bg-background border border-surface-border px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1"
+                class="text-xs text-text-muted hover:text-primary-text hover:bg-background border border-surface-border px-2 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1"
                 title="Agregar subtarea inline"
               >
                 <svg lucidePlus class="w-3.5 h-3.5" />
@@ -355,7 +355,7 @@
                           ? 'line-through text-text-muted/60 font-normal'
                           : 'text-text-main font-medium'
                       "
-                      class="text-xs truncate cursor-pointer hover:text-primary transition-colors"
+                      class="text-xs truncate cursor-pointer hover:text-primary-text transition-colors"
                       title="Haz clic para editar la subtarea"
                     >
                       {{ sub.nombre }}
@@ -393,7 +393,7 @@
               <!-- INPUT INLINE PARA AÑADIR SUBTAREA AL INSTANTE -->
               <form (ngSubmit)="createInlineSubtask(t.id)" class="pt-1">
                 <div class="flex flex-col items-left justify-around gap-4 md:flex-row md:gap-2">
-                  <span class="text-primary/70 text-xs">
+                  <span class="text-primary-text/70 text-xs">
                     <svg lucideCornerDownRight class="w-3.5 h-3.5" />
                   </span>
                   <input
@@ -407,7 +407,7 @@
                   <button
                     type="submit"
                     [disabled]="isSubmittingSubtask()[t.id] || !getSubtaskInput(t.id).trim()"
-                    class="text-xs bg-primary/20 hover:bg-primary/30 text-primary px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-20 cursor-pointer flex items-center gap-1 shrink-0 font-medium"
+                    class="text-xs bg-primary/20 hover:bg-primary/30 text-primary-text px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-20 cursor-pointer flex items-center gap-1 shrink-0 font-medium"
                   >
                     <svg lucidePlus class="w-3 h-3" />
                     <span>Guardar</span>
@@ -422,7 +422,7 @@
           class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-3"
         >
           <div
-            class="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary"
+            class="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary-text"
           >
             <svg lucideListTodo class="w-6 h-6" />
           </div>

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { APPEARANCE_STORAGE_KEY } from '../models/appearance.model';
+import { APPEARANCE_STORAGE_KEY, PALETTES } from '../models/appearance.model';
 import { AppearanceService } from './appearance.service';
 
 describe('AppearanceService', () => {
@@ -38,12 +38,12 @@ describe('AppearanceService', () => {
     expect(localStorage.getItem(APPEARANCE_STORAGE_KEY)).toBeNull();
   });
 
-  it('restores a saved palette and mode', () => {
-    localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify({ palette: 'forest', mode: 'light' }));
+  it.each(PALETTES)('restores the saved $label palette and mode', ({ value }) => {
+    localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify({ palette: value, mode: 'light' }));
     const service = TestBed.inject(AppearanceService);
     TestBed.tick();
 
-    expect(service.palette()).toBe('forest');
+    expect(service.palette()).toBe(value);
     expect(service.resolvedMode()).toBe('light');
     expect(document.documentElement.dataset['mode']).toBe('light');
   });

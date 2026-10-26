@@ -25,7 +25,7 @@
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary flex items-center justify-center shrink-0"
+              class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center shrink-0"
             >
               <svg lucideMessageSquare class="w-5 h-5" />
             </div>
@@ -59,12 +59,12 @@
         <!-- METADATOS Y TIMESTAMPS -->
         <div class="flex flex-wrap items-center gap-2 pt-1 text-xs text-text-muted">
           <div class="flex items-center gap-1.5 bg-background/80 px-2.5 py-1 rounded-lg border border-surface-border">
-            <svg lucideCalendar class="w-3.5 h-3.5 text-primary" />
+            <svg lucideCalendar class="w-3.5 h-3.5 text-primary-text" />
             <span>Creada: {{ item.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
           </div>
 
           @if (item.fecha_actualizacion) {
-            <div class="flex items-center gap-1.5 bg-background/80 px-2.5 py-1 rounded-lg border border-surface-border text-primary/80">
+            <div class="flex items-center gap-1.5 bg-background/80 px-2.5 py-1 rounded-lg border border-surface-border text-primary-text/80">
               <svg lucideClock class="w-3.5 h-3.5" />
               <span>Editada: {{ item.fecha_actualizacion | date: 'dd/MM/yyyy HH:mm' }}</span>
             </div>
@@ -98,7 +98,7 @@
               <button
                 type="button"
                 (click)="copyText()"
-                class="text-xs text-text-muted hover:text-primary flex items-center gap-1 transition-colors cursor-pointer"
+                class="text-xs text-text-muted hover:text-primary-text flex items-center gap-1 transition-colors cursor-pointer"
                 title="Copiar texto"
               >
                 @if (isCopied()) {
@@ -135,7 +135,7 @@
             type="button"
             [disabled]="isSubmitting() || !editingText().trim()"
             (click)="saveEdit()"
-            class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
             @if (isSubmitting()) {
               <span class="animate-spin text-xs">⠋</span>
@@ -168,7 +168,7 @@
             <button
               type="button"
               (click)="onClose()"
-              class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all cursor-pointer"
+              class="bg-primary hover:bg-primary-hover text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all cursor-pointer"
             >
               Listo
             </button>

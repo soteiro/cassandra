@@ -1,75 +1,80 @@
-/* Paletas semánticas compartidas por la app y la documentación API.
- * Fondos profundos, superficies diferenciadas y acentos intensos.
- * Cada variante sobrescribe estos roles sin cambiar las clases de las vistas.
+/* Presets adaptados de sistemas publicados, sin dependencias de sus componentes.
+ * Neutro: shadcn/ui. GitHub: Primer. VS Code: Modern. Catppuccin: Latte/Mocha.
+ * Synthwave ’84, Nord, Rosé Pine y Solarized amplían los presets publicados.
+ * Los identificadores anteriores conservan las preferencias guardadas.
+ * Fuentes y adaptación de roles: DESIGN.md.
  */
 :root {
   --theme-color-scheme: dark;
-  --theme-primary: #ffb020;
-  --theme-background: #0b0804;
-  --theme-surface: #3b2e20;
-  --theme-surface-border: #78634a;
-  --theme-text-main: #fff5e5;
-  --theme-text-muted: #e0ceb0;
-  --theme-accent: #50d7e2;
-  --theme-success: oklch(72% 0.17 142);
-  --theme-danger: oklch(75% 0.18 25);
+  --theme-primary: #fafafa;
+  --theme-primary-text: #fafafa;
+  --theme-primary-hover: #e5e5e5;
+  --theme-background: #0a0a0a;
+  --theme-surface: #171717;
+  --theme-surface-border: #333333;
+  --theme-text-main: #fafafa;
+  --theme-text-muted: #a1a1a1;
   --theme-text-default: var(--theme-text-main);
-  --theme-on-primary: #241400;
-  --theme-on-accent: var(--theme-on-primary);
-  --theme-on-success: var(--theme-on-primary);
-  --theme-on-solid: #fff;
+  --theme-on-primary: #171717;
   --theme-on-selected: var(--theme-on-primary);
-  --theme-on-positive: #071b11;
-  --theme-on-danger: #18181b;
-  --theme-browser-background: var(--theme-background);
-  --theme-overlay: #000;
+
+  /* Texto y fondo de una acción tienen roles distintos. */
+  --theme-accent: #58a6ff;
+  --theme-success: #3fb950;
+  --theme-danger: #ff7b72;
+  --theme-on-accent: #0d1117;
+  --theme-on-success: #0d1117;
+  --theme-on-positive: #0d1117;
+  --theme-on-danger: #0d1117;
+  --theme-on-solid: #ffffff;
+  --theme-overlay: #000000;
   --theme-interaction-shade: var(--theme-overlay);
-  --theme-control-background: #080603;
-  --theme-control-border: #a48b63;
+  --theme-browser-background: var(--theme-background);
+  --theme-control-background: #0a0a0a;
+  --theme-control-border: #525252;
   --theme-control-label: var(--theme-text-main);
   --theme-control-muted: var(--theme-text-muted);
   --theme-control-text: var(--theme-text-main);
-  --theme-warning: oklch(76.9% 0.188 70.08);
-  --theme-warning-text: oklch(82.8% 0.189 84.429);
-  --theme-neutral-text: oklch(78% 0.04 256.788);
-  --theme-warning-emphasis: oklch(87.9% 0.169 91.605);
-  --theme-info-emphasis: oklch(80.9% 0.105 251.813);
-  --theme-insight-emphasis: oklch(82.7% 0.119 306.383);
-  --theme-warning-surface: oklch(41.4% 0.112 45.904);
-  --theme-warning-border: oklch(47.3% 0.137 46.201);
-  --theme-info-surface: oklch(37.9% 0.146 265.522);
-  --theme-info-border: oklch(42.4% 0.199 265.638);
-  --theme-insight-surface: oklch(38.1% 0.176 304.987);
-  --theme-insight-border: oklch(43.8% 0.218 303.724);
-  --theme-insight: oklch(62.7% 0.265 303.9);
-  --theme-info: oklch(62.3% 0.214 259.815);
-  --theme-insight-text: oklch(81% 0.17 305.504);
-  --theme-info-text: oklch(80% 0.15 254.624);
-  --theme-personal: oklch(64.5% 0.246 16.439);
-  --theme-personal-text: oklch(80% 0.17 13.428);
-  --theme-positive: oklch(69.6% 0.17 162.48);
-  --theme-positive-text: oklch(76.5% 0.177 163.223);
-  --theme-learning: oklch(71.5% 0.143 215.221);
-  --theme-learning-text: oklch(78.9% 0.154 211.53);
-  --theme-insight-solid: oklch(55.8% 0.288 302.321);
-  --theme-insight-solid-hover: oklch(49.6% 0.265 301.924);
-  --theme-idea: oklch(79.5% 0.184 86.047);
-  --theme-idea-text: oklch(85.2% 0.199 91.936);
-  --theme-creative: oklch(66.7% 0.295 322.15);
-  --theme-creative-text: oklch(81% 0.20 322.16);
-  --theme-retrospective: oklch(70.4% 0.14 182.503);
-  --theme-retrospective-text: oklch(77.7% 0.152 181.912);
-  --theme-neutral: oklch(55.4% 0.046 257.417);
 
-  /* Mermaid necesita colores hexadecimales; no interpreta oklch ni var(). */
+  /* Estados y categorías de Primer, independientes del preset. */
+  --theme-warning: #d29922;
+  --theme-warning-text: #e3b341;
+  --theme-warning-emphasis: #f2cc60;
+  --theme-warning-surface: #341a00;
+  --theme-warning-border: #9e6a03;
+  --theme-info: #388bfd;
+  --theme-info-text: #79c0ff;
+  --theme-info-emphasis: #a5d6ff;
+  --theme-info-surface: #0c2d6b;
+  --theme-info-border: #1f6feb;
+  --theme-insight: #a371f7;
+  --theme-insight-text: #d2a8ff;
+  --theme-insight-emphasis: #e2c5ff;
+  --theme-insight-surface: #3c1e70;
+  --theme-insight-border: #8957e5;
+  --theme-insight-solid: #8957e5;
+  --theme-insight-solid-hover: #6e40c9;
+  --theme-positive: #3fb950;
+  --theme-positive-text: #7ee787;
+  --theme-personal: #db61a2;
+  --theme-personal-text: #ff9bce;
+  --theme-learning: #39c5cf;
+  --theme-learning-text: #a5e9f0;
+  --theme-idea: #d29922;
+  --theme-idea-text: #f2cc60;
+  --theme-creative: #db61a2;
+  --theme-creative-text: #ffbedd;
+  --theme-retrospective: #39c5cf;
+  --theme-retrospective-text: #a5e9f0;
+  --theme-neutral: #6e7681;
+  --theme-neutral-text: #b1bac4;
+
   --theme-diagram-background: var(--theme-background);
   --theme-diagram-surface: var(--theme-surface);
-  --theme-diagram-primary: var(--theme-primary);
+  --theme-diagram-primary: var(--theme-primary-text);
   --theme-diagram-text: var(--theme-text-main);
   --theme-diagram-muted: var(--theme-text-muted);
   --theme-diagram-border: var(--theme-surface-border);
-
-  /* Superficie y scrollbars de la documentación API. */
   --theme-docs-background: var(--theme-background);
   --theme-docs-scrollbar: rgb(255 255 255 / 20%);
   --theme-docs-scrollbar-hover: rgb(255 255 255 / 40%);
@@ -79,149 +84,266 @@
 
 :root[data-mode='light'] {
   --theme-color-scheme: light;
-  --theme-primary: #8a4b00;
-  --theme-background: #e9d7b0;
-  --theme-surface: #fffdf6;
-  --theme-surface-border: #aa8950;
-  --theme-text-main: #21170d;
-  --theme-text-muted: #563c1f;
-  --theme-text-default: var(--theme-text-main);
-  --theme-accent: #075a78;
-  --theme-success: #236b39;
-  --theme-danger: #b12836;
-  --theme-on-primary: #fff;
-  --theme-on-selected: var(--theme-on-primary);
-  --theme-on-positive: #fff;
-  --theme-on-danger: #fff;
-  --theme-browser-background: var(--theme-background);
-  --theme-control-background: var(--theme-surface);
-  --theme-control-border: var(--theme-surface-border);
-  --theme-control-label: var(--theme-text-main);
-  --theme-control-muted: var(--theme-text-muted);
-  --theme-control-text: var(--theme-text-main);
-  --theme-warning: #845000;
-  --theme-warning-text: #764600;
-  --theme-warning-emphasis: #714500;
-  --theme-warning-surface: #fff0d2;
-  --theme-warning-border: #b6842e;
-  --theme-info: #1f58a0;
-  --theme-info-text: #265a97;
-  --theme-info-emphasis: #204d82;
-  --theme-info-surface: #e2edff;
-  --theme-info-border: #779dce;
-  --theme-insight: #7446a3;
-  --theme-insight-text: #7446a3;
-  --theme-insight-emphasis: #613385;
-  --theme-insight-surface: #f0e6fb;
-  --theme-insight-border: #ae8ccf;
-  --theme-insight-solid: #7540b4;
-  --theme-insight-solid-hover: #5f2b9c;
-  --theme-positive: #247348;
-  --theme-positive-text: #22673e;
-  --theme-personal: #b03867;
-  --theme-personal-text: #a32859;
-  --theme-learning: #096e86;
-  --theme-learning-text: #08657b;
-  --theme-idea: #856100;
-  --theme-idea-text: #775500;
-  --theme-creative: #9b2d97;
-  --theme-creative-text: #8a2787;
-  --theme-retrospective: #146c63;
-  --theme-retrospective-text: #0c6159;
-  --theme-neutral: #687482;
-  --theme-neutral-text: #465467;
-  --theme-diagram-background: var(--theme-background);
-  --theme-diagram-surface: var(--theme-surface);
-  --theme-diagram-primary: var(--theme-primary);
-  --theme-diagram-text: var(--theme-text-main);
-  --theme-diagram-muted: var(--theme-text-muted);
-  --theme-diagram-border: var(--theme-surface-border);
-  --theme-docs-background: var(--theme-background);
+  --theme-primary: #171717;
+  --theme-primary-text: #171717;
+  --theme-primary-hover: #262626;
+  --theme-background: #f5f5f5;
+  --theme-surface: #ffffff;
+  --theme-surface-border: #d4d4d4;
+  --theme-text-main: #171717;
+  --theme-text-muted: #525252;
+  --theme-on-primary: #ffffff;
+  --theme-on-accent: #ffffff;
+  --theme-on-success: #ffffff;
+  --theme-on-positive: #ffffff;
+  --theme-on-danger: #ffffff;
+  --theme-accent: #0969da;
+  --theme-success: #1a7f37;
+  --theme-danger: #cf222e;
+  --theme-control-background: #ffffff;
+  --theme-control-border: #a3a3a3;
+
+  --theme-warning: #9a6700;
+  --theme-warning-text: #7d4e00;
+  --theme-warning-emphasis: #633c01;
+  --theme-warning-surface: #fff8c5;
+  --theme-warning-border: #bf8700;
+  --theme-info: #0969da;
+  --theme-info-text: #0550ae;
+  --theme-info-emphasis: #033d8b;
+  --theme-info-surface: #ddf4ff;
+  --theme-info-border: #80ccff;
+  --theme-insight: #8250df;
+  --theme-insight-text: #6639ba;
+  --theme-insight-emphasis: #512a97;
+  --theme-insight-surface: #fbefff;
+  --theme-insight-border: #c297ff;
+  --theme-insight-solid: #8250df;
+  --theme-insight-solid-hover: #6639ba;
+  --theme-positive: #1a7f37;
+  --theme-positive-text: #116329;
+  --theme-personal: #bf3989;
+  --theme-personal-text: #99286e;
+  --theme-learning: #0e7079;
+  --theme-learning-text: #0e5660;
+  --theme-idea: #9a6700;
+  --theme-idea-text: #744500;
+  --theme-creative: #bf3989;
+  --theme-creative-text: #99286e;
+  --theme-retrospective: #0e7079;
+  --theme-retrospective-text: #0e5660;
+  --theme-neutral: #818b98;
+  --theme-neutral-text: #59636e;
   --theme-docs-scrollbar: rgb(0 0 0 / 20%);
   --theme-docs-scrollbar-hover: rgb(0 0 0 / 40%);
 }
 
+/* GitHub / Primer: canvas inset y superficies neutrales. */
 :root[data-palette='ocean'][data-mode='dark'] {
-  --theme-primary: #4cb5ff;
-  --theme-background: #06111e;
-  --theme-surface: #183b59;
-  --theme-surface-border: #3d6285;
-  --theme-text-main: #f1f9ff;
-  --theme-text-muted: #c8e3fa;
-  --theme-accent: #39e0cc;
-  --theme-on-primary: #061b2b;
-  --theme-control-background: #030a12;
-  --theme-control-border: #6a9ac2;
-}
-
-:root[data-palette='forest'][data-mode='dark'] {
-  --theme-primary: #45e38b;
-  --theme-background: #07140c;
-  --theme-surface: #1b3b29;
-  --theme-surface-border: #3f634c;
-  --theme-text-main: #effff3;
-  --theme-text-muted: #c4e8d0;
-  --theme-accent: #ffcf5a;
-  --theme-on-primary: #062110;
-  --theme-control-background: #030b06;
-  --theme-control-border: #76a786;
-}
-
-:root[data-palette='violet'][data-mode='dark'] {
-  --theme-primary: #ce8aff;
-  --theme-background: #0d0618;
-  --theme-surface: #402759;
-  --theme-surface-border: #745595;
-  --theme-text-main: #fcf4ff;
-  --theme-text-muted: #e4cffa;
-  --theme-accent: #57e1d3;
-  --theme-on-primary: #240e36;
-  --theme-control-background: #0b0414;
-  --theme-control-border: #a181c3;
+  --theme-primary: #1f6feb;
+  --theme-primary-text: #58a6ff;
+  --theme-primary-hover: #1158c7;
+  --theme-background: #0d1117;
+  --theme-surface: #161b22;
+  --theme-surface-border: #30363d;
+  --theme-text-main: #e6edf3;
+  --theme-text-muted: #9da7b3;
+  --theme-on-primary: #ffffff;
+  --theme-control-background: #0d1117;
+  --theme-control-border: #484f58;
 }
 
 :root[data-palette='ocean'][data-mode='light'] {
-  --theme-primary: #075da8;
-  --theme-background: #ccdfef;
-  --theme-surface-border: #789bbd;
-  --theme-text-main: #102c43;
-  --theme-text-muted: #35536e;
-  --theme-accent: #006b66;
-  --theme-surface: #fff;
+  --theme-primary: #0969da;
+  --theme-primary-text: #0969da;
+  --theme-primary-hover: #0550ae;
+  --theme-background: #f6f8fa;
+  --theme-surface: #ffffff;
+  --theme-surface-border: #d1d9e0;
+  --theme-text-main: #1f2328;
+  --theme-text-muted: #59636e;
+  --theme-control-border: #818b98;
+}
+
+/* VS Code Modern: grises neutros, controles diferenciados y acción azul. */
+:root[data-palette='forest'][data-mode='dark'] {
+  --theme-primary: #0078d4;
+  --theme-primary-text: #4daafc;
+  --theme-primary-hover: #026ec1;
+  --theme-background: #181818;
+  --theme-surface: #1f1f1f;
+  --theme-surface-border: #3c3c3c;
+  --theme-text-main: #e0e0e0;
+  --theme-text-muted: #adadad;
+  --theme-on-primary: #ffffff;
+  --theme-control-background: #313131;
+  --theme-control-border: #616161;
 }
 
 :root[data-palette='forest'][data-mode='light'] {
-  --theme-primary: #21663a;
-  --theme-background: #cfe2d3;
-  --theme-surface-border: #85a58e;
-  --theme-text-main: #163821;
-  --theme-text-muted: #3b5c44;
-  --theme-accent: #765700;
-  --theme-surface: #fcfffc;
+  --theme-primary: #005fb8;
+  --theme-primary-text: #005fb8;
+  --theme-primary-hover: #0258a8;
+  --theme-background: #f8f8f8;
+  --theme-surface: #ffffff;
+  --theme-surface-border: #cecece;
+  --theme-text-main: #1f1f1f;
+  --theme-text-muted: #616161;
+  --theme-control-border: #8b8b8b;
+}
+
+/* Catppuccin Mocha / Latte: neutros azulados y acento mauve publicados. */
+:root[data-palette='violet'][data-mode='dark'] {
+  --theme-primary: #cba6f7;
+  --theme-primary-text: #cba6f7;
+  --theme-primary-hover: #b791e5;
+  --theme-background: #1e1e2e;
+  --theme-surface: #313244;
+  --theme-surface-border: #45475a;
+  --theme-text-main: #cdd6f4;
+  --theme-text-muted: #bac2de;
+  --theme-on-primary: #1e1e2e;
+  --theme-control-background: #181825;
+  --theme-control-border: #6c7086;
 }
 
 :root[data-palette='violet'][data-mode='light'] {
-  --theme-primary: #6a299c;
-  --theme-background: #e0d0ee;
-  --theme-surface-border: #a083ba;
-  --theme-text-main: #2c1640;
-  --theme-text-muted: #5d3d76;
-  --theme-accent: #006c70;
-  --theme-surface: #fefbff;
+  --theme-primary: #8839ef;
+  --theme-primary-text: #8839ef;
+  --theme-primary-hover: #7529d4;
+  --theme-background: #e6e9ef;
+  --theme-surface: #eff1f5;
+  --theme-surface-border: #bcc0cc;
+  --theme-text-main: #4c4f69;
+  --theme-text-muted: #5c5f77;
+  --theme-control-background: #eff1f5;
+  --theme-control-border: #9ca0b0;
 }
 
-:root:is([data-palette='ocean'], [data-palette='forest'], [data-palette='violet'])[data-mode='dark'] {
-  --theme-text-default: var(--theme-text-main);
-  --theme-on-selected: var(--theme-on-primary);
-  --theme-browser-background: var(--theme-background);
-  --theme-control-label: var(--theme-text-main);
-  --theme-control-muted: var(--theme-text-muted);
-  --theme-control-text: var(--theme-text-main);
-  --theme-diagram-background: var(--theme-background);
-  --theme-diagram-surface: var(--theme-surface);
-  --theme-diagram-primary: var(--theme-primary);
-  --theme-diagram-text: var(--theme-text-main);
-  --theme-diagram-muted: var(--theme-text-muted);
-  --theme-diagram-border: var(--theme-surface-border);
-  --theme-docs-background: var(--theme-background);
+/* Synthwave ’84: violeta profundo, rosa y cian del tema de Robb Owen. */
+:root[data-palette='synthwave'][data-mode='dark'] {
+  --theme-primary: #ff7edb;
+  --theme-primary-text: #ff7edb;
+  --theme-primary-hover: #f97e72;
+  --theme-background: #262335;
+  --theme-surface: #2a2139;
+  --theme-surface-border: #495495;
+  --theme-text-main: #ffffff;
+  --theme-text-muted: #b6b1c7;
+  --theme-on-primary: #241b2f;
+  --theme-accent: #03edf9;
+  --theme-on-accent: #241b2f;
+  --theme-control-background: #241b2f;
+  --theme-control-border: #8672a6;
+}
+
+/* Adaptación clara de Cassandra: conserva rosa/cian con texto más oscuro. */
+:root[data-palette='synthwave'][data-mode='light'] {
+  --theme-primary: #9c247c;
+  --theme-primary-text: #9c247c;
+  --theme-primary-hover: #80165f;
+  --theme-background: #f5eef8;
+  --theme-surface: #fffafd;
+  --theme-surface-border: #d3bfdc;
+  --theme-text-main: #2a2139;
+  --theme-text-muted: #695477;
+  --theme-accent: #007581;
+  --theme-control-background: #fffafd;
+  --theme-control-border: #947ba5;
+}
+
+/* Nord: Polar Night / Snow Storm, con Frost y texto adaptado a WCAG AA. */
+:root[data-palette='nord'][data-mode='dark'] {
+  --theme-primary: #88c0d0;
+  --theme-primary-text: #88c0d0;
+  --theme-primary-hover: #8fbcbb;
+  --theme-background: #2e3440;
+  --theme-surface: #3b4252;
+  --theme-surface-border: #4c566a;
+  --theme-text-main: #eceff4;
+  --theme-text-muted: #d8dee9;
+  --theme-on-primary: #2e3440;
+  --theme-accent: #8fbcbb;
+  --theme-on-accent: #2e3440;
+  --theme-success: #a3be8c;
+  --theme-danger: #f0a0a8;
+  --theme-control-background: #2e3440;
+  --theme-control-border: #7b88a1;
+}
+
+:root[data-palette='nord'][data-mode='light'] {
+  --theme-primary: #476b93;
+  --theme-primary-text: #476b93;
+  --theme-primary-hover: #3b597b;
+  --theme-background: #e5e9f0;
+  --theme-surface: #eceff4;
+  --theme-surface-border: #b4becd;
+  --theme-text-main: #2e3440;
+  --theme-text-muted: #4c566a;
+  --theme-accent: #3e6874;
+  --theme-success: #3f642f;
+  --theme-control-background: #eceff4;
+  --theme-control-border: #8490a5;
+}
+
+/* Rosé Pine: Main / Dawn, con rose/love para las acciones. */
+:root[data-palette='rose-pine'][data-mode='dark'] {
+  --theme-primary: #ebbcba;
+  --theme-primary-text: #ebbcba;
+  --theme-primary-hover: #dba8a6;
+  --theme-background: #191724;
+  --theme-surface: #1f1d2e;
+  --theme-surface-border: #403d52;
+  --theme-text-main: #e0def4;
+  --theme-text-muted: #908caa;
+  --theme-on-primary: #191724;
+  --theme-accent: #9ccfd8;
+  --theme-on-accent: #191724;
+  --theme-control-background: #191724;
+  --theme-control-border: #6e6a86;
+}
+
+:root[data-palette='rose-pine'][data-mode='light'] {
+  --theme-primary: #9e4865;
+  --theme-primary-text: #9e4865;
+  --theme-primary-hover: #873b55;
+  --theme-background: #faf4ed;
+  --theme-surface: #fffaf3;
+  --theme-surface-border: #cecacd;
+  --theme-text-main: #575279;
+  --theme-text-muted: #706b86;
+  --theme-accent: #286983;
+  --theme-control-background: #fffaf3;
+  --theme-control-border: #9893a5;
+}
+
+/* Solarized: base03/base02 y base2/base3, con acento teal adaptado a AA. */
+:root[data-palette='solarized'][data-mode='dark'] {
+  --theme-primary: #2aa198;
+  --theme-primary-text: #57c3b6;
+  --theme-primary-hover: #55b6a8;
+  --theme-background: #002b36;
+  --theme-surface: #073642;
+  --theme-surface-border: #31535c;
+  --theme-text-main: #eee8d5;
+  --theme-text-muted: #93a1a1;
+  --theme-on-primary: #002b36;
+  --theme-accent: #78b4dd;
+  --theme-on-accent: #002b36;
+  --theme-control-background: #002b36;
+  --theme-control-border: #657b83;
+}
+
+:root[data-palette='solarized'][data-mode='light'] {
+  --theme-primary: #006e68;
+  --theme-primary-text: #006e68;
+  --theme-primary-hover: #005b56;
+  --theme-background: #eee8d5;
+  --theme-surface: #fdf6e3;
+  --theme-surface-border: #c7c0aa;
+  --theme-text-main: #073642;
+  --theme-text-muted: #586e75;
+  --theme-accent: #176da0;
+  --theme-control-background: #fdf6e3;
+  --theme-control-border: #839496;
 }

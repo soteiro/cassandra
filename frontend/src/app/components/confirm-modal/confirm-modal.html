@@ -46,7 +46,7 @@
           type="button"
           (click)="onConfirm()"
           [disabled]="isProcessing()"
-          [class]="variant() === 'danger' ? 'bg-danger hover:bg-danger/90 text-on-danger shadow-danger/20' : 'bg-primary hover:bg-primary/90 text-on-primary'"
+          [class]="variant() === 'danger' ? 'bg-danger hover:bg-danger/90 text-on-danger shadow-danger/20' : 'bg-primary hover:bg-primary-hover text-on-primary'"
           class="px-4 py-2 text-xs font-semibold rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
         >
           @if (isProcessing()) {

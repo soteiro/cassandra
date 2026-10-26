@@ -2,75 +2,190 @@
 name: Cassandra
 description: "Sistema visual existente para claridad, estructura y foco."
 colors:
-  primary: "#ffb020"
-  background: "#0b0804"
-  surface: "#3b2e20"
-  surface-border: "#78634a"
-  text-main: "#fff5e5"
-  text-muted: "#e0ceb0"
-  accent: "#50d7e2"
-  on-primary: "#241400"
-  success: "oklch(72% 0.17 142)"
-  danger: "oklch(75% 0.18 25)"
-  warning: "oklch(76.9% 0.188 70.08)"
-  warning-text: "oklch(82.8% 0.189 84.429)"
-  light-primary: "#8a4b00"
-  light-background: "#e9d7b0"
-  light-surface: "#fffdf6"
-  light-surface-border: "#aa8950"
-  light-text-main: "#21170d"
-  light-text-muted: "#563c1f"
-  light-accent: "#075a78"
-  light-on-primary: "#fff"
-  light-success: "#236b39"
-  light-danger: "#b12836"
-  light-warning: "#845000"
-  light-warning-text: "#764600"
-  ocean-dark-primary: "#4cb5ff"
-  ocean-dark-background: "#06111e"
-  ocean-dark-surface: "#183b59"
-  ocean-dark-surface-border: "#3d6285"
-  ocean-dark-text-main: "#f1f9ff"
-  ocean-dark-text-muted: "#c8e3fa"
-  ocean-dark-accent: "#39e0cc"
-  ocean-dark-on-primary: "#061b2b"
-  ocean-light-primary: "#075da8"
-  ocean-light-background: "#ccdfef"
-  ocean-light-surface: "#fff"
-  ocean-light-surface-border: "#789bbd"
-  ocean-light-text-main: "#102c43"
-  ocean-light-text-muted: "#35536e"
-  ocean-light-accent: "#006b66"
-  forest-dark-primary: "#45e38b"
-  forest-dark-background: "#07140c"
-  forest-dark-surface: "#1b3b29"
-  forest-dark-surface-border: "#3f634c"
-  forest-dark-text-main: "#effff3"
-  forest-dark-text-muted: "#c4e8d0"
-  forest-dark-accent: "#ffcf5a"
-  forest-dark-on-primary: "#062110"
-  forest-light-primary: "#21663a"
-  forest-light-background: "#cfe2d3"
-  forest-light-surface: "#fcfffc"
-  forest-light-surface-border: "#85a58e"
-  forest-light-text-main: "#163821"
-  forest-light-text-muted: "#3b5c44"
-  forest-light-accent: "#765700"
-  violet-dark-primary: "#ce8aff"
-  violet-dark-background: "#0d0618"
-  violet-dark-surface: "#402759"
-  violet-dark-surface-border: "#745595"
-  violet-dark-text-main: "#fcf4ff"
-  violet-dark-text-muted: "#e4cffa"
-  violet-dark-accent: "#57e1d3"
-  violet-dark-on-primary: "#240e36"
-  violet-light-primary: "#6a299c"
-  violet-light-background: "#e0d0ee"
-  violet-light-surface: "#fefbff"
-  violet-light-surface-border: "#a083ba"
-  violet-light-text-main: "#2c1640"
-  violet-light-text-muted: "#5d3d76"
-  violet-light-accent: "#006c70"
+  primary: "#fafafa"
+  primary-text: "#fafafa"
+  primary-hover: "#e5e5e5"
+  background: "#0a0a0a"
+  surface: "#171717"
+  surface-border: "#333333"
+  text-main: "#fafafa"
+  text-muted: "#a1a1a1"
+  accent: "#58a6ff"
+  on-primary: "#171717"
+  success: "#3fb950"
+  danger: "#ff7b72"
+  warning: "#d29922"
+  warning-text: "#e3b341"
+  light-primary: "#171717"
+  light-primary-text: "#171717"
+  light-primary-hover: "#262626"
+  light-background: "#f5f5f5"
+  light-surface: "#ffffff"
+  light-surface-border: "#d4d4d4"
+  light-text-main: "#171717"
+  light-text-muted: "#525252"
+  light-accent: "#0969da"
+  light-on-primary: "#ffffff"
+  light-success: "#1a7f37"
+  light-danger: "#cf222e"
+  light-warning: "#9a6700"
+  light-warning-text: "#7d4e00"
+  ocean-dark-primary: "#1f6feb"
+  ocean-dark-primary-text: "#58a6ff"
+  ocean-dark-primary-hover: "#1158c7"
+  ocean-dark-background: "#0d1117"
+  ocean-dark-surface: "#161b22"
+  ocean-dark-surface-border: "#30363d"
+  ocean-dark-text-main: "#e6edf3"
+  ocean-dark-text-muted: "#9da7b3"
+  ocean-dark-accent: "#58a6ff"
+  ocean-dark-on-primary: "#ffffff"
+  ocean-light-primary: "#0969da"
+  ocean-light-primary-text: "#0969da"
+  ocean-light-primary-hover: "#0550ae"
+  ocean-light-background: "#f6f8fa"
+  ocean-light-surface: "#ffffff"
+  ocean-light-surface-border: "#d1d9e0"
+  ocean-light-text-main: "#1f2328"
+  ocean-light-text-muted: "#59636e"
+  ocean-light-accent: "#0969da"
+  forest-dark-primary: "#0078d4"
+  forest-dark-primary-text: "#4daafc"
+  forest-dark-primary-hover: "#026ec1"
+  forest-dark-background: "#181818"
+  forest-dark-surface: "#1f1f1f"
+  forest-dark-surface-border: "#3c3c3c"
+  forest-dark-text-main: "#e0e0e0"
+  forest-dark-text-muted: "#adadad"
+  forest-dark-accent: "#58a6ff"
+  forest-dark-on-primary: "#ffffff"
+  forest-light-primary: "#005fb8"
+  forest-light-primary-text: "#005fb8"
+  forest-light-primary-hover: "#0258a8"
+  forest-light-background: "#f8f8f8"
+  forest-light-surface: "#ffffff"
+  forest-light-surface-border: "#cecece"
+  forest-light-text-main: "#1f1f1f"
+  forest-light-text-muted: "#616161"
+  forest-light-accent: "#0969da"
+  violet-dark-primary: "#cba6f7"
+  violet-dark-primary-text: "#cba6f7"
+  violet-dark-primary-hover: "#b791e5"
+  violet-dark-background: "#1e1e2e"
+  violet-dark-surface: "#313244"
+  violet-dark-surface-border: "#45475a"
+  violet-dark-text-main: "#cdd6f4"
+  violet-dark-text-muted: "#bac2de"
+  violet-dark-accent: "#58a6ff"
+  violet-dark-on-primary: "#1e1e2e"
+  violet-light-primary: "#8839ef"
+  violet-light-primary-text: "#8839ef"
+  violet-light-primary-hover: "#7529d4"
+  violet-light-background: "#e6e9ef"
+  violet-light-surface: "#eff1f5"
+  violet-light-surface-border: "#bcc0cc"
+  violet-light-text-main: "#4c4f69"
+  violet-light-text-muted: "#5c5f77"
+  violet-light-accent: "#0969da"
+  synthwave-dark-primary: "#ff7edb"
+  synthwave-dark-primary-text: "#ff7edb"
+  synthwave-dark-primary-hover: "#f97e72"
+  synthwave-dark-background: "#262335"
+  synthwave-dark-surface: "#2a2139"
+  synthwave-dark-surface-border: "#495495"
+  synthwave-dark-text-main: "#ffffff"
+  synthwave-dark-text-muted: "#b6b1c7"
+  synthwave-dark-on-primary: "#241b2f"
+  synthwave-dark-accent: "#03edf9"
+  synthwave-dark-on-accent: "#241b2f"
+  synthwave-dark-control-background: "#241b2f"
+  synthwave-dark-control-border: "#8672a6"
+  synthwave-light-primary: "#9c247c"
+  synthwave-light-primary-text: "#9c247c"
+  synthwave-light-primary-hover: "#80165f"
+  synthwave-light-background: "#f5eef8"
+  synthwave-light-surface: "#fffafd"
+  synthwave-light-surface-border: "#d3bfdc"
+  synthwave-light-text-main: "#2a2139"
+  synthwave-light-text-muted: "#695477"
+  synthwave-light-accent: "#007581"
+  synthwave-light-control-background: "#fffafd"
+  synthwave-light-control-border: "#947ba5"
+  nord-dark-primary: "#88c0d0"
+  nord-dark-primary-text: "#88c0d0"
+  nord-dark-primary-hover: "#8fbcbb"
+  nord-dark-background: "#2e3440"
+  nord-dark-surface: "#3b4252"
+  nord-dark-surface-border: "#4c566a"
+  nord-dark-text-main: "#eceff4"
+  nord-dark-text-muted: "#d8dee9"
+  nord-dark-on-primary: "#2e3440"
+  nord-dark-accent: "#8fbcbb"
+  nord-dark-on-accent: "#2e3440"
+  nord-dark-success: "#a3be8c"
+  nord-dark-danger: "#f0a0a8"
+  nord-dark-control-background: "#2e3440"
+  nord-dark-control-border: "#7b88a1"
+  nord-light-primary: "#476b93"
+  nord-light-primary-text: "#476b93"
+  nord-light-primary-hover: "#3b597b"
+  nord-light-background: "#e5e9f0"
+  nord-light-surface: "#eceff4"
+  nord-light-surface-border: "#b4becd"
+  nord-light-text-main: "#2e3440"
+  nord-light-text-muted: "#4c566a"
+  nord-light-accent: "#3e6874"
+  nord-light-success: "#3f642f"
+  nord-light-control-background: "#eceff4"
+  nord-light-control-border: "#8490a5"
+  rose-pine-dark-primary: "#ebbcba"
+  rose-pine-dark-primary-text: "#ebbcba"
+  rose-pine-dark-primary-hover: "#dba8a6"
+  rose-pine-dark-background: "#191724"
+  rose-pine-dark-surface: "#1f1d2e"
+  rose-pine-dark-surface-border: "#403d52"
+  rose-pine-dark-text-main: "#e0def4"
+  rose-pine-dark-text-muted: "#908caa"
+  rose-pine-dark-on-primary: "#191724"
+  rose-pine-dark-accent: "#9ccfd8"
+  rose-pine-dark-on-accent: "#191724"
+  rose-pine-dark-control-background: "#191724"
+  rose-pine-dark-control-border: "#6e6a86"
+  rose-pine-light-primary: "#9e4865"
+  rose-pine-light-primary-text: "#9e4865"
+  rose-pine-light-primary-hover: "#873b55"
+  rose-pine-light-background: "#faf4ed"
+  rose-pine-light-surface: "#fffaf3"
+  rose-pine-light-surface-border: "#cecacd"
+  rose-pine-light-text-main: "#575279"
+  rose-pine-light-text-muted: "#706b86"
+  rose-pine-light-accent: "#286983"
+  rose-pine-light-control-background: "#fffaf3"
+  rose-pine-light-control-border: "#9893a5"
+  solarized-dark-primary: "#2aa198"
+  solarized-dark-primary-text: "#57c3b6"
+  solarized-dark-primary-hover: "#55b6a8"
+  solarized-dark-background: "#002b36"
+  solarized-dark-surface: "#073642"
+  solarized-dark-surface-border: "#31535c"
+  solarized-dark-text-main: "#eee8d5"
+  solarized-dark-text-muted: "#93a1a1"
+  solarized-dark-on-primary: "#002b36"
+  solarized-dark-accent: "#78b4dd"
+  solarized-dark-on-accent: "#002b36"
+  solarized-dark-control-background: "#002b36"
+  solarized-dark-control-border: "#657b83"
+  solarized-light-primary: "#006e68"
+  solarized-light-primary-text: "#006e68"
+  solarized-light-primary-hover: "#005b56"
+  solarized-light-background: "#eee8d5"
+  solarized-light-surface: "#fdf6e3"
+  solarized-light-surface-border: "#c7c0aa"
+  solarized-light-text-main: "#073642"
+  solarized-light-text-muted: "#586e75"
+  solarized-light-accent: "#176da0"
+  solarized-light-control-background: "#fdf6e3"
+  solarized-light-control-border: "#839496"
 typography:
   headline:
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif"
@@ -114,7 +229,7 @@ components:
     rounded: "{rounded.lg}"
     padding: "0.5rem 1rem"
   button-primary-hover:
-    backgroundColor: "color-mix(in oklab, var(--theme-primary) 90%, transparent)"
+    backgroundColor: "{colors.primary-hover}"
   button-secondary:
     textColor: "{colors.text-main}"
     rounded: "{rounded.lg}"
@@ -156,14 +271,14 @@ components:
 
 Cassandra conserva una interfaz de trabajo compacta y estructurada: fondos continuos, superficies delimitadas, tipografía legible y un acento reconocible para orientar la acción. La identidad vigente de PRODUCT.md exige claridad y poca distracción.
 
-Las cuatro paletas cambian los roles cromáticos y mantienen la misma jerarquía, geometría y navegación. Ámbar oscuro es la apariencia predeterminada; Océano, Bosque y Violeta amplían esa misma identidad. No se establece una nueva dirección artística.
+Los ocho presets adaptan sistemas publicados y mantienen la misma jerarquía, geometría y navegación. Neutro, basado en shadcn/ui, es la apariencia predeterminada; GitHub, VS Code, Catppuccin, Synthwave ’84, Nord, Rosé Pine y Solarized ofrecen otras combinaciones de superficies, texto y acentos.
 
 **Key Characteristics:**
 
 - Jerarquía mediante contraste tonal, bordes y peso tipográfico.
 - Un rol primario estable por paleta; estados funcionales separados del tema.
 - Controles con etiquetas visibles y foco explícito en Configuración.
-- La misma estructura en las ocho combinaciones de paleta y modo resuelto.
+- La misma estructura en las dieciséis combinaciones de paleta y modo resuelto.
 
 La fuente normativa de ejecución es `frontend/public/theme.css`; `frontend/src/styles.css` publica sus roles como utilidades Tailwind. Este documento registra el sistema implementado. El frontmatter contiene colores concretos reutilizados y sus diferencias por variante, sin sustituir la cascada CSS.
 
@@ -171,32 +286,40 @@ La fuente normativa de ejecución es `frontend/public/theme.css`; `frontend/src/
 
 ### Primary
 
-Ámbar, Océano, Bosque y Violeta son los nombres visibles definidos en `appearance.model.ts`. Cada una tiene un primario y un acento para modo oscuro y claro. `primary` señala acciones y navegación activa; `accent` distingue actividad en curso y prioridad normal. El acento es un rol secundario funcional del sistema existente.
+Neutro · shadcn/ui, GitHub, VS Code, Catppuccin, Synthwave ’84, Nord, Rosé Pine y Solarized son los nombres visibles definidos en `appearance.model.ts`. `primary` es el fondo de acciones y navegación activa; `primary-text` es el color de enlaces e iconos; `primary-hover` es el fondo de interacción. Separar estos roles permite conservar botones azules con texto blanco y enlaces azules más luminosos en modo oscuro. `accent` distingue actividad en curso y prioridad normal.
 
-Los nombres sin prefijo representan Ámbar oscuro. `light-<rol>` registra la sobrescritura de modo claro; `<paleta>-<modo>-<rol>` registra las sobrescrituras de Océano (`ocean`), Bosque (`forest`) y Violeta (`violet`). Solo se enumeran diferencias reales: no se crean valores nuevos para roles heredados.
+Los identificadores `amber`, `ocean`, `forest` y `violet` se conservan para mantener las preferencias guardadas. Los nombres sin prefijo representan Neutro oscuro. `light-<rol>` registra la sobrescritura de modo claro; `<paleta>-<modo>-<rol>` registra las sobrescrituras de los otros presets. Los valores heredados siguen la cascada de `theme.css`.
 
 | Tema | Oscuro | Claro |
 | --- | --- | --- |
-| Ámbar (`amber`) | Roles sin prefijo | Roles `light-*` sobre la base |
-| Océano (`ocean`) | Base + `ocean-dark-*` | Base + `light-*` + `ocean-light-*` |
-| Bosque (`forest`) | Base + `forest-dark-*` | Base + `light-*` + `forest-light-*` |
-| Violeta (`violet`) | Base + `violet-dark-*` | Base + `light-*` + `violet-light-*` |
+| Neutro (`amber`) | Roles sin prefijo | Roles `light-*` sobre la base |
+| GitHub (`ocean`) | Base + `ocean-dark-*` | Base + `light-*` + `ocean-light-*` |
+| VS Code (`forest`) | Base + `forest-dark-*` | Base + `light-*` + `forest-light-*` |
+| Catppuccin (`violet`) | Base + `violet-dark-*` | Base + `light-*` + `violet-light-*` |
+| Synthwave ’84 (`synthwave`) | Base + `synthwave-dark-*` | Base + `light-*` + `synthwave-light-*` |
+| Nord (`nord`) | Base + `nord-dark-*` | Base + `light-*` + `nord-light-*` |
+| Rosé Pine (`rose-pine`) | Base + `rose-pine-dark-*` | Base + `light-*` + `rose-pine-light-*` |
+| Solarized (`solarized`) | Base + `solarized-dark-*` | Base + `light-*` + `solarized-light-*` |
+
+Referencias: [shadcn/ui Neutral](https://ui.shadcn.com/docs/theming), [GitHub Primer](https://primer.style/product/primitives/color/), [VS Code Dark Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json), [VS Code Light Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/light_modern.json) y [Catppuccin Latte/Mocha](https://github.com/catppuccin/palette/blob/main/palette.json). Son adaptaciones a los componentes de Cassandra: se ajustan algunos textos secundarios y estados de hover para conservar contraste legible; no se importan componentes ni recursos de esos productos.
+
+Los presets adicionales se basan en [Synthwave ’84 de Robb Owen](https://github.com/robb0wen/synthwave-vscode/blob/master/themes/synthwave-color-theme.json), [Nord](https://www.nordtheme.com/docs/colors-and-palettes/), [Rosé Pine Main/Dawn](https://github.com/rose-pine/rose-pine-palette/blob/main/dist/css/rose-pine.css) y [Solarized de Ethan Schoonover](https://ethanschoonover.com/solarized/). Synthwave usa el violeta profundo, rosa y cian del tema oscuro original; el modo claro es una adaptación propia de Cassandra. Nord conserva Polar Night/Snow Storm y Frost; Rosé Pine combina Main y Dawn; Solarized combina base03/base02 y base2/base3 con acento teal. Los valores secundarios y de acción se ajustan para contraste AA; no son reproducciones exactas de los temas de editor.
 
 ### Neutral
 
-`background` es el lienzo y el interior de los campos; `surface` es la capa de tarjetas, navegación y diálogos. `surface-border` separa contenedores y listas. `text-main` comunica títulos y contenido; `text-muted` acompaña instrucciones y metadatos. El modo claro combina un lienzo teñido por la paleta con superficies casi blancas. El modo oscuro combina un lienzo profundo con superficies más luminosas y bordes visibles; los acentos intensos identifican acciones y selección.
+`background` es el lienzo y el interior de los campos; `surface` es la capa de tarjetas, navegación y diálogos. `surface-border` separa contenedores y listas. `text-main` comunica títulos y contenido; `text-muted` acompaña instrucciones y metadatos. Neutro, GitHub y VS Code usan grises discretos en sus superficies; Catppuccin conserva sus neutros azulados Latte/Mocha y acento mauve. El color de acción se concentra en controles y navegación activa.
 
 Los controles especiales mantienen roles propios `control-background`, `control-border`, `control-label`, `control-muted` y `control-text` en la fuente CSS. No deben sustituirse por colores fijos. Los colores de Mermaid y de la documentación API también se mantienen allí; Mermaid recibe valores hexadecimales resueltos porque no interpreta OKLCH ni `var()`.
 
 ### Functional States
 
-`success` identifica terminado y confirmaciones; `danger` identifica bloqueos y errores; `warning` y `warning-text` identifican avisos y prioridad alta. Estos roles cambian con el modo y se comparten entre paletas. Los roles existentes para categorías, información y reflexiones siguen definidos en `theme.css`; cambiar la paleta no redefine su significado.
+`success` identifica terminado y confirmaciones; `danger` identifica bloqueos y errores; `warning` y `warning-text` identifican avisos y prioridad alta. Estos roles cambian con el modo y se comparten entre paletas; Nord ajusta éxito y peligro para mantener contraste sobre sus superficies Polar Night/Snow Storm. Los roles existentes para categorías, información y reflexiones siguen definidos en `theme.css`; cambiar la paleta no redefine su significado.
 
 **The Semantic Roles Rule.** El componente elige un rol, no una paleta. Los valores y alias pertenecen a theme.css; styles.css expone los mismos roles a Tailwind.
 
 **The Paired Foregrounds Rule.** Un fondo sólido primario usa on-primary; un fondo accent o success usa su correspondiente on-accent u on-success. La elección de tema no cambia este contrato.
 
-`on-accent` y `on-success` siguen a `on-primary`. `on-selected` sigue a `on-primary` en las ocho variantes. Los alias `text-default`, colores de controles, diagramas y documentación siguen las reglas de cascada de la fuente. El frontmatter conserva OKLCH, hex y `color-mix()` donde esos formatos son canónicos; no normalizarlos a una tabla hexadecimal paralela.
+`on-accent`, `on-success`, `on-positive` y `on-danger` conservan pares propios por modo y preset, independientes del primario. `on-selected` sigue a `on-primary` en todas las variantes. Los alias `text-default`, colores de controles, diagramas y documentación siguen las reglas de cascada de la fuente. El primario de los diagramas sigue a `primary-text` para mantener sus etiquetas legibles.
 
 ## Typography
 
@@ -223,7 +346,7 @@ La página de claves conserva una columna hasta `lg` (64rem); después distribuy
 
 ## Elevation & Depth
 
-La profundidad se apoya en una diferencia tonal marcada entre lienzo, superficies y bordes, con sombras puntuales. El contraste también distingue los campos, la selección y los estados de interacción. Las tarjetas de Configuración permanecen sin sombra; la elevación fuerte se reserva para paneles móviles y diálogos. Las tarjetas de proyectos existentes añaden sombra y un desplazamiento vertical corto al pasar el puntero.
+La profundidad se apoya en capas tonales sutiles, bordes discretos y sombras puntuales. La selección y los estados de interacción concentran el contraste más fuerte. Las tarjetas de Configuración permanecen sin sombra; la elevación fuerte se reserva para paneles móviles y diálogos. Las tarjetas de proyectos existentes añaden sombra y un desplazamiento vertical corto al pasar el puntero.
 
 La escala usada de Tailwind incluye sombra tenue `xs`, sombra de acción `md`, sombra `xl` en hover de proyectos y sombra `2xl` para superposiciones. Los valores exactos se conservan en el sidecar. El fondo de diálogo combina overlay negro al 70 % con desenfoque (4px); el del panel móvil usa overlay al 50 %. El encabezado y la navegación inferior móviles tienen superficies translúcidas y desenfoque.
 
@@ -239,7 +362,7 @@ Los campos y botones de claves API usan esquinas suaves `lg`; la navegación y l
 
 Acciones claras con texto visible. En claves API, primario, secundario y peligro comparten altura mínima (2.75rem), radio `lg`, relleno (0.5rem 1rem) y etiqueta seminegrita (0.875rem).
 
-- **Primary:** `primary` con `on-primary`; hover al 90 % del fondo.
+- **Primary:** `primary` con `on-primary`; hover con el rol explícito `primary-hover` de cada preset.
 - **Secondary:** transparente, borde `surface-border`, texto `text-main`; hover con `surface-border` al 60 %.
 - **Danger:** borde `danger`, texto mezclado con `text-main` para mayor contraste y fondo `danger` al 10 % en hover.
 - **Focus / Disabled:** contorno primario (2px) separado (2px); deshabilitado con opacidad (60 %) y cursor de acción no disponible.
@@ -266,9 +389,9 @@ La entrada general es `/configuracion`. Apariencia aloja selectores independient
 
 ### Appearance Behavior
 
-Los valores de paleta son `amber`, `ocean`, `forest` y `violet`. Los modos son `dark`, `light` y `system`; este último se presenta como «Según el sistema» y se resuelve en claro u oscuro mediante `prefers-color-scheme`. Hay ocho combinaciones visuales resueltas, no doce temas distintos.
+Los valores de paleta son `amber`, `ocean`, `forest`, `violet`, `synthwave`, `nord`, `rose-pine` y `solarized`. Los modos son `dark`, `light` y `system`; este último se presenta como «Según el sistema» y se resuelve en claro u oscuro mediante `prefers-color-scheme`. Hay dieciséis combinaciones visuales resueltas; el modo sistema elige entre esas versiones claras y oscuras.
 
-La preferencia inicial es Ámbar oscuro. `cassandra.appearance` guarda `{ palette, mode }` en el almacenamiento local del dispositivo; los cambios se aplican al momento y se sincronizan entre pestañas del mismo origen. Si el almacenamiento no está disponible, la selección sigue aplicada en la sesión y la UI informa que no pudo guardarse. `theme-init.js` aplica la preferencia antes del primer render; `AppearanceService` mantiene `data-palette`, `data-mode`, `color-scheme` y las metas del navegador.
+La preferencia inicial es Neutro oscuro. `cassandra.appearance` guarda `{ palette, mode }` en el almacenamiento local del dispositivo; los cambios se aplican al momento y se sincronizan entre pestañas del mismo origen. Si el almacenamiento no está disponible, la selección sigue aplicada en la sesión y la UI informa que no pudo guardarse. `theme-init.js` aplica la preferencia antes del primer render; `AppearanceService` mantiene `data-palette`, `data-mode`, `color-scheme` y las metas del navegador.
 
 La misma fuente semántica alimenta la app y la documentación API. Las barras nativas Android conservan `R.color.app_background`; la actualización de metas del navegador no implica que esas barras estén tematizadas.
 

@@ -24,12 +24,29 @@ la sintaxis habitual (`bg-warning/15`).
 - `docs-*`: fondo y scrollbars de la documentación API. Su hoja compartida
   `public/docs/styles.css` carga la misma paleta dentro del iframe y en `/docs/`.
 
-En `/configuracion` se elige entre Ámbar, Océano, Bosque y Violeta, con modo
+En `/configuracion` se elige entre Neutro (shadcn/ui), GitHub, VS Code, Catppuccin,
+Synthwave ’84, Nord, Rosé Pine y Solarized, con modo
 claro, oscuro o según el sistema. La preferencia se guarda en `localStorage`
 con la clave `cassandra.appearance`, por dispositivo, y se comparte entre pestañas.
 `public/theme-init.js` aplica la elección antes del primer render; `AppearanceService`
 gestiona los cambios y escucha el modo del sistema. Al agregar una paleta, actualiza
 `PALETTES` en `appearance.model.ts`, la validación de arranque y `public/theme.css`.
+Son adaptaciones a los componentes de Cassandra. Referencias publicadas:
+[shadcn/ui](https://ui.shadcn.com/docs/theming),
+[GitHub Primer](https://primer.style/product/primitives/color/),
+[VS Code Modern](https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes),
+[Catppuccin Latte/Mocha](https://github.com/catppuccin/palette),
+[Synthwave ’84](https://github.com/robb0wen/synthwave-vscode),
+[Nord](https://www.nordtheme.com/docs/colors-and-palettes/),
+[Rosé Pine Main/Dawn](https://rosepinetheme.com/palette/)
+y [Solarized](https://ethanschoonover.com/solarized/).
+Synthwave ’84 toma el violeta, rosa y cian de su versión oscura publicada; su modo
+claro es una adaptación propia de Cassandra. Los textos, acciones y estados se
+ajustan cuando hace falta para conservar contraste AA.
+Los identificadores `amber`, `ocean`, `forest` y `violet` se conservan para no
+invalidar preferencias guardadas. `primary` es el fondo de acción y
+`primary-text` es el color de enlaces e iconos; cada uno tiene su propio contraste.
+`primary-hover` define un fondo de interacción explícito para cada preset.
 Los diagramas se vuelven a dibujar al cambiar de apariencia y su caché se invalida.
 Las claves API están en `/configuracion/claves-api`, enlazadas desde Configuración;
 la ruta anterior `/claves-api` redirige a su nueva dirección.
