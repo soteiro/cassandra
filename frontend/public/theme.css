@@ -223,7 +223,7 @@
 /* Synthwave ’84: violeta profundo, rosa y cian del tema de Robb Owen. */
 :root[data-palette='synthwave'][data-mode='dark'] {
   --theme-primary: #ff7edb;
-  --theme-primary-text: #ff7edb;
+  --theme-primary-text: #ffa0e4;
   --theme-primary-hover: #f97e72;
   --theme-background: #262335;
   --theme-surface: #2a2139;
@@ -240,14 +240,16 @@
 /* Adaptación clara de Cassandra: conserva rosa/cian con texto más oscuro. */
 :root[data-palette='synthwave'][data-mode='light'] {
   --theme-primary: #9c247c;
-  --theme-primary-text: #9c247c;
+  --theme-primary-text: #881f6c;
   --theme-primary-hover: #80165f;
   --theme-background: #f5eef8;
   --theme-surface: #fffafd;
   --theme-surface-border: #d3bfdc;
   --theme-text-main: #2a2139;
   --theme-text-muted: #695477;
-  --theme-accent: #007581;
+  --theme-accent: #00636d;
+  --theme-success: #146c2e;
+  --theme-danger: #9e1c27;
   --theme-control-background: #fffafd;
   --theme-control-border: #947ba5;
 }
@@ -255,7 +257,7 @@
 /* Nord: Polar Night / Snow Storm, con Frost y texto adaptado a WCAG AA. */
 :root[data-palette='nord'][data-mode='dark'] {
   --theme-primary: #88c0d0;
-  --theme-primary-text: #88c0d0;
+  --theme-primary-text: #d2e7ed;
   --theme-primary-hover: #8fbcbb;
   --theme-background: #2e3440;
   --theme-surface: #3b4252;
@@ -263,25 +265,27 @@
   --theme-text-main: #eceff4;
   --theme-text-muted: #d8dee9;
   --theme-on-primary: #2e3440;
-  --theme-accent: #8fbcbb;
+  --theme-accent: #a3d5d2;
   --theme-on-accent: #2e3440;
-  --theme-success: #a3be8c;
-  --theme-danger: #f0a0a8;
+  --theme-success: #b7d4a2;
+  --theme-danger: #ffc2ca;
+  --theme-warning-text: #f2cc60;
   --theme-control-background: #2e3440;
   --theme-control-border: #7b88a1;
 }
 
 :root[data-palette='nord'][data-mode='light'] {
   --theme-primary: #476b93;
-  --theme-primary-text: #476b93;
+  --theme-primary-text: #365170;
   --theme-primary-hover: #3b597b;
   --theme-background: #e5e9f0;
   --theme-surface: #eceff4;
   --theme-surface-border: #b4becd;
   --theme-text-main: #2e3440;
   --theme-text-muted: #4c566a;
-  --theme-accent: #3e6874;
+  --theme-accent: #365d68;
   --theme-success: #3f642f;
+  --theme-danger: #9e1c27;
   --theme-control-background: #eceff4;
   --theme-control-border: #8490a5;
 }
@@ -305,7 +309,7 @@
 
 :root[data-palette='rose-pine'][data-mode='light'] {
   --theme-primary: #9e4865;
-  --theme-primary-text: #9e4865;
+  --theme-primary-text: #833c54;
   --theme-primary-hover: #873b55;
   --theme-background: #faf4ed;
   --theme-surface: #fffaf3;
@@ -313,6 +317,8 @@
   --theme-text-main: #575279;
   --theme-text-muted: #706b86;
   --theme-accent: #286983;
+  --theme-success: #146c2e;
+  --theme-danger: #9e1c27;
   --theme-control-background: #fffaf3;
   --theme-control-border: #9893a5;
 }
@@ -320,7 +326,7 @@
 /* Solarized: base03/base02 y base2/base3, con acento teal adaptado a AA. */
 :root[data-palette='solarized'][data-mode='dark'] {
   --theme-primary: #2aa198;
-  --theme-primary-text: #57c3b6;
+  --theme-primary-text: #79cfc5;
   --theme-primary-hover: #55b6a8;
   --theme-background: #002b36;
   --theme-surface: #073642;
@@ -328,22 +334,26 @@
   --theme-text-main: #eee8d5;
   --theme-text-muted: #93a1a1;
   --theme-on-primary: #002b36;
-  --theme-accent: #78b4dd;
+  --theme-accent: #86c3e9;
   --theme-on-accent: #002b36;
+  --theme-success: #5ed170;
+  --theme-danger: #ff9088;
   --theme-control-background: #002b36;
   --theme-control-border: #657b83;
 }
 
 :root[data-palette='solarized'][data-mode='light'] {
   --theme-primary: #006e68;
-  --theme-primary-text: #006e68;
+  --theme-primary-text: #005550;
   --theme-primary-hover: #005b56;
   --theme-background: #eee8d5;
   --theme-surface: #fdf6e3;
   --theme-surface-border: #c7c0aa;
   --theme-text-main: #073642;
-  --theme-text-muted: #586e75;
-  --theme-accent: #176da0;
+  --theme-text-muted: #50666d;
+  --theme-accent: #125c88;
+  --theme-success: #105b27;
+  --theme-danger: #9e1c27;
   --theme-control-background: #fdf6e3;
   --theme-control-border: #839496;
 }
