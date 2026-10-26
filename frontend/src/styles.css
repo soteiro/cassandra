@@ -1,30 +1,67 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+@import '../public/theme.css';
 
-    @theme {
-        /* Tu configuración actual */
-        --color-primary: oklch(68.1% 0.162 75.834);
-        /* --color-primary: oklch(38.1% 0.176 304.987); */
-        --color-background: oklch(21% 0.006 285.885);
-        /* --color-background: #0F1524; */
+/* Expone los roles como utilidades Tailwind y variables --color-* existentes. */
+@theme inline {
+  --color-primary: var(--theme-primary);
+  --color-background: var(--theme-background);
+  --color-surface: var(--theme-surface);
+  --color-surface-border: var(--theme-surface-border);
+  --color-text-main: var(--theme-text-main);
+  --color-text-muted: var(--theme-text-muted);
+  --color-accent: var(--theme-accent);
+  --color-success: var(--theme-success);
+  --color-danger: var(--theme-danger);
+  --color-text-default: var(--theme-text-default);
+  --color-on-primary: var(--theme-on-primary);
+  --color-on-accent: var(--theme-on-accent);
+  --color-on-success: var(--theme-on-success);
+  --color-on-solid: var(--theme-on-solid);
+  --color-on-selected: var(--theme-on-selected);
+  --color-on-positive: var(--theme-on-positive);
+  --color-on-danger: var(--theme-on-danger);
+  --color-overlay: var(--theme-overlay);
+  --color-interaction-shade: var(--theme-interaction-shade);
+  --color-control-background: var(--theme-control-background);
+  --color-control-border: var(--theme-control-border);
+  --color-control-label: var(--theme-control-label);
+  --color-control-muted: var(--theme-control-muted);
+  --color-control-text: var(--theme-control-text);
+  --color-warning: var(--theme-warning);
+  --color-warning-text: var(--theme-warning-text);
+  --color-neutral-text: var(--theme-neutral-text);
+  --color-warning-emphasis: var(--theme-warning-emphasis);
+  --color-info-emphasis: var(--theme-info-emphasis);
+  --color-insight-emphasis: var(--theme-insight-emphasis);
+  --color-warning-surface: var(--theme-warning-surface);
+  --color-warning-border: var(--theme-warning-border);
+  --color-info-surface: var(--theme-info-surface);
+  --color-info-border: var(--theme-info-border);
+  --color-insight-surface: var(--theme-insight-surface);
+  --color-insight-border: var(--theme-insight-border);
+  --color-insight: var(--theme-insight);
+  --color-info: var(--theme-info);
+  --color-insight-text: var(--theme-insight-text);
+  --color-info-text: var(--theme-info-text);
+  --color-personal: var(--theme-personal);
+  --color-personal-text: var(--theme-personal-text);
+  --color-positive: var(--theme-positive);
+  --color-positive-text: var(--theme-positive-text);
+  --color-learning: var(--theme-learning);
+  --color-learning-text: var(--theme-learning-text);
+  --color-insight-solid: var(--theme-insight-solid);
+  --color-insight-solid-hover: var(--theme-insight-solid-hover);
+  --color-idea: var(--theme-idea);
+  --color-idea-text: var(--theme-idea-text);
+  --color-creative: var(--theme-creative);
+  --color-creative-text: var(--theme-creative-text);
+  --color-retrospective: var(--theme-retrospective);
+  --color-retrospective-text: var(--theme-retrospective-text);
+  --color-neutral: var(--theme-neutral);
 
-        /* Complementos sugeridos */
-        --color-surface: oklch(26% 0.008 285);
-        /* --color-surface: #151D2F; */
-        --color-surface-border: oklch(32% 0.01 285);
-
-        --color-text-main: oklch(96% 0.003 285);
-        --color-text-muted: oklch(72% 0.01 285);
-
-        --color-accent: oklch(70% 0.12 200);
-
-        --color-success: oklch(72% 0.17 142);
-        --color-danger: oklch(65% 0.20 25);
-
-        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-        --font-mono: 'JetBrains Mono', monospace;
-    }
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
 
 /* Opciones de select con fondo bg-background por defecto */
 select option {

@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
-import { APIKey, IssuedAPIKey } from '../../models/api-key.model';
-import { APIKeyService } from '../../services/api-key.service';
-import { proyectService } from '../../services/proyect.service';
+import { APIKey, IssuedAPIKey } from '../../../../models/api-key.model';
+import { APIKeyService } from '../../../../services/api-key.service';
+import { proyectService } from '../../../../services/proyect.service';
 import { ApiKeys } from './api-keys';
 
 const key: APIKey = {

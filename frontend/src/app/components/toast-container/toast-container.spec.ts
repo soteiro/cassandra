@@ -119,7 +119,7 @@ describe('ToastContainer', () => {
     it.each<[ToastType, string, string, string]>([
       ['success', 'border-success/30', 'text-success', 'bg-success'],
       ['error', 'border-danger/30', 'text-danger', 'bg-danger'],
-      ['warning', 'border-amber-500/30', 'text-amber-400', 'bg-amber-400'],
+      ['warning', 'border-warning/30', 'text-warning-text', 'bg-warning-text'],
       ['info', 'border-accent/30', 'text-accent', 'bg-accent'],
     ])('%s', (type, card, icon, bar) => {
       expect(component.getToastCardClass(type)).toContain(card);

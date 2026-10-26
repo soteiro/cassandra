@@ -860,23 +860,23 @@ describe('PresupuestoTab', () => {
   // ==========================================
   describe('visual helpers', () => {
     it('getRowClass should prioritise selection, then estado', () => {
-      expect(component.getRowClass(items[2])).toContain('emerald');
-      expect(component.getRowClass(items[3])).toContain('amber');
+      expect(component.getRowClass(items[2])).toContain('positive');
+      expect(component.getRowClass(items[3])).toContain('warning');
       expect(component.getRowClass(items[4])).toContain('bg-surface');
       component.toggleSelectItem(10);
       expect(component.getRowClass(items[2])).toContain('bg-primary/10');
     });
 
     it('getMontoColorClass should depend on estado and tipo', () => {
-      expect(component.getMontoColorClass(items[2])).toContain('emerald');
-      expect(component.getMontoColorClass(items[3])).toContain('amber');
+      expect(component.getMontoColorClass(items[2])).toContain('positive');
+      expect(component.getMontoColorClass(items[3])).toContain('warning');
       expect(component.getMontoColorClass(items[4])).toContain('text-danger');
       expect(component.getMontoColorClass(items[1])).toContain('text-success');
     });
 
     it('getStatusBadgeClass should depend on estado', () => {
-      expect(component.getStatusBadgeClass(items[2])).toContain('emerald');
-      expect(component.getStatusBadgeClass(items[3])).toContain('amber');
+      expect(component.getStatusBadgeClass(items[2])).toContain('positive');
+      expect(component.getStatusBadgeClass(items[3])).toContain('warning');
       expect(component.getStatusBadgeClass(items[4])).toContain('text-muted');
     });
 

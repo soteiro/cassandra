@@ -1,0 +1,224 @@
+/* Paletas semánticas compartidas por la app y la documentación API.
+ * Ámbar oscuro conserva los colores originales. Las demás variantes
+ * sobrescriben estos roles sin cambiar las clases de cada vista.
+ */
+:root {
+  --theme-color-scheme: dark;
+  --theme-primary: oklch(68.1% 0.162 75.834);
+  --theme-background: oklch(21% 0.006 285.885);
+  --theme-surface: oklch(26% 0.008 285);
+  --theme-surface-border: oklch(32% 0.01 285);
+  --theme-text-main: oklch(96% 0.003 285);
+  --theme-text-muted: oklch(72% 0.01 285);
+  --theme-accent: oklch(70% 0.12 200);
+  --theme-success: oklch(72% 0.17 142);
+  --theme-danger: oklch(65% 0.20 25);
+  --theme-text-default: #fff;
+  --theme-on-primary: oklch(21% 0.006 285.885);
+  --theme-on-accent: var(--theme-on-primary);
+  --theme-on-success: var(--theme-on-primary);
+  --theme-on-solid: #fff;
+  --theme-on-selected: #000;
+  --theme-on-positive: #071b11;
+  --theme-on-danger: #18181b;
+  --theme-browser-background: #18181b;
+  --theme-overlay: #000;
+  --theme-interaction-shade: var(--theme-overlay);
+  --theme-control-background: oklch(12.9% 0.042 264.695);
+  --theme-control-border: oklch(27.9% 0.041 260.031);
+  --theme-control-label: oklch(86.9% 0.022 252.894);
+  --theme-control-muted: oklch(70.4% 0.04 256.788);
+  --theme-control-text: #fff;
+  --theme-warning: oklch(76.9% 0.188 70.08);
+  --theme-warning-text: oklch(82.8% 0.189 84.429);
+  --theme-neutral-text: oklch(70.4% 0.04 256.788);
+  --theme-warning-emphasis: oklch(87.9% 0.169 91.605);
+  --theme-info-emphasis: oklch(80.9% 0.105 251.813);
+  --theme-insight-emphasis: oklch(82.7% 0.119 306.383);
+  --theme-warning-surface: oklch(41.4% 0.112 45.904);
+  --theme-warning-border: oklch(47.3% 0.137 46.201);
+  --theme-info-surface: oklch(37.9% 0.146 265.522);
+  --theme-info-border: oklch(42.4% 0.199 265.638);
+  --theme-insight-surface: oklch(38.1% 0.176 304.987);
+  --theme-insight-border: oklch(43.8% 0.218 303.724);
+  --theme-insight: oklch(62.7% 0.265 303.9);
+  --theme-info: oklch(62.3% 0.214 259.815);
+  --theme-insight-text: oklch(71.4% 0.203 305.504);
+  --theme-info-text: oklch(70.7% 0.165 254.624);
+  --theme-personal: oklch(64.5% 0.246 16.439);
+  --theme-personal-text: oklch(71.2% 0.194 13.428);
+  --theme-positive: oklch(69.6% 0.17 162.48);
+  --theme-positive-text: oklch(76.5% 0.177 163.223);
+  --theme-learning: oklch(71.5% 0.143 215.221);
+  --theme-learning-text: oklch(78.9% 0.154 211.53);
+  --theme-insight-solid: oklch(55.8% 0.288 302.321);
+  --theme-insight-solid-hover: oklch(49.6% 0.265 301.924);
+  --theme-idea: oklch(79.5% 0.184 86.047);
+  --theme-idea-text: oklch(85.2% 0.199 91.936);
+  --theme-creative: oklch(66.7% 0.295 322.15);
+  --theme-creative-text: oklch(74% 0.238 322.16);
+  --theme-retrospective: oklch(70.4% 0.14 182.503);
+  --theme-retrospective-text: oklch(77.7% 0.152 181.912);
+  --theme-neutral: oklch(55.4% 0.046 257.417);
+
+  /* Mermaid necesita colores hexadecimales; no interpreta oklch ni var(). */
+  --theme-diagram-background: #18181b;
+  --theme-diagram-surface: #232428;
+  --theme-diagram-primary: #d08700;
+  --theme-diagram-text: #f1f1f4;
+  --theme-diagram-muted: #a4a4ab;
+  --theme-diagram-border: #323238;
+
+  /* Superficie y scrollbars de la documentación API. */
+  --theme-docs-background: #0b0f19;
+  --theme-docs-scrollbar: rgb(255 255 255 / 20%);
+  --theme-docs-scrollbar-hover: rgb(255 255 255 / 40%);
+
+  color-scheme: var(--theme-color-scheme);
+}
+
+:root[data-mode='light'] {
+  --theme-color-scheme: light;
+  --theme-primary: #8a5a00;
+  --theme-background: #f7f8fa;
+  --theme-surface: #fff;
+  --theme-surface-border: #cbd2db;
+  --theme-text-main: #20242b;
+  --theme-text-muted: #586174;
+  --theme-text-default: var(--theme-text-main);
+  --theme-accent: #146c80;
+  --theme-success: #236b39;
+  --theme-danger: #b12836;
+  --theme-on-primary: #fff;
+  --theme-on-selected: var(--theme-on-primary);
+  --theme-on-positive: #fff;
+  --theme-on-danger: #fff;
+  --theme-browser-background: var(--theme-background);
+  --theme-control-background: #fff;
+  --theme-control-border: #a5b0bf;
+  --theme-control-label: var(--theme-text-main);
+  --theme-control-muted: var(--theme-text-muted);
+  --theme-control-text: var(--theme-text-main);
+  --theme-warning: #986000;
+  --theme-warning-text: #895600;
+  --theme-warning-emphasis: #714500;
+  --theme-warning-surface: #fff0d2;
+  --theme-warning-border: #b6842e;
+  --theme-info: #1f58a0;
+  --theme-info-text: #265a97;
+  --theme-info-emphasis: #204d82;
+  --theme-info-surface: #e2edff;
+  --theme-info-border: #779dce;
+  --theme-insight: #7446a3;
+  --theme-insight-text: #7446a3;
+  --theme-insight-emphasis: #613385;
+  --theme-insight-surface: #f0e6fb;
+  --theme-insight-border: #ae8ccf;
+  --theme-insight-solid: #7540b4;
+  --theme-insight-solid-hover: #5f2b9c;
+  --theme-positive: #247348;
+  --theme-positive-text: #22673e;
+  --theme-personal: #b03867;
+  --theme-personal-text: #a32859;
+  --theme-learning: #096e86;
+  --theme-learning-text: #08657b;
+  --theme-idea: #856100;
+  --theme-idea-text: #775500;
+  --theme-creative: #9b2d97;
+  --theme-creative-text: #8a2787;
+  --theme-retrospective: #146c63;
+  --theme-retrospective-text: #0c6159;
+  --theme-neutral: #687482;
+  --theme-neutral-text: #576577;
+  --theme-diagram-background: var(--theme-background);
+  --theme-diagram-surface: var(--theme-surface);
+  --theme-diagram-primary: var(--theme-primary);
+  --theme-diagram-text: var(--theme-text-main);
+  --theme-diagram-muted: var(--theme-text-muted);
+  --theme-diagram-border: var(--theme-surface-border);
+  --theme-docs-background: var(--theme-background);
+  --theme-docs-scrollbar: rgb(0 0 0 / 20%);
+  --theme-docs-scrollbar-hover: rgb(0 0 0 / 40%);
+}
+
+:root[data-palette='ocean'][data-mode='dark'] {
+  --theme-primary: #78b8ff;
+  --theme-background: #111c29;
+  --theme-surface: #182737;
+  --theme-surface-border: #36536f;
+  --theme-text-main: #edf5ff;
+  --theme-text-muted: #a9bbcf;
+  --theme-accent: #66d5d1;
+  --theme-on-primary: #0a1928;
+  --theme-control-background: #0c1622;
+  --theme-control-border: #456b8d;
+}
+
+:root[data-palette='forest'][data-mode='dark'] {
+  --theme-primary: #8ed3a2;
+  --theme-background: #142019;
+  --theme-surface: #1e2e24;
+  --theme-surface-border: #3e6248;
+  --theme-text-main: #edf7ef;
+  --theme-text-muted: #aac7b2;
+  --theme-accent: #ddc56f;
+  --theme-on-primary: #102317;
+  --theme-control-background: #101b14;
+  --theme-control-border: #517c5d;
+}
+
+:root[data-palette='violet'][data-mode='dark'] {
+  --theme-primary: #c4a1f5;
+  --theme-background: #1c1828;
+  --theme-surface: #292338;
+  --theme-surface-border: #57456f;
+  --theme-text-main: #f4efff;
+  --theme-text-muted: #bfb1d5;
+  --theme-accent: #76d4d0;
+  --theme-on-primary: #23132f;
+  --theme-control-background: #15111e;
+  --theme-control-border: #725a91;
+}
+
+:root[data-palette='ocean'][data-mode='light'] {
+  --theme-primary: #245c9b;
+  --theme-background: #f2f7fc;
+  --theme-surface-border: #c5d5e5;
+  --theme-text-main: #1e3146;
+  --theme-text-muted: #51667b;
+  --theme-accent: #126e73;
+}
+
+:root[data-palette='forest'][data-mode='light'] {
+  --theme-primary: #2c6b43;
+  --theme-background: #f3f8f2;
+  --theme-surface-border: #c6d8c7;
+  --theme-text-main: #21382b;
+  --theme-text-muted: #536b59;
+  --theme-accent: #796000;
+}
+
+:root[data-palette='violet'][data-mode='light'] {
+  --theme-primary: #7544a2;
+  --theme-background: #f8f4fc;
+  --theme-surface-border: #d6cae5;
+  --theme-text-main: #30223e;
+  --theme-text-muted: #6b587d;
+  --theme-accent: #166b75;
+}
+
+:root:is([data-palette='ocean'], [data-palette='forest'], [data-palette='violet'])[data-mode='dark'] {
+  --theme-text-default: var(--theme-text-main);
+  --theme-on-selected: var(--theme-on-primary);
+  --theme-browser-background: var(--theme-background);
+  --theme-control-label: var(--theme-text-main);
+  --theme-control-muted: var(--theme-text-muted);
+  --theme-control-text: var(--theme-text-main);
+  --theme-diagram-background: var(--theme-background);
+  --theme-diagram-surface: var(--theme-surface);
+  --theme-diagram-primary: var(--theme-primary);
+  --theme-diagram-text: var(--theme-text-main);
+  --theme-diagram-muted: var(--theme-text-muted);
+  --theme-diagram-border: var(--theme-surface-border);
+  --theme-docs-background: var(--theme-background);
+}

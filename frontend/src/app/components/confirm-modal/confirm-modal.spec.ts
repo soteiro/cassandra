@@ -76,19 +76,19 @@ describe('ConfirmModal', () => {
 
   it('uses danger styles for the confirm button in danger variant', async () => {
     await open();
-    expect(confirmButton().classList.contains('bg-danger/80')).toBe(true);
+    expect(confirmButton().classList.contains('bg-danger')).toBe(true);
     expect(el().querySelector('.text-danger')).not.toBeNull();
   });
 
   it('uses primary styles and warning icon in warning variant', async () => {
     await open({ variant: 'warning' });
     expect(confirmButton().classList.contains('bg-primary')).toBe(true);
-    expect(el().querySelector('.text-amber-400')).not.toBeNull();
+    expect(el().querySelector('.text-warning-text')).not.toBeNull();
   });
 
   it('shows no icon in info variant', async () => {
     await open({ variant: 'info' });
-    expect(el().querySelector('.text-amber-400')).toBeNull();
+    expect(el().querySelector('.text-warning-text')).toBeNull();
     expect(el().querySelector('.bg-danger\\/15')).toBeNull();
     expect(confirmButton().classList.contains('bg-primary')).toBe(true);
   });

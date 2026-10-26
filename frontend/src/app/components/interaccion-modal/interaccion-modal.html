@@ -6,7 +6,7 @@
 >
   <!-- BACKDROP CON TRANSICIÓN SUAVE DE OPACIDAD -->
   <div
-    class="backdrop-layer absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300 ease-in-out cursor-pointer"
+    class="backdrop-layer absolute inset-0 bg-overlay/60 backdrop-blur-xs transition-opacity duration-300 ease-in-out cursor-pointer"
     [class.opacity-100]="isOpen()"
     [class.opacity-0]="!isOpen()"
     (click)="onBackdropClick($event)"
@@ -135,7 +135,7 @@
             type="button"
             [disabled]="isSubmitting() || !editingText().trim()"
             (click)="saveEdit()"
-            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
             @if (isSubmitting()) {
               <span class="animate-spin text-xs">⠋</span>
@@ -168,7 +168,7 @@
             <button
               type="button"
               (click)="onClose()"
-              class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all cursor-pointer"
+              class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all cursor-pointer"
             >
               Listo
             </button>

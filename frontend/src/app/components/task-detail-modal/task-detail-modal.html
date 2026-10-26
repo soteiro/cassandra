@@ -1,7 +1,7 @@
 @if (shouldRender() && currentTask(); as t) {
   <!-- OVERLAY / BACKDROP -->
   <div
-    class="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs transition-opacity duration-300 ease-in-out cursor-pointer"
+    class="fixed inset-0 z-50 flex justify-end bg-overlay/60 backdrop-blur-xs transition-opacity duration-300 ease-in-out cursor-pointer"
     [class]="isVisible() ? 'opacity-100' : 'opacity-0 pointer-events-none'"
     (click)="onClose()"
   >
@@ -145,7 +145,7 @@
                       (click)="toggleSubtareaStatus(sub)"
                       [class]="
                         sub.estado === 'Terminado'
-                          ? 'bg-success border-success text-background'
+                          ? 'bg-success border-success text-on-success'
                           : 'border-surface-border hover:border-primary text-transparent bg-surface'
                       "
                       class="w-4 h-4 rounded border flex items-center justify-center transition-all cursor-pointer shrink-0"
@@ -311,7 +311,7 @@
             type="submit"
             form="taskEditForm"
             [disabled]="isSaving() || !nombre().trim()"
-            class="text-xs bg-primary hover:bg-primary/90 text-background font-semibold px-4 py-2 rounded-xl transition-all shadow-md shadow-primary/20 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+            class="text-xs bg-primary hover:bg-primary/90 text-on-primary font-semibold px-4 py-2 rounded-xl transition-all shadow-md shadow-primary/20 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
           >
             <svg lucideSave class="w-3.5 h-3.5" />
             <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>

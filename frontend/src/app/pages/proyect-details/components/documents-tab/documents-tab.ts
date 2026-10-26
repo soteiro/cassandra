@@ -46,42 +46,42 @@ export const CATEGORIES: CategoryMeta[] = [
   {
     id: 'arquitectura',
     label: 'Arquitectura',
-    badgeClass: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+    badgeClass: 'bg-info/10 text-info-text border-info/30',
   },
   {
     id: 'investigacion',
     label: 'Investigación',
-    badgeClass: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+    badgeClass: 'bg-insight/10 text-insight-text border-insight/30',
   },
   {
     id: 'decision',
     label: 'Decisión',
-    badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+    badgeClass: 'bg-warning/10 text-warning-text border-warning/30',
   },
   {
     id: 'guia',
     label: 'Guía',
-    badgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+    badgeClass: 'bg-positive/10 text-positive-text border-positive/30',
   },
   {
     id: 'idea',
     label: 'Idea',
-    badgeClass: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    badgeClass: 'bg-idea/10 text-idea-text border-idea/30',
   },
   {
     id: 'pajas mentales',
     label: 'Pajas Mentales',
-    badgeClass: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30',
+    badgeClass: 'bg-creative/10 text-creative-text border-creative/30',
   },
   {
     id: 'retrospectiva',
     label: 'Retrospectiva',
-    badgeClass: 'bg-teal-500/10 text-teal-400 border-teal-500/30',
+    badgeClass: 'bg-retrospective/10 text-retrospective-text border-retrospective/30',
   },
   {
     id: 'general',
     label: 'General',
-    badgeClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+    badgeClass: 'bg-neutral/10 text-neutral-text border-neutral/30',
   },
 ];
 
@@ -190,7 +190,7 @@ export class DocumentsTab {
       this.categories.find((c) => c.id === tipo) || {
         id: 'general',
         label: tipo,
-        badgeClass: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+        badgeClass: 'bg-neutral/10 text-neutral-text border-neutral/30',
       }
     );
   }

@@ -1,7 +1,7 @@
 package com.cassandra.app;
 
-import android.graphics.Color;
 import android.os.Bundle;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
@@ -21,7 +21,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     private void applyBarColors() {
-        int bgColor = Color.parseColor("#18181b");
+        int bgColor = ContextCompat.getColor(this, R.color.app_background);
         getWindow().setStatusBarColor(bgColor);
         getWindow().setNavigationBarColor(bgColor);
 

@@ -77,7 +77,7 @@
           }
           @if (project().fecha_limite) {
             <span class="text-text-muted/40">·</span>
-            <span class="text-amber-400/90 flex items-center gap-1">
+            <span class="text-warning-text/90 flex items-center gap-1">
               <svg lucideClock class="w-3 h-3" />
               Límite: {{ project().fecha_limite | date: 'dd/MM/yyyy' }}
             </span>

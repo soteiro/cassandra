@@ -49,7 +49,7 @@
           <button
             type="button"
             (click)="startCreate()"
-            class="px-3.5 py-1.5 bg-primary text-background font-semibold rounded-xl text-xs hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+            class="px-3.5 py-1.5 bg-primary text-on-primary font-semibold rounded-xl text-xs hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <svg lucidePlus class="w-4 h-4" />
             <span>Nuevo Documento</span>
@@ -122,7 +122,7 @@
           <button
             type="button"
             (click)="startCreate()"
-            class="px-4 py-2 bg-primary text-background font-semibold rounded-xl text-xs hover:bg-primary-hover transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+            class="px-4 py-2 bg-primary text-on-primary font-semibold rounded-xl text-xs hover:bg-primary-hover transition-colors inline-flex items-center gap-1.5 cursor-pointer"
           >
             <svg lucidePlus class="w-4 h-4" />
             <span>Crear primer documento</span>
@@ -249,7 +249,7 @@
             <button
               type="button"
               (click)="startEdit(doc)"
-              class="px-3 py-1.5 text-xs font-semibold bg-primary text-background rounded-xl hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer"
+              class="px-3 py-1.5 text-xs font-semibold bg-primary text-on-primary rounded-xl hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <svg lucidePencil class="w-3.5 h-3.5" />
               <span>Editar</span>
@@ -348,7 +348,7 @@
             type="button"
             (click)="saveDocument()"
             [disabled]="isSaving()"
-            class="px-4 py-2 bg-primary text-background font-semibold rounded-xl text-xs hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm"
+            class="px-4 py-2 bg-primary text-on-primary font-semibold rounded-xl text-xs hover:bg-primary-hover transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm"
           >
             @if (isSaving()) {
               <div class="w-3.5 h-3.5 border-2 border-background border-t-transparent rounded-full animate-spin"></div>

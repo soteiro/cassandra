@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "test font",
+        "files": [
+          "frontend/src/app/services/mermaid.service.spec.ts"
+        ],
+        "createdAt": "2026-10-26T14:21:38.492Z",
+        "reason": "Agent: Test Font is an intentional unit-test fixture at lines 85 and 104 that verifies Mermaid reads the font from CSS; it is not used by the application UI."
+      }
+    ]
+  }
+}

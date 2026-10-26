@@ -36,17 +36,17 @@
           <span class="block text-xs font-semibold text-text-muted uppercase tracking-wider text-[10px]">Total</span>
           <span class="text-base font-bold text-text-main">{{ stats().total }}</span>
         </div>
-        <div class="px-3.5 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-center min-w-16">
-          <span class="block text-xs font-semibold text-purple-300 uppercase tracking-wider text-[10px]">Reflexiones</span>
-          <span class="text-base font-bold text-purple-300">{{ stats().reflexiones }}</span>
+        <div class="px-3.5 py-2 bg-insight/10 border border-insight/20 rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-insight-emphasis uppercase tracking-wider text-[10px]">Reflexiones</span>
+          <span class="text-base font-bold text-insight-emphasis">{{ stats().reflexiones }}</span>
         </div>
-        <div class="px-3.5 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center min-w-16">
-          <span class="block text-xs font-semibold text-amber-300 uppercase tracking-wider text-[10px]">Memorias</span>
-          <span class="text-base font-bold text-amber-300">{{ stats().memorias }}</span>
+        <div class="px-3.5 py-2 bg-warning/10 border border-warning/20 rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-warning-emphasis uppercase tracking-wider text-[10px]">Memorias</span>
+          <span class="text-base font-bold text-warning-emphasis">{{ stats().memorias }}</span>
         </div>
-        <div class="px-3.5 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center min-w-16">
-          <span class="block text-xs font-semibold text-blue-300 uppercase tracking-wider text-[10px]">Eventos</span>
-          <span class="text-base font-bold text-blue-300">{{ stats().eventos }}</span>
+        <div class="px-3.5 py-2 bg-info/10 border border-info/20 rounded-xl text-center min-w-16">
+          <span class="block text-xs font-semibold text-info-emphasis uppercase tracking-wider text-[10px]">Eventos</span>
+          <span class="text-base font-bold text-info-emphasis">{{ stats().eventos }}</span>
         </div>
       </div>
     </div>
@@ -72,7 +72,7 @@
           [class]="
             'px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1 ' +
             (nuevoTipo() === 'reflexion'
-              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-xs'
+              ? 'bg-insight/20 text-insight-emphasis border border-insight/30 shadow-xs'
               : 'text-text-muted hover:text-text-main')
           "
         >
@@ -86,7 +86,7 @@
           [class]="
             'px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1 ' +
             (nuevoTipo() === 'memoria'
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-xs'
+              ? 'bg-warning/20 text-warning-emphasis border border-warning/30 shadow-xs'
               : 'text-text-muted hover:text-text-main')
           "
         >
@@ -100,7 +100,7 @@
           [class]="
             'px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1 ' +
             (nuevoTipo() === 'evento'
-              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-xs'
+              ? 'bg-info/20 text-info-emphasis border border-info/30 shadow-xs'
               : 'text-text-muted hover:text-text-main')
           "
         >
@@ -139,7 +139,7 @@
           type="button"
           [disabled]="isSubmittingNuevo() || !nuevoTexto().trim()"
           (click)="createReflexion()"
-          class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+          class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2 text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
         >
           @if (isSubmittingNuevo()) {
             <span class="animate-spin text-xs">⠋</span>
@@ -172,7 +172,7 @@
           (click)="setFilter('todas')"
           [class]="
             'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
-            (activeFilter() === 'todas' ? 'bg-primary text-background font-semibold' : 'text-text-muted hover:text-text-main')
+            (activeFilter() === 'todas' ? 'bg-primary text-on-primary font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
           Todas
@@ -182,7 +182,7 @@
           (click)="setFilter('reflexion')"
           [class]="
             'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
-            (activeFilter() === 'reflexion' ? 'bg-purple-500/20 text-purple-300 font-semibold' : 'text-text-muted hover:text-text-main')
+            (activeFilter() === 'reflexion' ? 'bg-insight/20 text-insight-emphasis font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
           Reflexiones
@@ -192,7 +192,7 @@
           (click)="setFilter('memoria')"
           [class]="
             'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
-            (activeFilter() === 'memoria' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-text-muted hover:text-text-main')
+            (activeFilter() === 'memoria' ? 'bg-warning/20 text-warning-emphasis font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
           Memorias
@@ -202,7 +202,7 @@
           (click)="setFilter('evento')"
           [class]="
             'min-h-11 sm:min-h-0 px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer ' +
-            (activeFilter() === 'evento' ? 'bg-blue-500/20 text-blue-300 font-semibold' : 'text-text-muted hover:text-text-main')
+            (activeFilter() === 'evento' ? 'bg-info/20 text-info-emphasis font-semibold' : 'text-text-muted hover:text-text-main')
           "
         >
           Eventos

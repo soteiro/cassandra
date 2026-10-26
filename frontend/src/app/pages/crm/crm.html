@@ -30,7 +30,7 @@
       <button
         type="button"
         (click)="openCreateModal()"
-        class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2.5 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
+        class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-4 py-2.5 text-xs shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
       >
         <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />
         <span>Nueva Persona</span>
@@ -104,7 +104,7 @@
 
           <a
             [routerLink]="['/crm/persona', myProfile.id]"
-            class="bg-primary hover:bg-primary/90 text-background font-semibold text-xs rounded-xl px-4 py-2.5 shadow-md flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer"
+            class="bg-primary hover:bg-primary/90 text-on-primary font-semibold text-xs rounded-xl px-4 py-2.5 shadow-md flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer"
           >
             <svg lucideFeather class="w-4 h-4 stroke-[2.5]" />
             <span>Abrir Bitácora</span>
@@ -165,7 +165,7 @@
           @if (!searchQuery()) {
             <button
               type="button"
-              class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2.5 text-xs shadow-lg transition-all cursor-pointer inline-flex items-center gap-1.5"
+              class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2.5 text-xs shadow-lg transition-all cursor-pointer inline-flex items-center gap-1.5"
               (click)="openCreateModal()"
             >
               <svg lucidePlus class="w-4 h-4 stroke-[2.5]" />

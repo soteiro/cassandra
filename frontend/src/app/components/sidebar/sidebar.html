@@ -56,8 +56,13 @@
         (click)="sidebar.close()"
         routerLink="/home"
         routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+        #homeLink="routerLinkActive"
+        [class.text-on-primary]="homeLink.isActive"
+        [class.text-text-main]="!homeLink.isActive"
+        [class]="homeLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+        ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent transition-all text-sm font-medium group cursor-pointer"
       >
         <svg lucideHouse class="w-4 h-4 group-hover:scale-105 transition-transform" />
         <span>Inicio</span>
@@ -66,8 +71,13 @@
       <a
         (click)="sidebar.close()"
         routerLink="/proyectos"
-        routerLinkActive="text-black font-semibold bg-primary  shadow-xs"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+        routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+        #projectsLink="routerLinkActive"
+        [class.text-on-primary]="projectsLink.isActive"
+        [class.text-text-main]="!projectsLink.isActive"
+        [class]="projectsLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+        ariaCurrentWhenActive="page"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent transition-all text-sm font-medium group cursor-pointer"
       >
         <svg lucideFolder class="w-4 h-4 group-hover:scale-105 transition-transform" />
         <span>Proyectos</span>
@@ -76,8 +86,13 @@
         (click)="sidebar.close()"
         routerLink="/crm"
         routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+        #crmLink="routerLinkActive"
+        [class.text-on-primary]="crmLink.isActive"
+        [class.text-text-main]="!crmLink.isActive"
+        [class]="crmLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+        ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent transition-all text-sm font-medium group cursor-pointer"
       >
         <svg lucideUser class="w-4 h-4 group-hover:scale-105 transition-transform" />
         <span>Crm</span>
@@ -86,8 +101,13 @@
         (click)="sidebar.close()"
         routerLink="/finanzas"
         routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+        #financeLink="routerLinkActive"
+        [class.text-on-primary]="financeLink.isActive"
+        [class.text-text-main]="!financeLink.isActive"
+        [class]="financeLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+        ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent transition-all text-sm font-medium group cursor-pointer"
       >
         <svg lucideWalletMinimal class="w-4 h-4 group-hover:scale-105 transition-transform" />
         <span>Finanzas</span>
@@ -99,24 +119,29 @@
   <div class="border-t border-surface-border pt-4 mt-auto space-y-3">
     <a
       (click)="sidebar.close()"
-      routerLink="/claves-api"
+      routerLink="/configuracion"
       routerLinkActive="bg-primary font-semibold"
-      #keysLink="routerLinkActive"
-      [class.text-background]="keysLink.isActive"
-      [class.text-text-main]="!keysLink.isActive"
-      [class]="keysLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+      #settingsLink="routerLinkActive"
+      [class.text-on-primary]="settingsLink.isActive"
+      [class.text-text-main]="!settingsLink.isActive"
+      [class]="settingsLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
       ariaCurrentWhenActive="page"
       class="flex items-center gap-3 min-h-11 px-3.5 py-2.5 rounded-xl border border-transparent transition-colors text-sm font-medium cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
-      <svg lucideKeyRound class="w-4 h-4" aria-hidden="true" />
-      <span>Claves API</span>
+      <svg lucideSettings class="w-4 h-4" aria-hidden="true" />
+      <span>Configuración</span>
     </a>
     <a
       (click)="sidebar.close()"
       routerLink="/docs"
       routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+      #docsLink="routerLinkActive"
+      [class.text-on-primary]="docsLink.isActive"
+      [class.text-text-main]="!docsLink.isActive"
+      [class]="docsLink.isActive ? 'hover:bg-primary/90' : 'hover:bg-surface-border/60'"
+      ariaCurrentWhenActive="page"
       [routerLinkActiveOptions]="{ exact: true }"
-      class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-text-main hover:text-text-main hover:bg-surface-border/60 border border-transparent transition-all text-sm font-medium group cursor-pointer"
+      class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent transition-all text-sm font-medium group cursor-pointer"
     >
       <svg lucideBookOpen class="w-4 h-4 group-hover:scale-105 transition-transform" />
       <span>API Docs</span>
@@ -152,7 +177,7 @@
           type="button"
           (click)="updates.installUpdate()"
           [disabled]="updates.installing()"
-          class="w-full min-h-11 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-background bg-primary hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-60"
+          class="w-full min-h-11 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-on-primary bg-primary hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-60"
         >
           {{ updates.installing() ? 'Abriendo instalador…' : 'Instalar actualización' }}
         </button>

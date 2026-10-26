@@ -191,9 +191,9 @@ describe('ReflexionesView', () => {
   });
 
   it('badge class and icon per tipo', () => {
-    expect(component.getBadgeClass('memoria')).toContain('amber');
-    expect(component.getBadgeClass('evento')).toContain('blue');
-    expect(component.getBadgeClass('reflexion')).toContain('purple');
+    expect(component.getBadgeClass('memoria')).toContain('warning');
+    expect(component.getBadgeClass('evento')).toContain('info');
+    expect(component.getBadgeClass('reflexion')).toContain('insight');
     expect(component.getBadgeClass('otro' as ReflexionTipo)).toContain('primary');
     expect(component.getTipoIcon('evento')).toBe('📅');
     expect(component.getTipoIcon('otro' as ReflexionTipo)).toBe('✍️');

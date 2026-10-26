@@ -104,7 +104,7 @@ export class PersonaDetails {
       val.includes('laboral') ||
       val.includes('oficina')
     ) {
-      return 'bg-blue-500/15 text-blue-400 border-blue-500/30';
+      return 'bg-info/15 text-info-text border-info/30';
     }
     if (
       val.includes('cliente') ||
@@ -112,21 +112,21 @@ export class PersonaDetails {
       val.includes('negocio') ||
       val.includes('b2b')
     ) {
-      return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
+      return 'bg-insight/15 text-insight-text border-insight/30';
     }
     if (
       val.includes('familia') ||
       val.includes('pareja') ||
       val.includes('hogar')
     ) {
-      return 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+      return 'bg-personal/15 text-personal-text border-personal/30';
     }
     if (
       val.includes('amigo') ||
       val.includes('amistad') ||
       val.includes('social')
     ) {
-      return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+      return 'bg-positive/15 text-positive-text border-positive/30';
     }
     if (
       val.includes('inver') ||
@@ -134,7 +134,7 @@ export class PersonaDetails {
       val.includes('socio') ||
       val.includes('partner')
     ) {
-      return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+      return 'bg-warning/15 text-warning-text border-warning/30';
     }
     if (
       val.includes('universidad') ||
@@ -142,7 +142,7 @@ export class PersonaDetails {
       val.includes('mentor') ||
       val.includes('profe')
     ) {
-      return 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30';
+      return 'bg-learning/15 text-learning-text border-learning/30';
     }
 
     return 'bg-primary/15 text-primary border-primary/30';

@@ -1,6 +1,6 @@
 @if (isOpen()) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs transition-opacity"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay/70 backdrop-blur-xs transition-opacity"
     (click)="onClose()"
   >
     <div
@@ -124,7 +124,7 @@
               <button
                 type="button"
                 (click)="selectEntorno(sug)"
-                [class]="entorno() === sug ? 'bg-primary text-background font-semibold' : 'bg-background hover:bg-surface-border text-text-muted hover:text-text-main'"
+                [class]="entorno() === sug ? 'bg-primary text-on-primary font-semibold' : 'bg-background hover:bg-surface-border text-text-muted hover:text-text-main'"
                 class="px-2 py-0.5 rounded-lg border border-surface-border text-[11px] transition-colors cursor-pointer"
               >
                 {{ sug }}
@@ -160,7 +160,7 @@
           <button
             type="submit"
             [disabled]="isSubmitting()"
-            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-5 py-2 transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
             @if (isSubmitting()) {
               <span class="animate-spin text-xs">⠋</span>

@@ -100,8 +100,8 @@ describe('ProjectHeader', () => {
 
   it('should map priorities to classes', () => {
     expect(component.getPriorityClass('Critica')).toContain('text-danger');
-    expect(component.getPriorityClass('Alta')).toContain('text-amber-300');
-    expect(component.getPriorityClass('Media')).toContain('text-blue-300');
+    expect(component.getPriorityClass('Alta')).toContain('text-warning-emphasis');
+    expect(component.getPriorityClass('Media')).toContain('text-info-emphasis');
     expect(component.getPriorityClass('Baja')).toContain('text-text-muted');
     expect(component.getPriorityClass(undefined)).toContain('text-text-muted');
   });
@@ -110,9 +110,9 @@ describe('ProjectHeader', () => {
     expect(component.getStatusClass('Completado')).toContain('text-success');
     expect(component.getStatusClass('Terminado')).toContain('text-success');
     expect(component.getStatusClass('En Curso')).toContain('text-accent');
-    expect(component.getStatusClass('Bloqueado')).toContain('text-amber-300');
+    expect(component.getStatusClass('Bloqueado')).toContain('text-warning-emphasis');
     expect(component.getStatusClass('Cancelado')).toContain('text-danger');
-    expect(component.getStatusClass('Idea')).toContain('text-purple-300');
+    expect(component.getStatusClass('Idea')).toContain('text-insight-emphasis');
     expect(component.getStatusClass('No Listado')).toContain('text-text-muted');
     expect(component.getStatusClass('desconocido')).toContain('text-text-muted');
   });

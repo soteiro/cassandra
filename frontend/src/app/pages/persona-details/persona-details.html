@@ -105,7 +105,7 @@
             <button
               type="button"
               (click)="openEditModal()"
-              class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-4 py-2 text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <svg lucidePencil class="w-3.5 h-3.5" />
               <span>Editar Perfil</span>
@@ -160,7 +160,7 @@
           <button
             type="button"
             (click)="showAddInteraccion.set(!showAddInteraccion())"
-            class="bg-primary hover:bg-primary/90 text-background font-semibold rounded-xl px-3.5 py-1.5 text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            class="bg-primary hover:bg-primary/90 text-on-primary font-semibold rounded-xl px-3.5 py-1.5 text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <svg lucidePlus class="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{{ showAddInteraccion() ? 'Cerrar Formulario' : 'Nueva Interacción' }}</span>
@@ -193,7 +193,7 @@
                 type="button"
                 [disabled]="isSubmittingInteraccion() || !nuevaInteraccionTexto().trim()"
                 (click)="createInteraccion()"
-                class="bg-primary hover:bg-primary/90 text-background font-semibold px-4 py-1.5 rounded-xl text-xs transition-all shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                class="bg-primary hover:bg-primary/90 text-on-primary font-semibold px-4 py-1.5 rounded-xl text-xs transition-all shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
               >
                 @if (isSubmittingInteraccion()) {
                   <span class="animate-spin text-xs">⠋</span>
