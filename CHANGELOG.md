@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.18.0](https://github.com/soteiro/cassandra/compare/v0.17.0...v0.18.0) (2026-10-28)
+
+
+### Features
+
+* **mcp:** crear y consultar tareas por proyecto ([5d6d575](https://github.com/soteiro/cassandra/commit/5d6d575d333a9f9494ef5aa0365cc33f525bb414))
+* **mcp:** create and read project tasks ([771ee65](https://github.com/soteiro/cassandra/commit/771ee658e1a8ae654c8eda351eb162570814903b))
+
+
+### Bug Fixes
+
+* add semanaARevisar function and integrate into SemanaWidget ([6239695](https://github.com/soteiro/cassandra/commit/62396955576ddde24e287070ac8cd623c4197707))
+
 ## [0.17.0](https://github.com/soteiro/cassandra/compare/v0.16.2...v0.17.0) (2026-10-28)
 
 
