@@ -2,7 +2,7 @@
   <header>
     <h1 id="api-keys-title" class="text-2xl font-bold text-text-main">Claves API</h1>
     <p class="mt-2 text-sm text-text-muted max-w-2xl">
-      Conecta tus asistentes con la memoria de tus proyectos. Cada clave tiene sus propios proyectos y permisos.
+      Conecta tus asistentes con la memoria y las tareas de tus proyectos. Cada clave tiene sus propios proyectos y permisos.
     </p>
   </header>
 
@@ -42,7 +42,7 @@
 
             <fieldset aria-describedby="projects-help">
               <legend class="text-sm font-medium mb-2">Proyectos autorizados</legend>
-              <p id="projects-help" class="text-xs text-text-muted mb-3">Elige entre 1 y 50 proyectos. La clave solo accede a su memoria.</p>
+              <p id="projects-help" class="text-xs text-text-muted mb-3">Elige entre 1 y 50 proyectos. Los permisos se aplican solo a los seleccionados.</p>
               @if (projectsResource.isLoading()) {
                 <p role="status" class="text-sm text-text-muted">Cargando proyectos…</p>
               } @else if (projectsResource.error()) {
@@ -70,12 +70,22 @@
             </fieldset>
 
             <div>
-              <label for="key-access" class="block text-sm font-medium mb-2">Permisos</label>
+              <label for="key-access" class="block text-sm font-medium mb-2">Memoria</label>
               <select id="key-access" formControlName="acceso" class="field" aria-describedby="access-help">
+                <option value="none">Sin acceso a memoria</option>
                 <option value="read">Solo leer memoria</option>
                 <option value="write">Leer y guardar memoria</option>
               </select>
               <p id="access-help" class="text-xs text-text-muted mt-2">Para que un asistente registre avances y decisiones, permite leer y guardar.</p>
+            </div>
+            <div>
+              <label for="key-tasks" class="block text-sm font-medium mb-2">Tareas</label>
+              <select id="key-tasks" formControlName="tareas" class="field" aria-describedby="tasks-help">
+                <option value="none">Sin acceso a tareas</option>
+                <option value="read">Solo leer tareas</option>
+                <option value="create">Leer y crear tareas</option>
+              </select>
+              <p id="tasks-help" class="text-xs text-text-muted mt-2">Permite consultar o crear tareas. Las claves no permiten editarlas, completarlas ni eliminarlas.</p>
             </div>
             <div>
               <label for="key-expiry" class="block text-sm font-medium mb-2">Vencimiento</label>
@@ -123,7 +133,7 @@
               <p class="font-mono text-xs text-text-muted break-all">{{ key.prefijo }}…</p>
               <dl class="text-sm space-y-2">
                 <div><dt class="text-text-muted">Proyectos</dt><dd class="break-words mt-0.5">{{ projectNames(key) }}</dd></div>
-                <div><dt class="sr-only">Permisos</dt><dd>{{ key.scopes.includes('memory:write') ? 'Leer y guardar memoria' : 'Solo leer memoria' }}</dd></div>
+                <div><dt class="text-text-muted">Permisos</dt><dd class="break-words mt-0.5">{{ permissionNames(key) }}</dd></div>
                 <div class="text-text-muted"><dt class="inline">Vence: </dt><dd class="inline">{{ key.expira_en ? (key.expira_en | date:'dd/MM/yyyy, HH:mm') : 'Sin vencimiento' }}</dd></div>
                 <div class="text-text-muted"><dt class="inline">Último uso: </dt><dd class="inline">{{ key.ultimo_uso ? (key.ultimo_uso | date:'dd/MM/yyyy, HH:mm') : 'Todavía sin uso' }}</dd></div>
               </dl>

@@ -105,7 +105,7 @@ func NewProjectMemoryHandler(repo *repository.ProjectMemoryRepository) *ProjectM
 	return &ProjectMemoryHandler{repo: repo}
 }
 
-func memoryProject(w http.ResponseWriter, r *http.Request, scope string) (int, int, bool) {
+func integrationProject(w http.ResponseWriter, r *http.Request, scope string) (int, int, bool) {
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		http.Error(w, "No autorizado", http.StatusUnauthorized)
@@ -116,7 +116,7 @@ func memoryProject(w http.ResponseWriter, r *http.Request, scope string) (int, i
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
 		return 0, 0, false
 	}
-	if a := middleware.GetMemoryAccess(r.Context()); a != nil {
+	if a := middleware.GetAPIKeyAccess(r.Context()); a != nil {
 		if !slices.Contains(a.ProyectoIDs, projectID) {
 			http.Error(w, "Recurso no encontrado", http.StatusNotFound)
 			return 0, 0, false
@@ -130,7 +130,7 @@ func memoryProject(w http.ResponseWriter, r *http.Request, scope string) (int, i
 }
 
 func (h *ProjectMemoryHandler) Context(w http.ResponseWriter, r *http.Request) {
-	userID, projectID, ok := memoryProject(w, r, models.MemoryRead)
+	userID, projectID, ok := integrationProject(w, r, models.MemoryRead)
 	if !ok {
 		return
 	}
@@ -143,7 +143,7 @@ func (h *ProjectMemoryHandler) Context(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProjectMemoryHandler) Search(w http.ResponseWriter, r *http.Request) {
-	userID, projectID, ok := memoryProject(w, r, models.MemoryRead)
+	userID, projectID, ok := integrationProject(w, r, models.MemoryRead)
 	if !ok {
 		return
 	}
@@ -180,7 +180,7 @@ func (h *ProjectMemoryHandler) Search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProjectMemoryHandler) Write(w http.ResponseWriter, r *http.Request) {
-	userID, projectID, ok := memoryProject(w, r, models.MemoryWrite)
+	userID, projectID, ok := integrationProject(w, r, models.MemoryWrite)
 	if !ok {
 		return
 	}
@@ -189,7 +189,7 @@ func (h *ProjectMemoryHandler) Write(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var keyID int64
-	if a := middleware.GetMemoryAccess(r.Context()); a != nil {
+	if a := middleware.GetAPIKeyAccess(r.Context()); a != nil {
 		keyID = a.APIKeyID
 	}
 	value, err := h.repo.Write(r.Context(), userID, projectID, keyID, req)

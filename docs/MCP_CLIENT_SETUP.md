@@ -7,7 +7,10 @@ Cassandra guarda la memoria del proyecto indicado en cada operación.
 ## 1. Preparar Cassandra QA y el conector
 
 En **QA → Configuración → Conexiones → Claves API**, generar una clave para el proyecto con **Leer y guardar
-memoria**. Obtener el ID desde su URL: `/proyectos/123` significa ID `123`.
+memoria**. Para trabajar con tareas, elegir también **Solo leer tareas** o
+**Leer y crear tareas** en el selector independiente **Tareas**. Puede elegirse
+**Sin acceso a memoria** para una clave dedicada a tareas. Obtener el ID desde su
+URL: `/proyectos/123` significa ID `123`.
 La clave y el ID deben pertenecer a QA: los probados en local son independientes.
 
 En el repositorio de Cassandra, compilar y consultar la ruta del conector:
@@ -129,8 +132,18 @@ Después, para comprobar escritura:
 > Crea una ficha breve de prueba de conexión en este proyecto mediante MCP y
 > confirma que puedes recuperarla con buscar_memoria.
 
-El cliente anuncia `obtener_contexto`, `buscar_memoria`, `guardar_avance` y
-`registrar_decision`. La memoria y sus fichas aparecen en **Documentos → Project logs**.
+El cliente anuncia `obtener_contexto`, `buscar_memoria`, `guardar_avance`,
+`registrar_decision`, `crear_tarea`, `listar_tareas` y `obtener_tarea`. Los permisos
+de la clave determinan cuáles puede ejecutar. La memoria y sus fichas aparecen
+en **Documentos → Project logs**; las tareas aparecen en el módulo habitual de tareas.
+
+Para comprobar lectura de tareas con una clave autorizada, pedir:
+
+> Consulta las primeras diez tareas del proyecto vinculado usando listar_tareas.
+
+Ver [el contrato de tareas](MCP_TASKS.md) para creación, subtareas y reintentos.
+Después de actualizar el backend y el conector, emitir una clave con los permisos
+necesarios, reemplazar la guardada para el proyecto y reiniciar el cliente MCP.
 
 QA reinicia su base en cada despliegue según el flujo actual de
 [deploy](../deploy/README.md): después hay que generar otra clave y revisar el

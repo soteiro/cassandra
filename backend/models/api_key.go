@@ -5,6 +5,8 @@ import "time"
 const (
 	MemoryRead  = "memory:read"
 	MemoryWrite = "memory:write"
+	TasksRead   = "tasks:read"
+	TasksCreate = "tasks:create"
 )
 
 type APIKey struct {
@@ -32,7 +34,7 @@ type IssuedAPIKey struct {
 	Token string `json:"token"`
 }
 
-type MemoryAccess struct {
+type APIKeyAccess struct {
 	UserID      int
 	APIKeyID    int64
 	Scopes      []string
