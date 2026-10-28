@@ -57,6 +57,7 @@ func NewRouter(opts Options) http.Handler {
 	apiKeysRepo := repository.NewAPIKeyRepository(db)
 	apiKeysHandler := handlers.NewAPIKeysHandler(apiKeysRepo)
 	memoryHandler := handlers.NewProjectMemoryHandler(repository.NewProjectMemoryRepository(db))
+	integrationTasksHandler := handlers.NewIntegrationTasksHandler(repository.NewIntegrationTasksRepository(db))
 	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
 	pronosticosHandler := handlers.NewPronosticosHandler(repository.NewPronosticosRepository(db), owner)
 	revisionHandler := handlers.NewRevisionHandler(repository.NewRevisionRepository(db))
@@ -92,12 +93,18 @@ func NewRouter(opts Options) http.Handler {
 	})
 
 	// Grupo de rutas protegidas
-	// Las keys se aceptan exclusivamente aquí, con permisos por operación/proyecto.
+	// Las keys se aceptan solo en estos grupos, con permisos por operación/proyecto.
 	r.Route("/api/memory", func(r chi.Router) {
-		r.Use(middleware.MemoryAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
+		r.Use(middleware.IntegrationAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
 		r.Get("/projects/{project_id}", memoryHandler.Context)
 		r.Get("/projects/{project_id}/entries", memoryHandler.Search)
 		r.Post("/projects/{project_id}/advances", memoryHandler.Write)
+	})
+	r.Route("/api/integrations/projects/{project_id}/tasks", func(r chi.Router) {
+		r.Use(middleware.IntegrationAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
+		r.Get("/", integrationTasksHandler.List)
+		r.Post("/", integrationTasksHandler.Create)
+		r.Get("/{task_id}", integrationTasksHandler.Get)
 	})
 
 	r.Group(func(r chi.Router) {

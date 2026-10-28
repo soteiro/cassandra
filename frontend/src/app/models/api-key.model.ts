@@ -1,10 +1,10 @@
-export type MemoryScope = 'memory:read' | 'memory:write';
+export type APIKeyScope = 'memory:read' | 'memory:write' | 'tasks:read' | 'tasks:create';
 
 export interface APIKey {
   id: number;
   nombre: string;
   prefijo: string;
-  scopes: MemoryScope[];
+  scopes: APIKeyScope[];
   proyecto_ids: number[];
   fecha_creacion: string;
   expira_en: string | null;
@@ -14,7 +14,7 @@ export interface APIKey {
 
 export interface CreateAPIKeyRequest {
   nombre: string;
-  scopes: MemoryScope[];
+  scopes: APIKeyScope[];
   proyecto_ids: number[];
   expira_en?: string;
 }

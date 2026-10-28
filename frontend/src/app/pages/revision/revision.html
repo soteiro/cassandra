@@ -54,7 +54,7 @@
     @switch (paso()) {
       @case (0) {
         <p class="text-xs text-text-muted">Empieza por lo que sí hiciste.</p>
-        <app-semana-widget [conEnlaceRevision]="false" />
+        <app-semana-widget [conEnlaceRevision]="false" [semana]="lunes()" />
       }
 
       @case (1) {

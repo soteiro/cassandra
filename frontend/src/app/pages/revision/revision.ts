@@ -12,7 +12,7 @@ import { SemanaWidget } from '../../components/semana-widget/semana-widget';
 import { TareaEstancada } from '../../models/revision.model';
 import { ProjectResponse } from '../../models/proyect.model';
 import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../utils/actividad.util';
-import { DIAS_SEMANA } from '../../utils/revision.util';
+import { DIAS_SEMANA, semanaARevisar } from '../../utils/revision.util';
 import { getErrorMessage } from '../../utils/http-error.util';
 
 /** Días sin cambios para que una tarea cuente como estancada. */
@@ -63,10 +63,15 @@ export class Revision {
   protected readonly preferencias = this.revisionService.preferenciasResource;
   protected readonly revisiones = this.revisionService.revisionesResource;
   protected readonly estancadasResource = this.revisionService.getEstancadas(() => DIAS_ESTANCADA);
-  private readonly lunes = inicioDeSemana(new Date());
+  /** Semana que se revisa; hasta conocer el día elegido, la semana en curso. */
+  protected readonly lunes = computed(() => {
+    const dia = this.preferencias.value()?.dia_revision;
+    const ahora = new Date();
+    return dia == null ? inicioDeSemana(ahora) : semanaARevisar(dia, ahora);
+  });
   protected readonly semana = this.actividadService.getResumen(() => ({
-    desde: this.lunes,
-    hasta: sumarSemanas(this.lunes, 1),
+    desde: this.lunes(),
+    hasta: sumarSemanas(this.lunes(), 1),
   }));
 
   /** Decisiones tomadas en esta revisión (por id de tarea / proyecto). */

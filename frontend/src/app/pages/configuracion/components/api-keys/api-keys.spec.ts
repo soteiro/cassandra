@@ -112,6 +112,53 @@ describe('ApiKeys', () => {
     expect(el.querySelector<HTMLInputElement>('#issued-key')?.value).toBe(issued.token);
   });
 
+  it('can issue a tasks-only key without granting access to memory', async () => {
+    await fill();
+    select('key-access', 'none');
+    select('key-tasks', 'create');
+    select('key-expiry', 'never');
+    button('Generar clave').click();
+    await render();
+    expect(api.create).toHaveBeenCalledExactlyOnceWith({
+      nombre: 'Mi asistente', scopes: ['tasks:read', 'tasks:create'], proyecto_ids: [12],
+    });
+  });
+
+  it('keeps task access read-only when combining it with memory permissions', async () => {
+    await fill();
+    select('key-access', 'write');
+    select('key-tasks', 'read');
+    button('Generar clave').click();
+    await render();
+    expect(api.create.mock.calls[0][0].scopes).toEqual(['memory:read', 'memory:write', 'tasks:read']);
+  });
+
+  it('requires at least one permission and preserves the selected projects', async () => {
+    await fill();
+    select('key-access', 'none');
+    button('Generar clave').click();
+    await render();
+    expect(api.create).not.toHaveBeenCalled();
+    expect(el.querySelector('[role="alert"]')?.textContent).toContain('Selecciona al menos un permiso');
+    expect(el.querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked).toBe(true);
+  });
+
+  it('shows the actual permissions for tasks-only and combined keys', async () => {
+    fixture.destroy();
+    api.list.mockReturnValue(of([
+      { ...key, scopes: ['tasks:create'] },
+      { ...key, id: 2, scopes: ['memory:read', 'memory:write', 'tasks:read', 'tasks:create'] },
+    ]));
+    fixture = TestBed.createComponent(ApiKeys);
+    el = fixture.nativeElement;
+    await render();
+    const permissions = Array.from(el.querySelectorAll('li dl')).map(node => node.textContent);
+    expect(permissions[0]).toContain('Crear tareas');
+    expect(permissions[0]).not.toContain('Leer memoria');
+    expect(permissions[0]).not.toContain('Leer tareas');
+    expect(permissions[1]).toContain('Leer memoria, Guardar memoria, Leer tareas, Crear tareas');
+  });
+
   it('copies the complete secret and confirms only after clipboard succeeds', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });

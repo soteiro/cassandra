@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideCalendarCheck, LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
@@ -22,9 +22,18 @@ export class SemanaWidget {
   private readonly actividadService = inject(ActividadService);
   /** En la propia página de revisión el enlace sobra. */
   readonly conEnlaceRevision = input(true);
+  /** Lunes de la semana a mostrar al abrir; sin él, la semana en curso. */
+  readonly semana = input<Date | null>(null);
   private readonly semanaActual = inicioDeSemana(new Date());
 
   readonly desde = signal(this.semanaActual);
+
+  constructor() {
+    effect(() => {
+      const s = this.semana();
+      if (s) this.desde.set(s);
+    });
+  }
   readonly hasta = computed(() => sumarSemanas(this.desde(), 1));
   readonly esSemanaActual = computed(() => this.desde().getTime() >= this.semanaActual.getTime());
   /** Domingo de la semana mostrada (para la etiqueta). */
