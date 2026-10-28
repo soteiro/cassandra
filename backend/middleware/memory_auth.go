@@ -11,19 +11,20 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type MemoryKeyAuthenticator interface {
-	Authenticate(context.Context, string) (*models.MemoryAccess, error)
+type APIKeyAuthenticator interface {
+	Authenticate(context.Context, string) (*models.APIKeyAccess, error)
 }
 
-const memoryAccessKey contextKey = "memoryAccess"
+const apiKeyAccessKey contextKey = "apiKeyAccess"
 
-func GetMemoryAccess(ctx context.Context) *models.MemoryAccess {
-	a, _ := ctx.Value(memoryAccessKey).(*models.MemoryAccess)
+func GetAPIKeyAccess(ctx context.Context) *models.APIKeyAccess {
+	a, _ := ctx.Value(apiKeyAccessKey).(*models.APIKeyAccess)
 	return a
 }
 
-// MemoryAuth permite sesión normal o key acotada solo en /api/memory.
-func MemoryAuth(jwtSecret string, users ActiveUsers, keys MemoryKeyAuthenticator) func(http.Handler) http.Handler {
+// IntegrationAuth admite sesión o key solo en rutas de integración explícitas.
+// Cada handler exige además el permiso y proyecto correspondientes.
+func IntegrationAuth(jwtSecret string, users ActiveUsers, keys APIKeyAuthenticator) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		session := AuthMiddleware(jwtSecret, users)(next)
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +43,7 @@ func MemoryAuth(jwtSecret string, users ActiveUsers, keys MemoryKeyAuthenticator
 				return
 			}
 			ctx := context.WithValue(r.Context(), UserIDKey, a.UserID)
-			ctx = context.WithValue(ctx, memoryAccessKey, a)
+			ctx = context.WithValue(ctx, apiKeyAccessKey, a)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

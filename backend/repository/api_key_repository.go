@@ -28,11 +28,11 @@ func keyHash(token string) string { return fmt.Sprintf("%x", sha256.Sum256([]byt
 
 func (r *APIKeyRepository) Create(ctx context.Context, userID int, req models.CreateAPIKeyRequest) (*models.IssuedAPIKey, error) {
 	req.Nombre = strings.TrimSpace(req.Nombre)
-	if req.Nombre == "" || strings.ContainsRune(req.Nombre, '\x00') || utf8.RuneCountInString(req.Nombre) > 100 || len(req.Scopes) == 0 || len(req.Scopes) > 2 || len(req.ProyectoIDs) == 0 || len(req.ProyectoIDs) > 50 {
+	if req.Nombre == "" || strings.ContainsRune(req.Nombre, '\x00') || utf8.RuneCountInString(req.Nombre) > 100 || len(req.Scopes) == 0 || len(req.Scopes) > 4 || len(req.ProyectoIDs) == 0 || len(req.ProyectoIDs) > 50 {
 		return nil, fmt.Errorf("%w: nombre, permisos y entre uno y cincuenta proyectos son obligatorios", models.ErrMemoryInvalid)
 	}
 	for _, scope := range req.Scopes {
-		if scope != models.MemoryRead && scope != models.MemoryWrite {
+		if scope != models.MemoryRead && scope != models.MemoryWrite && scope != models.TasksRead && scope != models.TasksCreate {
 			return nil, fmt.Errorf("%w: permiso desconocido", models.ErrMemoryInvalid)
 		}
 	}
@@ -111,12 +111,12 @@ func (r *APIKeyRepository) Revoke(ctx context.Context, userID int, id int64) err
 	return err
 }
 
-// Las keys de memoria se autentican solo en el router de memoria. No son JWTs.
-func (r *APIKeyRepository) Authenticate(ctx context.Context, token string) (*models.MemoryAccess, error) {
+// Las keys se autentican solo en rutas de integración. No son JWTs.
+func (r *APIKeyRepository) Authenticate(ctx context.Context, token string) (*models.APIKeyAccess, error) {
 	if !strings.HasPrefix(token, MemoryKeyPrefix) || len(token) != len(MemoryKeyPrefix)+43 {
 		return nil, pgx.ErrNoRows
 	}
-	a := &models.MemoryAccess{}
+	a := &models.APIKeyAccess{}
 	err := r.db.QueryRow(ctx, `UPDATE api_keys k SET ultimo_uso=CURRENT_TIMESTAMP FROM users u
 		WHERE k.token_hash=$1 AND k.user_id=u.id AND u.eliminado=false AND k.revocada_en IS NULL
 		AND (k.expira_en IS NULL OR k.expira_en>CURRENT_TIMESTAMP)

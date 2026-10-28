@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -21,6 +22,13 @@ func NewTareasRepository(db *pgxpool.Pool) *TareasRepository {
 
 // crear una tarea
 func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest) (*models.TareaResponse, error) {
+	return insertTarea(ctx, r.db, req)
+}
+
+// El mismo INSERT sirve a la API y a la transacción idempotente de integración.
+func insertTarea(ctx context.Context, db interface {
+	QueryRow(context.Context, string, ...any) pgx.Row
+}, req *models.TareaRequest) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
 	var fechaTerminado *time.Time
 	if req.Estado != nil && (*req.Estado == "Terminado" || *req.Estado == "Completado") {
@@ -56,7 +64,7 @@ func (r *TareasRepository) Create(ctx context.Context, req *models.TareaRequest)
 		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id
 	`
 
-	err := r.db.QueryRow(
+	err := db.QueryRow(
 		ctx,
 		query,
 		req.Nombre,

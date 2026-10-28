@@ -6,7 +6,7 @@ import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { APIKey, CreateAPIKeyRequest } from '../../../../models/api-key.model';
+import { APIKey, APIKeyScope, CreateAPIKeyRequest } from '../../../../models/api-key.model';
 import { APIKeyService } from '../../../../services/api-key.service';
 import { proyectService } from '../../../../services/proyect.service';
 import { getErrorMessage } from '../../../../utils/http-error.util';
@@ -43,6 +43,7 @@ export class ApiKeys {
   protected readonly form = inject(FormBuilder).nonNullable.group({
     nombre: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/\S/)]],
     acceso: ['read'],
+    tareas: ['none'],
     dias: ['90'],
   });
   private readonly secretInput = viewChild<ElementRef<HTMLInputElement>>('secretInput');
@@ -90,10 +91,19 @@ export class ApiKeys {
     this.createError.set('');
     if (this.form.invalid || this.selectedProjects().length === 0 || this.selectedProjects().length > 50
       || this.projectsResource.isLoading() || this.projectsResource.error()) return;
-    const { nombre, acceso, dias } = this.form.getRawValue();
+    const { nombre, acceso, tareas, dias } = this.form.getRawValue();
+    const scopes: APIKeyScope[] = [];
+    if (acceso === 'read' || acceso === 'write') scopes.push('memory:read');
+    if (acceso === 'write') scopes.push('memory:write');
+    if (tareas === 'read' || tareas === 'create') scopes.push('tasks:read');
+    if (tareas === 'create') scopes.push('tasks:create');
+    if (scopes.length === 0) {
+      this.createError.set('Selecciona al menos un permiso de memoria o tareas.');
+      return;
+    }
     const request: CreateAPIKeyRequest = {
       nombre: nombre.trim(),
-      scopes: acceso === 'write' ? ['memory:read', 'memory:write'] : ['memory:read'],
+      scopes,
       proyecto_ids: [...this.selectedProjects()],
     };
     if (dias !== 'never') request.expira_en = new Date(Date.now() + Number(dias) * 86_400_000).toISOString();
@@ -107,7 +117,7 @@ export class ApiKeys {
         this.copyFailed.set(false);
         this.notice.set('');
         this.saving.set(false);
-        this.form.reset({ nombre: '', acceso: 'read', dias: '90' });
+        this.form.reset({ nombre: '', acceso: 'read', tareas: 'none', dias: '90' });
         this.selectedProjects.set([]);
         this.submitted.set(false);
       },
@@ -146,6 +156,14 @@ export class ApiKeys {
 
   protected projectNames(key: APIKey): string {
     return key.proyecto_ids.map(id => this.projects().find(project => project.id === id)?.nombre ?? `Proyecto #${id}`).join(', ');
+  }
+
+  protected permissionNames(key: APIKey): string {
+    const names: Record<APIKeyScope, string> = {
+      'memory:read': 'Leer memoria', 'memory:write': 'Guardar memoria',
+      'tasks:read': 'Leer tareas', 'tasks:create': 'Crear tareas',
+    };
+    return key.scopes.map(scope => names[scope]).join(', ');
   }
 
   protected keyStatus(key: APIKey): 'Activa' | 'Revocada' | 'Vencida' {

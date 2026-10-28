@@ -1,6 +1,7 @@
 # Memoria de proyectos y MCP
 
-El conector local ofrece cuatro herramientas a un asistente de programación. El
+El conector local ofrece cuatro herramientas de memoria y tres de
+[tareas](MCP_TASKS.md) a un asistente de programación. El
 asistente redacta la memoria con la conversación y el repositorio que tiene
 disponibles; Cassandra la valida y guarda. No se contrata ni ejecuta un modelo en
 el servidor, no se ingieren chats automáticamente y no se publica un MCP remoto.
@@ -53,8 +54,11 @@ Por ejemplo, desde Bruno con sesión válida en el servidor de destino:
 Sustituir `12` por un proyecto propio existente. Puede añadirse `expira_en` en
 RFC3339; el vencimiento debe estar en el futuro. Se admiten de uno a cincuenta
 proyectos por key. Guardar el secreto en el gestor de secretos/entorno del cliente,
-fuera del repositorio y de la conversación. Una key permite solo memoria; no es una
-sesión JWT ni autoriza REST general, administración de keys, tareas, CRM o finanzas.
+fuera del repositorio y de la conversación. Estos permisos permiten solo memoria;
+`tasks:read` y `tasks:create` habilitan por separado la integración de tareas.
+Una key no es una sesión JWT ni autoriza REST general, administración de keys,
+edición o borrado de tareas, CRM o finanzas. Las claves anteriores no reciben
+permisos nuevos automáticamente.
 
 El login actual devuelve cookies: conservarlas en el cookie jar de Bruno/curl.
 Si se usa cookie, quitar un header Authorization heredado vacío o incorrecto:
@@ -113,8 +117,9 @@ políticas del cliente siguen aplicándose a las escrituras.
 
 ## 4. Contrato REST y herramientas
 
-Las rutas bajo `/api/memory` aceptan sesión normal o `Authorization: Bearer
-cass_mem_…`. Las demás rutas solo admiten su autenticación normal.
+Las rutas bajo `/api/memory` y las de tareas bajo `/api/integrations` aceptan
+sesión normal o `Authorization: Bearer cass_mem_…`, con permisos específicos por
+operación y proyecto. Las demás rutas solo admiten su autenticación normal.
 
 | Herramienta | Operación REST |
 |---|---|

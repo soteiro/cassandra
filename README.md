@@ -8,6 +8,7 @@ con Capacitor.
 - **Descargas** (binario del servidor y APK): [Releases](https://github.com/soteiro/cassandra/releases)
 - **Cambios por versión:** [CHANGELOG.md](CHANGELOG.md)
 - **Memoria de proyectos y MCP:** [docs/PROJECT_MEMORY.md](docs/PROJECT_MEMORY.md)
+- **Crear y consultar tareas por MCP:** [docs/MCP_TASKS.md](docs/MCP_TASKS.md)
 - **Configurar MCP en Codex, Claude Code y OpenCode:** [guía](docs/MCP_CLIENT_SETUP.md)
 
 ## Desarrollo
