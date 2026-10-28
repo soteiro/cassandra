@@ -82,14 +82,20 @@
 
     <!-- PRONÓSTICO (solo con datos suficientes) -->
     @if (textoPronostico() || pronostico()?.cambios_fecha_limite) {
-      <p class="text-xs text-text-muted" title="Según las tareas que cerraste en las últimas semanas, si no entran tareas nuevas">
-        @if (textoPronostico(); as texto) {
-          {{ texto }}.
-        }
-        @if (pronostico()?.cambios_fecha_limite; as cambios) {
-          Moviste la fecha límite {{ cambios }} {{ cambios === 1 ? 'vez' : 'veces' }}.
-        }
-      </p>
+      <div
+        class="p-3 bg-background/60 rounded-xl border border-accent/30 text-xs"
+        title="Según las tareas que cerraste en las últimas semanas, si no entran tareas nuevas"
+      >
+        <p class="text-text-muted leading-relaxed">
+          <strong class="text-text-main font-medium">Pronóstico:</strong>
+          @if (textoPronostico(); as texto) {
+            {{ texto }}.
+          }
+          @if (pronostico()?.cambios_fecha_limite; as cambios) {
+            Moviste la fecha límite {{ cambios }} {{ cambios === 1 ? 'vez' : 'veces' }}.
+          }
+        </p>
+      </div>
     }
 
     <!-- META / CRITERIO DE ÉXITO -->
