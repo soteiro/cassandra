@@ -8,6 +8,15 @@ export function ultimoDiaDeRevision(dia: number, ahora: Date): Date {
 }
 
 /**
+ * Lunes de la semana que se revisa: la que contiene el último día de revisión. Si toca
+ * el domingo y revisas el lunes, es la semana que acaba de terminar, no la nueva.
+ */
+export function semanaARevisar(dia: number, ahora: Date): Date {
+  const ultimo = ultimoDiaDeRevision(dia, ahora);
+  return new Date(ultimo.getFullYear(), ultimo.getMonth(), ultimo.getDate() - ((ultimo.getDay() + 6) % 7));
+}
+
+/**
  * Toca revisar desde el día elegido hasta hacerlo; se vuelve a pedir la semana
  * siguiente. Sin revisiones previas, toca el día elegido en adelante.
  */
