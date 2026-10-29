@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.0](https://github.com/soteiro/cassandra/compare/v0.18.0...v0.19.0) (2026-10-29)
+
+
+### Features
+
+* **ticktick:** add read-only today tasks and personal OAuth connections ([13e4486](https://github.com/soteiro/cassandra/commit/13e448676f471390ff8f27338ada649303f9d5b7))
+* **ticktick:** tareas de hoy e Inbox en Home ([34430b4](https://github.com/soteiro/cassandra/commit/34430b439d9e60b885351c12b0467375cdda0aff))
+
 ## [0.18.0](https://github.com/soteiro/cassandra/compare/v0.17.0...v0.18.0) (2026-10-28)
 
 
