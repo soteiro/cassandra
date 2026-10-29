@@ -1,0 +1,32 @@
+info:
+  name: Crear tarea de integración
+  type: http
+  seq: 2
+http:
+  method: POST
+  url: '{{base_url}}/api/integrations/projects/{{proyecto_id}}/tasks/'
+  body:
+    type: json
+    data: |-
+      {
+        "operacion_id": "{{task_operacion_id}}",
+        "nombre": "Verificar colección de Bruno",
+        "descripcion": "Comprobar el contrato REST de integración.",
+        "comentario": "Creada manualmente desde Bruno.",
+        "prioridad": "normal"
+      }
+  auth: inherit
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201) {
+          bru.setEnvVar('tarea_id', String(res.getBody().id));
+        }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  La API asigna estado Abierto. Un nuevo trabajo requiere otro task_operacion_id; reintentar el mismo cuerpo conserva la creación original. Para una subtarea añade tarea_padre_id del mismo proyecto.

@@ -1,0 +1,24 @@
+info:
+  name: Callback OAuth (manual)
+  type: http
+  seq: 5
+http:
+  method: GET
+  url: '{{base_url}}/api/connections/ticktick/callback'
+  params:
+    - name: code
+      value: '{{oauth_code}}'
+      type: query
+      enabled: true
+    - name: state
+      value: '{{oauth_state}}'
+      type: query
+      enabled: true
+  auth: null
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: false
+  maxRedirects: 5
+docs: |-
+  Solo diagnóstico manual: code y state deben provenir de la misma autorización vigente y son de un solo uso. El navegador completa normalmente este paso. La respuesta es una redirección a Configuración.

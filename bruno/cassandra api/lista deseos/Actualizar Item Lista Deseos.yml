@@ -5,7 +5,7 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:8080/api/lista-deseos/4
+  url: "{{base_url}}/api/lista-deseos/{{deseo_id}}"
   # gasto_real es opcional; omitirlo o enviar null conserva el valor actual.
   # Enviar 0 actualiza el gasto real a cero.
   body:
@@ -18,7 +18,7 @@ http:
         "gasto_real": 310000,
         "comprado": true,
         "justificacion": "Comprado en oferta CyberDay.",
-        "grupo_item_finanzas_id": 3
+        "grupo_item_finanzas_id": {{grupo_item_id}}
       }
   auth: inherit
 

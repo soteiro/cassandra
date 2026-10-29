@@ -1,0 +1,13 @@
+info:
+  name: Desconectar TickTick
+  type: http
+  seq: 4
+http:
+  method: DELETE
+  url: '{{base_url}}/api/connections/ticktick'
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

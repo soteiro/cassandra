@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:8080/api/finanzas/bancos/1
+  url: "{{base_url}}/api/finanzas/bancos/{{banco_id}}"
   body:
     type: none
   auth: inherit

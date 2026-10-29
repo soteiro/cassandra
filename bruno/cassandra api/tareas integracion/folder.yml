@@ -1,0 +1,10 @@
+info:
+  name: tareas integracion
+  type: folder
+  seq: 17
+request:
+  auth:
+    type: bearer
+    token: '{{api_key}}'
+docs: |-
+  Usa api_key con permisos tasks:read y tasks:create. El proyecto va en la ruta. También admite JWT cambiando el token a access_token.

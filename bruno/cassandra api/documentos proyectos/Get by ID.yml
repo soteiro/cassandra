@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/documentos/1
+  url: "{{base_url}}/api/documentos/{{documento_id}}"
   auth: inherit
 
 settings:

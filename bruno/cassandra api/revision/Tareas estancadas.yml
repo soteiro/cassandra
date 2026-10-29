@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/revision/estancadas?dias=14
+  url: "{{base_url}}/api/revision/estancadas?dias=14"
   body:
     type: none
   auth: inherit

@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/finanzas/movimientos-esperados
+  url: "{{base_url}}/api/finanzas/movimientos-esperados"
   body:
     type: json
     data: |-

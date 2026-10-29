@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/proyects/1/documentos
+  url: "{{base_url}}/api/proyects/{{proyecto_id}}/documentos"
   body:
     type: json
     data: |-

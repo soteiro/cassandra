@@ -1,0 +1,8 @@
+info:
+  name: ticktick
+  type: folder
+  seq: 18
+request:
+  auth: inherit
+docs: |-
+  Requiere habilitar TickTick en el servidor (docs/TICKTICK.md) y una sesión Cassandra. La autorización OAuth se completa en el navegador.

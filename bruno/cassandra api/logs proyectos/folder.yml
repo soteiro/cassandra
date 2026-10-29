@@ -1,0 +1,6 @@
+info:
+  name: logs proyectos
+  type: folder
+  seq: 14
+request:
+  auth: inherit

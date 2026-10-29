@@ -1,0 +1,20 @@
+info:
+  name: Crear nota por proyecto en el cuerpo
+  type: http
+  seq: 12
+http:
+  method: POST
+  url: '{{base_url}}/api/notas'
+  body:
+    type: json
+    data: |-
+      {
+        "proyecto_id": {{proyecto_id}},
+        "nota": "Nota creada por la ruta general."
+      }
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

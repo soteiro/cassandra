@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/interacciones
+  url: "{{base_url}}/api/interacciones"
   auth: inherit
 
 settings:
