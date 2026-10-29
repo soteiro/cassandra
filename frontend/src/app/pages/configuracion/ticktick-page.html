@@ -1,0 +1,50 @@
+<div class="mx-auto max-w-5xl space-y-6">
+  <a routerLink="/configuracion" class="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm text-text-muted hover:text-text-main focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+    <svg lucideArrowLeft class="size-4" aria-hidden="true" /> Volver a Configuración
+  </a>
+  <header class="border-b border-surface-border pb-6">
+    <h1 class="text-2xl font-bold text-text-main">TickTick</h1>
+    <p class="mt-2 max-w-prose text-sm text-text-muted">Consulta en Home las tareas pendientes que vencen hoy, incluidas las de Inbox. La conexión es personal y solo permite lectura.</p>
+  </header>
+  @if (notice()) { <p role="status" class="max-w-prose text-sm text-text-main">{{ notice() }}</p> }
+  @if (error()) { <p role="alert" class="text-sm text-danger">{{ error() }}</p> }
+  @if (loading()) {
+    <p role="status" class="text-sm text-text-muted">Consultando conexión…</p>
+  } @else if (connection(); as status) {
+    <section aria-labelledby="ticktick-connection" class="space-y-5 rounded-2xl border border-surface-border bg-surface p-5 md:p-6">
+      <div>
+        <h2 id="ticktick-connection" class="text-lg font-semibold text-text-main">Tu cuenta</h2>
+        <p class="mt-2 text-sm text-text-muted">{{ status.connected ? 'Conectada a TickTick' : 'Sin conectar' }}</p>
+        @if (status.connected_at) { <p class="mt-1 text-xs text-text-muted">Desde {{ status.connected_at | date:'dd/MM/yyyy' }}</p> }
+      </div>
+      @if (!status.available) {
+        <p class="max-w-prose text-sm text-text-muted">TickTick todavía no está habilitado en este servidor. Su administrador debe habilitar la integración para que puedas conectar tu cuenta.</p>
+      } @else if (server.isNative) {
+        <p class="max-w-prose text-sm text-text-muted">Para conectar o renovar la autorización, abre Cassandra en el navegador e inicia sesión con tu misma cuenta. Después podrás ver las tareas desde esta app.</p>
+        <a [href]="server.serverUrl() + '/configuracion/ticktick'" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-primary-text underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Abrir Cassandra en el navegador <span class="sr-only">(nueva pestaña)</span></a>
+      } @else if (!status.connected || status.needs_reauthorize) {
+        @if (status.needs_reauthorize) { <p role="status" class="text-sm text-warning-text">La autorización ya no permite consultar tus tareas. Vuelve a conectar tu cuenta.</p> }
+        <button #connectButton type="button" (click)="connect()" [disabled]="saving()" class="min-h-11 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-60 disabled:cursor-wait focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+          {{ saving() ? 'Abriendo TickTick…' : status.connected ? 'Volver a conectar' : 'Conectar TickTick' }}
+        </button>
+      } @else {
+        <a routerLink="/home" class="inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-primary-text underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Ver tareas de hoy</a>
+      }
+      @if (status.connected) {
+        <div class="space-y-3 border-t border-surface-border pt-5">
+          @if (confirming()) {
+            <p id="disconnect-help" class="text-sm text-text-main">¿Desconectar tu cuenta? Las tareas seguirán en TickTick.</p>
+            <div class="flex flex-wrap gap-3">
+              <button #cancelButton type="button" (click)="cancelDisconnect()" [disabled]="saving()" class="min-h-11 rounded-lg border border-surface-border px-4 py-2 text-sm font-semibold text-text-main hover:bg-surface-border/40 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Cancelar</button>
+              <button type="button" (click)="disconnect()" [disabled]="saving()" aria-describedby="disconnect-help" class="min-h-11 rounded-lg border border-danger px-4 py-2 text-sm font-semibold text-danger hover:bg-danger/10 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">{{ saving() ? 'Desconectando…' : 'Confirmar desconexión' }}</button>
+            </div>
+          } @else {
+            <button #disconnectButton type="button" (click)="confirming.set(true)" [disabled]="saving()" class="min-h-11 rounded-lg border border-danger px-4 py-2 text-sm font-semibold text-danger hover:bg-danger/10 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Desconectar TickTick</button>
+          }
+        </div>
+      }
+    </section>
+  } @else {
+    <button type="button" (click)="load()" class="min-h-11 rounded-lg border border-surface-border px-4 text-sm text-text-main focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Reintentar</button>
+  }
+</div>

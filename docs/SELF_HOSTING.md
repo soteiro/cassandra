@@ -65,6 +65,7 @@ PORT=8080
 |---|---|---|
 | `DATABASE_URL_LOCAL` | Sí | URL de conexión a PostgreSQL. |
 | `JWT_SECRET` | **Sí** | Firma las sesiones. Mínimo 32 caracteres, aleatorio y privado (`openssl rand -base64 48`). Sin él, o si es corto, el servidor no arranca. |
+| `TICKTICK_CLIENT_ID`, `TICKTICK_CLIENT_SECRET`, `TICKTICK_REDIRECT_URI`, `INTEGRATIONS_ENCRYPTION_KEY` | No | Habilitan la conexión TickTick por usuario. Las cuatro son necesarias al activarla; consulta [configuración de TickTick](TICKTICK.md). |
 | `PORT` | No (8080) | Puerto HTTP local; el proxy inverso apunta aquí. |
 | `RATE_LIMIT_PER_MIN` | No (100) | Peticiones por minuto y por IP. |
 | `ALLOWED_ORIGINS` | No | Orígenes CORS extra, separados por comas. La web y la app Android no los necesitan; solo si sirves otro frontend desde otro dominio. |

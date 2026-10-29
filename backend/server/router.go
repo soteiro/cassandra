@@ -13,6 +13,7 @@ import (
 
 	"cassandra/config"
 	"cassandra/handlers"
+	"cassandra/internal/ticktick"
 	"cassandra/middleware"
 	"cassandra/repository"
 
@@ -28,8 +29,9 @@ type Options struct {
 	Config *config.Config
 	DB     *pgxpool.Pool
 	// Frontend es el build de Angular (raíz con index.html). nil: no se sirve frontend.
-	Frontend fs.FS
-	Version  string
+	Frontend       fs.FS
+	Version        string
+	TickTickClient *ticktick.Client
 }
 
 // NewRouter construye el handler HTTP completo de la aplicación.
@@ -61,6 +63,7 @@ func NewRouter(opts Options) http.Handler {
 	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
 	pronosticosHandler := handlers.NewPronosticosHandler(repository.NewPronosticosRepository(db), owner)
 	revisionHandler := handlers.NewRevisionHandler(repository.NewRevisionRepository(db))
+	ticktickHandler := handlers.NewTickTickHandler(repository.NewTickTickRepository(db), cfg.TickTick, opts.TickTickClient)
 
 	r := chi.NewRouter()
 
@@ -68,6 +71,7 @@ func NewRouter(opts Options) http.Handler {
 	r.Use(chiMiddleware.RequestID)
 	// IP real solo si viene de un proxy de confianza (antes: RealIP, falsificable).
 	r.Use(middleware.TrustedRealIP(trustedProxies(cfg)))
+	r.Use(middleware.RedactOAuthRequestURI)
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.Recoverer)
 
@@ -91,6 +95,7 @@ func NewRouter(opts Options) http.Handler {
 	r.Get("/api/", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"response": "One Golang To Rule Them All"})
 	})
+	r.Get("/api/connections/ticktick/callback", ticktickHandler.Callback)
 
 	// Grupo de rutas protegidas
 	// Las keys se aceptan solo en estos grupos, con permisos por operación/proyecto.
@@ -109,6 +114,10 @@ func NewRouter(opts Options) http.Handler {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware(cfg.JwtSecret, userRepo))
+		r.Get("/api/connections/ticktick", ticktickHandler.Status)
+		r.Post("/api/connections/ticktick/authorize", ticktickHandler.Authorize)
+		r.Delete("/api/connections/ticktick", ticktickHandler.Disconnect)
+		r.Get("/api/ticktick/tasks/today", ticktickHandler.Today)
 		r.Get("/api/api-keys", apiKeysHandler.List)
 		r.Post("/api/api-keys", apiKeysHandler.Create)
 		r.Delete("/api/api-keys/{key_id}", apiKeysHandler.Revoke)

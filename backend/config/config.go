@@ -1,9 +1,11 @@
 package config
 
 import (
+	"encoding/base64"
 	"fmt"
-	"net/netip"
 	"log"
+	"net/netip"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -13,14 +15,22 @@ import (
 
 type Config struct {
 	DatabaseUrl string
-	Port string
-	JwtSecret string
+	Port        string
+	JwtSecret   string
 	// Peticiones máximas por IP y minuto. Se sube en los tests e2e.
 	RateLimitPerMin int
 	// Orígenes CORS: los de desarrollo y la app Capacitor, más ALLOWED_ORIGINS.
 	AllowedOrigins []string
 	// Proxies de los que se acepta X-Real-IP (TRUSTED_PROXIES; por defecto localhost).
 	TrustedProxies []netip.Prefix
+	TickTick       *TickTick
+}
+
+type TickTick struct {
+	ClientID      string
+	ClientSecret  string
+	RedirectURI   string
+	EncryptionKey []byte
 }
 
 // DefaultTrustedProxies: nginx en el mismo servidor.
@@ -49,17 +59,46 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return &Config{
-		DatabaseUrl: getEnv("DATABASE_URL_LOCAL", "postgres://localhost:5432/db"),
-		Port: getEnv("PORT", "8080"),
-		JwtSecret: jwtSecret,
-		RateLimitPerMin: getEnvInt("RATE_LIMIT_PER_MIN", 100),
-		AllowedOrigins: allowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
-		TrustedProxies: trustedProxies,
-		}, nil
+	ticktick, err := loadTickTick()
+	if err != nil {
+		return nil, err
 	}
 
+	return &Config{
+		DatabaseUrl:     getEnv("DATABASE_URL_LOCAL", "postgres://localhost:5432/db"),
+		Port:            getEnv("PORT", "8080"),
+		JwtSecret:       jwtSecret,
+		RateLimitPerMin: getEnvInt("RATE_LIMIT_PER_MIN", 100),
+		AllowedOrigins:  allowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
+		TrustedProxies:  trustedProxies,
+		TickTick:        ticktick,
+	}, nil
+}
+
+func loadTickTick() (*TickTick, error) {
+	values := []string{os.Getenv("TICKTICK_CLIENT_ID"), os.Getenv("TICKTICK_CLIENT_SECRET"), os.Getenv("TICKTICK_REDIRECT_URI"), os.Getenv("INTEGRATIONS_ENCRYPTION_KEY")}
+	n := 0
+	for _, v := range values {
+		if strings.TrimSpace(v) != "" {
+			n++
+		}
+	}
+	if n == 0 {
+		return nil, nil
+	}
+	if n != 4 {
+		return nil, fmt.Errorf("TickTick requiere TICKTICK_CLIENT_ID, TICKTICK_CLIENT_SECRET, TICKTICK_REDIRECT_URI e INTEGRATIONS_ENCRYPTION_KEY")
+	}
+	u, err := url.Parse(values[2])
+	if err != nil || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.Path != "/api/connections/ticktick/callback" || (u.Scheme != "https" && !(u.Scheme == "http" && (u.Hostname() == "localhost" || u.Hostname() == "127.0.0.1" || u.Hostname() == "::1"))) {
+		return nil, fmt.Errorf("TICKTICK_REDIRECT_URI debe ser HTTPS y terminar en /api/connections/ticktick/callback; HTTP solo en loopback")
+	}
+	key, err := base64.StdEncoding.DecodeString(values[3])
+	if err != nil || len(key) != 32 {
+		return nil, fmt.Errorf("INTEGRATIONS_ENCRYPTION_KEY debe contener 32 bytes codificados en base64")
+	}
+	return &TickTick{ClientID: values[0], ClientSecret: values[1], RedirectURI: values[2], EncryptionKey: key}, nil
+}
 
 // MinJWTSecretLength: 32 bytes (256 bits), el tamaño de clave de HS256.
 const MinJWTSecretLength = 32
@@ -78,12 +117,11 @@ func validateJWTSecret(secret string) (string, error) {
 }
 
 func getEnv(key, fallback string) string {
-		if value, ok := os.LookupEnv(key); ok {
-			return value
-		}
-		return fallback
+	if value, ok := os.LookupEnv(key); ok {
+		return value
 	}
-
+	return fallback
+}
 
 func getEnvInt(key string, fallback int) int {
 	value, ok := os.LookupEnv(key)
