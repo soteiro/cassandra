@@ -97,7 +97,7 @@ describe('Configuración routing', () => {
     expect(listKeys).toHaveBeenCalledOnce();
   }, 30_000);
 
-  it.each(['/configuracion', '/configuracion/claves-api', '/claves-api'])('requires a session before opening %s', async url => {
+  it.each(['/configuracion', '/configuracion/claves-api', '/configuracion/ticktick', '/claves-api'])('requires a session before opening %s', async url => {
     loggedIn.set(false);
     await RouterTestingHarness.create(url);
 

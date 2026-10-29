@@ -1,0 +1,67 @@
+<section aria-labelledby="ticktick-title" class="min-w-0 rounded-2xl border border-surface-border bg-surface">
+  <header class="flex flex-wrap items-center justify-between gap-2 border-b border-surface-border px-4 py-3">
+    <div class="flex items-center gap-2">
+      <svg lucideListTodo class="size-4 text-primary-text" aria-hidden="true" />
+      <h2 id="ticktick-title" class="text-sm font-bold text-text-main">TickTick · Hoy</h2>
+    </div>
+    <button type="button" (click)="load(true)" [disabled]="loading()"
+      class="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-text-main hover:bg-surface-border/40 disabled:opacity-60 disabled:cursor-wait focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+      <svg lucideRefreshCcw class="size-4" aria-hidden="true" />
+      {{ loading() ? 'Consultando…' : 'Actualizar' }}
+    </button>
+  </header>
+  <div class="space-y-4 p-4">
+    @if (error()) { <p role="alert" class="text-sm text-warning-text">{{ error() }}</p> }
+    @if (loading() && !data()) { <p role="status" class="text-sm text-text-muted">Consultando las tareas de hoy…</p> }
+    @if (data(); as today) {
+      @switch (today.state) {
+        @case ('unavailable') {
+          <p class="text-sm text-text-muted">TickTick todavía no está habilitado en este servidor.</p>
+        }
+        @case ('not_connected') {
+          <p class="text-sm text-text-muted">Conecta tu cuenta para ver aquí las tareas que vencen hoy, incluido Inbox.</p>
+          <a routerLink="/configuracion/ticktick" class="inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-primary-text underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Conectar TickTick</a>
+        }
+        @case ('reauthorize') {
+          <p role="status" class="text-sm text-warning-text">TickTick necesita que vuelvas a autorizar la lectura.</p>
+          <a routerLink="/configuracion/ticktick" class="inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-primary-text underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Volver a conectar</a>
+        }
+        @default {
+          <p class="text-xs text-text-muted">Pendientes con vencimiento hoy · Solo lectura</p>
+          @if (today.warnings.length) {
+            <div role="status" class="space-y-1 text-sm text-warning-text">
+              @for (warning of today.warnings; track $index) { <p>{{ warning }}</p> }
+            </div>
+          }
+          @if (today.tasks.length) {
+            <ul class="divide-y divide-surface-border">
+              @for (task of today.tasks; track task.project_id + ':' + task.id) {
+                <li class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-3 first:pt-0">
+                  <div class="min-w-0 flex-1 basis-48">
+                    <p class="break-words text-sm font-medium text-text-main [overflow-wrap:anywhere]">{{ task.title }}</p>
+                    <p class="mt-1 break-words text-xs text-text-muted [overflow-wrap:anywhere]">{{ task.list }}</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-text-muted">
+                    <span>{{ priority(task) }}</span>
+                    <span class="tabular-nums">{{ dueTime(task) }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else if (today.state === 'ready' && today.inbox_read) {
+            <p class="text-sm text-text-main">No tienes tareas pendientes que venzan hoy.</p>
+          } @else {
+            <p class="text-sm text-text-muted">No se encontraron tareas en los datos disponibles. La consulta está incompleta.</p>
+          }
+          <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-surface-border pt-3">
+            <p class="text-xs text-text-muted">Última consulta: {{ today.fetched_at | date:'HH:mm' }}</p>
+            <a href="https://ticktick.com/webapp/" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm text-primary-text underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              Abrir TickTick <span class="sr-only">(nueva pestaña)</span>
+              <svg lucideExternalLink class="size-4" aria-hidden="true" />
+            </a>
+          </footer>
+        }
+      }
+    }
+  </div>
+</section>

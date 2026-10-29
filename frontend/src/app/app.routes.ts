@@ -60,6 +60,10 @@ export const routes: Routes = [
           import('./pages/configuracion/api-keys-page').then((m) => m.ApiKeysPage),
       },
       {
+        path: 'configuracion/ticktick',
+        loadComponent: () => import('./pages/configuracion/ticktick-page').then((m) => m.TickTickPage),
+      },
+      {
         path: 'configuracion',
         loadComponent: () =>
           import('./pages/configuracion/configuracion').then((m) => m.Configuracion),

@@ -49,14 +49,27 @@ type User struct {
 
 // New crea la API sobre la base cassandra_test_<name>, con todas las tablas vacías.
 func New(t *testing.T, name string) *API {
+	return NewWithOptions(t, name, server.Options{})
+}
+
+// NewWithOptions permite sustituir proveedores externos sin omitir router ni DB reales.
+func NewWithOptions(t *testing.T, name string, options server.Options) *API {
 	t.Helper()
 	db := testdb.New(t, name)
-	cfg := &config.Config{
+	cfg := options.Config
+	if cfg == nil {
+		cfg = &config.Config{}
+	}
+	defaults := &config.Config{
 		JwtSecret:       JWTSecret,
 		RateLimitPerMin: 1_000_000,
 		AllowedOrigins:  config.DefaultAllowedOrigins,
 	}
-	srv := httptest.NewServer(server.NewRouter(server.Options{Config: cfg, DB: db, Version: "vtest"}))
+	cfg.JwtSecret = defaults.JwtSecret
+	cfg.RateLimitPerMin = defaults.RateLimitPerMin
+	cfg.AllowedOrigins = defaults.AllowedOrigins
+	options.Config, options.DB, options.Version = cfg, db, "vtest"
+	srv := httptest.NewServer(server.NewRouter(options))
 	t.Cleanup(srv.Close)
 	return &API{DB: db, Server: srv, t: t}
 }
