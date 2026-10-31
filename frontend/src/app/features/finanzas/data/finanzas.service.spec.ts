@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { Observable } from 'rxjs';
 import { FinanzasService } from './finanzas.service';
-import { expectHttpCall, HttpCase, setupHttpTesting } from '../../testing/http-testing';
+import { expectHttpCall, HttpCase, setupHttpTesting } from '../../../../testing/http-testing';
 
 describe('FinanzasService', () => {
   let http: HttpTestingController;

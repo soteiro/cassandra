@@ -37,7 +37,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 1. [P1] Filtros de estado del presupuesto fuera de pantalla
 
-- **Archivo:** `frontend/src/app/pages/finanzas/components/presupuesto-tab/presupuesto-tab.html:11`.
+- **Archivo:** `frontend/src/app/features/finanzas/components/presupuesto-tab/presupuesto-tab.html:11`.
 - **Controles:** Todos, Pendientes, En Proceso y Completados.
 - **Prueba:** barra de aproximadamente 333 px dentro de un espacio útil de 254 px en viewport de 320 px y de 294 px en 360 px. Su borde derecho llega a x=366; el botón Completados queda parcialmente fuera de pantalla en ambos tamaños.
 - **Impacto:** el usuario necesita desplazar horizontalmente el contenido para alcanzar y leer completamente el último filtro. En 390 px ya cabe en pantalla, pero la barra todavía rebasa el área interior de la tarjeta en unos 9 px.
@@ -47,7 +47,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 2. [P1] Pestañas principales de Finanzas exceden el ancho en 320 px
 
-- **Archivo:** `frontend/src/app/pages/finanzas/finanzas.html:36`.
+- **Archivo:** `frontend/src/app/features/finanzas/pages/finanzas/finanzas.html:36`.
 - **Controles:** Presupuesto, Lista de Deseos y Cuentas & Categorías.
 - **Prueba:** barra de aproximadamente 317 px frente a 288 px disponibles. En la vista inicial de Presupuesto su borde derecho llega a x=333 en una pantalla de 320 px; Cuentas & Categorías queda parcialmente fuera.
 - **Impacto:** la navegación principal desborda y el último destino requiere desplazamiento horizontal. En 360–412 px cabe, pero las etiquetas se comprimen en varias líneas.

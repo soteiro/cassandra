@@ -3,9 +3,9 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { PresupuestoTab, FinanzasGroup } from './presupuesto-tab';
-import { FinanzasService } from '../../../../services/finanzas.service';
+import { FinanzasService } from '../../data/finanzas.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { FinanzasPlantillaItem } from '../../../../models/finanzas.model';
+import { FinanzasPlantillaItem } from '../../data/finanzas.model';
 
 function item(partial: Partial<FinanzasPlantillaItem>): FinanzasPlantillaItem {
   return {

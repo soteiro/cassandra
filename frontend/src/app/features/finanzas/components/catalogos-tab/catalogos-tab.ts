@@ -1,14 +1,14 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FinanzasService } from '../../../../services/finanzas.service';
+import { FinanzasService } from '../../data/finanzas.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import {
   Banco,
   GrupoItemFinanzas,
   MovimientoEsperadoFinanzas,
   TipoBanco,
-} from '../../../../models/finanzas.model';
+} from '../../data/finanzas.model';
 import {
   LucideLandmark,
   LucideTag,

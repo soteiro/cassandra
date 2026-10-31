@@ -1,17 +1,17 @@
-import { LoadingDirective } from '../../shared/directives/loading.directive';
+import { LoadingDirective } from '../../../../shared/directives/loading.directive';
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize, Subscription } from 'rxjs';
-import { FinanzasService } from '../../services/finanzas.service';
-import { ToastService } from '../../shared/services/toast.service';
+import { FinanzasService } from '../../data/finanzas.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import {
   Banco,
   FinanzasPlantillaItem,
   FinanzasResumenPeriodo,
   GrupoItemFinanzas,
   MovimientoEsperadoFinanzas,
-} from '../../models/finanzas.model';
+} from '../../data/finanzas.model';
 import {
   LucideWallet,
   LucideScale,
@@ -27,9 +27,9 @@ import {
   LucideArrowDownRight,
   LucideSparkles,
 } from '@lucide/angular';
-import { PresupuestoTab } from './components/presupuesto-tab/presupuesto-tab';
-import { DeseosTab } from './components/deseos-tab/deseos-tab';
-import { CatalogosTab } from './components/catalogos-tab/catalogos-tab';
+import { PresupuestoTab } from '../../components/presupuesto-tab/presupuesto-tab';
+import { DeseosTab } from '../../components/deseos-tab/deseos-tab';
+import { CatalogosTab } from '../../components/catalogos-tab/catalogos-tab';
 
 @Component({
   selector: 'app-finanzas',

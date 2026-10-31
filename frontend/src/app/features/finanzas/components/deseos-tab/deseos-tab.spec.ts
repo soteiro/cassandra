@@ -3,9 +3,9 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { DeseosTab } from './deseos-tab';
-import { FinanzasService } from '../../../../services/finanzas.service';
+import { FinanzasService } from '../../data/finanzas.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { ListaDeseosItem } from '../../../../models/finanzas.model';
+import { ListaDeseosItem } from '../../data/finanzas.model';
 
 function deseo(partial: Partial<ListaDeseosItem>): ListaDeseosItem {
   return {

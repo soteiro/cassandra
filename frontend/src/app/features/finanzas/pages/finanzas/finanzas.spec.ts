@@ -3,9 +3,9 @@ import { provideRouter } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 
 import { Finanzas } from './finanzas';
-import { FinanzasService } from '../../services/finanzas.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { FinanzasPlantillaItem } from '../../models/finanzas.model';
+import { FinanzasService } from '../../data/finanzas.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { FinanzasPlantillaItem } from '../../data/finanzas.model';
 
 function item(partial: Partial<FinanzasPlantillaItem>): FinanzasPlantillaItem {
   return {

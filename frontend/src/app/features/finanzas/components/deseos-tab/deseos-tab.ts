@@ -2,12 +2,12 @@ import { LoadingDirective } from '../../../../shared/directives/loading.directiv
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FinanzasService } from '../../../../services/finanzas.service';
+import { FinanzasService } from '../../data/finanzas.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import {
   GrupoItemFinanzas,
   ListaDeseosItem,
-} from '../../../../models/finanzas.model';
+} from '../../data/finanzas.model';
 import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 import { BackButtonService } from '../../../../core/platform/back-button.service';
 import {
