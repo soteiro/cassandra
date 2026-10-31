@@ -1,0 +1,50 @@
+info:
+  name: Guardar avance
+  type: http
+  seq: 3
+http:
+  method: POST
+  url: '{{base_url}}/api/memory/projects/{{proyecto_id}}/advances'
+  body:
+    type: json
+    data: |-
+      {
+        "operacion_id": "{{memory_operacion_id}}",
+        "revision_esperada": {{memory_revision}},
+        "memoria": {
+          "de_que_trata": "Proyecto personal de seguimiento de trabajo.",
+          "en_que_quede": "Se revisó el contrato de la API.",
+          "por_que_asi": "Mantener los clientes alineados con el backend.",
+          "que_sigue": [
+            "Validar las peticiones desde Bruno."
+          ],
+          "fuentes": [
+            {
+              "tipo": "archivo",
+              "referencia": "backend/server/router.go"
+            }
+          ]
+        },
+        "fichas": [
+          {
+            "titulo": "Contrato de la API revisado",
+            "contenido": "La colección sigue las rutas del router.",
+            "tipo": "decision",
+            "estado": "implementada",
+            "fuentes": [
+              {
+                "tipo": "archivo",
+                "referencia": "backend/server/router.go"
+              }
+            ]
+          }
+        ]
+      }
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Consulta el contexto primero. Para cada avance nuevo cambia memory_operacion_id; para reintentar conserva exactamente el cuerpo original, incluida revision_esperada, sin volver a consultar contexto. Una revisión desactualizada devuelve 409.

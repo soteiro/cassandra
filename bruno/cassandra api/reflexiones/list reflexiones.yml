@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/reflexiones
+  url: "{{base_url}}/api/reflexiones"
   auth: inherit
 
 settings:

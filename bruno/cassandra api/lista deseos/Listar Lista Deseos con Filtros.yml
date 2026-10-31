@@ -5,14 +5,14 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/lista-deseos
+  url: "{{base_url}}/api/lista-deseos"
   params:
     - name: comprado
       value: "false"
       type: query
       enabled: true
     - name: grupo_id
-      value: "3"
+      value: "{{grupo_item_id}}"
       type: query
       enabled: false
   auth: inherit

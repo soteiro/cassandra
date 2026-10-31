@@ -5,13 +5,13 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:8080/api/notas/3
+  url: "{{base_url}}/api/notas/{{nota_id}}"
   body:
     type: json
     data: |-
       {
         "nota": "Nota técnica actualizada desde bruno",
-        "tarea_id": 1,
+        "tarea_id": {{tarea_id}},
         "clear_tarea_id": false,
         "eliminado": false
       }

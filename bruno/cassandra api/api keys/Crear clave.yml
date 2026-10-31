@@ -1,0 +1,39 @@
+info:
+  name: Crear clave
+  type: http
+  seq: 2
+http:
+  method: POST
+  url: '{{base_url}}/api/api-keys'
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Bruno local",
+        "scopes": [
+          "memory:read",
+          "memory:write",
+          "tasks:read",
+          "tasks:create"
+        ],
+        "proyecto_ids": [
+          {{proyecto_id}}
+        ]
+      }
+  auth: inherit
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201) {
+          const key = res.getBody();
+          bru.setEnvVar('api_key', key.token);
+          bru.setEnvVar('api_key_id', String(key.id));
+        }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Limitada al proyecto del entorno. Guarda api_key y api_key_id solo en memoria. expira_en es opcional (RFC3339).

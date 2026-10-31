@@ -1,0 +1,13 @@
+info:
+  name: Obtener Banco por ID
+  type: http
+  seq: 22
+http:
+  method: GET
+  url: '{{base_url}}/api/finanzas/bancos/{{banco_id}}'
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

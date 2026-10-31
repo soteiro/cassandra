@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/lista-deseos
+  url: "{{base_url}}/api/lista-deseos"
   auth: inherit
 
 settings:

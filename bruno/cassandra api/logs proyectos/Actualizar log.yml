@@ -1,0 +1,20 @@
+info:
+  name: Actualizar log
+  type: http
+  seq: 4
+http:
+  method: PUT
+  url: '{{base_url}}/api/logs/{{log_id}}'
+  body:
+    type: json
+    data: |-
+      {
+        "titulo": "Registro actualizado",
+        "contenido_raw": "Resultado y próximos pasos de la sesión."
+      }
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

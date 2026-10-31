@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/tareas
+  url: "{{base_url}}/api/tareas"
   body:
     type: none
   auth: inherit

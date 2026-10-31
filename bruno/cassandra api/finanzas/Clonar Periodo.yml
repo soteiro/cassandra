@@ -5,15 +5,15 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/finanzas/clonar
+  url: "{{base_url}}/api/finanzas/clonar"
   body:
     type: json
     data: |-
       {
-        "anio_origen": 2026,
-        "mes_origen": 3,
-        "anio_destino": 2026,
-        "mes_destino": 4
+        "anio_origen": {{anio}},
+        "mes_origen": {{mes}},
+        "anio_destino": {{anio_destino}},
+        "mes_destino": {{mes_destino}}
         
       }
   auth: inherit

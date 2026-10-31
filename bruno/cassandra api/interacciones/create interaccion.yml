@@ -5,12 +5,12 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/interacciones
+  url: "{{base_url}}/api/interacciones"
   body:
     type: json
     data: |-
       {
-        "persona_id": 1,
+        "persona_id": {{persona_id}},
         "interaccion": "Llamada telefónica para coordinar fecha de entrega"
       }
   auth: inherit
