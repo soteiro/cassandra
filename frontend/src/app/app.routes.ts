@@ -48,7 +48,8 @@ export const routes: Routes = [
       },
       {
         path: 'finanzas',
-        loadComponent: () => import('./pages/finanzas/finanzas').then((m) => m.Finanzas),
+        loadChildren: () =>
+          import('./features/finanzas/finanzas.routes').then((m) => m.finanzasRoutes),
       },
       {
         path: 'revision',
