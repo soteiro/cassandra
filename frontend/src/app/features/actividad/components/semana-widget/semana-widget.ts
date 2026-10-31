@@ -2,9 +2,9 @@ import { Component, computed, effect, inject, input, signal } from '@angular/cor
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideCalendarCheck, LucideChevronLeft, LucideChevronRight } from '@lucide/angular';
-import { ActividadService } from '../../services/actividad.service';
-import { TareaTerminada } from '../../models/actividad.model';
-import { inicioDeSemana, sumarSemanas } from '../../utils/actividad.util';
+import { ActividadService } from '../../data/actividad.service';
+import { TareaTerminada } from '../../data/actividad.model';
+import { inicioDeSemana, sumarSemanas } from '../../../../shared/utils/fecha.util';
 
 interface GrupoProyecto {
   proyectoId: number;

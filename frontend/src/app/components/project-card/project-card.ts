@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProjectResponse } from '../../models/proyect.model';
-import { haceCuanto } from '../../utils/actividad.util';
+import { haceCuanto } from '../../shared/utils/fecha.util';
 import {
   LucideFolder,
   LucideTarget,

@@ -7,7 +7,7 @@ import { proyectService } from '../../services/proyect.service';
 import { TaskService } from '../../services/task.service';
 import { NotaService } from '../../services/nota.service';
 import { DocumentoService } from '../../services/documento.service';
-import { ActividadService } from '../../services/actividad.service';
+import { ActividadService } from '../../features/actividad/data/actividad.service';
 import { PronosticoService } from '../../services/pronostico.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';

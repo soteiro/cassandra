@@ -5,7 +5,7 @@ import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../mod
 import { BackButtonService } from '../../core/platform/back-button.service';
 import { PronosticoService } from '../../services/pronostico.service';
 import { proyectService } from '../../services/proyect.service';
-import { fechaProbable, formatoFactor } from '../../utils/actividad.util';
+import { fechaProbable, formatoFactor } from '../../utils/pronostico.util';
 import {
   LucideSparkles,
   LucidePencil,

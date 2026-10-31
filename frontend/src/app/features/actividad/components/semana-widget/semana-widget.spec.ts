@@ -3,9 +3,9 @@ import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { SemanaWidget } from './semana-widget';
-import { ActividadService } from '../../services/actividad.service';
-import { ResumenActividad } from '../../models/actividad.model';
-import { inicioDeSemana } from '../../utils/actividad.util';
+import { ActividadService } from '../../data/actividad.service';
+import { ResumenActividad } from '../../data/actividad.model';
+import { inicioDeSemana } from '../../../../shared/utils/fecha.util';
 
 function resumen(over: Partial<ResumenActividad> = {}): ResumenActividad {
   return {

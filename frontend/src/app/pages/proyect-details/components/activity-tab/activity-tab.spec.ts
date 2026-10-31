@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ActivityTab } from './activity-tab';
-import { EventoActividad } from '../../../../models/actividad.model';
+import { EventoActividad } from '../../../../features/actividad/data/actividad.model';
 
 function evento(over: Partial<EventoActividad>): EventoActividad {
   return {
