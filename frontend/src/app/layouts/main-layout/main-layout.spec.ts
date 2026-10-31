@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { MainLayout } from './main-layout';
-import { BackButtonService } from '../../../services/back-button.service';
-import { CommandBarService } from '../../../services/command-bar.service';
+import { BackButtonService } from '../../services/back-button.service';
+import { CommandBarService } from '../../services/command-bar.service';
 
 describe('MainLayout', () => {
   let component: MainLayout;

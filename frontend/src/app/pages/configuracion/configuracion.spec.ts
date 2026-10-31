@@ -10,7 +10,7 @@ import { APIKeyService } from '../../services/api-key.service';
 import { AuthService } from '../../services/auth.service';
 import { proyectService } from '../../services/proyect.service';
 import { APPEARANCE_STORAGE_KEY } from '../../models/appearance.model';
-import { MainLayout } from '../../layouts/main-layout/main-layout/main-layout';
+import { MainLayout } from '../../layouts/main-layout/main-layout';
 import { Login } from '../login/login';
 import { ApiKeysPage } from './api-keys-page';
 import { Configuracion } from './configuracion';
