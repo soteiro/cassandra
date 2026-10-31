@@ -10,12 +10,12 @@ export const routes: Routes = [
   },
   {
     path: 'servidor',
-    loadComponent: () => import('./pages/servidor/servidor').then((m) => m.Servidor),
+    loadComponent: () => import('./features/auth/pages/servidor/servidor').then((m) => m.Servidor),
   },
   {
     path: 'login',
     canActivate: [serverConfiguredGuard],
-    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
+    loadComponent: () => import('./features/auth/pages/login/login').then((m) => m.Login),
   },
   {
     path: '',
@@ -23,7 +23,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./core/layout/main-layout/main-layout').then((m) => m.MainLayout),
     children: [
-      { path: 'home', loadComponent: () => import('./pages/home/home').then((m) => m.Home) },
+      {
+        path: 'home',
+        loadChildren: () => import('./features/home/home.routes').then((m) => m.homeRoutes),
+      },
       {
         path: 'proyectos',
         loadComponent: () => import('./pages/proyectos/proyectos').then((m) => m.Proyectos),
@@ -52,18 +55,11 @@ export const routes: Routes = [
           import('./features/revision/revision.routes').then((m) => m.revisionRoutes),
       },
       {
-        path: 'configuracion/claves-api',
-        loadComponent: () =>
-          import('./pages/configuracion/api-keys-page').then((m) => m.ApiKeysPage),
-      },
-      {
-        path: 'configuracion/ticktick',
-        loadComponent: () => import('./pages/configuracion/ticktick-page').then((m) => m.TickTickPage),
-      },
-      {
         path: 'configuracion',
-        loadComponent: () =>
-          import('./pages/configuracion/configuracion').then((m) => m.Configuracion),
+        loadChildren: () =>
+          import('./features/configuracion/configuracion.routes').then(
+            (m) => m.configuracionRoutes,
+          ),
       },
       {
         path: 'claves-api',
@@ -72,7 +68,7 @@ export const routes: Routes = [
       },
       {
         path: 'docs',
-        loadComponent: () => import('./pages/docs/docs').then((m) => m.Docs),
+        loadChildren: () => import('./features/docs/docs.routes').then((m) => m.docsRoutes),
       },
     ],
   },
