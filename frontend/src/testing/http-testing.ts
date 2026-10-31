@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Observable } from 'rxjs';
-import { AuthService } from '../app/services/auth.service';
+import { AuthService } from '../app/core/auth/auth.service';
 
 /** Configura TestBed con HttpClient de prueba y devuelve el controlador. */
 export function setupHttpTesting(options: { loggedIn?: boolean } = {}): HttpTestingController {

@@ -1,10 +1,10 @@
-import { LoadingDirective } from '../../directives/loading.directive';
+import { LoadingDirective } from '../../shared/directives/loading.directive';
 import { Component, signal, inject, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TaskService } from '../../services/task.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-modal';
 import { TaskStatusSelect } from '../../components/task-status-select/task-status-select';

@@ -11,14 +11,14 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentoService } from '../../../../services/documento.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import {
   DocumentoProyecto,
   DocumentoTipo,
 } from '../../../../models/documento.model';
-import { parseMarkdown } from '../../../../utils/markdown.util';
-import { MermaidDirective } from '../../../../directives/mermaid.directive';
-import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
+import { parseMarkdown } from '../../../../shared/utils/markdown.util';
+import { MermaidDirective } from '../../../../shared/directives/mermaid.directive';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 import {
   LucideBookOpen,
   LucideFileText,

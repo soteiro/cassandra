@@ -7,7 +7,7 @@ import { TasksTab } from './tasks-tab';
 import { Task } from '../../../../models/task.model';
 import { TaskService } from '../../../../services/task.service';
 import { NotaService } from '../../../../services/nota.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 1,

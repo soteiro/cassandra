@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { proyectService } from './proyect.service';
-import { AuthService } from './auth.service';
+import { AuthService } from '../core/auth/auth.service';
 import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../testing/http-testing';
 
 describe('proyectService', () => {

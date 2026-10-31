@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './guards/auth.guard';
-import { serverConfiguredGuard } from './guards/server-configured.guard';
+import { authGuard } from './core/auth/auth.guard';
+import { serverConfiguredGuard } from './core/server/server-configured.guard';
 
 export const routes: Routes = [
   {
@@ -21,7 +21,7 @@ export const routes: Routes = [
     path: '',
     canActivate: [serverConfiguredGuard, authGuard],
     loadComponent: () =>
-      import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
+      import('./core/layout/main-layout/main-layout').then((m) => m.MainLayout),
     children: [
       { path: 'home', loadComponent: () => import('./pages/home/home').then((m) => m.Home) },
       {

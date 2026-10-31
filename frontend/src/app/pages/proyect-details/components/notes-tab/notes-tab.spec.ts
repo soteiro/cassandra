@@ -8,7 +8,7 @@ import { NotaProyecto } from '../../../../models/nota.model';
 import { Task } from '../../../../models/task.model';
 import { NotaService } from '../../../../services/nota.service';
 import { TaskService } from '../../../../services/task.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 1,

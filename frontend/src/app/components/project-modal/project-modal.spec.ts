@@ -7,7 +7,7 @@ import { PronosticoService } from '../../services/pronostico.service';
 
 import { ProjectModal } from './project-modal';
 import { ProjectResponse } from '../../models/proyect.model';
-import { BackButtonService } from '../../services/back-button.service';
+import { BackButtonService } from '../../core/platform/back-button.service';
 
 const makeProject = (overrides: Partial<ProjectResponse> = {}): ProjectResponse => ({
   id: 10,

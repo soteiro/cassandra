@@ -5,8 +5,8 @@ import {
 import { DatePipe } from '@angular/common';
 import { ProjectLog } from '../../../../models/project-log.model';
 import { LOG_PAGE_SIZE, ProjectLogService } from '../../../../services/project-log.service';
-import { parseMarkdown } from '../../../../utils/markdown.util';
-import { MermaidDirective } from '../../../../directives/mermaid.directive';
+import { parseMarkdown } from '../../../../shared/utils/markdown.util';
+import { MermaidDirective } from '../../../../shared/directives/mermaid.directive';
 
 @Component({
   selector: 'app-project-logs-tab',

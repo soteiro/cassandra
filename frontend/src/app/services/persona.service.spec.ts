@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { PersonaService } from './persona.service';
-import { AuthService } from './auth.service';
+import { AuthService } from '../core/auth/auth.service';
 import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../testing/http-testing';
 
 describe('PersonaService', () => {

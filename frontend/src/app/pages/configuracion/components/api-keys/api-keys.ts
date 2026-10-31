@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
 import { APIKey, APIKeyScope, CreateAPIKeyRequest } from '../../../../models/api-key.model';
 import { APIKeyService } from '../../../../services/api-key.service';
 import { proyectService } from '../../../../services/proyect.service';
-import { getErrorMessage } from '../../../../utils/http-error.util';
+import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-api-keys',

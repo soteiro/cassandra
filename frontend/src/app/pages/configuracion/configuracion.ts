@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideArrowRight, LucideKeyRound } from '@lucide/angular';
-import { COLOR_MODES, PALETTES } from '../../models/appearance.model';
-import { AppearanceService } from '../../services/appearance.service';
+import { COLOR_MODES, PALETTES } from '../../shared/models/appearance.model';
+import { AppearanceService } from '../../shared/services/appearance.service';
 
 @Component({
   selector: 'app-configuracion',

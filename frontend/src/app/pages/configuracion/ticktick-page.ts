@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LucideArrowLeft } from '@lucide/angular';
 import { TickTickService } from '../../services/ticktick.service';
-import { ServerConfigService } from '../../services/server-config.service';
+import { ServerConfigService } from '../../core/server/server-config.service';
 import { TickTickConnection } from '../../models/ticktick.model';
 
 export const TICKTICK_NAVIGATE = new InjectionToken<(url: string) => void>('TickTick navigation', {

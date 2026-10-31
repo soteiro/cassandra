@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Docs } from './docs';
-import { AppearanceService } from '../../services/appearance.service';
+import { AppearanceService } from '../../shared/services/appearance.service';
 
 describe('Docs', () => {
   let component: Docs;

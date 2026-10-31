@@ -1,10 +1,10 @@
-import { LoadingDirective } from '../../directives/loading.directive';
+import { LoadingDirective } from '../../shared/directives/loading.directive';
 import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize, Subscription } from 'rxjs';
 import { FinanzasService } from '../../services/finanzas.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import {
   Banco,
   FinanzasPlantillaItem,

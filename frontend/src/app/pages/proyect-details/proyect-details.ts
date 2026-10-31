@@ -1,4 +1,4 @@
-import { LoadingDirective } from '../../directives/loading.directive';
+import { LoadingDirective } from '../../shared/directives/loading.directive';
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { NotaService } from '../../services/nota.service';
 import { DocumentoService } from '../../services/documento.service';
 import { ActividadService } from '../../services/actividad.service';
 import { PronosticoService } from '../../services/pronostico.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
 import { ProjectHeader } from './components/project-header/project-header';
 import { SubprojectsTab } from './components/subprojects-tab/subprojects-tab';
@@ -18,7 +18,7 @@ import { NotesTab } from './components/notes-tab/notes-tab';
 import { ProjectDocuments } from './components/project-documents/project-documents';
 import { ActivityTab } from './components/activity-tab/activity-tab';
 import { ProjectModal } from '../../components/project-modal/project-modal';
-import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { ConfirmModal } from '../../shared/ui/confirm-modal/confirm-modal';
 import {
   LucideListTodo,
   LucideFileText,
@@ -26,7 +26,7 @@ import {
   LucideBookOpen,
   LucideHistory,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../utils/http-error.util';
+import { getErrorMessage } from '../../shared/utils/http-error.util';
 import { contenidoRetrospectiva, RespuestasRetrospectiva } from '../../utils/retrospectiva.util';
 
 interface Tab {

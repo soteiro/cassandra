@@ -1,10 +1,10 @@
-import { LoadingDirective } from '../../directives/loading.directive';
+import { LoadingDirective } from '../../shared/directives/loading.directive';
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PersonaService } from '../../services/persona.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { PersonaRequest, PersonaResponse } from '../../models/persona.model';
 import { PersonaCard } from '../../components/persona-card/persona-card';
 import { PersonaModal } from '../../components/persona-modal/persona-modal';
@@ -18,7 +18,7 @@ import {
   LucideBrain,
   LucideArrowRight,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../utils/http-error.util';
+import { getErrorMessage } from '../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-crm',

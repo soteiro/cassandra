@@ -6,7 +6,7 @@ import { of, throwError } from 'rxjs';
 import { DocumentsTab } from './documents-tab';
 import { DocumentoProyecto } from '../../../../models/documento.model';
 import { DocumentoService } from '../../../../services/documento.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 const makeDoc = (overrides: Partial<DocumentoProyecto> = {}): DocumentoProyecto => ({
   id: 1,

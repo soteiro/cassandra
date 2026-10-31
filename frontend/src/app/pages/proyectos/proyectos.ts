@@ -1,9 +1,9 @@
-import { LoadingDirective } from '../../directives/loading.directive';
+import { LoadingDirective } from '../../shared/directives/loading.directive';
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { proyectService } from '../../services/proyect.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { ProjectRequest, ProjectResponse } from '../../models/proyect.model';
 import { ProjectCard } from '../../components/project-card/project-card';
 import { ProjectModal } from '../../components/project-modal/project-modal';
@@ -14,7 +14,7 @@ import {
   LucidePlus,
   LucideSearch,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../utils/http-error.util';
+import { getErrorMessage } from '../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-proyectos',

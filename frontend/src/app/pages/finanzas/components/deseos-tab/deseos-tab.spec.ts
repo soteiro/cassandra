@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 
 import { DeseosTab } from './deseos-tab';
 import { FinanzasService } from '../../../../services/finanzas.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { ListaDeseosItem } from '../../../../models/finanzas.model';
 
 function deseo(partial: Partial<ListaDeseosItem>): ListaDeseosItem {

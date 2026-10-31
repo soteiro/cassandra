@@ -6,7 +6,7 @@ import {
   ReflexionTipo,
   ReflexionUpdateRequest,
 } from '../../models/reflexion.model';
-import { BackButtonService } from '../../services/back-button.service';
+import { BackButtonService } from '../../core/platform/back-button.service';
 import {
   LucidePencil,
   LucideX,

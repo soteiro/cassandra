@@ -1,9 +1,9 @@
 import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { ToastService } from '../../services/toast.service';
-import { ServerConfigService } from '../../services/server-config.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { ServerConfigService } from '../../core/server/server-config.service';
 import { LucideEye, LucideEyeOff } from '@lucide/angular';
 
 @Component({

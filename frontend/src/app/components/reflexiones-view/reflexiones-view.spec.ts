@@ -5,7 +5,7 @@ import { of, throwError } from 'rxjs';
 
 import { ReflexionesView } from './reflexiones-view';
 import { ReflexionService } from '../../services/reflexion.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { ReflexionResponse, ReflexionTipo } from '../../models/reflexion.model';
 
 function refl(id: number, tipo: ReflexionTipo, reflexion = 'texto'): ReflexionResponse {
