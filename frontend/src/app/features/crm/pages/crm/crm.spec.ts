@@ -6,9 +6,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 
 import { Crm } from './crm';
-import { PersonaService } from '../../services/persona.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { PersonaResponse } from '../../models/persona.model';
+import { PersonaService } from '../../data/persona.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { PersonaResponse } from '../../data/persona.model';
 
 function persona(over: Partial<PersonaResponse>): PersonaResponse {
   return {

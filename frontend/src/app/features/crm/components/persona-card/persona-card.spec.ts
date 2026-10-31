@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { PersonaCard } from './persona-card';
-import { PersonaResponse } from '../../models/persona.model';
+import { PersonaResponse } from '../../data/persona.model';
 
 const base: PersonaResponse = {
   id: 42,

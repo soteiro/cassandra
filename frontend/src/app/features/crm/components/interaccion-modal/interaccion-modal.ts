@@ -1,11 +1,11 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InteraccionResponse } from '../../models/interaccion.model';
-import { InteraccionService } from '../../services/interaccion.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { ConfirmModal } from '../../shared/ui/confirm-modal/confirm-modal';
-import { BackButtonService } from '../../core/platform/back-button.service';
+import { InteraccionResponse } from '../../data/interaccion.model';
+import { InteraccionService } from '../../data/interaccion.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
+import { BackButtonService } from '../../../../core/platform/back-button.service';
 import {
   LucideMessageSquare,
   LucideX,
@@ -16,7 +16,7 @@ import {
   LucideCopy,
   LucideCheck,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../shared/utils/http-error.util';
+import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-interaccion-modal',

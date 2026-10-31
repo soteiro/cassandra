@@ -35,12 +35,7 @@ export const routes: Routes = [
       }, // ruta dinamica de proyectos
       {
         path: 'crm',
-        loadComponent: () => import('./pages/crm/crm').then((m) => m.Crm),
-      },
-      {
-        path: 'crm/persona/:id',
-        loadComponent: () =>
-          import('./pages/persona-details/persona-details').then((m) => m.PersonaDetails),
+        loadChildren: () => import('./features/crm/crm.routes').then((m) => m.crmRoutes),
       },
       {
         path: 'persona/:id',

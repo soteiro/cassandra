@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ReflexionService } from './reflexion.service';
-import { AuthService } from '../core/auth/auth.service';
-import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../testing/http-testing';
+import { AuthService } from '../../../core/auth/auth.service';
+import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../../../testing/http-testing';
 
 describe('ReflexionService', () => {
   let http: HttpTestingController;

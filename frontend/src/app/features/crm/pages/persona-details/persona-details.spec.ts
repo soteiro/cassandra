@@ -6,11 +6,11 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 
 import { PersonaDetails } from './persona-details';
-import { PersonaService } from '../../services/persona.service';
-import { InteraccionService } from '../../services/interaccion.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { PersonaResponse } from '../../models/persona.model';
-import { InteraccionResponse } from '../../models/interaccion.model';
+import { PersonaService } from '../../data/persona.service';
+import { InteraccionService } from '../../data/interaccion.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { PersonaResponse } from '../../data/persona.model';
+import { InteraccionResponse } from '../../data/interaccion.model';
 
 function fakeResource<T>(value: T) {
   return {
