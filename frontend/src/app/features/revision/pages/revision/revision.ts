@@ -3,17 +3,17 @@ import { DatePipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { RevisionService } from '../../services/revision.service';
-import { TaskService } from '../../services/task.service';
-import { proyectService } from '../../services/proyect.service';
-import { ActividadService } from '../../services/actividad.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { SemanaWidget } from '../../components/semana-widget/semana-widget';
-import { TareaEstancada } from '../../models/revision.model';
-import { ProjectResponse } from '../../models/proyect.model';
-import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../utils/actividad.util';
+import { RevisionService } from '../../data/revision.service';
+import { TaskService } from '../../../../services/task.service';
+import { proyectService } from '../../../../services/proyect.service';
+import { ActividadService } from '../../../../services/actividad.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { SemanaWidget } from '../../../../components/semana-widget/semana-widget';
+import { TareaEstancada } from '../../data/revision.model';
+import { ProjectResponse } from '../../../../models/proyect.model';
+import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../../../utils/actividad.util';
 import { DIAS_SEMANA, semanaARevisar } from '../../utils/revision.util';
-import { getErrorMessage } from '../../shared/utils/http-error.util';
+import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 /** Días sin cambios para que una tarea cuente como estancada. */
 export const DIAS_ESTANCADA = 14;

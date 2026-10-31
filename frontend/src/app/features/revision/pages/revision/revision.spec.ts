@@ -6,12 +6,12 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
 import { Revision } from './revision';
-import { RevisionService } from '../../services/revision.service';
-import { TaskService } from '../../services/task.service';
-import { proyectService } from '../../services/proyect.service';
-import { ActividadService } from '../../services/actividad.service';
-import { TareaEstancada } from '../../models/revision.model';
-import { ProjectResponse } from '../../models/proyect.model';
+import { RevisionService } from '../../data/revision.service';
+import { TaskService } from '../../../../services/task.service';
+import { proyectService } from '../../../../services/proyect.service';
+import { ActividadService } from '../../../../services/actividad.service';
+import { TareaEstancada } from '../../data/revision.model';
+import { ProjectResponse } from '../../../../models/proyect.model';
 
 function estancada(id: number): TareaEstancada {
   return {

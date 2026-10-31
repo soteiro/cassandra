@@ -4,7 +4,7 @@ import { forkJoin } from 'rxjs';
 import { ServerConfigService } from '../core/server/server-config.service';
 import { ToastService } from '../shared/services/toast.service';
 import { Task } from '../models/task.model';
-import { Preferencias } from '../models/revision.model';
+import { Preferencias } from '../features/revision/data/revision.model';
 
 /**
  * Límite de tareas En Curso: un aviso suave, nunca un bloqueo. Con menos cosas a la vez
