@@ -1,7 +1,8 @@
 import { Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { EventoActividad } from '../../../../models/actividad.model';
-import { describirEvento, haceCuanto } from '../../../../utils/actividad.util';
+import { EventoActividad } from '../../../../features/actividad/data/actividad.model';
+import { describirEvento } from '../../../../features/actividad/utils/actividad.util';
+import { haceCuanto } from '../../../../shared/utils/fecha.util';
 
 interface DiaActividad {
   clave: string;

@@ -6,12 +6,12 @@ import { Router, RouterLink } from '@angular/router';
 import { RevisionService } from '../../data/revision.service';
 import { TaskService } from '../../../../services/task.service';
 import { proyectService } from '../../../../services/proyect.service';
-import { ActividadService } from '../../../../services/actividad.service';
+import { ActividadService } from '../../../actividad/data/actividad.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { SemanaWidget } from '../../../../components/semana-widget/semana-widget';
+import { SemanaWidget } from '../../../actividad/components/semana-widget/semana-widget';
 import { TareaEstancada } from '../../data/revision.model';
 import { ProjectResponse } from '../../../../models/proyect.model';
-import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../../../utils/actividad.util';
+import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../../../shared/utils/fecha.util';
 import { DIAS_SEMANA, semanaARevisar } from '../../utils/revision.util';
 import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 

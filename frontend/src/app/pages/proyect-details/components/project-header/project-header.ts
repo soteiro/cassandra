@@ -11,7 +11,8 @@ import {
   LucideTarget,
   LucideChevronDown,
 } from '@lucide/angular';
-import { haceCuanto, rangoSemanas } from '../../../../utils/actividad.util';
+import { haceCuanto } from '../../../../shared/utils/fecha.util';
+import { rangoSemanas } from '../../../../utils/pronostico.util';
 
 // Preferencia de este navegador: el propósito se muestra plegado salvo que lo abras.
 const CLAVE_PROPOSITO = 'cassandra.proyecto.mostrarProposito';

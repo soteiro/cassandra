@@ -9,7 +9,7 @@ import { Revision } from './revision';
 import { RevisionService } from '../../data/revision.service';
 import { TaskService } from '../../../../services/task.service';
 import { proyectService } from '../../../../services/proyect.service';
-import { ActividadService } from '../../../../services/actividad.service';
+import { ActividadService } from '../../../actividad/data/actividad.service';
 import { TareaEstancada } from '../../data/revision.model';
 import { ProjectResponse } from '../../../../models/proyect.model';
 
