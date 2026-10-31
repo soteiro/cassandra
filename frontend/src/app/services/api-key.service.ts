@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { APIKey, CreateAPIKeyRequest, IssuedAPIKey } from '../models/api-key.model';
-import { ServerConfigService } from './server-config.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 
 @Injectable({ providedIn: 'root' })
 export class APIKeyService {

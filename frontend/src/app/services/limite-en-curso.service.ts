@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
-import { ServerConfigService } from './server-config.service';
-import { ToastService } from './toast.service';
+import { ServerConfigService } from '../core/server/server-config.service';
+import { ToastService } from '../shared/services/toast.service';
 import { Task } from '../models/task.model';
 import { Preferencias } from '../models/revision.model';
 

@@ -4,7 +4,7 @@ import { of, Subject, throwError } from 'rxjs';
 
 import { Finanzas } from './finanzas';
 import { FinanzasService } from '../../services/finanzas.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { FinanzasPlantillaItem } from '../../models/finanzas.model';
 
 function item(partial: Partial<FinanzasPlantillaItem>): FinanzasPlantillaItem {

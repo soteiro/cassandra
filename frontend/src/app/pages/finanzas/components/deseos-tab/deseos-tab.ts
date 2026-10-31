@@ -1,15 +1,15 @@
-import { LoadingDirective } from '../../../../directives/loading.directive';
+import { LoadingDirective } from '../../../../shared/directives/loading.directive';
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FinanzasService } from '../../../../services/finanzas.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import {
   GrupoItemFinanzas,
   ListaDeseosItem,
 } from '../../../../models/finanzas.model';
-import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
-import { BackButtonService } from '../../../../services/back-button.service';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
+import { BackButtonService } from '../../../../core/platform/back-button.service';
 import {
   LucideSparkles,
   LucideCheckCircle2,

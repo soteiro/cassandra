@@ -9,10 +9,10 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { LoadingService } from './services/loading.service';
-import { LoadingIndicator } from './components/loading-indicator/loading-indicator';
-import { ToastContainer } from './components/toast-container/toast-container';
-import { BackButtonService } from './services/back-button.service';
+import { LoadingService } from './shared/services/loading.service';
+import { LoadingIndicator } from './shared/ui/loading-indicator/loading-indicator';
+import { ToastContainer } from './shared/ui/toast-container/toast-container';
+import { BackButtonService } from './core/platform/back-button.service';
 
 @Component({
   selector: 'app-root',

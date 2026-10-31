@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, input, output, signal, untracked }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../models/proyect.model';
-import { BackButtonService } from '../../services/back-button.service';
+import { BackButtonService } from '../../core/platform/back-button.service';
 import { PronosticoService } from '../../services/pronostico.service';
 import { proyectService } from '../../services/proyect.service';
 import { fechaProbable, formatoFactor } from '../../utils/actividad.util';

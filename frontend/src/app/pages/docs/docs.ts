@@ -1,5 +1,5 @@
 import { Component, ElementRef, effect, inject, viewChild } from '@angular/core';
-import { AppearanceService } from '../../services/appearance.service';
+import { AppearanceService } from '../../shared/services/appearance.service';
 
 @Component({
   selector: 'app-docs',

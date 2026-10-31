@@ -8,7 +8,7 @@ import { BehaviorSubject, of, throwError } from 'rxjs';
 import { PersonaDetails } from './persona-details';
 import { PersonaService } from '../../services/persona.service';
 import { InteraccionService } from '../../services/interaccion.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { PersonaResponse } from '../../models/persona.model';
 import { InteraccionResponse } from '../../models/interaccion.model';
 

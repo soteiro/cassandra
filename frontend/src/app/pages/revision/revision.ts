@@ -7,13 +7,13 @@ import { RevisionService } from '../../services/revision.service';
 import { TaskService } from '../../services/task.service';
 import { proyectService } from '../../services/proyect.service';
 import { ActividadService } from '../../services/actividad.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { SemanaWidget } from '../../components/semana-widget/semana-widget';
 import { TareaEstancada } from '../../models/revision.model';
 import { ProjectResponse } from '../../models/proyect.model';
 import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../utils/actividad.util';
 import { DIAS_SEMANA, semanaARevisar } from '../../utils/revision.util';
-import { getErrorMessage } from '../../utils/http-error.util';
+import { getErrorMessage } from '../../shared/utils/http-error.util';
 
 /** Días sin cambios para que una tarea cuente como estancada. */
 export const DIAS_ESTANCADA = 14;

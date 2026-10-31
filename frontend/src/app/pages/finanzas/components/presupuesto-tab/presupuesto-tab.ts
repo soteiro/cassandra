@@ -11,7 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FinanzasService } from '../../../../services/finanzas.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import {
   Banco,
   ClonarPeriodoRequest,
@@ -23,8 +23,8 @@ import {
   MovimientoEsperadoFinanzas,
   TipoMovimientoFinanzas,
 } from '../../../../models/finanzas.model';
-import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
-import { BackButtonService } from '../../../../services/back-button.service';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
+import { BackButtonService } from '../../../../core/platform/back-button.service';
 import {
   LucideWallet,
   LucidePlus,
@@ -40,7 +40,7 @@ import {
   LucideClock,
   LucideX,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../../../utils/http-error.util';
+import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 export type FinanzasGroupMode = 'categoria' | 'banco' | 'mecanismo' | 'estado' | 'ninguno';
 

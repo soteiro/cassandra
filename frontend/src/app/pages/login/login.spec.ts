@@ -3,10 +3,10 @@ import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { Login } from './login';
-import { AuthService } from '../../services/auth.service';
-import { ToastService } from '../../services/toast.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { signal } from '@angular/core';
-import { ServerConfigService } from '../../services/server-config.service';
+import { ServerConfigService } from '../../core/server/server-config.service';
 
 type LoginInternals = {
   email: { (): string; set: (v: string) => void };

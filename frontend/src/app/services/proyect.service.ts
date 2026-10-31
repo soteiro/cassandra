@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { AuthService } from './auth.service';
+import { AuthService } from '../core/auth/auth.service';
 import { ProjectResponse, ProjectRequest, ProjectUpdateRequest } from '../models/proyect.model';
 import { Observable } from 'rxjs';
-import { ServerConfigService } from './server-config.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 
 @Injectable({
   providedIn: 'root'

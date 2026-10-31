@@ -7,7 +7,7 @@ import { of, throwError } from 'rxjs';
 
 import { Proyectos } from './proyectos';
 import { proyectService } from '../../services/proyect.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { ProjectResponse } from '../../models/proyect.model';
 
 function proj(over: Partial<ProjectResponse>): ProjectResponse {

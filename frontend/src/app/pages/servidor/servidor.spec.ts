@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
 import { Servidor } from './servidor';
-import { ConnectResult, ServerConfigService } from '../../services/server-config.service';
-import { ToastService } from '../../services/toast.service';
+import { ConnectResult, ServerConfigService } from '../../core/server/server-config.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 describe('Servidor', () => {
   let fixture: ComponentFixture<Servidor>;

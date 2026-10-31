@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { AuthService } from './auth.service';
+import { AuthService } from '../core/auth/auth.service';
 import { Task, TaskRequest } from '../models/task.model';
 import { Observable, tap } from 'rxjs';
-import { ServerConfigService } from './server-config.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 import { LimiteEnCursoService } from './limite-en-curso.service';
 
 @Injectable({

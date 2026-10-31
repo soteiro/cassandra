@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { APIKeyService } from './api-key.service';
-import { ServerConfigService } from './server-config.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 import { setupHttpTesting } from '../../testing/http-testing';
 
 describe('APIKeyService', () => {

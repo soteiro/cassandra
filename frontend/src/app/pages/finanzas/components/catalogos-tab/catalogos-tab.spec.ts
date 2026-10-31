@@ -3,7 +3,7 @@ import { of, throwError } from 'rxjs';
 
 import { CatalogosTab } from './catalogos-tab';
 import { FinanzasService } from '../../../../services/finanzas.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 describe('CatalogosTab', () => {
   let component: CatalogosTab;

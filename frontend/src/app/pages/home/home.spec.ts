@@ -7,7 +7,7 @@ import { of, Subject, throwError } from 'rxjs';
 
 import { Home } from './home';
 import { TaskService } from '../../services/task.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Task } from '../../models/task.model';
 
 function task(over: Partial<Task>): Task {

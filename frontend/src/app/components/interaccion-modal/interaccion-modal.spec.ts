@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 
 import { InteraccionModal } from './interaccion-modal';
 import { InteraccionService } from '../../services/interaccion.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { InteraccionResponse } from '../../models/interaccion.model';
 
 const item: InteraccionResponse = {

@@ -2,9 +2,9 @@ import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../../../services/task.service';
-import { ToastService } from '../../../../services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import { Task, TaskPrioridad } from '../../../../models/task.model';
-import { ConfirmModal } from '../../../../components/confirm-modal/confirm-modal';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 import { TaskDetailModal } from '../../../../components/task-detail-modal/task-detail-modal';
 import {
   LucideChevronDown,

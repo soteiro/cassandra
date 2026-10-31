@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { AuthService } from './auth.service';
-import { ServerConfigService } from './server-config.service';
+import { AuthService } from '../core/auth/auth.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 import { ProjectLog } from '../models/project-log.model';
 
 export const LOG_PAGE_SIZE = 30;

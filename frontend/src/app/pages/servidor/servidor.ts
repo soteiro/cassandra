@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ServerConfigService } from '../../services/server-config.service';
-import { ToastService } from '../../services/toast.service';
+import { ServerConfigService } from '../../core/server/server-config.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 /** Primera pantalla de la app Android: elegir el servidor Cassandra propio. */
 @Component({

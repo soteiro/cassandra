@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { AuthService } from './auth.service';
-import { ServerConfigService } from './server-config.service';
+import { AuthService } from '../core/auth/auth.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 import { Planificacion, PronosticoProyecto } from '../models/pronostico.model';
 
 /** Pronósticos: cuánto te demoras de verdad y cuándo terminaría un proyecto. */

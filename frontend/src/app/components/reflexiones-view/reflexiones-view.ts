@@ -1,9 +1,9 @@
-import { LoadingDirective } from '../../directives/loading.directive';
+import { LoadingDirective } from '../../shared/directives/loading.directive';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReflexionService } from '../../services/reflexion.service';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { PersonaResponse } from '../../models/persona.model';
 import {
   ReflexionResponse,
@@ -11,7 +11,7 @@ import {
   ReflexionUpdateRequest,
 } from '../../models/reflexion.model';
 import { ReflexionModal } from '../reflexion-modal/reflexion-modal';
-import { ConfirmModal } from '../confirm-modal/confirm-modal';
+import { ConfirmModal } from '../../shared/ui/confirm-modal/confirm-modal';
 import {
   LucidePlus,
   LucideClock,
@@ -21,7 +21,7 @@ import {
   LucideBookOpen,
   LucideFeather,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../utils/http-error.util';
+import { getErrorMessage } from '../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-reflexiones-view',

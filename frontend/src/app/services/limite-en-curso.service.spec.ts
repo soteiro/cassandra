@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { LimiteEnCursoService } from './limite-en-curso.service';
-import { ToastService } from './toast.service';
+import { ToastService } from '../shared/services/toast.service';
 import { setupHttpTesting } from '../../testing/http-testing';
 
 describe('LimiteEnCursoService', () => {

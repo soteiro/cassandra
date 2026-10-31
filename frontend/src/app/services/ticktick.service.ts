@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { ServerConfigService } from './server-config.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 import { TickTickConnection, TickTickToday } from '../models/ticktick.model';
 
 @Injectable({ providedIn: 'root' })

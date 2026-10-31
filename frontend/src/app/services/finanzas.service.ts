@@ -18,7 +18,7 @@ import {
   MovimientoEsperadoFinanzas,
   MovimientoEsperadoFinanzasRequest,
 } from '../models/finanzas.model';
-import { ServerConfigService } from './server-config.service';
+import { ServerConfigService } from '../core/server/server-config.service';
 
 @Injectable({
   providedIn: 'root',
