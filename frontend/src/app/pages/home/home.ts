@@ -10,7 +10,7 @@ import { TaskDetailModal } from '../../components/task-detail-modal/task-detail-
 import { TaskStatusSelect } from '../../components/task-status-select/task-status-select';
 import { SemanaWidget } from '../../components/semana-widget/semana-widget';
 import { TickTickWidget } from '../../components/ticktick-widget/ticktick-widget';
-import { RevisionCard } from '../../components/revision-card/revision-card';
+import { RevisionCard } from '../../features/revision/components/revision-card/revision-card';
 import {
   getTaskPriorityBadgeClass,
   getTaskPriorityBorderClass,

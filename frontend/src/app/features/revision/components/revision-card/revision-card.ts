@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { RevisionService } from '../../services/revision.service';
+import { RevisionService } from '../../data/revision.service';
 import { tocaRevision } from '../../utils/revision.util';
 
 /** Tarjeta del inicio: aparece desde el día de revisión elegido hasta que la haces. */

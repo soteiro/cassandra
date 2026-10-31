@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from '../core/auth/auth.service';
-import { ServerConfigService } from '../core/server/server-config.service';
-import { Preferencias, ResumenRevision, Revision, TareaEstancada } from '../models/revision.model';
+import { AuthService } from '../../../core/auth/auth.service';
+import { ServerConfigService } from '../../../core/server/server-config.service';
+import { Preferencias, ResumenRevision, Revision, TareaEstancada } from './revision.model';
 
 /** Revisión semanal: tareas estancadas, revisiones guardadas y preferencias. */
 @Injectable({

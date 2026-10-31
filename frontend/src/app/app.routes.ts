@@ -53,7 +53,8 @@ export const routes: Routes = [
       },
       {
         path: 'revision',
-        loadComponent: () => import('./pages/revision/revision').then((m) => m.Revision),
+        loadChildren: () =>
+          import('./features/revision/revision.routes').then((m) => m.revisionRoutes),
       },
       {
         path: 'configuracion/claves-api',
