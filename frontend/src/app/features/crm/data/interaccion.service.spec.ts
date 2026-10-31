@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { InteraccionService } from './interaccion.service';
-import { AuthService } from '../core/auth/auth.service';
-import { expectHttpCall, HttpCase, setupHttpTesting } from '../../testing/http-testing';
+import { AuthService } from '../../../core/auth/auth.service';
+import { expectHttpCall, HttpCase, setupHttpTesting } from '../../../../testing/http-testing';
 
 describe('InteraccionService', () => {
   let http: HttpTestingController;

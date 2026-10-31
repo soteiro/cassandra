@@ -1,16 +1,16 @@
-import { LoadingDirective } from '../../shared/directives/loading.directive';
+import { LoadingDirective } from '../../../../shared/directives/loading.directive';
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { PersonaService } from '../../services/persona.service';
-import { InteraccionService } from '../../services/interaccion.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { PersonaResponse, PersonaUpdateRequest } from '../../models/persona.model';
-import { InteraccionResponse } from '../../models/interaccion.model';
+import { PersonaService } from '../../data/persona.service';
+import { InteraccionService } from '../../data/interaccion.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { PersonaResponse, PersonaUpdateRequest } from '../../data/persona.model';
+import { InteraccionResponse } from '../../data/interaccion.model';
 import { PersonaModal } from '../../components/persona-modal/persona-modal';
-import { ConfirmModal } from '../../shared/ui/confirm-modal/confirm-modal';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 import { InteraccionModal } from '../../components/interaccion-modal/interaccion-modal';
 import { ReflexionesView } from '../../components/reflexiones-view/reflexiones-view';
 import {
@@ -25,7 +25,7 @@ import {
   LucideArrowRight,
   LucideClock,
 } from '@lucide/angular';
-import { getErrorMessage } from '../../shared/utils/http-error.util';
+import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-persona-details',

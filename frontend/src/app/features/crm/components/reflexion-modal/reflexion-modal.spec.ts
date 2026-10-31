@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { ReflexionModal } from './reflexion-modal';
-import { ReflexionResponse, ReflexionUpdateRequest } from '../../models/reflexion.model';
+import { ReflexionResponse, ReflexionUpdateRequest } from '../../data/reflexion.model';
 
 const data: ReflexionResponse = {
   id: 3,

@@ -1,8 +1,8 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PersonaRequest, PersonaResponse, PersonaUpdateRequest } from '../../models/persona.model';
-import { BackButtonService } from '../../core/platform/back-button.service';
+import { PersonaRequest, PersonaResponse, PersonaUpdateRequest } from '../../data/persona.model';
+import { BackButtonService } from '../../../../core/platform/back-button.service';
 import {
   LucideUserPlus,
   LucidePencil,

@@ -77,7 +77,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 5. [P2] Historial de Reflexiones invade el margen derecho en 320 px
 
-- **Archivo:** `frontend/src/app/components/reflexiones-view/reflexiones-view.html:168`.
+- **Archivo:** `frontend/src/app/features/crm/components/reflexiones-view/reflexiones-view.html:168`.
 - **Controles:** Todas, Reflexiones, Memorias y Eventos.
 - **Prueba:** barra de aproximadamente 305 px frente a 288 px disponibles; termina en x=321. Produce aproximadamente 1 px de exceso horizontal en el área principal y consume el margen derecho.
 - **Impacto:** el contorno queda recortado y la barra pierde su margen. Los textos de los botones permanecen visibles en el caso probado; no se observó un bloqueo de navegación.

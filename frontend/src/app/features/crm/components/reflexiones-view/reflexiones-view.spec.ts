@@ -4,9 +4,9 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { ReflexionesView } from './reflexiones-view';
-import { ReflexionService } from '../../services/reflexion.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { ReflexionResponse, ReflexionTipo } from '../../models/reflexion.model';
+import { ReflexionService } from '../../data/reflexion.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { ReflexionResponse, ReflexionTipo } from '../../data/reflexion.model';
 
 function refl(id: number, tipo: ReflexionTipo, reflexion = 'texto'): ReflexionResponse {
   return { id, user_id: 1, reflexion, tipo, fecha_creacion: '2026-01-01T00:00:00Z', eliminado: false };

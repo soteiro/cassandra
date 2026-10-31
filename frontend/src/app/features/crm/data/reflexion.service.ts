@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { AuthService } from '../core/auth/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import {
   ReflexionRequest,
   ReflexionResponse,
   ReflexionUpdateRequest,
-} from '../models/reflexion.model';
+} from './reflexion.model';
 import { Observable } from 'rxjs';
-import { ServerConfigService } from '../core/server/server-config.service';
+import { ServerConfigService } from '../../../core/server/server-config.service';
 
 @Injectable({
   providedIn: 'root',

@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PersonaResponse } from '../../models/persona.model';
+import { PersonaResponse } from '../../data/persona.model';
 import { LucideArrowRight } from '@lucide/angular';
 
 @Component({
