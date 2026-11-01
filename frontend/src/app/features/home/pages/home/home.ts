@@ -3,18 +3,18 @@ import { Component, signal, inject, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { TaskService } from '../../../../services/task.service';
+import { TaskService } from '../../../tareas/data/task.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { Task } from '../../../../models/task.model';
-import { TaskDetailModal } from '../../../../components/task-detail-modal/task-detail-modal';
-import { TaskStatusSelect } from '../../../../components/task-status-select/task-status-select';
+import { Task } from '../../../tareas/data/task.model';
+import { TaskDetailModal } from '../../../tareas/components/task-detail-modal/task-detail-modal';
+import { TaskStatusSelect } from '../../../tareas/components/task-status-select/task-status-select';
 import { SemanaWidget } from '../../../actividad/components/semana-widget/semana-widget';
 import { TickTickWidget } from '../../../ticktick/components/ticktick-widget/ticktick-widget';
 import { RevisionCard } from '../../../revision/components/revision-card/revision-card';
 import {
   getTaskPriorityBadgeClass,
   getTaskPriorityBorderClass,
-} from '../../../../utils/task-styles.util';
+} from '../../../tareas/utils/task-styles.util';
 import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
 
 @Component({

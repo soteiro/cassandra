@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RevisionService } from '../../data/revision.service';
-import { TaskService } from '../../../../services/task.service';
+import { TaskService } from '../../../tareas/data/task.service';
 import { proyectService } from '../../../../services/proyect.service';
 import { ActividadService } from '../../../actividad/data/actividad.service';
 import { ToastService } from '../../../../shared/services/toast.service';

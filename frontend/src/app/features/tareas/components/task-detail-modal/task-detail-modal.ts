@@ -1,12 +1,12 @@
 import { Component, effect, inject, input, output, signal, computed, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task, TaskPrioridad } from '../../models/task.model';
-import { TaskService } from '../../services/task.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { BackButtonService } from '../../core/platform/back-button.service';
-import { NotaService } from '../../services/nota.service';
-import { NotaProyecto } from '../../models/nota.model';
+import { Task, TaskPrioridad } from '../../data/task.model';
+import { TaskService } from '../../data/task.service';
+import { ToastService } from '../../../../shared/services/toast.service';
+import { BackButtonService } from '../../../../core/platform/back-button.service';
+import { NotaService } from '../../../notas/data/nota.service';
+import { NotaProyecto } from '../../../notas/data/nota.model';
 import {
   LucideX,
   LucideCheck,

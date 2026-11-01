@@ -1,6 +1,6 @@
 import { Component, input, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TaskPrioridad } from '../../models/task.model';
+import { TaskPrioridad } from '../../data/task.model';
 import {
   getTaskPriorityBadgeClass,
   SelectOptionConfig,

@@ -1,13 +1,13 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NotaService } from '../../../../services/nota.service';
-import { TaskService } from '../../../../services/task.service';
+import { NotaService } from '../../../../features/notas/data/nota.service';
+import { TaskService } from '../../../../features/tareas/data/task.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { NotaProyecto } from '../../../../models/nota.model';
-import { Task } from '../../../../models/task.model';
+import { NotaProyecto } from '../../../../features/notas/data/nota.model';
+import { Task } from '../../../../features/tareas/data/task.model';
 import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
-import { TaskDetailModal } from '../../../../components/task-detail-modal/task-detail-modal';
+import { TaskDetailModal } from '../../../../features/tareas/components/task-detail-modal/task-detail-modal';
 import {
   LucideFileText,
   LucideSearch,
