@@ -2,6 +2,16 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.1.
 
+## Estructura
+
+`src/app` se organiza por área funcional, no por tipo de archivo:
+
+- `core/`: lo que existe una sola vez en la app (auth, servidor, plataforma y layout).
+- `shared/`: código reutilizable sin lógica de dominio (UI genérica, directivas, utilidades).
+- `features/<área>/`: cada área con sus `pages/`, `components/`, `data/` y `utils/`, y su `<área>.routes.ts` cargado con `loadChildren`.
+
+Las reglas (dónde va el código nuevo, qué puede importar a qué y cómo se nombran las cosas) están en [`AGENTS.md`](AGENTS.md#project-structure).
+
 ## Colores de la interfaz
 
 La paleta actual está centralizada en [`public/theme.css`](public/theme.css).
