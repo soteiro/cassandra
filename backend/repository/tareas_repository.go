@@ -73,7 +73,7 @@ func insertTarea(ctx context.Context, db interface {
 		req.UserID,
 		estado,
 		prioridad,
-		req.ProyectID,
+		req.ProjectID,
 		req.TareaPadreID,
 		fechaTerminado,
 	).Scan(
@@ -87,12 +87,12 @@ func insertTarea(ctx context.Context, db interface {
 		&tarea.Estado,
 		&tarea.Prioridad,
 		&tarea.UserID,
-		&tarea.ProyectID,
+		&tarea.ProjectID,
 		&tarea.TareaPadreID,
 	)
 
 	if err != nil {
-		log.Printf("[REPO:Tareas.Create] Error en SQL INSERT: %v | user_id=%d proyect_id=%d", err, req.UserID, req.ProyectID)
+		log.Printf("[REPO:Tareas.Create] Error en SQL INSERT: %v | user_id=%d proyect_id=%d", err, req.UserID, req.ProjectID)
 		return nil, err
 	}
 	return &tarea, nil
@@ -152,7 +152,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 			&tarea.Estado,
 			&tarea.Prioridad,
 			&tarea.UserID,
-			&tarea.ProyectID,
+			&tarea.ProjectID,
 			&tarea.TareaPadreID,
 			&tarea.ProyectoNombre,
 		)
@@ -204,7 +204,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 			&tarea.Estado,
 			&tarea.Prioridad,
 			&tarea.UserID,
-			&tarea.ProyectID,
+			&tarea.ProjectID,
 			&tarea.TareaPadreID,
 		)
 		if err != nil {
@@ -271,7 +271,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 		&tarea.Estado,
 		&tarea.Prioridad,
 		&tarea.UserID,
-		&tarea.ProyectID,
+		&tarea.ProjectID,
 		&tarea.TareaPadreID,
 	)
 
@@ -308,7 +308,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 				&sub.Estado,
 				&sub.Prioridad,
 				&sub.UserID,
-				&sub.ProyectID,
+				&sub.ProjectID,
 				&sub.TareaPadreID,
 			); err != nil {
 				// Se omite la subtarea pero queda registrado, en vez de perderla en silencio.

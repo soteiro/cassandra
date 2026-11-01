@@ -46,7 +46,7 @@ func NewRouter(opts Options) http.Handler {
 	// Verifica que los ids referenciados en una petición (proyecto padre, persona, banco...)
 	// sean del usuario autenticado.
 	owner := repository.NewOwnership(db)
-	proyectHandler := handlers.NewProyectHandler(repository.NewProyectRepository(db), owner)
+	projectHandler := handlers.NewProjectHandler(repository.NewProjectRepository(db), owner)
 	tareasHandler := handlers.NewTareasHandler(repository.NewTareasRepository(db), owner)
 	logsHandler := handlers.NewLogsHandler(repository.NewLogsRepository(db), owner)
 	notasProyectoHandler := handlers.NewNotasProyectoHandler(repository.NewNotasProyectoRepository(db), owner)
@@ -126,13 +126,13 @@ func NewRouter(opts Options) http.Handler {
 		r.Get("/api/users/{id}", userHandler.GetUser)
 		r.Put("/api/users/{id}", userHandler.UpdateUser)
 		r.Delete("/api/users/{id}", userHandler.DeleteUser)
-		r.Post("/api/proyects", proyectHandler.CreateProyect)
-		r.Get("/api/proyects", proyectHandler.ListProyect)
+		r.Post("/api/proyects", projectHandler.CreateProject)
+		r.Get("/api/proyects", projectHandler.ListProject)
 
-		r.Delete("/api/proyects/{id}", proyectHandler.DeleteByID)
-		r.Get("/api/proyects/{id}", proyectHandler.GetByID)
-		r.Get("/api/proyects/{id}/subproyectos", proyectHandler.GetSubproyectos)
-		r.Put("/api/proyects/{id}", proyectHandler.Update)
+		r.Delete("/api/proyects/{id}", projectHandler.DeleteByID)
+		r.Get("/api/proyects/{id}", projectHandler.GetByID)
+		r.Get("/api/proyects/{id}/subproyectos", projectHandler.GetSubproyectos)
+		r.Put("/api/proyects/{id}", projectHandler.Update)
 
 		// Rutas de Tareas Protegidas
 		r.Post("/api/tareas", tareasHandler.CreateTarea)

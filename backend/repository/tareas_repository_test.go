@@ -40,7 +40,7 @@ func TestTareasCreateUsesAbiertoWhenEstadoIsMissing(t *testing.T) {
 	for name, estado := range map[string]*string{"estado nil": nil, "estado vacío": &vacio} {
 		t.Run(name, func(t *testing.T) {
 			tarea, err := repo.Create(context.Background(), &models.TareaRequest{
-				Nombre: "Tarea " + name, UserID: userID, ProyectID: proyectoID, Estado: estado,
+				Nombre: "Tarea " + name, UserID: userID, ProjectID: proyectoID, Estado: estado,
 			})
 			if err != nil {
 				t.Fatal(err)
@@ -54,7 +54,7 @@ func TestTareasCreateUsesAbiertoWhenEstadoIsMissing(t *testing.T) {
 	t.Run("respeta un estado explícito", func(t *testing.T) {
 		enCurso := "En Curso"
 		tarea, err := repo.Create(context.Background(), &models.TareaRequest{
-			Nombre: "Explícita", UserID: userID, ProyectID: proyectoID, Estado: &enCurso,
+			Nombre: "Explícita", UserID: userID, ProjectID: proyectoID, Estado: &enCurso,
 		})
 		if err != nil {
 			t.Fatal(err)
@@ -71,13 +71,13 @@ func TestTareasGetByIDLogsUnreadableSubtasks(t *testing.T) {
 	repo := NewTareasRepository(db)
 	ctx := context.Background()
 
-	padre, err := repo.Create(ctx, &models.TareaRequest{Nombre: "Padre", UserID: userID, ProyectID: proyectoID})
+	padre, err := repo.Create(ctx, &models.TareaRequest{Nombre: "Padre", UserID: userID, ProjectID: proyectoID})
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, nombre := range []string{"Sana", "Rota"} {
 		if _, err := repo.Create(ctx, &models.TareaRequest{
-			Nombre: nombre, UserID: userID, ProyectID: proyectoID, TareaPadreID: &padre.ID,
+			Nombre: nombre, UserID: userID, ProjectID: proyectoID, TareaPadreID: &padre.ID,
 		}); err != nil {
 			t.Fatal(err)
 		}

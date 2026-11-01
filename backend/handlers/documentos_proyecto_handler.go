@@ -37,12 +37,12 @@ func (h *DocumentosProyectoHandler) Create(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	proyectIDStr := chi.URLParam(r, "proyect_id")
-	if proyectIDStr == "" {
-		proyectIDStr = chi.URLParam(r, "proyecto_id")
+	projectIDStr := chi.URLParam(r, "proyect_id")
+	if projectIDStr == "" {
+		projectIDStr = chi.URLParam(r, "proyecto_id")
 	}
-	if proyectIDStr != "" {
-		if pID, err := atoi32(proyectIDStr); err == nil && pID > 0 {
+	if projectIDStr != "" {
+		if pID, err := atoi32(projectIDStr); err == nil && pID > 0 {
 			req.ProyectoID = pID
 		}
 	}
@@ -84,19 +84,19 @@ func (h *DocumentosProyectoHandler) GetByProyectoID(w http.ResponseWriter, r *ht
 		return
 	}
 
-	proyectIDStr := chi.URLParam(r, "proyect_id")
-	if proyectIDStr == "" {
-		proyectIDStr = chi.URLParam(r, "proyecto_id")
+	projectIDStr := chi.URLParam(r, "proyect_id")
+	if projectIDStr == "" {
+		projectIDStr = chi.URLParam(r, "proyecto_id")
 	}
-	proyectID, err := atoi32(proyectIDStr)
-	if err != nil || proyectID <= 0 {
+	projectID, err := atoi32(projectIDStr)
+	if err != nil || projectID <= 0 {
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
 		return
 	}
 
 	tipoFilter := r.URL.Query().Get("tipo")
 
-	docs, err := h.Repo.GetByProyectoID(r.Context(), proyectID, userID, tipoFilter)
+	docs, err := h.Repo.GetByProyectoID(r.Context(), projectID, userID, tipoFilter)
 	if err != nil {
 		log.Printf("[HANDLER:Documentos.GetByProyectoID] Error: %v", err)
 		dbError(w, "Error al obtener documentos", err)

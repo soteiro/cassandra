@@ -3,7 +3,7 @@ package models
 import "time"
 
 // definir la entidad completa
-type Proyects struct {
+type Projects struct {
 	ID                   int        `json:"id"`
 	Nombre               string     `json:"nombre"`
 	FechaCreacion        time.Time  `json:"fecha_creacion"`
@@ -24,7 +24,7 @@ type Proyects struct {
 }
 
 // definir los datos que se espera recibir la creacion de un proyecto
-type ProyectRequest struct {
+type ProjectRequest struct {
 	Nombre               string     `json:"nombre"`
 	Descripcion          string     `json:"descripcion"`
 	Comentario           string     `json:"comentario"`
@@ -39,7 +39,7 @@ type ProyectRequest struct {
 }
 
 // datos que devuelva la creacion de un proyecto
-type ProyectResponse struct {
+type ProjectResponse struct {
 	ID                   int        `json:"id"`
 	Nombre               string     `json:"nombre"`
 	Descripcion          string     `json:"descripcion"`
@@ -62,7 +62,7 @@ type ProyectResponse struct {
 }
 
 // el * hace opcional el parametro
-type ProyectUpdateRequest struct {
+type ProjectUpdateRequest struct {
 	Nombre               *string    `json:"nombre"`
 	Descripcion          *string    `json:"descripcion"`
 	Comentario           *string    `json:"comentario"`
@@ -76,7 +76,7 @@ type ProyectUpdateRequest struct {
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
 
-type ProyectUpdateResponse struct {
+type ProjectUpdateResponse struct {
 	ID                   int        `json:"id"`
 	Nombre               string     `json:"nombre"`
 	Descripcion          string     `json:"descripcion"`

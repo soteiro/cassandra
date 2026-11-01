@@ -13,7 +13,7 @@ type Tareas struct {
 	Estado         *string    `json:"estado"`
 	Prioridad      string     `json:"prioridad"`
 	UserID         int        `json:"user_id"`
-	ProyectID      int        `json:"proyect_id"`
+	ProjectID      int        `json:"proyect_id"`
 	TareaPadreID   *int       `json:"tarea_padre_id,omitempty"`
 }
 
@@ -25,7 +25,7 @@ type TareaRequest struct {
 	Estado       *string `json:"estado"`
 	Prioridad    *string `json:"prioridad,omitempty"`
 	UserID       int     `json:"user_id"`
-	ProyectID    int     `json:"proyect_id"`
+	ProjectID    int     `json:"proyect_id"`
 	TareaPadreID *int    `json:"tarea_padre_id,omitempty"`
 }
 
@@ -41,7 +41,7 @@ type TareaResponse struct {
 	Estado             *string         `json:"estado"`
 	Prioridad          string          `json:"prioridad"`
 	UserID             int             `json:"user_id"`
-	ProyectID          int             `json:"proyect_id"`
+	ProjectID          int             `json:"proyect_id"`
 	ProyectoNombre     *string         `json:"proyecto_nombre,omitempty"`
 	TareaPadreID       *int            `json:"tarea_padre_id,omitempty"`
 	Subtareas          []TareaResponse `json:"subtareas,omitempty"`

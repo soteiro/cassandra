@@ -9,18 +9,18 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type ProyectRepository struct {
+type ProjectRepository struct {
 	db *pgxpool.Pool
 }
 
 // constructor del repo proyectos
-func NewProyectRepository(db *pgxpool.Pool) *ProyectRepository {
-	return &ProyectRepository{db: db}
+func NewProjectRepository(db *pgxpool.Pool) *ProjectRepository {
+	return &ProjectRepository{db: db}
 }
 
 // crear un proyecto
-func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectRequest) (*models.ProyectResponse, error) {
-	var proyect models.ProyectResponse
+func (r *ProjectRepository) Create(ctx context.Context, req *models.ProjectRequest) (*models.ProjectResponse, error) {
+	var project models.ProjectResponse
 	query := `
 		INSERT INTO proyectos (
 			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id, premortem
@@ -48,31 +48,31 @@ func (r *ProyectRepository) Create(ctx context.Context, req *models.ProyectReque
 		req.ProyectoPadreID,
 		req.Premortem,
 	).Scan(
-		&proyect.ID,
-		&proyect.Nombre,
-		&proyect.Descripcion,
-		&proyect.Comentario,
-		&proyect.FechaCreacion,
-		&proyect.FechaTerminado,
-		&proyect.FechaActualizacion,
-		&proyect.Estado,
-		&proyect.PorQue,
-		&proyect.ParaQue,
-		&proyect.CriterioFinalizacion,
-		&proyect.Premortem,
-		&proyect.Prioridad,
-		&proyect.FechaLimite,
-		&proyect.ProyectoPadreID,
+		&project.ID,
+		&project.Nombre,
+		&project.Descripcion,
+		&project.Comentario,
+		&project.FechaCreacion,
+		&project.FechaTerminado,
+		&project.FechaActualizacion,
+		&project.Estado,
+		&project.PorQue,
+		&project.ParaQue,
+		&project.CriterioFinalizacion,
+		&project.Premortem,
+		&project.Prioridad,
+		&project.FechaLimite,
+		&project.ProyectoPadreID,
 	)
 
 	if err != nil {
 		log.Printf("[REPO:Proyect.Create] Error en SQL INSERT: %v | user_id=%d", err, req.UserID)
 		return nil, err
 	}
-	return &proyect, nil
+	return &project, nil
 }
 
-func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.ProyectResponse, error) {
+func (r *ProjectRepository) GetAll(ctx context.Context, UserID int) ([]models.ProjectResponse, error) {
 	query := `
 	SELECT 
 		p.id,
@@ -112,9 +112,9 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 	}
 	defer rows.Close()
 
-	var proyects []models.ProyectResponse
+	var projects []models.ProjectResponse
 	for rows.Next() {
-		var p models.ProyectResponse
+		var p models.ProjectResponse
 		err := rows.Scan(
 			&p.ID,
 			&p.Nombre,
@@ -140,16 +140,16 @@ func (r *ProyectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			return nil, err
 		}
 
-		proyects = append(proyects, p)
+		projects = append(projects, p)
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("[REPO:Proyect.GetAll] Error al iterar filas: %v | user_id=%d", err, UserID)
 		return nil, err
 	}
-	return proyects, nil
+	return projects, nil
 }
 
-func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, userID int) ([]models.ProyectResponse, error) {
+func (r *ProjectRepository) GetSubproyectos(ctx context.Context, parentID int, userID int) ([]models.ProjectResponse, error) {
 	query := `
 	SELECT 
 		p.id,
@@ -191,9 +191,9 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 	}
 	defer rows.Close()
 
-	var proyects []models.ProyectResponse
+	var projects []models.ProjectResponse
 	for rows.Next() {
-		var p models.ProyectResponse
+		var p models.ProjectResponse
 		err := rows.Scan(
 			&p.ID,
 			&p.Nombre,
@@ -219,16 +219,16 @@ func (r *ProyectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 			return nil, err
 		}
 
-		proyects = append(proyects, p)
+		projects = append(projects, p)
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("[REPO:Proyect.GetSubproyectos] Error al iterar filas: %v | parent_id=%d user_id=%d", err, parentID, userID)
 		return nil, err
 	}
-	return proyects, nil
+	return projects, nil
 }
 
-func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*models.ProyectResponse, error) {
+func (r *ProjectRepository) Delete(ctx context.Context, id int, user_id int) (*models.ProjectResponse, error) {
 	query := `
 	UPDATE proyectos
 	SET eliminado = true
@@ -249,8 +249,8 @@ func (r *ProyectRepository) Delete(ctx context.Context, id int, user_id int) (*m
 	return nil, nil
 }
 
-func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*models.ProyectResponse, error) {
-	var p models.ProyectResponse
+func (r *ProjectRepository) GetById(ctx context.Context, id int, userID int) (*models.ProjectResponse, error) {
+	var p models.ProjectResponse
 	query := `
 	SELECT 
 		p.id, 
@@ -312,8 +312,8 @@ func (r *ProyectRepository) GetById(ctx context.Context, id int, userID int) (*m
 }
 
 // Update con COALESCE
-func (r *ProyectRepository) Update(ctx context.Context, id int, userID int, req *models.ProyectUpdateRequest) (*models.ProyectUpdateResponse, error) {
-	var p models.ProyectUpdateResponse
+func (r *ProjectRepository) Update(ctx context.Context, id int, userID int, req *models.ProjectUpdateRequest) (*models.ProjectUpdateResponse, error) {
+	var p models.ProjectUpdateResponse
 	var modoFechaTerminado int // 0 = no change, 1 = completado (NOW si null), 2 = reabierto (NULL)
 	if req.Estado != nil {
 		if *req.Estado == "Completado" || *req.Estado == "Terminado" {

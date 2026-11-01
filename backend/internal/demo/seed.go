@@ -39,7 +39,7 @@ func Seed(ctx context.Context, db *pgxpool.Pool, email, password string, now tim
 
 	s := &seeder{
 		ctx:       ctx,
-		proyectos: repository.NewProyectRepository(db),
+		proyectos: repository.NewProjectRepository(db),
 		tareas:    repository.NewTareasRepository(db),
 		notas:     repository.NewNotasProyectoRepository(db),
 		docs:      repository.NewDocumentosProyectoRepository(db),
@@ -72,7 +72,7 @@ type seeder struct {
 	userID    int
 	err       error
 	summary   Summary
-	proyectos *repository.ProyectRepository
+	proyectos *repository.ProjectRepository
 	tareas    *repository.TareasRepository
 	notas     *repository.NotasProyectoRepository
 	docs      *repository.DocumentosProyectoRepository
@@ -91,7 +91,7 @@ func (s *seeder) proyecto(nombre, prioridad string, padre *int) int {
 	if s.err != nil {
 		return 0
 	}
-	p, err := s.proyectos.Create(s.ctx, &models.ProyectRequest{
+	p, err := s.proyectos.Create(s.ctx, &models.ProjectRequest{
 		Nombre: nombre, UserID: s.userID, Prioridad: prioridad, ProyectoPadreID: padre,
 		Descripcion:          "Proyecto de ejemplo.",
 		PorQue:               "Para tener datos con los que probar la app.",
@@ -111,7 +111,7 @@ func (s *seeder) tarea(proyectoID int, nombre, estado, prioridad string, padre *
 		return 0
 	}
 	t, err := s.tareas.Create(s.ctx, &models.TareaRequest{
-		Nombre: nombre, UserID: s.userID, ProyectID: proyectoID,
+		Nombre: nombre, UserID: s.userID, ProjectID: proyectoID,
 		Estado: &estado, Prioridad: &prioridad, TareaPadreID: padre,
 	})
 	s.fail("tarea "+nombre, err)
