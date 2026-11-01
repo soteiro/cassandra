@@ -57,7 +57,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 3. [P1] Los filtros de Tareas vuelven a desbordar a 768 px
 
-- **Archivo:** `frontend/src/app/pages/proyect-details/components/tasks-tab/tasks-tab.html:22`.
+- **Archivo:** `frontend/src/app/features/proyectos/components/tasks-tab/tasks-tab.html:22`.
 - **Controles:** Pendientes, En Curso, Bloqueadas, Abiertas, Completadas y Todas.
 - **Prueba:** a 768 px, la barra tiene 420 px de ancho interior y 493 px de contenido. El área principal presenta 27 px de exceso horizontal y Todas queda parcialmente fuera de pantalla.
 - **Impacto:** el cambio a tablet/escritorio empeora una barra que funciona en móvil. También afecta ventanas estrechas y orientación horizontal alrededor de ese breakpoint.
@@ -67,7 +67,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 4. [P2] Filtros de Proyectos rebasan su tarjeta en 320 px
 
-- **Archivo:** `frontend/src/app/pages/proyectos/proyectos.html:94`.
+- **Archivo:** `frontend/src/app/features/proyectos/pages/proyectos/proyectos.html:94`.
 - **Controles:** Todos, Activos, Terminados y Alta Prioridad, con contadores.
 - **Prueba:** barra de aproximadamente 295 px en una tarjeta de 288 px de ancho exterior. Comienza en x=29 y termina en x=324: invade el padding, sobresale de la tarjeta y genera 4 px de exceso horizontal en el área principal.
 - **Impacto:** el borde de la barra queda recortado y se pierde la alineación. Con los contadores de prueba, los botones permanecen dentro de pantalla; el efecto es menor que en Finanzas.
@@ -87,7 +87,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ## Controles que se ajustaron correctamente
 
-- **Pestañas principales de detalle de proyecto**, `proyect-details.html:19`: usan una columna en móvil y filas que pueden envolver desde `md`.
+- **Pestañas principales de detalle de proyecto**, `project-details.html:19`: usan una columna en móvil y filas que pueden envolver desde `md`.
 - **Filtros de Tareas en 320–412 px**: la cuadrícula de dos columnas evita el desborde. El problema aparece al cambiar a `md:flex`.
 - **Filtros de Notas**, `notes-tab.html:45`: `flex-wrap` distribuye los botones dentro del espacio disponible.
 - **Categorías de Documentos**, `documents-tab.html:62`: los botones saltan de línea.

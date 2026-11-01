@@ -8,7 +8,7 @@ import { of } from 'rxjs';
 import { routes } from '../../../../app.routes';
 import { APIKeyService } from '../../data/api-key.service';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { proyectService } from '../../../../services/proyect.service';
+import { ProjectService } from '../../../proyectos/data/project.service';
 import { APPEARANCE_STORAGE_KEY } from '../../../../shared/models/appearance.model';
 import { MainLayout } from '../../../../core/layout/main-layout/main-layout';
 import { Login } from '../../../auth/pages/login/login';
@@ -33,8 +33,8 @@ describe('Configuración routing', () => {
         provideHttpClientTesting(),
         { provide: AuthService, useValue: { isLoggedIn: loggedIn } },
         { provide: APIKeyService, useValue: { list: listKeys } },
-        { provide: proyectService, useValue: {
-          proyectResource: { value: signal([]), isLoading: signal(false), error: signal(undefined) },
+        { provide: ProjectService, useValue: {
+          projectsResource: { value: signal([]), isLoading: signal(false), error: signal(undefined) },
         } },
       ],
     }).compileComponents();

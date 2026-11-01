@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 import { APIKey, IssuedAPIKey } from '../../data/api-key.model';
 import { APIKeyService } from '../../data/api-key.service';
-import { proyectService } from '../../../../services/proyect.service';
+import { ProjectService } from '../../../proyectos/data/project.service';
 import { ApiKeys } from './api-keys';
 
 const key: APIKey = {
@@ -44,7 +44,7 @@ describe('ApiKeys', () => {
     resource.reload.mockClear();
     await TestBed.configureTestingModule({
       imports: [ApiKeys], providers: [provideRouter([]),
-        { provide: APIKeyService, useValue: api }, { provide: proyectService, useValue: { proyectResource: resource } },
+        { provide: APIKeyService, useValue: api }, { provide: ProjectService, useValue: { projectsResource: resource } },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(ApiKeys);

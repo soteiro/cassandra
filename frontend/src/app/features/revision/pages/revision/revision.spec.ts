@@ -8,10 +8,10 @@ import { of } from 'rxjs';
 import { Revision } from './revision';
 import { RevisionService } from '../../data/revision.service';
 import { TaskService } from '../../../tareas/data/task.service';
-import { proyectService } from '../../../../services/proyect.service';
+import { ProjectService } from '../../../proyectos/data/project.service';
 import { ActividadService } from '../../../actividad/data/actividad.service';
 import { TareaEstancada } from '../../data/revision.model';
-import { ProjectResponse } from '../../../../models/proyect.model';
+import { ProjectResponse } from '../../../proyectos/data/project.model';
 
 function estancada(id: number): TareaEstancada {
   return {
@@ -30,19 +30,19 @@ describe('Revision', () => {
   let fixture: ComponentFixture<Revision>;
   let component: Revision;
   let tasks: { updateTask: ReturnType<typeof vi.fn>; deleteTask: ReturnType<typeof vi.fn> };
-  let proyectos: { proyectResource: { value: ReturnType<typeof signal> }; updateProyect: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
+  let proyectos: { projectsResource: { value: ReturnType<typeof signal> }; updateProject: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
   let revision: { crearRevision: ReturnType<typeof vi.fn> } & Record<string, unknown>;
 
   beforeEach(async () => {
     tasks = { updateTask: vi.fn().mockReturnValue(of({})), deleteTask: vi.fn().mockReturnValue(of(undefined)) };
     proyectos = {
-      proyectResource: {
+      projectsResource: {
         value: signal<ProjectResponse[]>([
           { id: 1, nombre: 'Activo', estado: 'En Proceso', para_que: 'Algo' } as ProjectResponse,
           { id: 2, nombre: 'Pausado', estado: 'Pausado' } as ProjectResponse,
         ]),
       },
-      updateProyect: vi.fn().mockReturnValue(of({})),
+      updateProject: vi.fn().mockReturnValue(of({})),
       reload: vi.fn(),
     };
     revision = {
@@ -60,7 +60,7 @@ describe('Revision', () => {
         provideHttpClientTesting(),
         { provide: RevisionService, useValue: revision },
         { provide: TaskService, useValue: tasks },
-        { provide: proyectService, useValue: proyectos },
+        { provide: ProjectService, useValue: proyectos },
         {
           provide: ActividadService,
           useValue: {
@@ -100,7 +100,7 @@ describe('Revision', () => {
   it('solo revisa proyectos en marcha y puede pausarlos', () => {
     expect(component.proyectosActivos().map((p) => p.id)).toEqual([1]);
     component.decidirProyecto(component.proyectosActivos()[0], 'pausado');
-    expect(proyectos.updateProyect).toHaveBeenCalledWith(1, { estado: 'Pausado' });
+    expect(proyectos.updateProject).toHaveBeenCalledWith(1, { estado: 'Pausado' });
   });
 
   it('guarda la nota con el resumen de la revisión', () => {

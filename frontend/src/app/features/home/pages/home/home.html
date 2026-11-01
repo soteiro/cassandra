@@ -167,7 +167,7 @@
   <app-task-detail-modal
     [isOpen]="!!selectedTask()"
     [task]="selectedTask()"
-    [proyectId]="selectedTask()?.proyect_id || 0"
+    [projectId]="selectedTask()?.proyect_id || 0"
     (closeModal)="selectedTask.set(null)"
     (taskUpdated)="recargarTareas()"
   />

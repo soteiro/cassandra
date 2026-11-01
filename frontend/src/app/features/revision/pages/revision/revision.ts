@@ -5,12 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { RevisionService } from '../../data/revision.service';
 import { TaskService } from '../../../tareas/data/task.service';
-import { proyectService } from '../../../../services/proyect.service';
+import { ProjectService } from '../../../proyectos/data/project.service';
 import { ActividadService } from '../../../actividad/data/actividad.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { SemanaWidget } from '../../../actividad/components/semana-widget/semana-widget';
 import { TareaEstancada } from '../../data/revision.model';
-import { ProjectResponse } from '../../../../models/proyect.model';
+import { ProjectResponse } from '../../../proyectos/data/project.model';
 import { haceCuanto, inicioDeSemana, sumarSemanas } from '../../../../shared/utils/fecha.util';
 import { DIAS_SEMANA, semanaARevisar } from '../../utils/revision.util';
 import { getErrorMessage } from '../../../../shared/utils/http-error.util';
@@ -49,7 +49,7 @@ const ESTADO_POR_DECISION: Partial<Record<DecisionTarea, string>> = {
 export class Revision {
   private readonly revisionService = inject(RevisionService);
   private readonly taskService = inject(TaskService);
-  private readonly proyectService = inject(proyectService);
+  private readonly projectService = inject(ProjectService);
   private readonly actividadService = inject(ActividadService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
@@ -87,7 +87,7 @@ export class Revision {
   );
 
   readonly proyectosActivos = computed(() =>
-    (this.proyectService.proyectResource.value() ?? []).filter((p) => ESTADOS_ACTIVOS.has(p.estado)),
+    (this.projectService.projectsResource.value() ?? []).filter((p) => ESTADOS_ACTIVOS.has(p.estado)),
   );
 
   siguiente(): void {
@@ -156,7 +156,7 @@ export class Revision {
       return;
     }
     this.procesando.set(p.id);
-    this.proyectService.updateProyect(p.id, { estado: 'Pausado' }).subscribe({
+    this.projectService.updateProject(p.id, { estado: 'Pausado' }).subscribe({
       next: () => {
         this.procesando.set(null);
         this.decisionesProyectos.update((d) => ({ ...d, [p.id]: decision }));
@@ -193,7 +193,7 @@ export class Revision {
         this.guardando.set(false);
         this.toast.success('Revisión guardada');
         this.revisiones.reload();
-        this.proyectService.reload();
+        this.projectService.reload();
         this.router.navigate(['/home']);
       },
       error: (err) => {

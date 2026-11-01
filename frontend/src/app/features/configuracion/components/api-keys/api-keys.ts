@@ -8,7 +8,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { APIKey, APIKeyScope, CreateAPIKeyRequest } from '../../data/api-key.model';
 import { APIKeyService } from '../../data/api-key.service';
-import { proyectService } from '../../../../services/proyect.service';
+import { ProjectService } from '../../../proyectos/data/project.service';
 import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 @Component({
@@ -21,7 +21,7 @@ import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 export class ApiKeys {
   private readonly service = inject(APIKeyService);
   private readonly destroyRef = inject(DestroyRef);
-  protected readonly projectsResource = inject(proyectService).proyectResource;
+  protected readonly projectsResource = inject(ProjectService).projectsResource;
   protected readonly projects = computed(() => this.projectsResource.error() ? [] : this.projectsResource.value() ?? []);
   protected readonly keys = signal<APIKey[]>([]);
   protected readonly loading = signal(false);

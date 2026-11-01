@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { APP_PLATFORM } from '../platform/app-platform';
 import { normalizeServerUrl, SERVER_STORAGE_KEY, ServerConfigService } from './server-config.service';
-import { proyectService } from '../../services/proyect.service';
+import { ProjectService } from '../../features/proyectos/data/project.service';
 import { AuthService } from '../auth/auth.service';
 
 describe('normalizeServerUrl', () => {
@@ -126,7 +126,7 @@ describe('ServerConfigService', () => {
     it('should send requests to the configured server', () => {
       localStorage.setItem(SERVER_STORAGE_KEY, 'https://cassandra.midominio.com');
       setup(true);
-      TestBed.inject(proyectService).deleteProyect(3).subscribe();
+      TestBed.inject(ProjectService).deleteProject(3).subscribe();
       http.expectOne('https://cassandra.midominio.com/api/proyects/3').flush(null);
     });
 

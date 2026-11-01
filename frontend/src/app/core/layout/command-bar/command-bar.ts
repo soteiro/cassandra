@@ -2,7 +2,7 @@ import { Component, ElementRef, computed, effect, inject, signal, viewChild } fr
 import { Router } from '@angular/router';
 import { LucideFolder, LucideSearch } from '@lucide/angular';
 import { CommandBarService } from './command-bar.service';
-import { ProjectSearchService } from './project-search.service';
+import { ProjectSearchService } from '../../../features/proyectos/data/project-search.service';
 import { BackButtonService } from '../../platform/back-button.service';
 
 @Component({
