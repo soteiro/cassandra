@@ -1,4 +1,4 @@
-import { TaskPrioridad } from '../models/task.model';
+import { TaskPrioridad } from '../data/task.model';
 
 export type TaskStatus = 'Abierto' | 'En Curso' | 'Terminado' | 'Bloqueado';
 

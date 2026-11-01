@@ -6,9 +6,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of, Subject, throwError } from 'rxjs';
 
 import { Home } from './home';
-import { TaskService } from '../../../../services/task.service';
+import { TaskService } from '../../../tareas/data/task.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { Task } from '../../../../models/task.model';
+import { Task } from '../../../tareas/data/task.model';
 
 function task(over: Partial<Task>): Task {
   return {

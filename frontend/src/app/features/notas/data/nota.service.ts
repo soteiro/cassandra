@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { AuthService } from '../core/auth/auth.service';
-import { NotaProyecto, NotaProyectoRequest, NotaProyectoUpdateRequest } from '../models/nota.model';
+import { AuthService } from '../../../core/auth/auth.service';
+import { NotaProyecto, NotaProyectoRequest, NotaProyectoUpdateRequest } from './nota.model';
 import { Observable } from 'rxjs';
-import { ServerConfigService } from '../core/server/server-config.service';
+import { ServerConfigService } from '../../../core/server/server-config.service';
 
 @Injectable({
   providedIn: 'root'

@@ -4,10 +4,10 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { NotesTab } from './notes-tab';
-import { NotaProyecto } from '../../../../models/nota.model';
-import { Task } from '../../../../models/task.model';
-import { NotaService } from '../../../../services/nota.service';
-import { TaskService } from '../../../../services/task.service';
+import { NotaProyecto } from '../../../../features/notas/data/nota.model';
+import { Task } from '../../../../features/tareas/data/task.model';
+import { NotaService } from '../../../../features/notas/data/nota.service';
+import { TaskService } from '../../../../features/tareas/data/task.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 const makeTask = (overrides: Partial<Task> = {}): Task => ({

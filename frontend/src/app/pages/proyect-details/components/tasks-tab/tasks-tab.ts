@@ -1,11 +1,11 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaskService } from '../../../../services/task.service';
+import { TaskService } from '../../../../features/tareas/data/task.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { Task, TaskPrioridad } from '../../../../models/task.model';
+import { Task, TaskPrioridad } from '../../../../features/tareas/data/task.model';
 import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
-import { TaskDetailModal } from '../../../../components/task-detail-modal/task-detail-modal';
+import { TaskDetailModal } from '../../../../features/tareas/components/task-detail-modal/task-detail-modal';
 import {
   LucideChevronDown,
   LucideChevronRight,
@@ -17,9 +17,9 @@ import {
   LucideCornerDownRight,
   LucideMessageCircleMore,
 } from '@lucide/angular';
-import { TaskStatusSelect } from '../../../../components/task-status-select/task-status-select';
-import { TaskPrioritySelect } from '../../../../components/task-priority-select/task-priority-select';
-import { getTaskPriorityBorderClass } from '../../../../utils/task-styles.util';
+import { TaskStatusSelect } from '../../../../features/tareas/components/task-status-select/task-status-select';
+import { TaskPrioritySelect } from '../../../../features/tareas/components/task-priority-select/task-priority-select';
+import { getTaskPriorityBorderClass } from '../../../../features/tareas/utils/task-styles.util';
 
 @Component({
   selector: 'app-tasks-tab',

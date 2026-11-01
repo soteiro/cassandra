@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 
 import { Revision } from './revision';
 import { RevisionService } from '../../data/revision.service';
-import { TaskService } from '../../../../services/task.service';
+import { TaskService } from '../../../tareas/data/task.service';
 import { proyectService } from '../../../../services/proyect.service';
 import { ActividadService } from '../../../actividad/data/actividad.service';
 import { TareaEstancada } from '../../data/revision.model';

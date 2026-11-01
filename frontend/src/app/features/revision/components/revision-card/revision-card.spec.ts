@@ -4,7 +4,8 @@ import { provideRouter } from '@angular/router';
 
 import { RevisionCard } from './revision-card';
 import { RevisionService } from '../../data/revision.service';
-import { Preferencias, Revision } from '../../data/revision.model';
+import { Revision } from '../../data/revision.model';
+import { Preferencias } from '../../../../shared/models/preferencias.model';
 
 describe('RevisionCard', () => {
   let fixture: ComponentFixture<RevisionCard>;

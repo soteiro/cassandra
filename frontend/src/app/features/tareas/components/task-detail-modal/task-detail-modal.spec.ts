@@ -4,11 +4,11 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { TaskDetailModal } from './task-detail-modal';
-import { Task } from '../../models/task.model';
-import { NotaProyecto } from '../../models/nota.model';
-import { TaskService } from '../../services/task.service';
-import { NotaService } from '../../services/nota.service';
-import { ToastService } from '../../shared/services/toast.service';
+import { Task } from '../../data/task.model';
+import { NotaProyecto } from '../../../notas/data/nota.model';
+import { TaskService } from '../../data/task.service';
+import { NotaService } from '../../../notas/data/nota.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 const makeTask = (overrides: Partial<Task> = {}): Task => ({
   id: 1,
