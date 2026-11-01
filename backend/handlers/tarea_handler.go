@@ -52,7 +52,7 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "El nombre de la tarea no puede estar vacío", http.StatusBadRequest)
 		return
 	}
-	if req.ProyectID == 0 {
+	if req.ProjectID == 0 {
 		log.Printf("[HANDLER:Tareas.CreateTarea] Validación fallida: proyect_id es obligatorio | user_id=%d", userID)
 		http.Error(w, "El ID del proyecto (proyect_id) es obligatorio", http.StatusBadRequest)
 		return
@@ -80,20 +80,20 @@ func (h *TareasHandler) CreateTarea(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.UserID = userID
-	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: req.ProyectID}, repository.Ref{Recurso: repository.Tarea, ID: idOf(req.TareaPadreID)}) {
+	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: req.ProjectID}, repository.Ref{Recurso: repository.Tarea, ID: idOf(req.TareaPadreID)}) {
 		return
 	}
 
 	tarea, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
-		log.Printf("[HANDLER:Tareas.CreateTarea] Error en repositorio: %v | user_id=%d proyect_id=%d", err, userID, req.ProyectID)
+		log.Printf("[HANDLER:Tareas.CreateTarea] Error en repositorio: %v | user_id=%d proyect_id=%d", err, userID, req.ProjectID)
 		dbError(w, "error al crear la tarea", err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	log.Printf("[HANDLER:Tareas.CreateTarea] Éxito: tarea creada | id=%d user_id=%d proyect_id=%d", tarea.ID, userID, req.ProyectID)
+	log.Printf("[HANDLER:Tareas.CreateTarea] Éxito: tarea creada | id=%d user_id=%d proyect_id=%d", tarea.ID, userID, req.ProjectID)
 	json.NewEncoder(w).Encode(tarea)
 }
 
@@ -257,9 +257,9 @@ func (h *TareasHandler) DeleteTarea(w http.ResponseWriter, r *http.Request) {
 
 // GetTareasByProyecto obtiene todas las tareas pertenecientes a un proyecto específico del usuario
 func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Request) {
-	proyectIDStr := chi.URLParam(r, "proyect_id")
-	if proyectIDStr == "" {
-		proyectIDStr = chi.URLParam(r, "proyecto_id")
+	projectIDStr := chi.URLParam(r, "proyect_id")
+	if projectIDStr == "" {
+		projectIDStr = chi.URLParam(r, "proyecto_id")
 	}
 
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
@@ -269,16 +269,16 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	proyectID, err := atoi32(proyectIDStr)
-	if err != nil || proyectID <= 0 {
-		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] ID de proyecto inválido: %s", proyectIDStr)
+	projectID, err := atoi32(projectIDStr)
+	if err != nil || projectID <= 0 {
+		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] ID de proyecto inválido: %s", projectIDStr)
 		http.Error(w, "ID de proyecto inválido", http.StatusBadRequest)
 		return
 	}
 
-	tareas, err := h.repo.GetByProyectoID(r.Context(), proyectID, userID)
+	tareas, err := h.repo.GetByProyectoID(r.Context(), projectID, userID)
 	if err != nil {
-		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
+		log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, projectID, userID)
 		dbError(w, "Error al obtener tareas del proyecto", err)
 		return
 	}
@@ -288,7 +288,7 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Éxito: %d tareas obtenidas | proyecto_id=%d user_id=%d", len(tareas), proyectID, userID)
+	log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Éxito: %d tareas obtenidas | proyecto_id=%d user_id=%d", len(tareas), projectID, userID)
 	json.NewEncoder(w).Encode(tareas)
 }
 

@@ -40,9 +40,9 @@ func (h *LogsHandler) CreateLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Si proyect_id viene en la URL, sobrescribir o asignar
-	proyectIDStr := chi.URLParam(r, "proyect_id")
-	if proyectIDStr != "" {
-		pID, err := atoi32(proyectIDStr)
+	projectIDStr := chi.URLParam(r, "proyect_id")
+	if projectIDStr != "" {
+		pID, err := atoi32(projectIDStr)
 		if err == nil && pID > 0 {
 			req.ProyectoID = pID
 		}
@@ -88,10 +88,10 @@ func (h *LogsHandler) GetLogsByProyecto(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	proyectIDStr := chi.URLParam(r, "proyect_id")
-	proyectID, err := atoi32(proyectIDStr)
-	if err != nil || proyectID <= 0 {
-		log.Printf("[HANDLER:Logs.GetLogsByProyecto] ID de proyecto inválido: %s", proyectIDStr)
+	projectIDStr := chi.URLParam(r, "proyect_id")
+	projectID, err := atoi32(projectIDStr)
+	if err != nil || projectID <= 0 {
+		log.Printf("[HANDLER:Logs.GetLogsByProyecto] ID de proyecto inválido: %s", projectIDStr)
 		http.Error(w, "proyect_id invalido", http.StatusBadRequest)
 		return
 	}
@@ -116,15 +116,15 @@ func (h *LogsHandler) GetLogsByProyecto(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Búsqueda demasiado larga", http.StatusBadRequest)
 		return
 	}
-	logsList, err := h.repo.SearchByProyectoID(r.Context(), userID, proyectID, search, limit, offset)
+	logsList, err := h.repo.SearchByProyectoID(r.Context(), userID, projectID, search, limit, offset)
 	if err != nil {
-		log.Printf("[HANDLER:Logs.GetLogsByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, proyectID, userID)
+		log.Printf("[HANDLER:Logs.GetLogsByProyecto] Error en repositorio: %v | proyecto_id=%d user_id=%d", err, projectID, userID)
 		dbError(w, "error al obtener logs", err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	log.Printf("[HANDLER:Logs.GetLogsByProyecto] Éxito: %d logs obtenidos | proyecto_id=%d user_id=%d", len(logsList), proyectID, userID)
+	log.Printf("[HANDLER:Logs.GetLogsByProyecto] Éxito: %d logs obtenidos | proyecto_id=%d user_id=%d", len(logsList), projectID, userID)
 	json.NewEncoder(w).Encode(logsList)
 }
 

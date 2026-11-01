@@ -13,19 +13,19 @@ import (
 	"cassandra/repository"
 )
 
-type ProyectHandler struct {
-	repo *repository.ProyectRepository
+type ProjectHandler struct {
+	repo *repository.ProjectRepository
 	owner *repository.Ownership
 }
 
 // constructor para inyectar el repo
-func NewProyectHandler(repo *repository.ProyectRepository, owner *repository.Ownership) *ProyectHandler {
-	return &ProyectHandler{repo: repo, owner: owner}
+func NewProjectHandler(repo *repository.ProjectRepository, owner *repository.Ownership) *ProjectHandler {
+	return &ProjectHandler{repo: repo, owner: owner}
 }
 
 // crear proyecto
-func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
-	var req models.ProyectRequest
+func (h *ProjectHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
+	var req models.ProjectRequest
 
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
@@ -80,7 +80,7 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proyect, err := h.repo.Create(r.Context(), &req)
+	project, err := h.repo.Create(r.Context(), &req)
 	if err != nil {
 		if isUniqueViolation(err) {
 			http.Error(w, "Ya tienes un proyecto con ese nombre", http.StatusConflict)
@@ -94,12 +94,12 @@ func (h *ProyectHandler) CreateProyect(w http.ResponseWriter, r *http.Request) {
 	// responder
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	log.Printf("[HANDLER:Proyect.CreateProyect] Éxito: proyecto creado | id=%d user_id=%d nombre=%q", proyect.ID, userID, proyect.Nombre)
-	json.NewEncoder(w).Encode(&proyect)
+	log.Printf("[HANDLER:Proyect.CreateProyect] Éxito: proyecto creado | id=%d user_id=%d nombre=%q", project.ID, userID, project.Nombre)
+	json.NewEncoder(w).Encode(&project)
 }
 
 // listat con getall
-func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
+func (h *ProjectHandler) ListProject(w http.ResponseWriter, r *http.Request) {
 	// verificar que el usuario sea dueño de sus datos
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
@@ -108,22 +108,22 @@ func (h *ProyectHandler) ListProyect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proyect, err := h.repo.GetAll(r.Context(), userID)
+	project, err := h.repo.GetAll(r.Context(), userID)
 	if err != nil {
 		log.Printf("[HANDLER:Proyect.ListProyect] Error en repositorio: %v | user_id=%d", err, userID)
 		dbError(w, "error al listar usuario", err)
 		return
 	}
-	if proyect == nil {
-		proyect = []models.ProyectResponse{}
+	if project == nil {
+		project = []models.ProjectResponse{}
 	}
 	w.Header().Set("Content-type", "application/json")
-	log.Printf("[HANDLER:Proyect.ListProyect] Éxito: %d proyectos obtenidos | user_id=%d", len(proyect), userID)
-	json.NewEncoder(w).Encode(&proyect)
+	log.Printf("[HANDLER:Proyect.ListProyect] Éxito: %d proyectos obtenidos | user_id=%d", len(project), userID)
+	json.NewEncoder(w).Encode(&project)
 }
 
 // eliminar proyecto por id, soft
-func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
+func (h *ProjectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
@@ -152,24 +152,24 @@ func (h *ProyectHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
-	proyectID := chi.URLParam(r, "id")
+func (h *ProjectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	projectID := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		log.Printf("[HANDLER:Proyect.GetByID] Acceso no autorizado")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	strProyectID, err := atoi32(proyectID)
-	if err != nil || strProyectID <= 0 {
-		log.Printf("[HANDLER:Proyect.GetByID] ID inválido: %s | user_id=%d", proyectID, userID)
+	strProjectID, err := atoi32(projectID)
+	if err != nil || strProjectID <= 0 {
+		log.Printf("[HANDLER:Proyect.GetByID] ID inválido: %s | user_id=%d", projectID, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
 		return
 	}
 
-	res, err := h.repo.GetById(r.Context(), strProyectID, userID)
+	res, err := h.repo.GetById(r.Context(), strProjectID, userID)
 	if err != nil {
-		log.Printf("[HANDLER:Proyect.GetByID] Error o no encontrado: %v | id=%d user_id=%d", err, strProyectID, userID)
+		log.Printf("[HANDLER:Proyect.GetByID] Error o no encontrado: %v | id=%d user_id=%d", err, strProjectID, userID)
 		dbError(w, "Error al obtener el proyecto", err)
 		return
 	}
@@ -180,57 +180,57 @@ func (h *ProyectHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 }
 
 // listar subproyectos de un proyecto padre
-func (h *ProyectHandler) GetSubproyectos(w http.ResponseWriter, r *http.Request) {
-	proyectID := chi.URLParam(r, "id")
+func (h *ProjectHandler) GetSubproyectos(w http.ResponseWriter, r *http.Request) {
+	projectID := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		log.Printf("[HANDLER:Proyect.GetSubproyectos] Acceso no autorizado")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	strProyectID, err := atoi32(proyectID)
-	if err != nil || strProyectID <= 0 {
-		log.Printf("[HANDLER:Proyect.GetSubproyectos] ID inválido: %s | user_id=%d", proyectID, userID)
+	strProjectID, err := atoi32(projectID)
+	if err != nil || strProjectID <= 0 {
+		log.Printf("[HANDLER:Proyect.GetSubproyectos] ID inválido: %s | user_id=%d", projectID, userID)
 		http.Error(w, "ID invalido", http.StatusBadRequest)
 		return
 	}
 
-	subproyectos, err := h.repo.GetSubproyectos(r.Context(), strProyectID, userID)
+	subproyectos, err := h.repo.GetSubproyectos(r.Context(), strProjectID, userID)
 	if err != nil {
-		log.Printf("[HANDLER:Proyect.GetSubproyectos] Error en repositorio: %v | parent_id=%d user_id=%d", err, strProyectID, userID)
+		log.Printf("[HANDLER:Proyect.GetSubproyectos] Error en repositorio: %v | parent_id=%d user_id=%d", err, strProjectID, userID)
 		dbError(w, "error al obtener subproyectos", err)
 		return
 	}
 	if subproyectos == nil {
-		subproyectos = []models.ProyectResponse{}
+		subproyectos = []models.ProjectResponse{}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	log.Printf("[HANDLER:Proyect.GetSubproyectos] Éxito: %d subproyectos obtenidos | parent_id=%d user_id=%d", len(subproyectos), strProyectID, userID)
+	log.Printf("[HANDLER:Proyect.GetSubproyectos] Éxito: %d subproyectos obtenidos | parent_id=%d user_id=%d", len(subproyectos), strProjectID, userID)
 	json.NewEncoder(w).Encode(subproyectos)
 }
 
 // update
-func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
-	proyectID := chi.URLParam(r, "id")
+func (h *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
+	projectID := chi.URLParam(r, "id")
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		log.Printf("[HANDLER:Proyect.Update] Acceso no autorizado")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	strProyectId, err := atoi32(proyectID)
-	if err != nil || strProyectId <= 0 {
-		log.Printf("[HANDLER:Proyect.Update] ID inválido: %s | user_id=%d", proyectID, userID)
+	strProjectId, err := atoi32(projectID)
+	if err != nil || strProjectId <= 0 {
+		log.Printf("[HANDLER:Proyect.Update] ID inválido: %s | user_id=%d", projectID, userID)
 		http.Error(w, "ID de proyecto invalido", http.StatusBadRequest)
 		return
 	}
 
 	// decodificar el json
-	var req models.ProyectUpdateRequest
+	var req models.ProjectUpdateRequest
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		log.Printf("[HANDLER:Proyect.Update] JSON inválido: %v | id=%d user_id=%d", err, strProyectId, userID)
+		log.Printf("[HANDLER:Proyect.Update] JSON inválido: %v | id=%d user_id=%d", err, strProjectId, userID)
 		http.Error(w, "json invalido", http.StatusBadRequest)
 		return
 	}
@@ -239,7 +239,7 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if req.Nombre != nil {
 		*req.Nombre = strings.TrimSpace(*req.Nombre)
 		if *req.Nombre == "" {
-			log.Printf("[HANDLER:Proyect.Update] Validación fallida: nombre vacío tras trim | id=%d user_id=%d", strProyectId, userID)
+			log.Printf("[HANDLER:Proyect.Update] Validación fallida: nombre vacío tras trim | id=%d user_id=%d", strProjectId, userID)
 			http.Error(w, "El nombre no puede quedar vacío tras eliminar espacios", http.StatusBadRequest)
 			return
 		}
@@ -270,19 +270,19 @@ func (h *ProyectHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proyect, err := h.repo.Update(r.Context(), strProyectId, userID, &req)
+	project, err := h.repo.Update(r.Context(), strProjectId, userID, &req)
 	if err != nil {
 		if isUniqueViolation(err) {
 			http.Error(w, "Ya tienes un proyecto con ese nombre", http.StatusConflict)
 			return
 		}
-		log.Printf("[HANDLER:Proyect.Update] Error en repositorio: %v | id=%d user_id=%d", err, strProyectId, userID)
+		log.Printf("[HANDLER:Proyect.Update] Error en repositorio: %v | id=%d user_id=%d", err, strProjectId, userID)
 		dbError(w, "error al modificar el proyecto", err)
 		return
 	}
 
 	// responder
 	w.Header().Set("Content-Type", "application/json")
-	log.Printf("[HANDLER:Proyect.Update] Éxito: proyecto actualizado | id=%d user_id=%d", proyect.ID, userID)
-	json.NewEncoder(w).Encode(proyect)
+	log.Printf("[HANDLER:Proyect.Update] Éxito: proyecto actualizado | id=%d user_id=%d", project.ID, userID)
+	json.NewEncoder(w).Encode(project)
 }
