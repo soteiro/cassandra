@@ -149,10 +149,12 @@ TickTick no pasa por las herramientas ni las claves del MCP.
 - `backend/config/` y documentación de autoalojamiento: aplicación OAuth,
   callback exacto por entorno y clave de cifrado. No reutilizar automáticamente
   el token de Aurora ni alterar su configuración.
-- `frontend/src/app/services/` y `models/`: contrato propio de tareas externas;
+- `frontend/src/app/features/ticktick/data/`: contrato propio de tareas externas;
   conservar IDs y prioridades del proveedor sin confundirlos con tareas locales.
-- `frontend/src/app/pages/home/`: componente TickTick con recurso independiente.
-  `frontend/src/app/pages/configuracion/`: entrada y pantalla de conexión.
+- `frontend/src/app/features/ticktick/components/ticktick-widget/`: componente
+  TickTick de home con recurso independiente.
+  `frontend/src/app/features/ticktick/pages/ticktick-page/`: pantalla de conexión;
+  la entrada está en `frontend/src/app/features/configuracion/`.
 
 Rutas implementadas:
 
