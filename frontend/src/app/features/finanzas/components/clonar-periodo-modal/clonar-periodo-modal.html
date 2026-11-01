@@ -1,0 +1,95 @@
+@if (showCloneModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
+    <div class="bg-surface border border-surface-border rounded-2xl w-full max-w-md overflow-hidden shadow-2xl space-y-4">
+      <div class="flex items-center justify-between p-5 border-b border-surface-border">
+        <h3 class="text-base font-bold text-text-main flex items-center gap-2">
+          <svg lucideCopy class="w-5 h-5 text-accent" />
+          <span>Clonar Período</span>
+        </h3>
+        <button
+          type="button"
+          (click)="closeCloneModal()"
+          class="text-text-muted hover:text-text-main p-1 rounded-lg transition-colors cursor-pointer"
+        >
+          <svg lucideX class="w-5 h-5" />
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <p class="text-text-muted">
+          Esto duplicará todos los movimientos del mes de origen hacia el mes de destino, reseteando su estado a <strong>pendiente</strong>.
+        </p>
+
+        <!-- ORIGEN -->
+        <div class="p-3 bg-background rounded-xl border border-surface-border space-y-2">
+          <span class="font-bold text-text-muted uppercase text-[10px]">Período de Origen</span>
+          <div class="grid grid-cols-2 gap-2">
+            <select
+              [ngModel]="cloneMesOrigen()"
+              (ngModelChange)="cloneMesOrigen.set($event)"
+              class="bg-surface border border-surface-border text-text-main rounded-lg p-2 outline-none"
+            >
+              @for (m of meses(); track $index) {
+                <option [ngValue]="$index + 1">{{ m }}</option>
+              }
+            </select>
+            <select
+              [ngModel]="cloneAnioOrigen()"
+              (ngModelChange)="cloneAnioOrigen.set($event)"
+              class="bg-surface border border-surface-border text-text-main rounded-lg p-2 outline-none"
+            >
+              @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
+                <option [ngValue]="a">{{ a }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- DESTINO -->
+        <div class="p-3 bg-background rounded-xl border border-surface-border space-y-2">
+          <span class="font-bold text-accent uppercase text-[10px]">Período de Destino</span>
+          <div class="grid grid-cols-2 gap-2">
+            <select
+              [ngModel]="cloneMesDestino()"
+              (ngModelChange)="cloneMesDestino.set($event)"
+              class="bg-surface border border-accent/40 text-text-main rounded-lg p-2 outline-none"
+            >
+              @for (m of meses(); track $index) {
+                <option [ngValue]="$index + 1">{{ m }}</option>
+              }
+            </select>
+            <select
+              [ngModel]="cloneAnioDestino()"
+              (ngModelChange)="cloneAnioDestino.set($event)"
+              class="bg-surface border border-accent/40 text-text-main rounded-lg p-2 outline-none"
+            >
+              @for (a of [2024, 2025, 2026, 2027, 2028]; track a) {
+                <option [ngValue]="a">{{ a }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-surface-border">
+          <button
+            type="button"
+            (click)="closeCloneModal()"
+            class="px-4 py-2 rounded-xl text-text-muted hover:text-text-main border border-surface-border transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="submitClone()"
+            [disabled]="isSubmittingClone()"
+            class="bg-accent hover:bg-accent/90 text-on-accent px-5 py-2 rounded-xl font-medium transition-all disabled:opacity-40 cursor-pointer flex items-center gap-1.5"
+          >
+            <svg lucideCopy class="w-4 h-4" />
+            <span>{{ isSubmittingClone() ? 'Clonando...' : 'Clonar Período' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,11 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
-import { PresupuestoTab, FinanzasGroup } from './presupuesto-tab';
+import { PresupuestoTab } from './presupuesto-tab';
 import { FinanzasService } from '../../data/finanzas.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { FinanzasPlantillaItem } from '../../data/finanzas.model';
+import { FinanzasGroup } from '../../utils/presupuesto.util';
+import { MovimientoFormModal } from '../movimiento-form-modal/movimiento-form-modal';
+import { ClonarPeriodoModal } from '../clonar-periodo-modal/clonar-periodo-modal';
+import { MovimientoQuickAdd } from '../movimiento-quick-add/movimiento-quick-add';
 
 function item(partial: Partial<FinanzasPlantillaItem>): FinanzasPlantillaItem {
   return {
@@ -25,11 +30,46 @@ function item(partial: Partial<FinanzasPlantillaItem>): FinanzasPlantillaItem {
 
 function buildItems(): FinanzasPlantillaItem[] {
   return [
-    item({ id: 1, tipo: 'ingreso', nombre: 'Sueldo', monto: 2000, estado: 'completado', banco_id: 1, banco_nombre: 'BCI' }),
+    item({
+      id: 1,
+      tipo: 'ingreso',
+      nombre: 'Sueldo',
+      monto: 2000,
+      estado: 'completado',
+      banco_id: 1,
+      banco_nombre: 'BCI',
+    }),
     item({ id: 2, tipo: 'ingreso', nombre: 'Freelance', monto: 500, estado: 'pendiente' }),
-    item({ id: 10, nombre: 'Arriendo', monto: 600, estado: 'completado', grupo_item_id: 100, grupo_item_nombre: 'Casa', banco_id: 1, banco_nombre: 'BCI', movimiento_esperado_id: 7, movimiento_esperado_nombre: 'PAC' }),
-    item({ id: 11, nombre: 'Luz', monto: 100, estado: 'en proceso', grupo_item_id: 100, grupo_item_nombre: 'Casa' }),
-    item({ id: 12, nombre: 'Supermercado', monto: 300, estado: 'pendiente', grupo_item_id: 200, grupo_item_nombre: 'Comida', banco_id: 2, banco_nombre: 'Santander' }),
+    item({
+      id: 10,
+      nombre: 'Arriendo',
+      monto: 600,
+      estado: 'completado',
+      grupo_item_id: 100,
+      grupo_item_nombre: 'Casa',
+      banco_id: 1,
+      banco_nombre: 'BCI',
+      movimiento_esperado_id: 7,
+      movimiento_esperado_nombre: 'PAC',
+    }),
+    item({
+      id: 11,
+      nombre: 'Luz',
+      monto: 100,
+      estado: 'en proceso',
+      grupo_item_id: 100,
+      grupo_item_nombre: 'Casa',
+    }),
+    item({
+      id: 12,
+      nombre: 'Supermercado',
+      monto: 300,
+      estado: 'pendiente',
+      grupo_item_id: 200,
+      grupo_item_nombre: 'Comida',
+      banco_id: 2,
+      banco_nombre: 'Santander',
+    }),
     item({ id: 13, nombre: 'Café', monto: 50, estado: 'pendiente' }),
   ];
 }
@@ -37,6 +77,7 @@ function buildItems(): FinanzasPlantillaItem[] {
 describe('PresupuestoTab', () => {
   let component: PresupuestoTab;
   let fixture: ComponentFixture<PresupuestoTab>;
+  let el: HTMLElement;
   let finanzas: Record<string, ReturnType<typeof vi.fn>>;
   let toast: ToastService;
   let reloadSpy: import('vitest').Mock<() => void>;
@@ -45,6 +86,8 @@ describe('PresupuestoTab', () => {
 
   /** Versión actual del ítem en la copia local del componente. */
   const local = (id: number) => component.localItems().find((i) => i.id === id)!;
+  const child = <T>(type: new (...args: never[]) => T): T =>
+    fixture.debugElement.query(By.directive(type)).componentInstance as T;
 
   beforeEach(async () => {
     finanzas = {
@@ -65,6 +108,7 @@ describe('PresupuestoTab', () => {
 
     fixture = TestBed.createComponent(PresupuestoTab);
     component = fixture.componentInstance;
+    el = fixture.nativeElement;
     items = buildItems();
     fixture.componentRef.setInput('selectedAnio', 2026);
     fixture.componentRef.setInput('selectedMes', 5);
@@ -92,129 +136,38 @@ describe('PresupuestoTab', () => {
   });
 
   // ==========================================
-  describe('filters', () => {
+  describe('filters and grouping', () => {
     it('should split items by tipo', () => {
       expect(component.ingresos().map((i) => i.id)).toEqual([1, 2]);
       expect(component.egresos().map((i) => i.id)).toEqual([10, 11, 12, 13]);
     });
 
-    it('should filter egresos by search across nombre, banco, categoría and mecanismo', async () => {
-      fixture.componentRef.setInput('searchQuery', '  CASA ');
-      expect(component.egresos().map((i) => i.id)).toEqual([10, 11]);
-      fixture.componentRef.setInput('searchQuery', 'santander');
-      expect(component.egresos().map((i) => i.id)).toEqual([12]);
-      fixture.componentRef.setInput('searchQuery', 'pac');
-      expect(component.egresos().map((i) => i.id)).toEqual([10]);
-      fixture.componentRef.setInput('searchQuery', 'café');
-      expect(component.egresos().map((i) => i.id)).toEqual([13]);
-    });
-
-    it('should filter ingresos by nombre and banco only', () => {
-      fixture.componentRef.setInput('searchQuery', 'bci');
-      expect(component.ingresos().map((i) => i.id)).toEqual([1]);
-      fixture.componentRef.setInput('searchQuery', 'free');
-      expect(component.ingresos().map((i) => i.id)).toEqual([2]);
-    });
-
-    it('should filter by status', () => {
-      component.statusFilter.set('pendientes');
-      expect(component.egresos().map((i) => i.id)).toEqual([12, 13]);
-      expect(component.ingresos().map((i) => i.id)).toEqual([2]);
-      component.statusFilter.set('en_proceso');
-      expect(component.egresos().map((i) => i.id)).toEqual([11]);
-      component.statusFilter.set('completados');
-      expect(component.egresos().map((i) => i.id)).toEqual([10]);
-      expect(component.ingresos().map((i) => i.id)).toEqual([1]);
-    });
-
-    it('should combine search and status', () => {
+    it('should apply the search input and the status filter', () => {
       fixture.componentRef.setInput('searchQuery', 'casa');
+      expect(component.egresos().map((i) => i.id)).toEqual([10, 11]);
       component.statusFilter.set('completados');
       expect(component.egresos().map((i) => i.id)).toEqual([10]);
     });
-  });
 
-  // ==========================================
-  describe('grouping and totals', () => {
-    it('should group by categoría by default, sorted by total desc', () => {
-      const groups = component.groupedEgresos();
-      expect(groups.map((g) => g.key)).toEqual(['cat_100', 'cat_200', 'sin_categoria']);
-      const casa = groups[0];
-      expect(casa.title).toBe('Casa');
-      expect(casa.total).toBe(700);
-      expect(casa.totalCompletado).toBe(600);
-      expect(casa.totalEnProceso).toBe(100);
-      expect(casa.totalPendiente).toBe(0);
-      expect(casa.porcentajeCompletado).toBe(86);
-      expect(groups[2].title).toBe('Sin categoría');
-      expect(groups[2].total).toBe(50);
-      expect(groups[2].porcentajeCompletado).toBe(0);
+    it('the quick-add status buttons should drive the filter', async () => {
+      child(MovimientoQuickAdd).statusFilter.set('pendientes');
+      await fixture.whenStable();
+      expect(component.statusFilter()).toBe('pendientes');
+      expect(component.egresos().map((i) => i.id)).toEqual([12, 13]);
     });
 
-    it('should group by banco', () => {
+    it('should group by the selected mode', () => {
+      expect(component.groupedEgresos().map((g) => g.key)).toEqual([
+        'cat_100',
+        'cat_200',
+        'sin_categoria',
+      ]);
       component.groupMode.set('banco');
-      const groups = component.groupedEgresos();
-      expect(groups.map((g) => [g.key, g.title, g.total])).toEqual([
-        ['banco_1', 'BCI', 600],
-        ['banco_2', 'Santander', 300],
-        ['sin_banco', 'Sin cuenta / banco', 150],
+      expect(component.groupedEgresos().map((g) => g.key)).toEqual([
+        'banco_1',
+        'banco_2',
+        'sin_banco',
       ]);
-    });
-
-    it('should group by mecanismo', () => {
-      component.groupMode.set('mecanismo');
-      const groups = component.groupedEgresos();
-      expect(groups.map((g) => [g.key, g.title, g.total])).toEqual([
-        ['mec_7', 'PAC', 600],
-        ['sin_mecanismo', 'Sin mecanismo', 450],
-      ]);
-    });
-
-    it('should group by estado', () => {
-      component.groupMode.set('estado');
-      const groups = component.groupedEgresos();
-      expect(groups.map((g) => [g.key, g.title, g.total])).toEqual([
-        ['estado_completado', 'Completados', 600],
-        ['estado_pendiente', 'Pendientes', 350],
-        ['estado_en proceso', 'En Proceso', 100],
-      ]);
-    });
-
-    it('should return a single group in "ninguno" mode with aggregate totals', () => {
-      component.groupMode.set('ninguno');
-      const [g] = component.groupedEgresos();
-      expect(g.key).toBe('todos');
-      expect(g.title).toBe('Todos los gastos');
-      expect(g.items.length).toBe(4);
-      expect(g.total).toBe(1050);
-      expect(g.totalCompletado).toBe(600);
-      expect(g.totalEnProceso).toBe(100);
-      expect(g.totalPendiente).toBe(350);
-      expect(g.porcentajeCompletado).toBe(57);
-
-      const [gi] = component.groupedIngresos();
-      expect(gi.title).toBe('Todos los ingresos');
-      expect(gi.total).toBe(2500);
-      expect(gi.porcentajeCompletado).toBe(80);
-    });
-
-    it('should report 0% when the group total is 0', () => {
-      fixture.componentRef.setInput('items', []);
-      component.groupMode.set('ninguno');
-      const [g] = component.groupedEgresos();
-      expect(g.total).toBe(0);
-      expect(g.porcentajeCompletado).toBe(0);
-      component.groupMode.set('categoria');
-      expect(component.groupedEgresos()).toEqual([]);
-    });
-
-    it('should treat missing montos as 0', () => {
-      fixture.componentRef.setInput('items', [
-        item({ id: 1, monto: null as unknown as number }),
-        item({ id: 2, monto: 10 }),
-      ]);
-      component.groupMode.set('ninguno');
-      expect(component.groupedEgresos()[0].total).toBe(10);
     });
 
     it('currentGroupedList should follow the sub tab', () => {
@@ -231,23 +184,33 @@ describe('PresupuestoTab', () => {
 
       component.collapseAllGroups();
       expect([...component.collapsedGroups()].sort()).toEqual(
-        ['cat_100', 'cat_200', 'sin_categoria'].sort()
+        ['cat_100', 'cat_200', 'sin_categoria'].sort(),
       );
       component.expandAllGroups();
       expect(component.collapsedGroups().size).toBe(0);
+    });
+
+    it('should render one row per visible egreso', () => {
+      expect(el.querySelectorAll('app-movimiento-row').length).toBe(4);
     });
   });
 
   // ==========================================
   describe('multi selection', () => {
-    it('should toggle a single item and stop propagation', () => {
-      const event = { stopPropagation: vi.fn() } as unknown as Event;
-      component.toggleSelectItem(10, event);
-      expect(event.stopPropagation).toHaveBeenCalled();
+    it('should toggle a single item', () => {
+      component.toggleSelectItem(10);
       expect(component.isItemSelected(10)).toBe(true);
       expect(component.selectedCount()).toBe(1);
       component.toggleSelectItem(10);
       expect(component.isItemSelected(10)).toBe(false);
+    });
+
+    it('checking a row should select it and show the bulk bar', async () => {
+      expect(el.querySelector('app-bulk-actions-bar')).toBeNull();
+      (el.querySelector('[title="Seleccionar para acciones en lote"]') as HTMLInputElement).click();
+      await fixture.whenStable();
+      expect(component.selectedCount()).toBe(1);
+      expect(el.querySelector('app-bulk-actions-bar')).not.toBeNull();
     });
 
     it('selectedTotalMonto should sum selected items', () => {
@@ -276,8 +239,14 @@ describe('PresupuestoTab', () => {
 
     it('isGroupAllSelected should be false for an empty group', () => {
       const empty: FinanzasGroup = {
-        key: 'e', title: 'e', items: [], total: 0, totalCompletado: 0,
-        totalEnProceso: 0, totalPendiente: 0, porcentajeCompletado: 0,
+        key: 'e',
+        title: 'e',
+        items: [],
+        total: 0,
+        totalCompletado: 0,
+        totalEnProceso: 0,
+        totalPendiente: 0,
+        porcentajeCompletado: 0,
       };
       expect(component.isGroupAllSelected(empty)).toBe(false);
     });
@@ -305,35 +274,34 @@ describe('PresupuestoTab', () => {
       expect(component.isAllVisibleSelected()).toBe(false);
     });
 
-    it('clearSelection should reset selection and bulk menus', () => {
+    it('clearSelection should reset selection', () => {
       component.toggleSelectItem(10);
-      component.showBulkCategoryMenu.set(true);
-      component.showBulkBancoMenu.set(true);
       component.clearSelection();
       expect(component.selectedCount()).toBe(0);
-      expect(component.showBulkCategoryMenu()).toBe(false);
-      expect(component.showBulkBancoMenu()).toBe(false);
     });
 
-    it('document click should close floating menus', () => {
+    it('document click should close the estado menu', () => {
       component.statusMenuOpenId.set(10);
-      component.showBulkCategoryMenu.set(true);
       document.dispatchEvent(new MouseEvent('click'));
       expect(component.statusMenuOpenId()).toBeNull();
-      expect(component.showBulkCategoryMenu()).toBe(false);
     });
   });
 
   // ==========================================
   describe('estado changes', () => {
-    it('cycleItemEstado should go pendiente -> en proceso -> completado -> pendiente', () => {
-      // items[4] (id 12) está pendiente; cada ciclo usa la versión actualizada de la lista local.
-      component.cycleItemEstado(local(12));
-      expect(finanzas['updatePlantillaItem']).toHaveBeenLastCalledWith(12, { estado: 'en proceso' });
-      component.cycleItemEstado(local(12));
-      expect(finanzas['updatePlantillaItem']).toHaveBeenLastCalledWith(12, { estado: 'completado' });
-      component.cycleItemEstado(local(12));
-      expect(finanzas['updatePlantillaItem']).toHaveBeenLastCalledWith(12, { estado: 'pendiente' });
+    it('clicking a row estado pill should cycle pendiente -> en proceso -> completado -> pendiente', async () => {
+      const pill = () =>
+        el
+          .querySelectorAll('app-movimiento-row')[2]
+          .querySelector('[title^="Estado actual"]') as HTMLButtonElement;
+      // Sin agrupar, la tercera fila es Supermercado (id 12, pendiente); cada clic usa la versión ya actualizada.
+      component.groupMode.set('ninguno');
+      await fixture.whenStable();
+      for (const esperado of ['en proceso', 'completado', 'pendiente']) {
+        pill().click();
+        await fixture.whenStable();
+        expect(finanzas['updatePlantillaItem']).toHaveBeenLastCalledWith(12, { estado: esperado });
+      }
       expect(reloadSpy).toHaveBeenCalledTimes(3);
     });
 
@@ -370,11 +338,46 @@ describe('PresupuestoTab', () => {
     });
 
     it('toggleStatusMenu should open and close the menu for an id', () => {
-      const event = { stopPropagation: vi.fn() } as unknown as Event;
-      component.toggleStatusMenu(10, event);
+      component.toggleStatusMenu(10);
       expect(component.statusMenuOpenId()).toBe(10);
-      component.toggleStatusMenu(10, event);
+      component.toggleStatusMenu(10);
       expect(component.statusMenuOpenId()).toBeNull();
+    });
+  });
+
+  // ==========================================
+  describe('inline edits from a row', () => {
+    it('updateMonto should update optimistically and reload', () => {
+      component.updateMonto(items[2], 750);
+      expect(finanzas['updatePlantillaItem']).toHaveBeenCalledWith(10, { monto: 750 });
+      expect(local(10).monto).toBe(750);
+      expect(items[2].monto).toBe(600);
+      expect(toast.success).toHaveBeenCalled();
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+
+    it('updateMonto should revert on error and still reload', () => {
+      finanzas['updatePlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
+      component.updateMonto(items[2], 750);
+      expect(local(10).monto).toBe(600);
+      expect(toast.error).toHaveBeenCalledWith('Error al actualizar monto');
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+
+    it('updateNombre should update optimistically without reloading', () => {
+      component.updateNombre(items[2], 'Dividendo');
+      expect(finanzas['updatePlantillaItem']).toHaveBeenCalledWith(10, { nombre: 'Dividendo' });
+      expect(local(10).nombre).toBe('Dividendo');
+      expect(items[2].nombre).toBe('Arriendo');
+      expect(toast.success).toHaveBeenCalledWith('Concepto actualizado');
+      expect(reloadSpy).not.toHaveBeenCalled();
+    });
+
+    it('updateNombre should revert on error', () => {
+      finanzas['updatePlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
+      component.updateNombre(items[2], 'Otro');
+      expect(local(10).nombre).toBe('Arriendo');
+      expect(toast.error).toHaveBeenCalledWith('Error al actualizar concepto');
     });
   });
 
@@ -443,11 +446,9 @@ describe('PresupuestoTab', () => {
     });
 
     it('bulkSetCategoria should use the category name in the toast', () => {
-      component.showBulkCategoryMenu.set(true);
       component.bulkSetCategoria(100);
       expect(finanzas['batchUpdateCategoria']).toHaveBeenCalledWith([10, 11], 100);
       expect(toast.success).toHaveBeenCalledWith('2 movimientos asignados a "Casa"');
-      expect(component.showBulkCategoryMenu()).toBe(false);
       expect(component.selectedCount()).toBe(0);
       expect(reloadSpy).toHaveBeenCalled();
     });
@@ -481,283 +482,6 @@ describe('PresupuestoTab', () => {
       component.bulkSetBanco(1);
       expect(toast.error).toHaveBeenCalledWith('Error al asignar cuenta en lote');
       expect(component.isBulkProcessing()).toBe(false);
-    });
-  });
-
-  // ==========================================
-  describe('inline monto', () => {
-    it('should start editing with the current monto', () => {
-      component.startInlineMonto(items[2]);
-      expect(component.editingMontoId()).toBe(10);
-      expect(component.editingMontoValue()).toBe(600);
-    });
-
-    it('should ignore saves for another item', () => {
-      component.startInlineMonto(items[2]);
-      component.saveInlineMonto(items[3]);
-      expect(finanzas['updatePlantillaItem']).not.toHaveBeenCalled();
-      expect(component.editingMontoId()).toBe(10);
-    });
-
-    it('should not call the service when value is unchanged or null', () => {
-      component.startInlineMonto(items[2]);
-      component.saveInlineMonto(items[2]);
-      expect(component.editingMontoId()).toBeNull();
-
-      component.startInlineMonto(items[2]);
-      component.editingMontoValue.set(null);
-      component.saveInlineMonto(items[2]);
-      expect(finanzas['updatePlantillaItem']).not.toHaveBeenCalled();
-    });
-
-    it('should update the monto optimistically and reload', () => {
-      component.startInlineMonto(items[2]);
-      component.editingMontoValue.set(750);
-      component.saveInlineMonto(items[2]);
-      expect(finanzas['updatePlantillaItem']).toHaveBeenCalledWith(10, { monto: 750 });
-      expect(local(10).monto).toBe(750);
-      expect(items[2].monto).toBe(600);
-      expect(toast.success).toHaveBeenCalled();
-      expect(reloadSpy).toHaveBeenCalled();
-    });
-
-    it('should revert the monto on error and still reload', () => {
-      finanzas['updatePlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
-      component.startInlineMonto(items[2]);
-      component.editingMontoValue.set(750);
-      component.saveInlineMonto(items[2]);
-      expect(local(10).monto).toBe(600);
-      expect(toast.error).toHaveBeenCalledWith('Error al actualizar monto');
-      expect(reloadSpy).toHaveBeenCalled();
-    });
-
-    it('cancelInlineMonto should reset state', () => {
-      component.startInlineMonto(items[2]);
-      component.cancelInlineMonto();
-      expect(component.editingMontoId()).toBeNull();
-      expect(component.editingMontoValue()).toBeNull();
-    });
-  });
-
-  // ==========================================
-  describe('inline nombre', () => {
-    it('should update a trimmed new name', () => {
-      component.startInlineNombre(items[2]);
-      expect(component.editingNombreValue()).toBe('Arriendo');
-      component.editingNombreValue.set('  Dividendo ');
-      component.saveInlineNombre(items[2]);
-      expect(finanzas['updatePlantillaItem']).toHaveBeenCalledWith(10, { nombre: 'Dividendo' });
-      expect(local(10).nombre).toBe('Dividendo');
-      expect(items[2].nombre).toBe('Arriendo');
-      expect(toast.success).toHaveBeenCalledWith('Concepto actualizado');
-    });
-
-    it('should skip empty or unchanged names', () => {
-      component.startInlineNombre(items[2]);
-      component.editingNombreValue.set('   ');
-      component.saveInlineNombre(items[2]);
-      component.startInlineNombre(items[2]);
-      component.saveInlineNombre(items[2]);
-      expect(finanzas['updatePlantillaItem']).not.toHaveBeenCalled();
-      expect(component.editingNombreId()).toBeNull();
-    });
-
-    it('should revert on error', () => {
-      finanzas['updatePlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
-      component.startInlineNombre(items[2]);
-      component.editingNombreValue.set('Otro');
-      component.saveInlineNombre(items[2]);
-      expect(local(10).nombre).toBe('Arriendo');
-      expect(toast.error).toHaveBeenCalledWith('Error al actualizar concepto');
-    });
-
-    it('cancelInlineNombre should reset state', () => {
-      component.startInlineNombre(items[2]);
-      component.cancelInlineNombre();
-      expect(component.editingNombreId()).toBeNull();
-      expect(component.editingNombreValue()).toBe('');
-    });
-  });
-
-  // ==========================================
-  describe('item modal', () => {
-    it('openCreateModal should reset the form with the given tipo', () => {
-      component.formNombre.set('old');
-      component.openCreateModal('ingreso');
-      expect(component.showItemModal()).toBe(true);
-      expect(component.isEditingItem()).toBe(false);
-      expect(component.formTipo()).toBe('ingreso');
-      expect(component.formNombre()).toBe('');
-      expect(component.formEstado()).toBe('pendiente');
-    });
-
-    it('openEditModal should populate the form from the item', () => {
-      component.openEditModal(items[2]);
-      expect(component.isEditingItem()).toBe(true);
-      expect(component.editingItemId()).toBe(10);
-      expect(component.formNombre()).toBe('Arriendo');
-      expect(component.formMonto()).toBe(600);
-      expect(component.formBancoId()).toBe(1);
-      expect(component.formGrupoItemId()).toBe(100);
-      expect(component.formMovimientoEsperadoId()).toBe(7);
-      expect(component.formEstado()).toBe('completado');
-    });
-
-    it('openEditModal should map undefined relations to null', () => {
-      component.openEditModal(items[5]);
-      expect(component.formBancoId()).toBeNull();
-      expect(component.formGrupoItemId()).toBeNull();
-      expect(component.formMovimientoEsperadoId()).toBeNull();
-    });
-
-    it('closeItemModal should reset editing state', () => {
-      component.openEditModal(items[2]);
-      component.closeItemModal();
-      expect(component.showItemModal()).toBe(false);
-      expect(component.isEditingItem()).toBe(false);
-      expect(component.editingItemId()).toBeNull();
-    });
-
-    it('saveItem should require a name', () => {
-      component.openCreateModal();
-      component.saveItem();
-      expect(toast.error).toHaveBeenCalledWith('El nombre del movimiento es obligatorio');
-      expect(finanzas['createPlantillaItem']).not.toHaveBeenCalled();
-    });
-
-    it('saveItem should create an egreso including categoría and mecanismo', () => {
-      component.openCreateModal('egreso');
-      component.formNombre.set(' Gas ');
-      component.formMonto.set(40);
-      component.formBancoId.set(1);
-      component.formGrupoItemId.set(100);
-      component.formMovimientoEsperadoId.set(7);
-      component.saveItem();
-      expect(finanzas['createPlantillaItem']).toHaveBeenCalledWith({
-        tipo: 'egreso',
-        nombre: 'Gas',
-        monto: 40,
-        mes: 5,
-        anio: 2026,
-        estado: 'pendiente',
-        banco_id: 1,
-        grupo_item_id: 100,
-        movimiento_esperado_id: 7,
-      });
-      expect(toast.success).toHaveBeenCalledWith('Movimiento creado');
-      expect(component.showItemModal()).toBe(false);
-      expect(component.isSubmittingItem()).toBe(false);
-      expect(reloadSpy).toHaveBeenCalled();
-    });
-
-    it('saveItem should drop categoría/mecanismo for ingresos and default monto to 0', () => {
-      component.openCreateModal('ingreso');
-      component.formNombre.set('Bono');
-      component.formGrupoItemId.set(100);
-      component.formMovimientoEsperadoId.set(7);
-      component.saveItem();
-      expect(finanzas['createPlantillaItem']).toHaveBeenCalledWith(
-        expect.objectContaining({ tipo: 'ingreso', monto: 0, grupo_item_id: null, movimiento_esperado_id: null })
-      );
-    });
-
-    it('saveItem should toast on create error and keep modal open', () => {
-      finanzas['createPlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
-      component.openCreateModal();
-      component.formNombre.set('Gas');
-      component.saveItem();
-      expect(toast.error).toHaveBeenCalledWith('Error al crear movimiento');
-      expect(component.showItemModal()).toBe(true);
-      expect(component.isSubmittingItem()).toBe(false);
-    });
-
-    it('saveItem should update when editing', () => {
-      component.openEditModal(items[2]);
-      component.formMonto.set(650);
-      component.saveItem();
-      expect(finanzas['updatePlantillaItem']).toHaveBeenCalledWith(10, {
-        nombre: 'Arriendo',
-        monto: 650,
-        tipo: 'egreso',
-        banco_id: 1,
-        grupo_item_id: 100,
-        movimiento_esperado_id: 7,
-        estado: 'completado',
-        mes: 5,
-        anio: 2026,
-      });
-      expect(toast.success).toHaveBeenCalledWith('Movimiento actualizado');
-      expect(component.showItemModal()).toBe(false);
-      expect(reloadSpy).toHaveBeenCalled();
-    });
-
-    it('saveItem should toast on update error', () => {
-      finanzas['updatePlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
-      component.openEditModal(items[2]);
-      component.saveItem();
-      expect(toast.error).toHaveBeenCalledWith('Error al actualizar movimiento');
-      expect(component.isSubmittingItem()).toBe(false);
-    });
-
-    // Documenta el comportamiento actual: si se edita sin id, isSubmittingItem queda en true.
-    it('saveItem while editing without id should show an error and not get stuck submitting', () => {
-      component.isEditingItem.set(true);
-      component.editingItemId.set(null);
-      component.formNombre.set('x');
-      component.saveItem();
-      expect(finanzas['updatePlantillaItem']).not.toHaveBeenCalled();
-      expect(component.isSubmittingItem()).toBe(false);
-      expect(toast.error).toHaveBeenCalledWith('No se encontró el movimiento a editar');
-    });
-  });
-
-  // ==========================================
-  describe('quick create', () => {
-    it('should ignore blank names', () => {
-      component.quickNombre.set('  ');
-      component.createQuick();
-      expect(finanzas['createPlantillaItem']).not.toHaveBeenCalled();
-    });
-
-    it('should create a pending egreso and reset fields', () => {
-      component.quickNombre.set(' Pan ');
-      component.quickMonto.set(2);
-      component.quickBancoId.set(1);
-      component.quickGrupoId.set(200);
-      component.createQuick();
-      expect(finanzas['createPlantillaItem']).toHaveBeenCalledWith({
-        tipo: 'egreso',
-        nombre: 'Pan',
-        monto: 2,
-        mes: 5,
-        anio: 2026,
-        estado: 'pendiente',
-        banco_id: 1,
-        grupo_item_id: 200,
-      });
-      expect(component.quickNombre()).toBe('');
-      expect(component.quickMonto()).toBeNull();
-      expect(component.isSubmittingQuick()).toBe(false);
-      expect(reloadSpy).toHaveBeenCalled();
-    });
-
-    it('should drop grupo for ingresos', () => {
-      component.quickTipo.set('ingreso');
-      component.quickNombre.set('Venta');
-      component.quickGrupoId.set(200);
-      component.createQuick();
-      expect(finanzas['createPlantillaItem']).toHaveBeenCalledWith(
-        expect.objectContaining({ tipo: 'ingreso', grupo_item_id: null, monto: 0 })
-      );
-    });
-
-    it('should toast on error and keep the name', () => {
-      finanzas['createPlantillaItem'].mockReturnValue(throwError(() => new Error('x')));
-      component.quickNombre.set('Pan');
-      component.createQuick();
-      expect(toast.error).toHaveBeenCalledWith('Error al crear movimiento');
-      expect(component.quickNombre()).toBe('Pan');
-      expect(component.isSubmittingQuick()).toBe(false);
     });
   });
 
@@ -799,89 +523,43 @@ describe('PresupuestoTab', () => {
   });
 
   // ==========================================
-  describe('clone periodo', () => {
-    it('openCloneModal should default destination to next month', () => {
-      component.openCloneModal();
-      expect(component.cloneMesOrigen()).toBe(5);
-      expect(component.cloneAnioOrigen()).toBe(2026);
-      expect(component.cloneMesDestino()).toBe(6);
-      expect(component.cloneAnioDestino()).toBe(2026);
-      expect(component.showCloneModal()).toBe(true);
+  describe('modals', () => {
+    it('openCreateModal should open the form modal with the given tipo', () => {
+      component.openCreateModal('ingreso');
+      const modal = child(MovimientoFormModal);
+      expect(modal.showItemModal()).toBe(true);
+      expect(modal.isEditingItem()).toBe(false);
+      expect(modal.formTipo()).toBe('ingreso');
     });
 
-    it('openCloneModal should roll December to January of next year', () => {
-      fixture.componentRef.setInput('selectedMes', 12);
-      component.openCloneModal();
-      expect(component.cloneMesDestino()).toBe(1);
-      expect(component.cloneAnioDestino()).toBe(2027);
+    it('openEditModal should open the form modal for the item', () => {
+      component.openEditModal(items[2]);
+      const modal = child(MovimientoFormModal);
+      expect(modal.isEditingItem()).toBe(true);
+      expect(modal.editingItemId()).toBe(10);
     });
 
-    it('submitClone should clone, close the modal and emit periodoChange', () => {
+    it('a saved form should reload', () => {
+      child(MovimientoFormModal).saved.emit();
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+
+    it('openCloneModal should open the clone modal from the selected period', () => {
       component.openCloneModal();
-      component.submitClone();
-      expect(finanzas['clonarPeriodo']).toHaveBeenCalledWith({
-        anio_origen: 2026,
-        mes_origen: 5,
-        anio_destino: 2026,
-        mes_destino: 6,
-      });
-      expect(toast.success).toHaveBeenCalledWith('¡Éxito! Se clonaron 4 movimientos a Junio 2026');
-      expect(component.showCloneModal()).toBe(false);
-      expect(component.isSubmittingClone()).toBe(false);
+      const modal = child(ClonarPeriodoModal);
+      expect(modal.showCloneModal()).toBe(true);
+      expect(modal.cloneMesOrigen()).toBe(5);
+      expect(modal.cloneAnioOrigen()).toBe(2026);
+    });
+
+    it('a cloned period should be forwarded as periodoChange', () => {
+      child(ClonarPeriodoModal).cloned.emit({ mes: 6, anio: 2026 });
       expect(periodoSpy).toHaveBeenCalledWith({ mes: 6, anio: 2026 });
     });
 
-    it('submitClone should coerce string values to numbers', () => {
-      component.openCloneModal();
-      component.cloneMesDestino.set('7' as unknown as number);
-      component.submitClone();
-      expect(finanzas['clonarPeriodo']).toHaveBeenCalledWith(
-        expect.objectContaining({ mes_destino: 7 })
-      );
-    });
-
-    it('submitClone should toast the backend error and keep modal open', () => {
-      finanzas['clonarPeriodo'].mockReturnValue(throwError(() => ({ error: 'ya existe' })));
-      component.openCloneModal();
-      component.submitClone();
-      expect(toast.error).toHaveBeenCalledWith('Error al clonar el período: ya existe');
-      expect(component.showCloneModal()).toBe(true);
-      expect(component.isSubmittingClone()).toBe(false);
-      expect(periodoSpy).not.toHaveBeenCalled();
-    });
-
-    it('closeCloneModal should hide the modal', () => {
-      component.openCloneModal();
-      component.closeCloneModal();
-      expect(component.showCloneModal()).toBe(false);
-    });
-  });
-
-  // ==========================================
-  describe('visual helpers', () => {
-    it('getRowClass should prioritise selection, then estado', () => {
-      expect(component.getRowClass(items[2])).toContain('positive');
-      expect(component.getRowClass(items[3])).toContain('warning');
-      expect(component.getRowClass(items[4])).toContain('bg-surface');
-      component.toggleSelectItem(10);
-      expect(component.getRowClass(items[2])).toContain('bg-primary/10');
-    });
-
-    it('getMontoColorClass should depend on estado and tipo', () => {
-      expect(component.getMontoColorClass(items[2])).toContain('positive');
-      expect(component.getMontoColorClass(items[3])).toContain('warning');
-      expect(component.getMontoColorClass(items[4])).toContain('text-danger');
-      expect(component.getMontoColorClass(items[1])).toContain('text-success');
-    });
-
-    it('getStatusBadgeClass should depend on estado', () => {
-      expect(component.getStatusBadgeClass(items[2])).toContain('positive');
-      expect(component.getStatusBadgeClass(items[3])).toContain('warning');
-      expect(component.getStatusBadgeClass(items[4])).toContain('text-muted');
-    });
-
-    it('formatCurrency should format CLP', () => {
-      expect(component.formatCurrency(600)).toMatch(/600/);
+    it('a quick-add creation should reload', () => {
+      child(MovimientoQuickAdd).created.emit();
+      expect(reloadSpy).toHaveBeenCalled();
     });
   });
 });
