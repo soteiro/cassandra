@@ -88,7 +88,7 @@ describe('TaskDetailModal', () => {
     fixture = TestBed.createComponent(TaskDetailModal);
     component = fixture.componentInstance;
     el = fixture.nativeElement;
-    fixture.componentRef.setInput('proyectId', 3);
+    fixture.componentRef.setInput('projectId', 3);
     updatedSpy = vi.fn();
     deletedSpy = vi.fn();
     closeSpy = vi.fn();

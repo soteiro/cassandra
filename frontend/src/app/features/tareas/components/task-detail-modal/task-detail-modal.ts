@@ -48,7 +48,7 @@ export class TaskDetailModal {
   // Inputs
   isOpen = input<boolean>(false);
   task = input<Task | null>(null);
-  proyectId = input.required<number>();
+  projectId = input.required<number>();
 
   // Outputs
   closeModal = output<void>();
@@ -250,7 +250,7 @@ export class TaskDetailModal {
         comentario: '',
         estado: 'Abierto',
         prioridad: 'normal',
-        proyect_id: this.proyectId(),
+        proyect_id: this.projectId(),
         tarea_padre_id: t.id,
       })
       .subscribe({
@@ -329,7 +329,7 @@ export class TaskDetailModal {
 
     this.isSavingNota.set(true);
     this.notaService
-      .createNota(this.proyectId(), {
+      .createNota(this.projectId(), {
         nota: text,
         tarea_id: t.id,
       })

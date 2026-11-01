@@ -20,8 +20,7 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [serverConfiguredGuard, authGuard],
-    loadComponent: () =>
-      import('./core/layout/main-layout/main-layout').then((m) => m.MainLayout),
+    loadComponent: () => import('./core/layout/main-layout/main-layout').then((m) => m.MainLayout),
     children: [
       {
         path: 'home',
@@ -29,13 +28,9 @@ export const routes: Routes = [
       },
       {
         path: 'proyectos',
-        loadComponent: () => import('./pages/proyectos/proyectos').then((m) => m.Proyectos),
+        loadChildren: () =>
+          import('./features/proyectos/proyectos.routes').then((m) => m.proyectosRoutes),
       },
-      {
-        path: 'proyectos/:id',
-        loadComponent: () =>
-          import('./pages/proyect-details/proyect-details').then((m) => m.ProyectDetails),
-      }, // ruta dinamica de proyectos
       {
         path: 'crm',
         loadChildren: () => import('./features/crm/crm.routes').then((m) => m.crmRoutes),
@@ -76,5 +71,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: '/home',
   },
-  
 ];
