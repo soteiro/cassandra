@@ -12,6 +12,15 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 Las reglas (dónde va el código nuevo, qué puede importar a qué y cómo se nombran las cosas) están en [`AGENTS.md`](AGENTS.md#project-structure).
 
+### Migración futura: alias de imports
+
+Hoy todos los imports son relativos (`../../../../shared/...`). Está decidido posponer los alias hasta que valga la pena; si se hace, el plan es:
+
+1. En `tsconfig.json`, dentro de `compilerOptions`, agregar `"paths"`: `@core/*` → `src/app/core/*`, `@shared/*` → `src/app/shared/*` y `@features/*` → `src/app/features/*`.
+2. Reescribir con un script solo los imports que **cruzan** entre `core/`, `shared/` y `features/<x>/`. Los imports dentro de una misma feature siguen siendo relativos, para que una feature se pueda mover sin tocar su interior.
+3. Hacerlo en un solo PR mecánico, sin otros cambios, verificado con `ng build`, `ng test --watch=false` y `pnpm run e2e`.
+4. Actualizar la sección *Project Structure* de `AGENTS.md` (y sus copias en `.claude/`, `.gemini/`, `.github/` y `.cursor/`) para que el código nuevo use los alias.
+
 ## Colores de la interfaz
 
 La paleta actual está centralizada en [`public/theme.css`](public/theme.css).
