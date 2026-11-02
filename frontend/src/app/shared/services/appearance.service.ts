@@ -24,6 +24,9 @@ export class AppearanceService {
     return mode === 'system' ? (this.systemDark() ? 'dark' : 'light') : mode;
   });
   readonly themeKey = computed(() => `${this.palette()}:${this.resolvedMode()}`);
+  private readonly browserColorState = signal<string | null>(null);
+  /** Fondo de la paleta aplicada (`--theme-browser-background`), una vez pintada. */
+  readonly browserColor = this.browserColorState.asReadonly();
   readonly stored = signal(true);
 
   constructor() {
@@ -57,6 +60,7 @@ export class AppearanceService {
         this.document
           .querySelector('meta[name="theme-color"]')
           ?.setAttribute('content', browserColor);
+      this.browserColorState.set(browserColor || null);
     });
   }
 
