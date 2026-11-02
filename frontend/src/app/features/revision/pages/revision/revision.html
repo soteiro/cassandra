@@ -73,7 +73,7 @@
           Tareas abiertas sin cambios hace {{ diasEstancada }} días o más, de proyectos en marcha.
           Decide qué pasa con cada una.
         </p>
-        @if (estancadasResource?.isLoading() && !estancadasResource?.value()) {
+        @if (estancadasResource?.isLoading() && !estancadasResource.value()) {
           <p class="text-xs text-text-muted animate-pulse">Buscando tareas estancadas…</p>
         } @else if (estancadasResource?.error()) {
           <p class="text-sm text-danger" role="alert"

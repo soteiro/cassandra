@@ -255,7 +255,7 @@
     </div>
 
     <!-- CONTENIDO DEL TIMELINE -->
-    @if (reflexionesResource?.isLoading() && !reflexionesResource?.value()) {
+    @if (reflexionesResource?.isLoading() && !reflexionesResource.value()) {
       <!-- SKELETON -->
       <div class="space-y-3">
         @for (item of [1, 2, 3]; track item) {
@@ -275,7 +275,7 @@
         <p class="text-sm text-danger">No se pudieron cargar las reflexiones.</p>
         <button
           type="button"
-          (click)="reflexionesResource?.reload()"
+          (click)="reflexionesResource.reload()"
           class="text-sm text-primary-text underline cursor-pointer"
           >Reintentar</button
         >

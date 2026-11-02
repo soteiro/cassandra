@@ -68,7 +68,7 @@
 
       <!-- LISTADO DE TAREAS COMPACTO -->
       <div class="p-2 sm:p-3 space-y-1.5 max-h-95 overflow-y-auto">
-        @if (tasksResource?.isLoading() && !tasksResource?.value()) {
+        @if (tasksResource?.isLoading() && !tasksResource.value()) {
           <!-- SKELETON COMPACTO -->
           @for (item of [1, 2, 3]; track item) {
             <div
