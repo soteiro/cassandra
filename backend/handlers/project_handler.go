@@ -14,7 +14,7 @@ import (
 )
 
 type ProjectHandler struct {
-	repo *repository.ProjectRepository
+	repo  *repository.ProjectRepository
 	owner *repository.Ownership
 }
 
@@ -75,7 +75,7 @@ func (h *ProjectHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
 	// inyectar el user_id desde el contexto
 	req.UserID = userID
 
-	// guardar datos 
+	// guardar datos
 	if !requireOwned(w, r, h.owner, userID, repository.Ref{Recurso: repository.Proyecto, ID: idOf(req.ProyectoPadreID)}) {
 		return
 	}

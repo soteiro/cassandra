@@ -27,12 +27,31 @@ describe('InteraccionService', () => {
     http.expectNone(() => true);
 
     TestBed.inject(AuthService).isLoggedIn.set(false);
-    expect(TestBed.runInInjectionContext(() => service.getInteraccionesByPersonaId(() => 6))).toBeUndefined();
+    expect(
+      TestBed.runInInjectionContext(() => service.getInteraccionesByPersonaId(() => 6)),
+    ).toBeUndefined();
   });
 
   it.each<HttpCase>([
-    { name: 'createInteraccion', call: () => service.createInteraccion(6, { interaccion: 'café' }), method: 'POST', url: '/api/personas/6/interacciones', body: { interaccion: 'café' } },
-    { name: 'updateInteraccion', call: () => service.updateInteraccion(2, { interaccion: 'té' } as never), method: 'PUT', url: '/api/interacciones/2', body: { interaccion: 'té' } },
-    { name: 'deleteInteraccion', call: () => service.deleteInteraccion(2), method: 'DELETE', url: '/api/interacciones/2' },
+    {
+      name: 'createInteraccion',
+      call: () => service.createInteraccion(6, { interaccion: 'café' }),
+      method: 'POST',
+      url: '/api/personas/6/interacciones',
+      body: { interaccion: 'café' },
+    },
+    {
+      name: 'updateInteraccion',
+      call: () => service.updateInteraccion(2, { interaccion: 'té' } as never),
+      method: 'PUT',
+      url: '/api/interacciones/2',
+      body: { interaccion: 'té' },
+    },
+    {
+      name: 'deleteInteraccion',
+      call: () => service.deleteInteraccion(2),
+      method: 'DELETE',
+      url: '/api/interacciones/2',
+    },
   ])('$name should call $method $url', (c) => expectHttpCall(http, c));
 });

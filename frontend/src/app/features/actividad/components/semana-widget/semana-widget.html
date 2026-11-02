@@ -1,7 +1,13 @@
-<div class="bg-surface border border-surface-border rounded-2xl shadow-xs overflow-hidden flex flex-col">
-  <div class="p-3 sm:px-4 sm:py-3 border-b border-surface-border flex items-center justify-between gap-3 bg-surface/80">
+<div
+  class="bg-surface border border-surface-border rounded-2xl shadow-xs overflow-hidden flex flex-col"
+>
+  <div
+    class="p-3 sm:px-4 sm:py-3 border-b border-surface-border flex items-center justify-between gap-3 bg-surface/80"
+  >
     <div class="flex items-center gap-2 min-w-0">
-      <div class="w-6 h-6 rounded-lg bg-success/15 border border-success/30 text-success flex items-center justify-center shrink-0">
+      <div
+        class="w-6 h-6 rounded-lg bg-success/15 border border-success/30 text-success flex items-center justify-center shrink-0"
+      >
         <svg lucideCalendarCheck class="w-3.5 h-3.5" />
       </div>
       <h2 class="text-xs sm:text-sm font-bold text-text-main truncate">
@@ -37,7 +43,7 @@
   </div>
 
   <div class="p-3 sm:p-4 space-y-3 max-h-95 overflow-y-auto">
-    @if (resumen?.isLoading() && !resumen?.value()) {
+    @if (resumen?.isLoading() && !resumen.value()) {
       <div class="space-y-2 animate-pulse">
         <div class="w-40 h-3 bg-background rounded-md"></div>
         <div class="w-56 h-3 bg-background rounded-md"></div>
@@ -45,16 +51,27 @@
     } @else if (resumen?.error()) {
       <div class="space-y-2" role="alert">
         <p class="text-sm text-danger">No se pudo cargar el resumen.</p>
-        <button type="button" (click)="resumen?.reload()" class="text-sm text-primary-text underline cursor-pointer">Reintentar</button>
+        <button
+          type="button"
+          (click)="resumen.reload()"
+          class="text-sm text-primary-text underline cursor-pointer"
+          >Reintentar</button
+        >
       </div>
     } @else if (resumen?.value(); as r) {
       @if (r.tareas_terminadas.length || r.proyectos_completados.length) {
         <p class="text-xs text-text-main">
           Terminaste
-          <strong>{{ r.tareas_terminadas.length }} {{ r.tareas_terminadas.length === 1 ? 'tarea' : 'tareas' }}</strong>
+          <strong
+            >{{ r.tareas_terminadas.length }}
+            {{ r.tareas_terminadas.length === 1 ? 'tarea' : 'tareas' }}</strong
+          >
           @if (r.proyectos_completados.length) {
             y completaste
-            <strong>{{ r.proyectos_completados.length }} {{ r.proyectos_completados.length === 1 ? 'proyecto' : 'proyectos' }}</strong>
+            <strong
+              >{{ r.proyectos_completados.length }}
+              {{ r.proyectos_completados.length === 1 ? 'proyecto' : 'proyectos' }}</strong
+            >
           }
         </p>
 
@@ -70,7 +87,10 @@
         <div class="space-y-2.5">
           @for (g of porProyecto(); track g.proyectoId) {
             <div>
-              <a [routerLink]="['/proyectos', g.proyectoId]" class="text-[11px] font-semibold text-text-muted hover:text-primary-text hover:underline">
+              <a
+                [routerLink]="['/proyectos', g.proyectoId]"
+                class="text-[11px] font-semibold text-text-muted hover:text-primary-text hover:underline"
+              >
                 {{ g.proyectoNombre || 'Proyecto #' + g.proyectoId }}
               </a>
               <ul class="mt-1 space-y-1">
@@ -89,7 +109,11 @@
         </div>
       } @else {
         <p class="text-xs text-text-muted">
-          {{ esSemanaActual() ? 'Todavía no hay nada terminado esta semana.' : 'No terminaste tareas esa semana.' }}
+          {{
+            esSemanaActual()
+              ? 'Todavía no hay nada terminado esta semana.'
+              : 'No terminaste tareas esa semana.'
+          }}
         </p>
       }
 
@@ -101,7 +125,9 @@
           <p>También: {{ otros().join(' · ') }}</p>
         }
         @if (conEnlaceRevision()) {
-          <a routerLink="/revision" class="inline-block pt-1 text-primary-text hover:underline">Hacer la revisión semanal →</a>
+          <a routerLink="/revision" class="inline-block pt-1 text-primary-text hover:underline"
+            >Hacer la revisión semanal →</a
+          >
         }
       </div>
     }

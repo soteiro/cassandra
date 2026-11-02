@@ -19,7 +19,10 @@ describe('RevisionCard', () => {
       imports: [RevisionCard],
       providers: [
         provideRouter([]),
-        { provide: RevisionService, useValue: { preferenciasResource: { value: pref }, revisionesResource: { value: revs } } },
+        {
+          provide: RevisionService,
+          useValue: { preferenciasResource: { value: pref }, revisionesResource: { value: revs } },
+        },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(RevisionCard);

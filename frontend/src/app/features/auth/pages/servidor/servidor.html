@@ -11,7 +11,9 @@
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="server-address" class="text-sm font-medium text-control-label">Dirección del servidor</label>
+      <label for="server-address" class="text-sm font-medium text-control-label"
+        >Dirección del servidor</label
+      >
       <input
         id="server-address"
         type="url"
@@ -28,11 +30,16 @@
         aria-describedby="server-help"
         class="px-3 py-2 bg-control-background border border-control-border rounded-lg text-control-text focus:outline-none focus:border-primary"
       />
-      <p id="server-help" class="text-[11px] text-text-muted">Debe usar https. No hace falta escribir /api.</p>
+      <p id="server-help" class="text-[11px] text-text-muted"
+        >Debe usar https. No hace falta escribir /api.</p
+      >
     </div>
 
     @if (errorMessage()) {
-      <p role="alert" class="p-3 bg-danger/15 border border-danger/30 rounded-xl text-danger text-xs">
+      <p
+        role="alert"
+        class="p-3 bg-danger/15 border border-danger/30 rounded-xl text-danger text-xs"
+      >
         {{ errorMessage() }}
       </p>
     }

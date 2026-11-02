@@ -43,8 +43,12 @@ export class AppUpdateService {
   readonly download = signal<ApkDownloadStatus>({ status: 'idle' });
   readonly startingDownload = signal(false);
   readonly installing = signal(false);
-  readonly downloading = computed(() => this.startingDownload() ||
-    this.download().status === 'downloading' || this.download().status === 'paused');
+  readonly downloading = computed(
+    () =>
+      this.startingDownload() ||
+      this.download().status === 'downloading' ||
+      this.download().status === 'paused',
+  );
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -69,7 +73,9 @@ export class AppUpdateService {
     try {
       await this.loadCurrentVersion();
       const current = this.currentVersion();
-      const release = await firstValueFrom(this.http.get<GithubRelease>(environment.releasesApiUrl));
+      const release = await firstValueFrom(
+        this.http.get<GithubRelease>(environment.releasesApiUrl),
+      );
       if (!current) return { status: 'error' };
 
       if (!isNewerVersion(release.tag_name, current)) {
@@ -108,7 +114,10 @@ export class AppUpdateService {
       this.updateDownload(status);
       this.toast.info('Android está descargando la actualización. Puedes seguir usando Cassandra.');
     } catch {
-      this.updateDownload({ status: 'failed', error: 'No se pudo iniciar la descarga. Revisa tu conexión y vuelve a intentarlo.' });
+      this.updateDownload({
+        status: 'failed',
+        error: 'No se pudo iniciar la descarga. Revisa tu conexión y vuelve a intentarlo.',
+      });
     } finally {
       this.startingDownload.set(false);
     }
@@ -120,7 +129,10 @@ export class AppUpdateService {
       if (!this.destroyed && !this.startingDownload()) this.updateDownload(status);
     } catch {
       if (!this.destroyed && this.downloading()) {
-        this.updateDownload({ status: 'failed', error: 'No se pudo consultar la descarga. Vuelve a buscar actualizaciones.' });
+        this.updateDownload({
+          status: 'failed',
+          error: 'No se pudo consultar la descarga. Vuelve a buscar actualizaciones.',
+        });
       }
     }
   }
@@ -148,13 +160,18 @@ export class AppUpdateService {
     try {
       const result = await this.updater.install();
       if (result.permissionRequired) {
-        this.toast.info('Activa “Permitir desde esta fuente” para Cassandra en Android. Al volver, pulsa “Instalar actualización”.', {
-          duration: 0,
-          action: { label: 'Instalar actualización', onClick: () => void this.installUpdate() },
-        });
+        this.toast.info(
+          'Activa “Permitir desde esta fuente” para Cassandra en Android. Al volver, pulsa “Instalar actualización”.',
+          {
+            duration: 0,
+            action: { label: 'Instalar actualización', onClick: () => void this.installUpdate() },
+          },
+        );
       }
     } catch {
-      this.toast.error('No se pudo abrir el instalador. Comprueba que el APK siga disponible y vuelve a intentarlo.');
+      this.toast.error(
+        'No se pudo abrir el instalador. Comprueba que el APK siga disponible y vuelve a intentarlo.',
+      );
       await this.refreshDownload();
     } finally {
       this.installing.set(false);

@@ -58,7 +58,9 @@ export function describirEvento(e: EventoActividad): string {
       partes.push(`${etiqueta}: ${valor(cambio.despues)}`);
     }
   }
-  return partes.length ? `${sujeto}: ${partes.join(', ')}` : `${sujeto} ${participio('editad', e.entidad)}`;
+  return partes.length
+    ? `${sujeto}: ${partes.join(', ')}`
+    : `${sujeto} ${participio('editad', e.entidad)}`;
 }
 
 /** «cread» + a/o según el género de la entidad («tarea creada», «documento creado»). */

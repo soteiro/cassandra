@@ -1,5 +1,13 @@
 /** Días de la semana como los guarda el backend (0 = domingo). */
-export const DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+export const DIAS_SEMANA = [
+  'Domingo',
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+];
 
 /** Medianoche local del último `dia` (0 = domingo) igual o anterior a `ahora`. */
 export function ultimoDiaDeRevision(dia: number, ahora: Date): Date {
@@ -13,7 +21,11 @@ export function ultimoDiaDeRevision(dia: number, ahora: Date): Date {
  */
 export function semanaARevisar(dia: number, ahora: Date): Date {
   const ultimo = ultimoDiaDeRevision(dia, ahora);
-  return new Date(ultimo.getFullYear(), ultimo.getMonth(), ultimo.getDate() - ((ultimo.getDay() + 6) % 7));
+  return new Date(
+    ultimo.getFullYear(),
+    ultimo.getMonth(),
+    ultimo.getDate() - ((ultimo.getDay() + 6) % 7),
+  );
 }
 
 /**

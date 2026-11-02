@@ -102,7 +102,10 @@ describe('NotesTab', () => {
     });
 
     it('should render notes and the search box', async () => {
-      fixture.componentRef.setInput('notas', [makeNota({ nota: 'Primera' }), makeNota({ id: 2, nota: 'Segunda' })]);
+      fixture.componentRef.setInput('notas', [
+        makeNota({ nota: 'Primera' }),
+        makeNota({ id: 2, nota: 'Segunda' }),
+      ]);
       await render();
       expect(el.textContent).toContain('Primera');
       expect(el.textContent).toContain('Segunda');

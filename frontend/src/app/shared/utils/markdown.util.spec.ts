@@ -87,7 +87,10 @@ describe('parseMarkdown', () => {
 
     it('should render tables with header and body', () => {
       const el = render('| Nombre | Monto |\n|---|:---:|\n| Luz | 100 |\n| Agua | 50 |');
-      expect([...el.querySelectorAll('th')].map((th) => th.textContent)).toEqual(['Nombre', 'Monto']);
+      expect([...el.querySelectorAll('th')].map((th) => th.textContent)).toEqual([
+        'Nombre',
+        'Monto',
+      ]);
       expect(el.querySelectorAll('tbody tr').length).toBe(2);
       expect(el.querySelector('tbody td')?.textContent).toBe('Luz');
     });

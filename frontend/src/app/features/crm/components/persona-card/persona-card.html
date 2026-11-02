@@ -1,7 +1,4 @@
-<a
-  [routerLink]="['/crm/persona', persona().id]"
-  class="group block w-full"
->
+<a [routerLink]="['/crm/persona', persona().id]" class="group block w-full">
   <article
     class="p-3.5 sm:p-4 bg-surface border border-surface-border hover:border-primary/40 rounded-2xl transition-all duration-200 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-0.5 flex items-center justify-between gap-4"
   >
@@ -27,7 +24,9 @@
           {{ persona().nombre }}
         </h3>
 
-        <p class="text-xs text-text-muted group-hover:text-text-muted/90 transition-colors truncate mt-0.5">
+        <p
+          class="text-xs text-text-muted group-hover:text-text-muted/90 transition-colors truncate mt-0.5"
+        >
           {{ persona().alias ? '@' + persona().alias : 'Sin alias' }}
         </p>
       </div>

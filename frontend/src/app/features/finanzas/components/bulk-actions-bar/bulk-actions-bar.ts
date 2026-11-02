@@ -9,7 +9,7 @@ import {
   LucideX,
 } from '@lucide/angular';
 import { Banco, EstadoFinanzas, GrupoItemFinanzas } from '../../data/finanzas.model';
-import { formatCLP } from '../../utils/presupuesto.util';
+import { formatCLP } from '../../utils/moneda.util';
 
 /** Barra flotante con las acciones sobre los movimientos seleccionados. */
 @Component({

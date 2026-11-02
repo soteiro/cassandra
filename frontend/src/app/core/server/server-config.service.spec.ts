@@ -1,8 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+  TestRequest,
+} from '@angular/common/http/testing';
 import { APP_PLATFORM } from '../platform/app-platform';
-import { normalizeServerUrl, SERVER_STORAGE_KEY, ServerConfigService } from './server-config.service';
+import {
+  normalizeServerUrl,
+  SERVER_STORAGE_KEY,
+  ServerConfigService,
+} from './server-config.service';
 import { ProjectService } from '../../features/proyectos/data/project.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -19,9 +27,12 @@ describe('normalizeServerUrl', () => {
     expect(normalizeServerUrl(input)).toBe(expected);
   });
 
-  it.each(['', '   ', 'ftp://servidor.com', 'https://', 'no es una url'])('should reject %j', (input) => {
-    expect(normalizeServerUrl(input)).toBeNull();
-  });
+  it.each(['', '   ', 'ftp://servidor.com', 'https://', 'no es una url'])(
+    'should reject %j',
+    (input) => {
+      expect(normalizeServerUrl(input)).toBeNull();
+    },
+  );
 });
 
 describe('ServerConfigService', () => {
@@ -32,7 +43,10 @@ describe('ServerConfigService', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: APP_PLATFORM, useValue: { isNative: () => native, getVersion: async () => '0.3.0' } },
+        {
+          provide: APP_PLATFORM,
+          useValue: { isNative: () => native, getVersion: async () => '0.3.0' },
+        },
       ],
     });
     http = TestBed.inject(HttpTestingController);
@@ -109,7 +123,10 @@ describe('ServerConfigService', () => {
   it('connect should report unreachable servers', async () => {
     const service = setup(true);
     const promise = service.connect('https://caido.com');
-    (await versionRequest('https://caido.com/api/version')).flush(null, { status: 502, statusText: 'Bad Gateway' });
+    (await versionRequest('https://caido.com/api/version')).flush(null, {
+      status: 502,
+      statusText: 'Bad Gateway',
+    });
     const result = await promise;
     expect(!result.ok && result.error).toContain('No se pudo conectar');
   });
@@ -133,7 +150,9 @@ describe('ServerConfigService', () => {
     it('AuthService.me should not call any server while unconfigured', () => {
       setup(true);
       let result: boolean | undefined;
-      TestBed.inject(AuthService).me().subscribe((v) => (result = v));
+      TestBed.inject(AuthService)
+        .me()
+        .subscribe((v) => (result = v));
       expect(result).toBe(false);
       http.expectNone(() => true);
     });

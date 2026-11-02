@@ -21,6 +21,6 @@ export class MainLayout {
   private readonly _sidebarBackBtn = this.backButtonService.registerEffect(
     () => this.sidebar.isOpen(),
     () => this.sidebar.close(),
-    70
+    70,
   );
 }

@@ -17,7 +17,7 @@ import (
 
 type NotasProyectoHandler struct {
 	NotasRepo *repository.NotasProyectoRepository
-	owner *repository.Ownership
+	owner     *repository.Ownership
 }
 
 // constructor
@@ -150,7 +150,7 @@ func (h *NotasProyectoHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("[HANDLER:NotasProyecto.Delete] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
 		dbError(w, "Error al eliminar la nota de proyecto", err)
-		return 
+		return
 	}
 
 	log.Printf("[HANDLER:NotasProyecto.Delete] Éxito: nota eliminada | id=%d user_id=%d", id, userID)
@@ -182,7 +182,7 @@ func (h *NotasProyectoHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("[HANDLER:NotasProyecto.GetByID] Error en repositorio: %v | id=%d user_id=%d", err, id, userID)
 		dbError(w, "Error al obtener la nota de proyecto", err)
-		return 
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -191,7 +191,7 @@ func (h *NotasProyectoHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-// update 
+// update
 func (h *NotasProyectoHandler) Update(w http.ResponseWriter, r *http.Request) {
 	userId, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {

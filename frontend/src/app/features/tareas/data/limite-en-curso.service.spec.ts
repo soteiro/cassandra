@@ -18,13 +18,17 @@ describe('LimiteEnCursoService', () => {
 
   const verificar = (enCurso: number, limite: number) => {
     TestBed.inject(LimiteEnCursoService).verificar();
-    http.expectOne('/api/tareas?estado=En%20Curso').flush(Array.from({ length: enCurso }, (_, i) => ({ id: i })));
+    http
+      .expectOne('/api/tareas?estado=En%20Curso')
+      .flush(Array.from({ length: enCurso }, (_, i) => ({ id: i })));
     http.expectOne('/api/preferencias').flush({ dia_revision: 0, limite_en_curso: limite });
   };
 
   it('avisa si te pasas del límite', () => {
     verificar(6, 5);
-    expect(toast.info).toHaveBeenCalledWith('Tienes 6 tareas en curso y tu límite es 5. ¿Cuál pausas?');
+    expect(toast.info).toHaveBeenCalledWith(
+      'Tienes 6 tareas en curso y tu límite es 5. ¿Cuál pausas?',
+    );
   });
 
   it('no avisa en el límite o por debajo', () => {

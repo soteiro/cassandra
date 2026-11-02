@@ -87,7 +87,9 @@ export class Revision {
   );
 
   readonly proyectosActivos = computed(() =>
-    (this.projectService.projectsResource.value() ?? []).filter((p) => ESTADOS_ACTIVOS.has(p.estado)),
+    (this.projectService.projectsResource.value() ?? []).filter((p) =>
+      ESTADOS_ACTIVOS.has(p.estado),
+    ),
   );
 
   siguiente(): void {

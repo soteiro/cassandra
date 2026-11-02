@@ -15,7 +15,7 @@ import (
 )
 
 type FinanzasHandler struct {
-	repo *repository.FinanzasRepository
+	repo  *repository.FinanzasRepository
 	owner *repository.Ownership
 }
 

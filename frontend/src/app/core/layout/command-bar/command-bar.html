@@ -35,7 +35,7 @@
               type="button"
               (click)="select(match.project.id)"
               (mouseenter)="selectedIndex.set(i)"
-              class="w-full rounded-xl flex items-center gap-3 px-4 py-2.5 text-left text-sm  transition-colors cursor-pointer"
+              class="w-full rounded-xl flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer"
               [class.bg-primary]="selectedIndex() === i"
               [class.text-on-selected]="selectedIndex() === i"
               [class.text-text-main]="selectedIndex() !== i"

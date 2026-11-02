@@ -99,7 +99,9 @@ test.describe('tareas', () => {
     await expect(page.getByRole('button', { name: 'Pendientes (1)' })).toBeVisible();
 
     // Cambio de estado con el select.
-    await taskCard(page, tarea).getByRole('combobox', { name: 'Estado de la tarea' }).selectOption('En Curso');
+    await taskCard(page, tarea)
+      .getByRole('combobox', { name: 'Estado de la tarea' })
+      .selectOption('En Curso');
     await expect(page.getByRole('button', { name: 'En Curso (1)' })).toBeVisible();
 
     // Completar: desaparece de Pendientes y aparece tachada en Completadas.
@@ -134,6 +136,8 @@ test.describe('tareas', () => {
 
     await subtaskRow(card, 'Sub A').getByTitle('Completar subtarea').click();
     await expect(card.getByTitle('Subtareas: 1 de 2 completadas')).toBeVisible();
-    await expect(card.getByTitle('Haz clic para editar la subtarea').filter({ hasText: 'Sub A' })).toHaveClass(/line-through/);
+    await expect(
+      card.getByTitle('Haz clic para editar la subtarea').filter({ hasText: 'Sub A' }),
+    ).toHaveClass(/line-through/);
   });
 });

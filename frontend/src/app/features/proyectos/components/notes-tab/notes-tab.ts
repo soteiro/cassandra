@@ -78,7 +78,7 @@ export class NotesTab {
 
   getLinkableTasks(currentSelectedId?: number | null): Task[] {
     return (this.tareas() || []).filter(
-      (t) => t.estado === 'En Curso' || (currentSelectedId && t.id === currentSelectedId)
+      (t) => t.estado === 'En Curso' || (currentSelectedId && t.id === currentSelectedId),
     );
   }
 
@@ -88,23 +88,25 @@ export class NotesTab {
     if (!text || !pId) return;
 
     this.isSubmittingNota.set(true);
-    this.notaService.createNota(pId, {
-      nota: text,
-      tarea_id: this.newNotaTareaId() || undefined,
-    }).subscribe({
-      next: () => {
-        this.toastService.success('Nota guardada');
-        this.newNotaText.set('');
-        this.newNotaTareaId.set(null);
-        this.isSubmittingNota.set(false);
-        this.reload.emit();
-      },
-      error: (err) => {
-        this.toastService.error('Error al guardar la nota');
-        console.error('Error al crear nota:', err);
-        this.isSubmittingNota.set(false);
-      },
-    });
+    this.notaService
+      .createNota(pId, {
+        nota: text,
+        tarea_id: this.newNotaTareaId() || undefined,
+      })
+      .subscribe({
+        next: () => {
+          this.toastService.success('Nota guardada');
+          this.newNotaText.set('');
+          this.newNotaTareaId.set(null);
+          this.isSubmittingNota.set(false);
+          this.reload.emit();
+        },
+        error: (err) => {
+          this.toastService.error('Error al guardar la nota');
+          console.error('Error al crear nota:', err);
+          this.isSubmittingNota.set(false);
+        },
+      });
   }
 
   startEditNota(nota: NotaProyecto) {
@@ -129,23 +131,25 @@ export class NotesTab {
     const tareaIdVal = this.editingNotaTareaId();
 
     this.isUpdatingNota.set(true);
-    this.notaService.updateNota(nota.id, {
-      nota: text,
-      tarea_id: tareaIdVal,
-      clear_tarea_id: tareaIdVal === null,
-    }).subscribe({
-      next: () => {
-        this.toastService.success('Nota actualizada');
-        this.cancelEditNota();
-        this.isUpdatingNota.set(false);
-        this.reload.emit();
-      },
-      error: (err) => {
-        this.toastService.error('Error al actualizar la nota');
-        console.error('Error al actualizar nota:', err);
-        this.isUpdatingNota.set(false);
-      },
-    });
+    this.notaService
+      .updateNota(nota.id, {
+        nota: text,
+        tarea_id: tareaIdVal,
+        clear_tarea_id: tareaIdVal === null,
+      })
+      .subscribe({
+        next: () => {
+          this.toastService.success('Nota actualizada');
+          this.cancelEditNota();
+          this.isUpdatingNota.set(false);
+          this.reload.emit();
+        },
+        error: (err) => {
+          this.toastService.error('Error al actualizar la nota');
+          console.error('Error al actualizar nota:', err);
+          this.isUpdatingNota.set(false);
+        },
+      });
   }
 
   openDeleteNotaModal(nota: NotaProyecto) {
@@ -190,7 +194,7 @@ export class NotesTab {
       result = result.filter(
         (n) =>
           n.nota.toLowerCase().includes(query) ||
-          (n.tarea_nombre && n.tarea_nombre.toLowerCase().includes(query))
+          (n.tarea_nombre && n.tarea_nombre.toLowerCase().includes(query)),
       );
     }
 
@@ -210,7 +214,6 @@ export class NotesTab {
   getTareasCount(): number {
     return (this.notas() || []).filter((n) => !!n.tarea_id).length;
   }
-
 
   copyNotaContent(nota: NotaProyecto) {
     if (!navigator?.clipboard) return;
@@ -267,4 +270,3 @@ export class NotesTab {
     this.reload.emit();
   }
 }
-

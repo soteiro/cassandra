@@ -1,4 +1,14 @@
-<div [appLoading]="(personaResource?.isLoading() || false) || (!personaResource?.error() && !personaResource?.value()?.es_yo && (interaccionesResource?.isLoading() || false))" loadingLabel="Cargando perfil…" class="max-w-4xl mx-auto space-y-6">
+<div
+  [appLoading]="
+    personaResource?.isLoading() ||
+    false ||
+    (!personaResource?.error() &&
+      !personaResource?.value()?.es_yo &&
+      (interaccionesResource?.isLoading() || false))
+  "
+  loadingLabel="Cargando perfil…"
+  class="max-w-4xl mx-auto space-y-6"
+>
   <!-- BREADCRUMB / VOLVER -->
   <div>
     <a
@@ -10,7 +20,7 @@
     </a>
   </div>
 
-  @if (personaResource?.isLoading() && !personaResource?.value()) {
+  @if (personaResource?.isLoading() && !personaResource.value()) {
     <!-- SKELETON CARGA PERFIL -->
     <div class="p-6 bg-surface border border-surface-border rounded-2xl animate-pulse space-y-6">
       <div class="flex items-center gap-5">
@@ -24,15 +34,21 @@
     </div>
   } @else if (personaResource?.error()) {
     <!-- ERROR PERFIL -->
-    <div class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between">
+    <div
+      class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between"
+    >
       <div>
-        <h4 class="text-sm font-semibold text-danger">Error al cargar la información del contacto</h4>
-        <p class="text-xs text-text-muted mt-0.5">No se pudo obtener el perfil desde el servidor o no existe.</p>
+        <h4 class="text-sm font-semibold text-danger"
+          >Error al cargar la información del contacto</h4
+        >
+        <p class="text-xs text-text-muted mt-0.5"
+          >No se pudo obtener el perfil desde el servidor o no existe.</p
+        >
       </div>
       <div class="flex items-center gap-2">
         <button
           type="button"
-          (click)="personaResource?.reload()"
+          (click)="personaResource.reload()"
           class="text-xs bg-danger/20 hover:bg-danger/30 text-danger border border-danger/40 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
         >
           Reintentar
@@ -71,7 +87,9 @@
                 <h1 class="text-xl sm:text-2xl font-bold text-text-main tracking-tight truncate">
                   {{ persona.nombre }}
                 </h1>
-                <span class="text-xs font-mono text-text-muted/70 bg-background/90 px-2 py-0.5 rounded-md border border-surface-border">
+                <span
+                  class="text-xs font-mono text-text-muted/70 bg-background/90 px-2 py-0.5 rounded-md border border-surface-border"
+                >
                   #{{ persona.id }}
                 </span>
               </div>
@@ -85,7 +103,10 @@
               <div class="flex items-center gap-2 pt-1 flex-wrap">
                 @if (persona.entorno) {
                   <span
-                    [class]="'px-2.5 py-0.5 text-xs font-semibold rounded-lg border inline-flex items-center gap-1.5 ' + getEntornoBadgeClass(persona.entorno)"
+                    [class]="
+                      'px-2.5 py-0.5 text-xs font-semibold rounded-lg border inline-flex items-center gap-1.5 ' +
+                      getEntornoBadgeClass(persona.entorno)
+                    "
                   >
                     <svg lucideTag class="w-3 h-3" />
                     <span>{{ persona.entorno }}</span>
@@ -124,7 +145,9 @@
 
         <!-- SECCIÓN DE NOTAS Y CONTEXTO DEL PERFIL -->
         <div class="p-4 bg-background/60 rounded-xl border border-surface-border/60 space-y-2">
-          <div class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-muted/80">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-muted/80"
+          >
             <svg lucideInfo class="w-3.5 h-3.5 text-primary-text" />
             <span>Información de Contexto & Notas</span>
           </div>
@@ -134,7 +157,8 @@
             </p>
           } @else {
             <p class="text-xs text-text-muted/60 italic">
-              Sin información adicional registrada. Haz clic en "Editar Perfil" para agregar detalles o notas contextuales.
+              Sin información adicional registrada. Haz clic en "Editar Perfil" para agregar
+              detalles o notas contextuales.
             </p>
           }
         </div>
@@ -142,17 +166,20 @@
 
       <!-- SECCIÓN DE LISTA SIMPLE DE INTERACCIONES -->
       <div class="p-6 bg-surface border border-surface-border rounded-2xl space-y-5">
-        <div class="flex items-center justify-between gap-4 pb-3 border-b border-surface-border flex-wrap">
+        <div
+          class="flex items-center justify-between gap-4 pb-3 border-b border-surface-border flex-wrap"
+        >
           <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center">
+            <div
+              class="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center"
+            >
               <svg lucideMessageSquare class="w-4 h-4" />
             </div>
             <div>
-              <h3 class="text-base font-bold text-text-main">
-                Interacciones & Historial
-              </h3>
+              <h3 class="text-base font-bold text-text-main"> Interacciones & Historial </h3>
               <p class="text-xs text-text-muted">
-                Haz clic en cualquier interacción para ver todos sus detalles en el panel lateral derecho.
+                Haz clic en cualquier interacción para ver todos sus detalles en el panel lateral
+                derecho.
               </p>
             </div>
           </div>
@@ -169,7 +196,9 @@
 
         <!-- FORMULARIO PARA AGREGAR NUEVA INTERACCIÓN -->
         @if (showAddInteraccion()) {
-          <div class="p-4 bg-background/80 rounded-xl border border-surface-border space-y-3 animate-in fade-in duration-150">
+          <div
+            class="p-4 bg-background/80 rounded-xl border border-surface-border space-y-3 animate-in fade-in duration-150"
+          >
             <label class="block text-xs font-semibold text-text-main">
               Registrar nueva interacción o nota
             </label>
@@ -207,10 +236,12 @@
         }
 
         <!-- CARGA DE INTERACCIONES -->
-        @if (interaccionesResource?.isLoading() && !interaccionesResource?.value()) {
+        @if (interaccionesResource?.isLoading() && !interaccionesResource.value()) {
           <div class="space-y-2.5">
             @for (item of [1, 2, 3]; track item) {
-              <div class="p-4 bg-background/60 border border-surface-border rounded-xl animate-pulse flex items-center justify-between">
+              <div
+                class="p-4 bg-background/60 border border-surface-border rounded-xl animate-pulse flex items-center justify-between"
+              >
                 <div class="w-2/3 h-4 bg-background rounded-lg"></div>
                 <div class="w-20 h-3 bg-background rounded-lg"></div>
               </div>
@@ -219,7 +250,12 @@
         } @else if (interaccionesResource?.error()) {
           <div role="alert" class="p-4 space-y-3">
             <p class="text-sm text-danger">No se pudieron cargar las interacciones.</p>
-            <button type="button" (click)="interaccionesResource?.reload()" class="text-sm text-primary-text underline cursor-pointer">Reintentar</button>
+            <button
+              type="button"
+              (click)="interaccionesResource.reload()"
+              class="text-sm text-primary-text underline cursor-pointer"
+              >Reintentar</button
+            >
           </div>
         } @else if (interaccionesResource?.value(); as interacciones) {
           <!-- LISTA SIMPLE DE INTERACCIONES -->
@@ -231,8 +267,12 @@
               >
                 <!-- TEXTO DE LA INTERACCIÓN -->
                 <div class="min-w-0 flex-1 flex items-center gap-3">
-                  <div class="w-2 h-2 rounded-full bg-primary/70 shrink-0 group-hover:scale-125 transition-transform"></div>
-                  <p class="text-xs sm:text-sm text-text-main group-hover:text-primary-text transition-colors truncate">
+                  <div
+                    class="w-2 h-2 rounded-full bg-primary/70 shrink-0 group-hover:scale-125 transition-transform"
+                  ></div>
+                  <p
+                    class="text-xs sm:text-sm text-text-main group-hover:text-primary-text transition-colors truncate"
+                  >
                     {{ item.interaccion }}
                   </p>
                 </div>
@@ -244,7 +284,9 @@
                     <span>{{ item.fecha_creacion | date: 'dd/MM/yyyy HH:mm' }}</span>
                   </div>
 
-                  <span class="text-xs font-semibold text-primary-text/70 group-hover:text-primary-text group-hover:translate-x-1 transition-all flex items-center gap-1">
+                  <span
+                    class="text-xs font-semibold text-primary-text/70 group-hover:text-primary-text group-hover:translate-x-1 transition-all flex items-center gap-1"
+                  >
                     <span class="hidden sm:inline text-[11px]">Ver</span>
                     <svg lucideArrowRight class="w-3.5 h-3.5" />
                   </span>
@@ -252,7 +294,9 @@
               </div>
             } @empty {
               <!-- ESTADO VACÍO -->
-              <div class="p-8 text-center bg-background/40 border border-dashed border-surface-border/60 rounded-xl space-y-2">
+              <div
+                class="p-8 text-center bg-background/40 border border-dashed border-surface-border/60 rounded-xl space-y-2"
+              >
                 <p class="text-xs text-text-muted">
                   No hay interacciones registradas para este contacto todavía.
                 </p>
@@ -284,7 +328,11 @@
       <app-confirm-modal
         [isOpen]="showDeleteModal()"
         title="¿Eliminar contacto?"
-        [message]="'¿Estás seguro de que deseas eliminar permanentemente a ' + persona.nombre + '? Esta acción no se puede deshacer.'"
+        [message]="
+          '¿Estás seguro de que deseas eliminar permanentemente a ' +
+          persona.nombre +
+          '? Esta acción no se puede deshacer.'
+        "
         confirmText="Eliminar Persona"
         cancelText="Cancelar"
         variant="danger"

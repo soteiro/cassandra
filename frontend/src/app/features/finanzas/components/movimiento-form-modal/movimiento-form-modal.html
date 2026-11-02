@@ -1,6 +1,10 @@
 @if (showItemModal()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
-    <div class="bg-surface border border-surface-border rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs"
+  >
+    <div
+      class="bg-surface border border-surface-border rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4"
+    >
       <div class="flex items-center justify-between p-5 border-b border-surface-border">
         <h3 class="text-base font-bold text-text-main flex items-center gap-2">
           <svg lucideWallet class="w-5 h-5 text-primary-text" />
@@ -113,7 +117,9 @@
         <!-- DESTINO / MECANISMO DE PAGO (SOLO EGRESOS) -->
         @if (formTipo() === 'egreso') {
           <div>
-            <label class="block text-text-muted font-medium mb-1">Mecanismo / Destino de Pago</label>
+            <label class="block text-text-muted font-medium mb-1"
+              >Mecanismo / Destino de Pago</label
+            >
             <select
               [ngModel]="formMovimientoEsperadoId()"
               (ngModelChange)="formMovimientoEsperadoId.set($event)"

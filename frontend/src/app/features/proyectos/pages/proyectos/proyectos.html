@@ -1,17 +1,24 @@
-<div [appLoading]="projectsResource.isLoading()" loadingLabel="Cargando proyectos…" class="max-w-6xl mx-auto space-y-6">
+<div
+  [appLoading]="projectsResource.isLoading()"
+  loadingLabel="Cargando proyectos…"
+  class="max-w-6xl mx-auto space-y-6"
+>
   <!-- ENCABEZADO Y ACCIONES PRINCIPALES -->
-  <div class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-surface-border">
+  <div
+    class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-surface-border"
+  >
     <div class="space-y-1">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center">
+        <div
+          class="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center"
+        >
           <svg lucideFolder class="w-4 h-4" />
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold text-text-main tracking-tight">
-          Proyectos
-        </h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-text-main tracking-tight"> Proyectos </h1>
       </div>
       <p class="text-xs text-text-muted">
-        Iniciativas estratégicas principales. Los subproyectos y entregables se gestionan dentro de cada proyecto.
+        Iniciativas estratégicas principales. Los subproyectos y entregables se gestionan dentro de
+        cada proyecto.
       </p>
     </div>
 
@@ -60,10 +67,14 @@
     </div>
   } @else if (projectsResource.error()) {
     <!-- ERROR -->
-    <div class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between">
+    <div
+      class="p-6 bg-danger/15 border border-danger/30 rounded-2xl flex items-center justify-between"
+    >
       <div>
         <h4 class="text-sm font-semibold text-danger">Error al cargar proyectos</h4>
-        <p class="text-xs text-text-muted mt-0.5">No se pudo sincronizar la lista desde el servidor.</p>
+        <p class="text-xs text-text-muted mt-0.5"
+          >No se pudo sincronizar la lista desde el servidor.</p
+        >
       </div>
       <button
         type="button"
@@ -75,10 +86,14 @@
     </div>
   } @else if (projectsResource.value(); as proyectos) {
     <!-- BARRA DE BÚSQUEDA Y FILTROS -->
-    <div class="flex flex-wrap items-center justify-between gap-3 bg-surface border border-surface-border rounded-2xl p-3 shadow-sm">
+    <div
+      class="flex flex-wrap items-center justify-between gap-3 bg-surface border border-surface-border rounded-2xl p-3 shadow-sm"
+    >
       <!-- INPUT DE BÚSQUEDA -->
       <div class="relative flex-1 min-w-55">
-        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+        <span
+          class="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+        >
           <svg lucideSearch class="w-4 h-4" />
         </span>
         <input
@@ -92,11 +107,17 @@
       </div>
 
       <!-- FILTROS POR ESTADO / PRIORIDAD -->
-      <div class="grid w-full min-w-0 grid-cols-2 items-center gap-1 bg-background p-1 rounded-xl border border-surface-border text-xs sm:flex sm:w-auto sm:max-w-full sm:flex-wrap">
+      <div
+        class="grid w-full min-w-0 grid-cols-2 items-center gap-1 bg-background p-1 rounded-xl border border-surface-border text-xs sm:flex sm:w-auto sm:max-w-full sm:flex-wrap"
+      >
         <button
           type="button"
           (click)="statusFilter.set('all')"
-          [class]="statusFilter() === 'all' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="
+            statusFilter() === 'all'
+              ? 'bg-surface text-primary-text font-semibold shadow-xs'
+              : 'text-text-muted hover:text-text-main'
+          "
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Todos ({{ getStats(proyectos).total }})
@@ -104,7 +125,11 @@
         <button
           type="button"
           (click)="statusFilter.set('active')"
-          [class]="statusFilter() === 'active' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="
+            statusFilter() === 'active'
+              ? 'bg-surface text-primary-text font-semibold shadow-xs'
+              : 'text-text-muted hover:text-text-main'
+          "
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Activos ({{ getStats(proyectos).active }})
@@ -112,7 +137,11 @@
         <button
           type="button"
           (click)="statusFilter.set('completed')"
-          [class]="statusFilter() === 'completed' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="
+            statusFilter() === 'completed'
+              ? 'bg-surface text-primary-text font-semibold shadow-xs'
+              : 'text-text-muted hover:text-text-main'
+          "
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Terminados ({{ getStats(proyectos).completed }})
@@ -120,7 +149,11 @@
         <button
           type="button"
           (click)="statusFilter.set('critical')"
-          [class]="statusFilter() === 'critical' ? 'bg-surface text-primary-text font-semibold shadow-xs' : 'text-text-muted hover:text-text-main'"
+          [class]="
+            statusFilter() === 'critical'
+              ? 'bg-surface text-primary-text font-semibold shadow-xs'
+              : 'text-text-muted hover:text-text-main'
+          "
           class="min-h-11 px-2.5 py-1 rounded-lg transition-colors cursor-pointer sm:min-h-0"
         >
           Alta Prioridad ({{ getStats(proyectos).critical }})
@@ -130,19 +163,31 @@
 
     <!-- GRID DE TARJETAS DE PROYECTOS PRINCIPALES -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      @for (p of getFilteredProjects(proyectos); track p.id;) {
+      @for (p of getFilteredProjects(proyectos); track p.id) {
         <app-project-card [project]="p" />
       } @empty {
-        <div class="col-span-full p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-4">
-          <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-text">
+        <div
+          class="col-span-full p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-4"
+        >
+          <div
+            class="w-12 h-12 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-text"
+          >
             <svg lucideFolderPlus class="w-6 h-6" />
           </div>
           <div>
             <h4 class="text-base font-semibold text-text-main">
-              {{ searchQuery() || statusFilter() !== 'all' ? 'No se encontraron proyectos con ese criterio' : 'No tienes proyectos principales creados aún' }}
+              {{
+                searchQuery() || statusFilter() !== 'all'
+                  ? 'No se encontraron proyectos con ese criterio'
+                  : 'No tienes proyectos principales creados aún'
+              }}
             </h4>
             <p class="text-xs text-text-muted mt-1 max-w-md mx-auto">
-              {{ searchQuery() || statusFilter() !== 'all' ? 'Prueba ajustando los términos de búsqueda o los filtros activos.' : 'Tómate un momento para definir tu primer proyecto con propósito e intención.' }}
+              {{
+                searchQuery() || statusFilter() !== 'all'
+                  ? 'Prueba ajustando los términos de búsqueda o los filtros activos.'
+                  : 'Tómate un momento para definir tu primer proyecto con propósito e intención.'
+              }}
             </p>
           </div>
           @if (!searchQuery() && statusFilter() === 'all') {

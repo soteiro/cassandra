@@ -7,7 +7,7 @@ import { ServerConfigService } from '../../../core/server/server-config.service'
 import { LimiteEnCursoService } from './limite-en-curso.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TaskService {
   private readonly serverConfig = inject(ServerConfigService);
@@ -18,7 +18,7 @@ export class TaskService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly limiteEnCurso = inject(LimiteEnCursoService);
-  
+
   public getTasksByProyectoId(proyectoId: () => string | number | null) {
     if (!this.authService.isLoggedIn()) {
       return undefined;
@@ -50,11 +50,15 @@ export class TaskService {
   }
 
   createTask(req: TaskRequest): Observable<Task> {
-    return this.http.post<Task>(`${this.apiUrl}/tareas`, req).pipe(tap(() => this.avisarSiEnCurso(req.estado)));
+    return this.http
+      .post<Task>(`${this.apiUrl}/tareas`, req)
+      .pipe(tap(() => this.avisarSiEnCurso(req.estado)));
   }
 
   updateTask(id: number, req: Partial<TaskRequest>): Observable<Task> {
-    return this.http.put<Task>(`${this.apiUrl}/tareas/${id}`, req).pipe(tap(() => this.avisarSiEnCurso(req.estado)));
+    return this.http
+      .put<Task>(`${this.apiUrl}/tareas/${id}`, req)
+      .pipe(tap(() => this.avisarSiEnCurso(req.estado)));
   }
 
   /** Al poner una tarea En Curso, aviso suave si te pasas del límite. */

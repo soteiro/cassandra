@@ -2,21 +2,11 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProjectResponse } from '../../data/project.model';
 import { ProjectCard } from '../project-card/project-card';
-import {
-  LucideLayers,
-  LucidePlus,
-  LucideFolderPlus,
-} from '@lucide/angular';
+import { LucideLayers, LucidePlus, LucideFolderPlus } from '@lucide/angular';
 
 @Component({
   selector: 'app-subprojects-tab',
-  imports: [
-    CommonModule,
-    ProjectCard,
-    LucideLayers,
-    LucidePlus,
-    LucideFolderPlus,
-  ],
+  imports: [CommonModule, ProjectCard, LucideLayers, LucidePlus, LucideFolderPlus],
   templateUrl: './subprojects-tab.html',
 })
 export class SubprojectsTab {

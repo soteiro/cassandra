@@ -16,7 +16,8 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-//directiva //go:embed, le dice a go que compile los archivos sql dentro del ejecutable
+// directiva //go:embed, le dice a go que compile los archivos sql dentro del ejecutable
+//
 //go:embed migrations/*.sql
 var migrationFS embed.FS
 

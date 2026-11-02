@@ -37,7 +37,9 @@ describe('APIKeyService', () => {
   it('reads the current server URL on every request', () => {
     TestBed.resetTestingModule();
     const apiUrl = signal('https://first.example/api');
-    TestBed.configureTestingModule({ providers: [{ provide: ServerConfigService, useValue: { apiUrl } }] });
+    TestBed.configureTestingModule({
+      providers: [{ provide: ServerConfigService, useValue: { apiUrl } }],
+    });
     http = setupHttpTesting();
     service = TestBed.inject(APIKeyService);
     service.list().subscribe();

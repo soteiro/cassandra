@@ -172,11 +172,3 @@ export function getMontoColorClass(item: FinanzasPlantillaItem): string {
     ? 'text-danger font-semibold font-mono'
     : 'text-success font-semibold font-mono';
 }
-
-export function formatCLP(val: number): string {
-  return new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-  }).format(val || 0);
-}

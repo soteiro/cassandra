@@ -69,7 +69,10 @@ export class ServerConfigService {
       );
       version = body?.version;
     } catch {
-      return { ok: false, error: 'No se pudo conectar con el servidor. Revisa la dirección y tu conexión.' };
+      return {
+        ok: false,
+        error: 'No se pudo conectar con el servidor. Revisa la dirección y tu conexión.',
+      };
     }
     if (typeof version !== 'string' || !version) {
       return { ok: false, error: 'La dirección responde, pero no es un servidor Cassandra.' };

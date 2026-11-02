@@ -9,9 +9,16 @@ describe('TickTickPage', () => {
   beforeEach(() => {
     navigate.mockReset();
     TestBed.configureTestingModule({
-      imports: [TickTickPage], providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]),
+      imports: [TickTickPage],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
         { provide: TICKTICK_NAVIGATE, useValue: navigate },
-        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({}) } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParamMap: convertToParamMap({}) } },
+        },
       ],
     });
   });
@@ -20,7 +27,9 @@ describe('TickTickPage', () => {
   function setup(connected = false) {
     const fixture = TestBed.createComponent(TickTickPage);
     const http = TestBed.inject(HttpTestingController);
-    http.expectOne('/api/connections/ticktick').flush({ available: true, connected, needs_reauthorize: false, connected_at: null });
+    http
+      .expectOne('/api/connections/ticktick')
+      .flush({ available: true, connected, needs_reauthorize: false, connected_at: null });
     fixture.detectChanges();
     return { fixture, http, el: fixture.nativeElement as HTMLElement };
   }
@@ -36,30 +45,44 @@ describe('TickTickPage', () => {
   it('rejects an unexpected redirect origin', () => {
     const { fixture, http } = setup();
     fixture.componentInstance.connect();
-    http.expectOne('/api/connections/ticktick/authorize').flush({ authorization_url: 'https://evil.test' });
+    http
+      .expectOne('/api/connections/ticktick/authorize')
+      .flush({ authorization_url: 'https://evil.test' });
     expect(navigate).not.toHaveBeenCalled();
     expect(fixture.componentInstance.error()).toContain('No se pudo abrir');
     expect(fixture.componentInstance.saving()).toBe(false);
   });
   it('requires confirmation before disconnecting and reports failed remote revocation', () => {
     const { fixture, http, el } = setup(true);
-    el.querySelector<HTMLButtonElement>('button')!.click(); fixture.detectChanges();
+    el.querySelector<HTMLButtonElement>('button')!.click();
+    fixture.detectChanges();
     http.expectNone((r) => r.method === 'DELETE');
     expect(el.textContent).toContain('¿Desconectar tu cuenta?');
     fixture.componentInstance.disconnect();
     const request = http.expectOne('/api/connections/ticktick');
     expect(request.request.method).toBe('DELETE');
-    request.flush({ available: true, connected: false, needs_reauthorize: false, connected_at: null, revocation_failed: true });
+    request.flush({
+      available: true,
+      connected: false,
+      needs_reauthorize: false,
+      connected_at: null,
+      revocation_failed: true,
+    });
     fixture.detectChanges();
     expect(el.textContent).toContain('No se pudo confirmar la revocación');
     expect(el.textContent).toContain('Conectar TickTick');
   });
   it('removes callback status from the address and explains expiry', () => {
-    TestBed.overrideProvider(ActivatedRoute, { useValue: { snapshot: { queryParamMap: convertToParamMap({ ticktick: 'invalid_state' }) } } });
+    TestBed.overrideProvider(ActivatedRoute, {
+      useValue: { snapshot: { queryParamMap: convertToParamMap({ ticktick: 'invalid_state' }) } },
+    });
     const router = TestBed.inject(Router);
     const clean = vi.spyOn(router, 'navigate').mockResolvedValue(true);
     const { el } = setup();
     expect(el.textContent).toContain('venció o ya se utilizó');
-    expect(clean).toHaveBeenCalledWith([], expect.objectContaining({ replaceUrl: true, queryParams: { ticktick: null } }));
+    expect(clean).toHaveBeenCalledWith(
+      [],
+      expect.objectContaining({ replaceUrl: true, queryParams: { ticktick: null } }),
+    );
   });
 });

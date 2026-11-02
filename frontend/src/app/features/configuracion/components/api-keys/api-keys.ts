@@ -1,6 +1,13 @@
 import {
-  afterRenderEffect, ChangeDetectionStrategy, Component, computed, DestroyRef,
-  ElementRef, inject, signal, viewChild,
+  afterRenderEffect,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,7 +29,9 @@ export class ApiKeys {
   private readonly service = inject(APIKeyService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly projectsResource = inject(ProjectService).projectsResource;
-  protected readonly projects = computed(() => this.projectsResource.error() ? [] : this.projectsResource.value() ?? []);
+  protected readonly projects = computed(() =>
+    this.projectsResource.error() ? [] : (this.projectsResource.value() ?? []),
+  );
   protected readonly keys = signal<APIKey[]>([]);
   protected readonly loading = signal(false);
   protected readonly loadError = signal('');
@@ -55,7 +64,10 @@ export class ApiKeys {
     this.loadKeys();
     afterRenderEffect(() => {
       const input = this.secretInput()?.nativeElement;
-      if (input) { input.focus(); input.select(); }
+      if (input) {
+        input.focus();
+        input.select();
+      }
     });
     afterRenderEffect(() => this.revokeConfirm()?.nativeElement.focus());
     afterRenderEffect(() => {
@@ -71,17 +83,27 @@ export class ApiKeys {
     if (this.loading()) return;
     this.loading.set(true);
     this.loadError.set('');
-    this.service.list().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: keys => { this.keys.set(keys ?? []); this.loading.set(false); },
-      error: err => {
-        this.loadError.set(getErrorMessage(err, 'No se pudieron cargar las claves. Intenta de nuevo.'));
-        this.loading.set(false);
-      },
-    });
+    this.service
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (keys) => {
+          this.keys.set(keys ?? []);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.loadError.set(
+            getErrorMessage(err, 'No se pudieron cargar las claves. Intenta de nuevo.'),
+          );
+          this.loading.set(false);
+        },
+      });
   }
 
   protected toggleProject(id: number): void {
-    this.selectedProjects.update(ids => ids.includes(id) ? ids.filter(value => value !== id) : [...ids, id]);
+    this.selectedProjects.update((ids) =>
+      ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id],
+    );
   }
 
   protected generate(): void {
@@ -89,8 +111,14 @@ export class ApiKeys {
     this.submitted.set(true);
     this.form.markAllAsTouched();
     this.createError.set('');
-    if (this.form.invalid || this.selectedProjects().length === 0 || this.selectedProjects().length > 50
-      || this.projectsResource.isLoading() || this.projectsResource.error()) return;
+    if (
+      this.form.invalid ||
+      this.selectedProjects().length === 0 ||
+      this.selectedProjects().length > 50 ||
+      this.projectsResource.isLoading() ||
+      this.projectsResource.error()
+    )
+      return;
     const { nombre, acceso, tareas, dias } = this.form.getRawValue();
     const scopes: APIKeyScope[] = [];
     if (acceso === 'read' || acceso === 'write') scopes.push('memory:read');
@@ -106,26 +134,35 @@ export class ApiKeys {
       scopes,
       proyecto_ids: [...this.selectedProjects()],
     };
-    if (dias !== 'never') request.expira_en = new Date(Date.now() + Number(dias) * 86_400_000).toISOString();
+    if (dias !== 'never')
+      request.expira_en = new Date(Date.now() + Number(dias) * 86_400_000).toISOString();
     this.focusName.set(false);
     this.saving.set(true);
-    this.service.create(request).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: ({ token, ...key }) => {
-        this.keys.update(keys => [key, ...keys]);
-        this.issued.set({ id: key.id, nombre: key.nombre, token });
-        this.copyStatus.set('');
-        this.copyFailed.set(false);
-        this.notice.set('');
-        this.saving.set(false);
-        this.form.reset({ nombre: '', acceso: 'read', tareas: 'none', dias: '90' });
-        this.selectedProjects.set([]);
-        this.submitted.set(false);
-      },
-      error: err => {
-        this.createError.set(getErrorMessage(err, 'No se pudo generar la clave. Conservamos los datos para reintentar.'));
-        this.saving.set(false);
-      },
-    });
+    this.service
+      .create(request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ token, ...key }) => {
+          this.keys.update((keys) => [key, ...keys]);
+          this.issued.set({ id: key.id, nombre: key.nombre, token });
+          this.copyStatus.set('');
+          this.copyFailed.set(false);
+          this.notice.set('');
+          this.saving.set(false);
+          this.form.reset({ nombre: '', acceso: 'read', tareas: 'none', dias: '90' });
+          this.selectedProjects.set([]);
+          this.submitted.set(false);
+        },
+        error: (err) => {
+          this.createError.set(
+            getErrorMessage(
+              err,
+              'No se pudo generar la clave. Conservamos los datos para reintentar.',
+            ),
+          );
+          this.saving.set(false);
+        },
+      });
   }
 
   protected async copyKey(): Promise<void> {
@@ -140,7 +177,9 @@ export class ApiKeys {
     } catch {
       if (this.destroyRef.destroyed || this.issued() !== key) return;
       this.copyFailed.set(true);
-      this.copyStatus.set('No se pudo copiar automáticamente. Selecciona la clave y cópiala manualmente.');
+      this.copyStatus.set(
+        'No se pudo copiar automáticamente. Selecciona la clave y cópiala manualmente.',
+      );
       this.secretInput()?.nativeElement.focus();
       this.secretInput()?.nativeElement.select();
     } finally {
@@ -155,15 +194,21 @@ export class ApiKeys {
   }
 
   protected projectNames(key: APIKey): string {
-    return key.proyecto_ids.map(id => this.projects().find(project => project.id === id)?.nombre ?? `Proyecto #${id}`).join(', ');
+    return key.proyecto_ids
+      .map(
+        (id) => this.projects().find((project) => project.id === id)?.nombre ?? `Proyecto #${id}`,
+      )
+      .join(', ');
   }
 
   protected permissionNames(key: APIKey): string {
     const names: Record<APIKeyScope, string> = {
-      'memory:read': 'Leer memoria', 'memory:write': 'Guardar memoria',
-      'tasks:read': 'Leer tareas', 'tasks:create': 'Crear tareas',
+      'memory:read': 'Leer memoria',
+      'memory:write': 'Guardar memoria',
+      'tasks:read': 'Leer tareas',
+      'tasks:create': 'Crear tareas',
     };
-    return key.scopes.map(scope => names[scope]).join(', ');
+    return key.scopes.map((scope) => names[scope]).join(', ');
   }
 
   protected keyStatus(key: APIKey): 'Activa' | 'Revocada' | 'Vencida' {
@@ -190,20 +235,29 @@ export class ApiKeys {
     if (!key || this.revoking()) return;
     this.revoking.set(true);
     this.revokeError.set('');
-    this.service.revoke(key.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.keys.update(keys => keys.map(item => item.id === key.id ? { ...item, revocada_en: new Date().toISOString() } : item));
-        if (this.issued()?.id === key.id) this.issued.set(null);
-        this.pendingRevoke.set(null);
-        this.revoking.set(false);
-        this.notice.set(`Clave «${key.nombre}» revocada.`);
-        this.focusName.set(true);
-        this.nameInput()?.nativeElement.focus();
-      },
-      error: err => {
-        this.revokeError.set(getErrorMessage(err, 'No se pudo revocar la clave. Intenta de nuevo.'));
-        this.revoking.set(false);
-      },
-    });
+    this.service
+      .revoke(key.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.keys.update((keys) =>
+            keys.map((item) =>
+              item.id === key.id ? { ...item, revocada_en: new Date().toISOString() } : item,
+            ),
+          );
+          if (this.issued()?.id === key.id) this.issued.set(null);
+          this.pendingRevoke.set(null);
+          this.revoking.set(false);
+          this.notice.set(`Clave «${key.nombre}» revocada.`);
+          this.focusName.set(true);
+          this.nameInput()?.nativeElement.focus();
+        },
+        error: (err) => {
+          this.revokeError.set(
+            getErrorMessage(err, 'No se pudo revocar la clave. Intenta de nuevo.'),
+          );
+          this.revoking.set(false);
+        },
+      });
   }
 }

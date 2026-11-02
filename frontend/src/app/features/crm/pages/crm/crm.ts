@@ -82,8 +82,7 @@ export class Crm {
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        const errorMsg =
-          getErrorMessage(err, 'Error al registrar la persona');
+        const errorMsg = getErrorMessage(err, 'Error al registrar la persona');
         this.toastService.error(errorMsg);
       },
     });
@@ -102,9 +101,7 @@ export class Crm {
 
     if (query) {
       list = list.filter(
-        (p) =>
-          p.nombre?.toLowerCase().includes(query) ||
-          p.alias?.toLowerCase().includes(query)
+        (p) => p.nombre?.toLowerCase().includes(query) || p.alias?.toLowerCase().includes(query),
       );
     }
 
@@ -125,4 +122,3 @@ export class Crm {
     return { total: active.length, contactos: contactos.length };
   }
 }
-

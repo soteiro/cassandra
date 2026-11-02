@@ -39,7 +39,15 @@ export async function createTask(
   extra: Record<string, unknown> = {},
 ): Promise<Created> {
   const res = await request.post('/api/tareas', {
-    data: { nombre, descripcion: '', comentario: '', estado: 'Abierto', prioridad: 'normal', proyect_id: proyectId, ...extra },
+    data: {
+      nombre,
+      descripcion: '',
+      comentario: '',
+      estado: 'Abierto',
+      prioridad: 'normal',
+      proyect_id: proyectId,
+      ...extra,
+    },
   });
   expect(res.ok(), await res.text()).toBeTruthy();
   return res.json();

@@ -155,7 +155,11 @@ describe('TasksTab', () => {
     });
 
     it('getTaskCountByStatus should be case-insensitive and default to Abierto', () => {
-      const list = [makeTask({ estado: '' }), makeTask({ estado: 'abierto' }), makeTask({ estado: 'En Curso' })];
+      const list = [
+        makeTask({ estado: '' }),
+        makeTask({ estado: 'abierto' }),
+        makeTask({ estado: 'En Curso' }),
+      ];
       expect(component.getTaskCountByStatus(list, 'Abierto')).toBe(2);
       expect(component.getTaskCountByStatus(list, 'en curso')).toBe(1);
     });
@@ -278,7 +282,9 @@ describe('TasksTab', () => {
     it('«Ya lo hice» la crea terminada', () => {
       component.quickTaskTitle.set('Llamé al banco');
       component.createQuickTask(true);
-      expect(taskService.createTask).toHaveBeenCalledWith(expect.objectContaining({ nombre: 'Llamé al banco', estado: 'Terminado' }));
+      expect(taskService.createTask).toHaveBeenCalledWith(
+        expect.objectContaining({ nombre: 'Llamé al banco', estado: 'Terminado' }),
+      );
       expect(toast.success).toHaveBeenCalledWith('Registrada como hecha');
     });
 

@@ -7,7 +7,11 @@ import { parseMarkdown } from '../utils/markdown.util';
 
 @Component({
   imports: [MermaidDirective],
-  template: `<div [innerHTML]="html()" [appMermaid]="html()" [appMermaidDebounce]="debounce()"></div>`,
+  template: `<div
+    [innerHTML]="html()"
+    [appMermaid]="html()"
+    [appMermaidDebounce]="debounce()"
+  ></div>`,
 })
 class Host {
   readonly html = signal('');
@@ -82,7 +86,8 @@ describe('MermaidDirective', () => {
   });
 
   it('redraws an existing diagram when appearance changes without losing its source', async () => {
-    mermaid.render.mockResolvedValueOnce('<svg id="first-palette"></svg>')
+    mermaid.render
+      .mockResolvedValueOnce('<svg id="first-palette"></svg>')
       .mockResolvedValueOnce('<svg id="second-palette"></svg>');
     host.html.set(doc('graph TD; A-->B'));
     fixture.detectChanges();

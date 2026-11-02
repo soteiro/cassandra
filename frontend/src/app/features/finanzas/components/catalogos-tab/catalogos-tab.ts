@@ -9,12 +9,7 @@ import {
   MovimientoEsperadoFinanzas,
   TipoBanco,
 } from '../../data/finanzas.model';
-import {
-  LucideLandmark,
-  LucideTag,
-  LucideSlidersHorizontal,
-  LucideTrash2,
-} from '@lucide/angular';
+import { LucideLandmark, LucideTag, LucideSlidersHorizontal, LucideTrash2 } from '@lucide/angular';
 
 @Component({
   selector: 'app-catalogos-tab',
@@ -60,21 +55,19 @@ export class CatalogosTab {
     if (!nombre) return;
 
     this.isSubmittingBanco.set(true);
-    this.finanzasService
-      .createBanco({ nombre, tipo: this.newBancoTipo() })
-      .subscribe({
-        next: () => {
-          this.toastService.success(`Cuenta "${nombre}" agregada`);
-          this.newBancoNombre.set('');
-          this.isSubmittingBanco.set(false);
-          this.reload.emit();
-        },
-        error: (err) => {
-          this.toastService.error('Error al crear cuenta/banco');
-          this.isSubmittingBanco.set(false);
-          console.error(err);
-        },
-      });
+    this.finanzasService.createBanco({ nombre, tipo: this.newBancoTipo() }).subscribe({
+      next: () => {
+        this.toastService.success(`Cuenta "${nombre}" agregada`);
+        this.newBancoNombre.set('');
+        this.isSubmittingBanco.set(false);
+        this.reload.emit();
+      },
+      error: (err) => {
+        this.toastService.error('Error al crear cuenta/banco');
+        this.isSubmittingBanco.set(false);
+        console.error(err);
+      },
+    });
   }
 
   deleteBanco(id: number): void {

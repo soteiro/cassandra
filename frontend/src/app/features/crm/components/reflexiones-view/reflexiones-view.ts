@@ -51,8 +51,9 @@ export class ReflexionesView {
   activeFilter = signal<string>('todas');
 
   // Resource
-  protected readonly reflexionesResource =
-    this.reflexionService.getReflexionesByTipo(this.activeFilter);
+  protected readonly reflexionesResource = this.reflexionService.getReflexionesByTipo(
+    this.activeFilter,
+  );
 
   // Quick writer signals
   nuevoTexto = signal('');
@@ -78,7 +79,7 @@ export class ReflexionesView {
 
   // Calculate statistics from current items
   stats = computed(() => {
-    const items = this.reflexionesResource?.error() ? [] : (this.reflexionesResource?.value() || []);
+    const items = this.reflexionesResource?.error() ? [] : this.reflexionesResource?.value() || [];
     return {
       total: items.length,
       reflexiones: items.filter((i) => i.tipo === 'reflexion').length,
@@ -121,8 +122,7 @@ export class ReflexionesView {
         },
         error: (err) => {
           this.isSubmittingNuevo.set(false);
-          const errorMsg =
-            getErrorMessage(err, 'Error al guardar la reflexión');
+          const errorMsg = getErrorMessage(err, 'Error al guardar la reflexión');
           this.toast.error(errorMsg);
         },
       });
@@ -153,8 +153,7 @@ export class ReflexionesView {
       },
       error: (err) => {
         this.isSubmittingEdit.set(false);
-        const errorMsg =
-          getErrorMessage(err, 'Error al actualizar la entrada');
+        const errorMsg = getErrorMessage(err, 'Error al actualizar la entrada');
         this.toast.error(errorMsg);
       },
     });
@@ -185,8 +184,7 @@ export class ReflexionesView {
       },
       error: (err) => {
         this.isDeleting.set(false);
-        const errorMsg =
-          getErrorMessage(err, 'Error al eliminar la entrada');
+        const errorMsg = getErrorMessage(err, 'Error al eliminar la entrada');
         this.toast.error(errorMsg);
       },
     });

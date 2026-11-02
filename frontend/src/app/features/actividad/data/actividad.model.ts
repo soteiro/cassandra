@@ -20,7 +20,12 @@ export interface ResumenActividad {
   tareas_terminadas: TareaTerminada[];
   proyectos_completados: ProyectoCompleto[];
   flujo: { creadas: number; terminadas: number };
-  otros: { interacciones: number; personas_contactadas: number; reflexiones: number; notas: number };
+  otros: {
+    interacciones: number;
+    personas_contactadas: number;
+    reflexiones: number;
+    notas: number;
+  };
 }
 
 export type CambioEvento = { antes?: unknown; despues?: unknown; modificado?: boolean };

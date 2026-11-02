@@ -45,7 +45,9 @@
     <!-- LISTADO DE BANCOS -->
     <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
       @for (b of bancos(); track b.id) {
-        <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+        <div
+          class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs"
+        >
           <div>
             <span class="font-medium text-text-main">{{ b.nombre }}</span>
             <span class="ml-2 text-[10px] text-text-muted uppercase">({{ b.tipo }})</span>
@@ -70,9 +72,7 @@
     <div class="flex items-center justify-between pb-2 border-b border-surface-border">
       <div class="flex items-center gap-2">
         <svg lucideTag class="w-4 h-4 text-accent" />
-        <h3 class="text-xs font-bold text-text-main uppercase tracking-wider">
-          Categorías
-        </h3>
+        <h3 class="text-xs font-bold text-text-main uppercase tracking-wider"> Categorías </h3>
       </div>
       <span class="text-xs text-text-muted font-medium">{{ grupos().length }}</span>
     </div>
@@ -99,7 +99,9 @@
     <!-- LISTADO DE CATEGORÍAS -->
     <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
       @for (g of grupos(); track g.id) {
-        <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+        <div
+          class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs"
+        >
           <span class="font-medium text-text-main">{{ g.nombre }}</span>
           <button
             type="button"
@@ -150,7 +152,9 @@
     <!-- LISTADO DE MECANISMOS -->
     <div class="space-y-1.5 max-h-64 overflow-y-auto pr-1">
       @for (m of movimientosEsperados(); track m.id) {
-        <div class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs">
+        <div
+          class="flex items-center justify-between p-2 rounded-lg bg-background/60 border border-surface-border text-xs"
+        >
           <span class="font-medium text-text-main">{{ m.nombre }}</span>
           <button
             type="button"

@@ -98,27 +98,31 @@ describe('MermaidService CSS palette', () => {
   it('initializes Mermaid with resolved CSS colors rather than a fixed palette', async () => {
     await TestBed.inject(MermaidService).render('graph TD; A-->B');
 
-    expect(mermaidModule.initialize).toHaveBeenCalledWith(expect.objectContaining({
-      themeVariables: expect.objectContaining({
-        darkMode: true,
-        fontFamily: 'Test Font',
-        background: '#101112',
-        primaryColor: '#202122',
-        primaryBorderColor: '#aabbcc',
-        primaryTextColor: '#eeeeee',
-        lineColor: '#999999',
-        clusterBorder: '#303132',
+    expect(mermaidModule.initialize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        themeVariables: expect.objectContaining({
+          darkMode: true,
+          fontFamily: 'Test Font',
+          background: '#101112',
+          primaryColor: '#202122',
+          primaryBorderColor: '#aabbcc',
+          primaryTextColor: '#eeeeee',
+          lineColor: '#999999',
+          clusterBorder: '#303132',
+        }),
       }),
-    }));
+    );
   });
 
   it('reads the color scheme from CSS when the library is first loaded', async () => {
     palette.textContent = palette.textContent.replace('scheme: dark', 'scheme: light');
     await TestBed.inject(MermaidService).render('graph TD; A-->B');
 
-    expect(mermaidModule.initialize).toHaveBeenCalledWith(expect.objectContaining({
-      themeVariables: expect.objectContaining({ darkMode: false }),
-    }));
+    expect(mermaidModule.initialize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        themeVariables: expect.objectContaining({ darkMode: false }),
+      }),
+    );
   });
 
   it('does not reuse diagrams or the previous Mermaid configuration after the palette changes', async () => {
@@ -131,8 +135,10 @@ describe('MermaidService CSS palette', () => {
     await service.render('graph TD; A-->B');
 
     expect(mermaidModule.render).toHaveBeenCalledTimes(2);
-    expect(mermaidModule.initialize).toHaveBeenLastCalledWith(expect.objectContaining({
-      themeVariables: expect.objectContaining({ primaryBorderColor: '#bbaa77' }),
-    }));
+    expect(mermaidModule.initialize).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        themeVariables: expect.objectContaining({ primaryBorderColor: '#bbaa77' }),
+      }),
+    );
   });
 });

@@ -2,7 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { PersonaService } from './persona.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../../../testing/http-testing';
+import {
+  expectHttpCall,
+  HttpCase,
+  settle,
+  setupHttpTesting,
+} from '../../../../testing/http-testing';
 
 describe('PersonaService', () => {
   let http: HttpTestingController;
@@ -40,8 +45,25 @@ describe('PersonaService', () => {
   });
 
   it.each<HttpCase>([
-    { name: 'createPersona', call: () => service.createPersona({ nombre: 'Ana' } as never), method: 'POST', url: '/api/personas', body: { nombre: 'Ana' } },
-    { name: 'updatePersona', call: () => service.updatePersona(4, { nombre: 'Bea' } as never), method: 'PUT', url: '/api/personas/4', body: { nombre: 'Bea' } },
-    { name: 'deletePersona', call: () => service.deletePersona(4), method: 'DELETE', url: '/api/personas/4' },
+    {
+      name: 'createPersona',
+      call: () => service.createPersona({ nombre: 'Ana' } as never),
+      method: 'POST',
+      url: '/api/personas',
+      body: { nombre: 'Ana' },
+    },
+    {
+      name: 'updatePersona',
+      call: () => service.updatePersona(4, { nombre: 'Bea' } as never),
+      method: 'PUT',
+      url: '/api/personas/4',
+      body: { nombre: 'Bea' },
+    },
+    {
+      name: 'deletePersona',
+      call: () => service.deletePersona(4),
+      method: 'DELETE',
+      url: '/api/personas/4',
+    },
   ])('$name should call $method $url', (c) => expectHttpCall(http, c));
 });

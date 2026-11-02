@@ -15,7 +15,9 @@ import { tocaRevision } from '../../utils/revision.util';
       >
         <span>
           <strong class="font-semibold">Toca la revisión semanal.</strong>
-          <span class="text-text-muted"> Unos 15 minutos para cerrar lo que quedó sin decidir.</span>
+          <span class="text-text-muted">
+            Unos 15 minutos para cerrar lo que quedó sin decidir.</span
+          >
         </span>
         <span class="text-accent border p-2 rounded-lg font-bold shrink-0">Empezar →</span>
       </a>

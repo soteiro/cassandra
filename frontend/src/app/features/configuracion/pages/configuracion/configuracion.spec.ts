@@ -33,9 +33,16 @@ describe('Configuración routing', () => {
         provideHttpClientTesting(),
         { provide: AuthService, useValue: { isLoggedIn: loggedIn } },
         { provide: APIKeyService, useValue: { list: listKeys } },
-        { provide: ProjectService, useValue: {
-          projectsResource: { value: signal([]), isLoading: signal(false), error: signal(undefined) },
-        } },
+        {
+          provide: ProjectService,
+          useValue: {
+            projectsResource: {
+              value: signal([]),
+              isLoading: signal(false),
+              error: signal(undefined),
+            },
+          },
+        },
       ],
     }).compileComponents();
   });
@@ -52,13 +59,18 @@ describe('Configuración routing', () => {
     expect(page.querySelector('#appearance-palette')).not.toBeNull();
     expect(page.querySelector('a[href="/configuracion/claves-api"]')).not.toBeNull();
     expect(page.querySelector('app-api-keys')).toBeNull();
-    expect(page.querySelector('a[href="/configuracion"]')?.getAttribute('aria-current')).toBe('page');
+    expect(page.querySelector('a[href="/configuracion"]')?.getAttribute('aria-current')).toBe(
+      'page',
+    );
     expect(page.querySelector('a[href="/claves-api"]')).toBeNull();
     expect(listKeys).not.toHaveBeenCalled();
   }, 30_000);
 
   it('shows the saved selections when the options are first rendered', async () => {
-    localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify({ palette: 'violet', mode: 'light' }));
+    localStorage.setItem(
+      APPEARANCE_STORAGE_KEY,
+      JSON.stringify({ palette: 'violet', mode: 'light' }),
+    );
     const harness = await RouterTestingHarness.create('/configuracion');
     const page = harness.routeNativeElement!;
 
@@ -97,7 +109,12 @@ describe('Configuración routing', () => {
     expect(listKeys).toHaveBeenCalledOnce();
   }, 30_000);
 
-  it.each(['/configuracion', '/configuracion/claves-api', '/configuracion/ticktick', '/claves-api'])('requires a session before opening %s', async url => {
+  it.each([
+    '/configuracion',
+    '/configuracion/claves-api',
+    '/configuracion/ticktick',
+    '/claves-api',
+  ])('requires a session before opening %s', async (url) => {
     loggedIn.set(false);
     await RouterTestingHarness.create(url);
 

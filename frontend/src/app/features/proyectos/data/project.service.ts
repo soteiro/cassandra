@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { ServerConfigService } from '../../../core/server/server-config.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProjectService {
   private readonly serverConfig = inject(ServerConfigService);

@@ -19,7 +19,10 @@ const item: InteraccionResponse = {
 describe('InteraccionModal', () => {
   let component: InteraccionModal;
   let fixture: ComponentFixture<InteraccionModal>;
-  let service: { updateInteraccion: ReturnType<typeof vi.fn>; deleteInteraccion: ReturnType<typeof vi.fn> };
+  let service: {
+    updateInteraccion: ReturnType<typeof vi.fn>;
+    deleteInteraccion: ReturnType<typeof vi.fn>;
+  };
   let toast: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
   let events: string[];
 

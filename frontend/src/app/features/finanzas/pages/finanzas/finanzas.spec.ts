@@ -48,7 +48,7 @@ describe('Finanzas', () => {
           { id: 1, comprado: false },
           { id: 2, comprado: true },
           { id: 3, comprado: false },
-        ])
+        ]),
       ),
     };
 
@@ -79,7 +79,7 @@ describe('Finanzas', () => {
     expect(component.isLoading()).toBe(false);
     expect(finanzas['getPlantilla']).toHaveBeenCalledWith(
       component.selectedAnio(),
-      component.selectedMes()
+      component.selectedMes(),
     );
   });
 
@@ -224,9 +224,5 @@ describe('Finanzas', () => {
     } finally {
       vi.useRealTimers();
     }
-  });
-
-  it('formatCurrency should format CLP without decimals', () => {
-    expect(component.formatCurrency(1234567)).toMatch(/1\.234\.567/);
   });
 });

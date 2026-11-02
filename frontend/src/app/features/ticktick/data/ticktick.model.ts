@@ -30,7 +30,10 @@ export interface TickTickToday {
 export function tickTickDay(now = new Date()): { date: string; zone: string } {
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
   const parts = new Intl.DateTimeFormat('en', {
-    timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone: zone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   }).formatToParts(now);
   const part = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
   return { date: `${part('year')}-${part('month')}-${part('day')}`, zone };

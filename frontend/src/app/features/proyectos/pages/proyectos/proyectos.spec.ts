@@ -43,13 +43,35 @@ describe('Proyectos', () => {
   let toast: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
 
   const projects: ProjectResponse[] = [
-    proj({ id: 1, nombre: 'Baja vieja', prioridad: 'Baja', fecha_creacion: '2025-01-01T00:00:00Z' }),
+    proj({
+      id: 1,
+      nombre: 'Baja vieja',
+      prioridad: 'Baja',
+      fecha_creacion: '2025-01-01T00:00:00Z',
+    }),
     proj({ id: 2, nombre: 'Critica', prioridad: 'Critica' }),
     proj({ id: 3, nombre: 'Alta hecha', prioridad: 'Alta', estado: 'Completado' }),
-    proj({ id: 4, nombre: 'Media nueva', prioridad: 'Media', fecha_creacion: '2026-05-01T00:00:00Z' }),
-    proj({ id: 5, nombre: 'Media vieja', prioridad: 'Media', fecha_creacion: '2026-01-01T00:00:00Z', para_que: 'ganar dinero' }),
+    proj({
+      id: 4,
+      nombre: 'Media nueva',
+      prioridad: 'Media',
+      fecha_creacion: '2026-05-01T00:00:00Z',
+    }),
+    proj({
+      id: 5,
+      nombre: 'Media vieja',
+      prioridad: 'Media',
+      fecha_creacion: '2026-01-01T00:00:00Z',
+      para_que: 'ganar dinero',
+    }),
     proj({ id: 6, nombre: 'Sub', prioridad: 'Critica', proyecto_padre_id: 2 }),
-    proj({ id: 7, nombre: 'Cancelado', prioridad: 'Baja', estado: 'Cancelado', fecha_creacion: '2024-01-01T00:00:00Z' }),
+    proj({
+      id: 7,
+      nombre: 'Cancelado',
+      prioridad: 'Baja',
+      estado: 'Cancelado',
+      fecha_creacion: '2024-01-01T00:00:00Z',
+    }),
   ];
 
   beforeEach(async () => {
@@ -133,7 +155,12 @@ describe('Proyectos', () => {
 
   it('getStats summarises root projects', () => {
     // "active" excluye Cancelado, igual que el filtro 'active'.
-    expect(component.getStats(projects)).toEqual({ total: 6, active: 4, completed: 1, critical: 2 });
+    expect(component.getStats(projects)).toEqual({
+      total: 6,
+      active: 4,
+      completed: 1,
+      critical: 2,
+    });
     expect(component.getStats([])).toEqual({ total: 0, active: 0, completed: 0, critical: 0 });
   });
 
