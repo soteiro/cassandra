@@ -2,7 +2,6 @@ import { FinanzasPlantillaItem } from '../data/finanzas.model';
 import {
   agruparMovimientos,
   filtrarMovimientos,
-  formatCLP,
   getMontoColorClass,
   getRowClass,
   getStatusBadgeClass,
@@ -209,10 +208,5 @@ describe('visual helpers', () => {
     expect(getStatusBadgeClass(completado)).toContain('positive');
     expect(getStatusBadgeClass(enProceso)).toContain('warning');
     expect(getStatusBadgeClass(pendiente)).toContain('text-muted');
-  });
-
-  it('formatCLP should format CLP', () => {
-    expect(formatCLP(600)).toMatch(/600/);
-    expect(formatCLP(null as unknown as number)).toMatch(/0/);
   });
 });

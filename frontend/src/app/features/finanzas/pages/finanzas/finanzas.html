@@ -245,7 +245,7 @@
         </div>
         <div class="flex items-baseline justify-between">
           <span class="text-2xl font-black text-success tracking-tight">
-            {{ formatCurrency(resumen().total_ingresos) }}
+            {{ formatCLP(resumen().total_ingresos) }}
           </span>
           <span class="text-xs text-text-muted">
             {{ ingresos().length }} {{ ingresos().length === 1 ? 'ítem' : 'ítems' }}
@@ -270,7 +270,7 @@
         </div>
         <div class="flex items-baseline justify-between">
           <span class="text-2xl font-black text-danger tracking-tight">
-            {{ formatCurrency(resumen().total_egresos) }}
+            {{ formatCLP(resumen().total_egresos) }}
           </span>
           <span class="text-xs text-text-muted">
             {{ egresos().length }} {{ egresos().length === 1 ? 'ítem' : 'ítems' }}
@@ -310,7 +310,7 @@
             [class]="resumen().balance >= 0 ? 'text-primary-text' : 'text-danger'"
             class="text-2xl font-black tracking-tight"
           >
-            {{ formatCurrency(resumen().balance) }}
+            {{ formatCLP(resumen().balance) }}
           </span>
           <span class="text-xs text-text-muted"> {{ porcentajeReal() }}% del presupuesto </span>
         </div>

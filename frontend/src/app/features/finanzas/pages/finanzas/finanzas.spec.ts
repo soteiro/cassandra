@@ -225,8 +225,4 @@ describe('Finanzas', () => {
       vi.useRealTimers();
     }
   });
-
-  it('formatCurrency should format CLP without decimals', () => {
-    expect(component.formatCurrency(1234567)).toMatch(/1\.234\.567/);
-  });
 });

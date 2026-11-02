@@ -28,8 +28,8 @@ import {
   filtrarMovimientos,
   FinanzasGroup,
   FinanzasGroupMode,
-  formatCLP,
 } from '../../utils/presupuesto.util';
+import { formatCLP } from '../../utils/moneda.util';
 import { MovimientoQuickAdd } from '../movimiento-quick-add/movimiento-quick-add';
 import { MovimientoRow } from '../movimiento-row/movimiento-row';
 import { BulkActionsBar } from '../bulk-actions-bar/bulk-actions-bar';
