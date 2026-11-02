@@ -39,7 +39,8 @@ export class ProjectSearchService {
       }
     }
 
-    const sortByNombre = (a: ProjectResponse, b: ProjectResponse) => a.nombre.localeCompare(b.nombre);
+    const sortByNombre = (a: ProjectResponse, b: ProjectResponse) =>
+      a.nombre.localeCompare(b.nombre);
 
     return [...startsWith.sort(sortByNombre), ...includes.sort(sortByNombre)]
       .slice(0, limit)

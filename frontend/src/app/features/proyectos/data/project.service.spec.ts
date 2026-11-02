@@ -3,7 +3,12 @@ import { signal } from '@angular/core';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ProjectService } from './project.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../../../testing/http-testing';
+import {
+  expectHttpCall,
+  HttpCase,
+  settle,
+  setupHttpTesting,
+} from '../../../../testing/http-testing';
 
 describe('ProjectService', () => {
   let http: HttpTestingController;
@@ -79,9 +84,26 @@ describe('ProjectService', () => {
   });
 
   it.each<HttpCase>([
-    { name: 'create', call: () => service.createProject({ nombre: 'P' } as never), method: 'POST', url: '/api/proyects', body: { nombre: 'P' } },
-    { name: 'update', call: () => service.updateProject(2, { estado: 'Pausado' }), method: 'PUT', url: '/api/proyects/2', body: { estado: 'Pausado' } },
-    { name: 'delete', call: () => service.deleteProject(2), method: 'DELETE', url: '/api/proyects/2' },
+    {
+      name: 'create',
+      call: () => service.createProject({ nombre: 'P' } as never),
+      method: 'POST',
+      url: '/api/proyects',
+      body: { nombre: 'P' },
+    },
+    {
+      name: 'update',
+      call: () => service.updateProject(2, { estado: 'Pausado' }),
+      method: 'PUT',
+      url: '/api/proyects/2',
+      body: { estado: 'Pausado' },
+    },
+    {
+      name: 'delete',
+      call: () => service.deleteProject(2),
+      method: 'DELETE',
+      url: '/api/proyects/2',
+    },
   ])('$name should call $method $url', (c) => {
     TestBed.tick();
     http.expectOne('/api/proyects').flush([]);

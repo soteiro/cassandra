@@ -1,8 +1,14 @@
 <!-- bottom-12 deja la barra por encima de la navegación inferior en móvil -->
-<div class="fixed bottom-12 left-1/2 -translate-x-1/2 z-40 bg-surface/95 backdrop-blur-md border border-primary/40 rounded-2xl p-2.5 px-4 shadow-2xl flex flex-wrap items-center gap-3 text-xs ring-1 ring-primary/20 max-w-2xl w-[92vw] sm:w-auto justify-between sm:justify-center animate-in fade-in slide-in-from-bottom-3 duration-200">
+<div
+  class="fixed bottom-12 left-1/2 -translate-x-1/2 z-40 bg-surface/95 backdrop-blur-md border border-primary/40 rounded-2xl p-2.5 px-4 shadow-2xl flex flex-wrap items-center gap-3 text-xs ring-1 ring-primary/20 max-w-2xl w-[92vw] sm:w-auto justify-between sm:justify-center animate-in fade-in slide-in-from-bottom-3 duration-200"
+>
   <!-- CONTADOR Y TOTAL SELECCIONADO -->
-  <div class="flex items-center gap-2 text-text-main font-semibold border-r border-surface-border pr-3">
-    <span class="w-5 h-5 rounded-full bg-primary/20 text-primary-text flex items-center justify-center text-[10px] font-bold">
+  <div
+    class="flex items-center gap-2 text-text-main font-semibold border-r border-surface-border pr-3"
+  >
+    <span
+      class="w-5 h-5 rounded-full bg-primary/20 text-primary-text flex items-center justify-center text-[10px] font-bold"
+    >
       {{ count() }}
     </span>
     <span class="text-xs">
@@ -47,7 +53,10 @@
   </div>
 
   <!-- ASIGNACIÓN EN LOTE (CATEGORÍA Y BANCO) -->
-  <div class="relative flex items-center gap-1.5 border-l border-surface-border pl-3" (click)="$event.stopPropagation()">
+  <div
+    class="relative flex items-center gap-1.5 border-l border-surface-border pl-3"
+    (click)="$event.stopPropagation()"
+  >
     <!-- ASIGNAR CATEGORÍA -->
     <div class="relative">
       <button
@@ -62,8 +71,13 @@
       </button>
 
       @if (showBulkCategoryMenu()) {
-        <div class="absolute bottom-full mb-2 left-0 w-48 bg-surface border border-surface-border rounded-xl shadow-xl p-1.5 space-y-1 max-h-56 overflow-y-auto z-50">
-          <span class="text-[10px] font-bold text-text-muted uppercase px-2 py-1 block border-b border-surface-border pb-1">Asignar categoría</span>
+        <div
+          class="absolute bottom-full mb-2 left-0 w-48 bg-surface border border-surface-border rounded-xl shadow-xl p-1.5 space-y-1 max-h-56 overflow-y-auto z-50"
+        >
+          <span
+            class="text-[10px] font-bold text-text-muted uppercase px-2 py-1 block border-b border-surface-border pb-1"
+            >Asignar categoría</span
+          >
           <button
             type="button"
             (click)="categoriaChange.emit(null)"
@@ -98,8 +112,13 @@
       </button>
 
       @if (showBulkBancoMenu()) {
-        <div class="absolute bottom-full mb-2 left-0 w-48 bg-surface border border-surface-border rounded-xl shadow-xl p-1.5 space-y-1 max-h-56 overflow-y-auto z-50">
-          <span class="text-[10px] font-bold text-text-muted uppercase px-2 py-1 block border-b border-surface-border pb-1">Asignar cuenta</span>
+        <div
+          class="absolute bottom-full mb-2 left-0 w-48 bg-surface border border-surface-border rounded-xl shadow-xl p-1.5 space-y-1 max-h-56 overflow-y-auto z-50"
+        >
+          <span
+            class="text-[10px] font-bold text-text-muted uppercase px-2 py-1 block border-b border-surface-border pb-1"
+            >Asignar cuenta</span
+          >
           <button
             type="button"
             (click)="bancoChange.emit(null)"

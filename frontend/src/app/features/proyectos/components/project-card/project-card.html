@@ -12,12 +12,18 @@
         </div>
         <div class="flex items-center gap-1.5 flex-wrap justify-end">
           <span
-            [class]="'px-2.5 py-0.5 text-xs font-semibold rounded-lg ' + getPriorityClass(project().prioridad)"
+            [class]="
+              'px-2.5 py-0.5 text-xs font-semibold rounded-lg ' +
+              getPriorityClass(project().prioridad)
+            "
           >
             {{ project().prioridad }}
           </span>
           <span
-            [class]="'px-2.5 py-0.5 text-xs font-medium rounded-lg border ' + getStatusClass(project().estado)"
+            [class]="
+              'px-2.5 py-0.5 text-xs font-medium rounded-lg border ' +
+              getStatusClass(project().estado)
+            "
           >
             {{ project().estado }}
           </span>
@@ -32,20 +38,27 @@
           >
             {{ project().nombre }}
           </h3>
-          @if (!isSubproject() && project().subproyectos_count && project().subproyectos_count! > 0) {
+          @if (
+            !isSubproject() && project().subproyectos_count && project().subproyectos_count! > 0
+          ) {
             <span
               class="px-2 py-0.5 text-[10px] font-semibold bg-primary/15 text-primary-text border border-primary/30 rounded-md inline-flex items-center gap-1"
               title="Contiene subproyectos"
             >
               <svg lucideLayers class="w-3 h-3" />
-              {{ project().subproyectos_count }} subproyecto{{ project().subproyectos_count === 1 ? '' : 's' }}
+              {{ project().subproyectos_count }} subproyecto{{
+                project().subproyectos_count === 1 ? '' : 's'
+              }}
             </span>
           }
         </div>
         @if (project().nombre_padre && isSubproject()) {
           <p class="text-[11px] font-medium text-text-muted mt-0.5 inline-flex items-center gap-1">
             <svg lucideCornerDownRight class="w-3 h-3 text-primary-text/70" />
-            <span>Subproyecto de: <strong class="text-text-main/80">{{ project().nombre_padre }}</strong></span>
+            <span
+              >Subproyecto de:
+              <strong class="text-text-main/80">{{ project().nombre_padre }}</strong></span
+            >
           </p>
         }
         @if (project().para_que || project().descripcion) {
@@ -59,15 +72,20 @@
     <!-- CRITERIO DE FINALIZACIÓN Y PIE -->
     <div class="space-y-3 pt-2">
       @if (project().criterio_finalizacion) {
-        <div class="p-2.5 bg-background/60 rounded-xl border border-surface-border/60 flex items-start gap-2">
+        <div
+          class="p-2.5 bg-background/60 rounded-xl border border-surface-border/60 flex items-start gap-2"
+        >
           <svg lucideTarget class="w-3.5 h-3.5 text-primary-text shrink-0 mt-0.5" />
           <p class="text-[11px] text-text-muted line-clamp-1 leading-snug">
-            <strong class="text-text-main/80 font-medium">Meta:</strong> {{ project().criterio_finalizacion }}
+            <strong class="text-text-main/80 font-medium">Meta:</strong>
+            {{ project().criterio_finalizacion }}
           </p>
         </div>
       }
 
-      <div class="flex items-center justify-between text-xs text-text-muted pt-2 border-t border-surface-border/50">
+      <div
+        class="flex items-center justify-between text-xs text-text-muted pt-2 border-t border-surface-border/50"
+      >
         <div class="flex items-center gap-1.5 text-[11px]">
           <svg lucideCalendar class="w-3 h-3 text-text-muted/70" />
           <span>{{ project().fecha_creacion | date: 'dd/MM/yyyy' }}</span>
@@ -84,7 +102,9 @@
           }
         </div>
 
-        <span class="text-xs font-semibold text-primary-text group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+        <span
+          class="text-xs font-semibold text-primary-text group-hover:translate-x-1 transition-transform inline-flex items-center gap-1"
+        >
           <span>{{ isSubproject() ? 'Ver Tareas' : 'Abrir' }}</span>
           <svg lucideArrowRight class="w-3.5 h-3.5" />
         </span>

@@ -24,7 +24,11 @@
               {{ mode() === 'edit' ? 'Editar Persona' : 'Nueva Persona en CRM' }}
             </h3>
             <p class="text-xs text-text-muted mt-0.5">
-              {{ mode() === 'edit' ? 'Actualiza los datos, notas o entorno del contacto.' : 'Registra un contacto clave y asígnale su entorno relacional.' }}
+              {{
+                mode() === 'edit'
+                  ? 'Actualiza los datos, notas o entorno del contacto.'
+                  : 'Registra un contacto clave y asígnale su entorno relacional.'
+              }}
             </p>
           </div>
         </div>
@@ -45,7 +49,9 @@
       }
 
       <!-- AVATAR PREVIEW CARD (ROBOHASH) -->
-      <div class="p-3.5 bg-background/70 rounded-2xl border border-surface-border flex items-center gap-4">
+      <div
+        class="p-3.5 bg-background/70 rounded-2xl border border-surface-border flex items-center gap-4"
+      >
         <div
           class="w-16 h-16 rounded-2xl bg-surface-border/40 border border-primary/30 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-inner"
         >
@@ -56,14 +62,22 @@
           />
         </div>
         <div class="min-w-0 flex-1">
-          <span class="text-[10px] uppercase font-semibold tracking-wider text-primary-text/80 block">
+          <span
+            class="text-[10px] uppercase font-semibold tracking-wider text-primary-text/80 block"
+          >
             Avatar RoboHash
           </span>
           <p class="text-sm font-bold text-text-main truncate">
             {{ nombre() || 'Nombre de la Persona' }}
           </p>
           <p class="text-xs text-text-muted/70 truncate">
-            {{ alias() ? '@' + alias() : (entorno() ? 'Entorno: ' + entorno() : 'Identificador asignado por sistema') }}
+            {{
+              alias()
+                ? '@' + alias()
+                : entorno()
+                  ? 'Entorno: ' + entorno()
+                  : 'Identificador asignado por sistema'
+            }}
           </p>
         </div>
       </div>
@@ -72,9 +86,7 @@
         <!-- NOMBRE Y ALIAS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-text-main font-medium mb-1">
-              Nombre Completo *
-            </label>
+            <label class="block text-text-main font-medium mb-1"> Nombre Completo * </label>
             <input
               type="text"
               [ngModel]="nombre()"
@@ -103,7 +115,8 @@
         <!-- ENTORNO Y SUGERENCIAS -->
         <div>
           <label class="block text-text-main font-medium mb-1">
-            Entorno / Categoría <span class="text-text-muted font-normal">(Ámbito de relación)</span>
+            Entorno / Categoría
+            <span class="text-text-muted font-normal">(Ámbito de relación)</span>
           </label>
           <input
             type="text"
@@ -124,7 +137,11 @@
               <button
                 type="button"
                 (click)="selectEntorno(sug)"
-                [class]="entorno() === sug ? 'bg-primary text-on-primary font-semibold' : 'bg-background hover:bg-surface-border text-text-muted hover:text-text-main'"
+                [class]="
+                  entorno() === sug
+                    ? 'bg-primary text-on-primary font-semibold'
+                    : 'bg-background hover:bg-surface-border text-text-muted hover:text-text-main'
+                "
                 class="px-2 py-0.5 rounded-lg border border-surface-border text-[11px] transition-colors cursor-pointer"
               >
                 {{ sug }}
@@ -136,7 +153,8 @@
         <!-- INFORMACIÓN / NOTAS -->
         <div>
           <label class="block text-text-main font-medium mb-1">
-            Información, Notas y Contexto <span class="text-text-muted font-normal">(Opcional)</span>
+            Información, Notas y Contexto
+            <span class="text-text-muted font-normal">(Opcional)</span>
           </label>
           <textarea
             rows="4"

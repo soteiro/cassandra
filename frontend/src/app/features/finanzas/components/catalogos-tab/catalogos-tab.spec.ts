@@ -43,7 +43,14 @@ describe('CatalogosTab', () => {
   });
 
   it('should accept catalog inputs', async () => {
-    const banco = { id: 1, user_id: 1, nombre: 'BCI', tipo: 'debito', fecha_creacion: '', eliminado: false };
+    const banco = {
+      id: 1,
+      user_id: 1,
+      nombre: 'BCI',
+      tipo: 'debito',
+      fecha_creacion: '',
+      eliminado: false,
+    };
     fixture.componentRef.setInput('bancos', [banco]);
     await fixture.whenStable();
     expect(component.bancos()).toEqual([banco]);
@@ -60,7 +67,10 @@ describe('CatalogosTab', () => {
       component.newBancoNombre.set('  Santander ');
       component.newBancoTipo.set('credito');
       component.createBanco();
-      expect(finanzas['createBanco']).toHaveBeenCalledWith({ nombre: 'Santander', tipo: 'credito' });
+      expect(finanzas['createBanco']).toHaveBeenCalledWith({
+        nombre: 'Santander',
+        tipo: 'credito',
+      });
       expect(toast.success).toHaveBeenCalledWith('Cuenta "Santander" agregada');
       expect(component.newBancoNombre()).toBe('');
       expect(component.isSubmittingBanco()).toBe(false);

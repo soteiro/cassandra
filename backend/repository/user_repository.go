@@ -214,7 +214,6 @@ func (r *UserRepository) Update(ctx context.Context, id int, req *models.UserUpd
 	return &user, nil
 }
 
-
 // UpdatePasswordByEmail reemplaza el hash de la contraseña de un usuario activo.
 // Devuelve cuántas filas cambió (0 si no existe el email).
 func (r *UserRepository) UpdatePasswordByEmail(ctx context.Context, email, passwordHash string) (int64, error) {

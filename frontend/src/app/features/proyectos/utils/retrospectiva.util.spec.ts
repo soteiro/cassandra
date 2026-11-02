@@ -32,7 +32,12 @@ describe('contenidoRetrospectiva', () => {
   });
 
   it('omite lo que no se escribió', () => {
-    const md = contenidoRetrospectiva(proyecto({ para_que: '' }), 'Cancelado', { cumplido: '', aprendido: 'Nada' }, new Date());
+    const md = contenidoRetrospectiva(
+      proyecto({ para_que: '' }),
+      'Cancelado',
+      { cumplido: '', aprendido: 'Nada' },
+      new Date(),
+    );
     expect(md).not.toContain('El para qué');
     expect(md).not.toContain('pre-mortem');
     expect(md).not.toContain('¿Se cumplió');

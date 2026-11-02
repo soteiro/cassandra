@@ -9,7 +9,14 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { ReflexionResponse, ReflexionTipo } from '../../data/reflexion.model';
 
 function refl(id: number, tipo: ReflexionTipo, reflexion = 'texto'): ReflexionResponse {
-  return { id, user_id: 1, reflexion, tipo, fecha_creacion: '2026-01-01T00:00:00Z', eliminado: false };
+  return {
+    id,
+    user_id: 1,
+    reflexion,
+    tipo,
+    fecha_creacion: '2026-01-01T00:00:00Z',
+    eliminado: false,
+  };
 }
 
 describe('ReflexionesView', () => {
@@ -93,7 +100,11 @@ describe('ReflexionesView', () => {
   it('avatarUrl depends on the persona input', () => {
     expect(component.avatarUrl).toBe('https://robohash.org/yo?size=200x200');
     fixture.componentRef.setInput('persona', {
-      id: 5, user_id: 1, nombre: 'Yo', fecha_creacion: '', eliminado: false,
+      id: 5,
+      user_id: 1,
+      nombre: 'Yo',
+      fecha_creacion: '',
+      eliminado: false,
     });
     expect(component.avatarUrl).toBe('https://robohash.org/5?size=200x200');
   });
@@ -142,7 +153,10 @@ describe('ReflexionesView', () => {
   it('saveEdit updates the selected item and closes', () => {
     component.openEdit(refl(2, 'memoria'));
     component.saveEdit({ reflexion: 'nuevo', tipo: 'memoria' });
-    expect(service.updateReflexion).toHaveBeenCalledWith(2, { reflexion: 'nuevo', tipo: 'memoria' });
+    expect(service.updateReflexion).toHaveBeenCalledWith(2, {
+      reflexion: 'nuevo',
+      tipo: 'memoria',
+    });
     expect(component.showEditModal()).toBe(false);
     expect(component.isSubmittingEdit()).toBe(false);
     expect(resource.reload).toHaveBeenCalled();

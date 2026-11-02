@@ -1,11 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { AuthService } from '../../../core/auth/auth.service';
-import {
-  ReflexionRequest,
-  ReflexionResponse,
-  ReflexionUpdateRequest,
-} from './reflexion.model';
+import { ReflexionRequest, ReflexionResponse, ReflexionUpdateRequest } from './reflexion.model';
 import { Observable } from 'rxjs';
 import { ServerConfigService } from '../../../core/server/server-config.service';
 
@@ -58,14 +54,8 @@ export class ReflexionService {
     return this.http.post<ReflexionResponse>(`${this.apiUrl}/reflexiones`, req);
   }
 
-  updateReflexion(
-    id: number,
-    req: ReflexionUpdateRequest
-  ): Observable<ReflexionResponse> {
-    return this.http.put<ReflexionResponse>(
-      `${this.apiUrl}/reflexiones/${id}`,
-      req
-    );
+  updateReflexion(id: number, req: ReflexionUpdateRequest): Observable<ReflexionResponse> {
+    return this.http.put<ReflexionResponse>(`${this.apiUrl}/reflexiones/${id}`, req);
   }
 
   deleteReflexion(id: number): Observable<void> {

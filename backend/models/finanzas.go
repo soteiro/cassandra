@@ -107,7 +107,7 @@ type MovimientoEsperadoFinanzasUpdateRequest struct {
 type FinanzasPlantilla struct {
 	ID                   int       `json:"id"`
 	UserID               int       `json:"user_id"`
-	Tipo                 string    `json:"tipo"`   // ingreso, egreso
+	Tipo                 string    `json:"tipo"` // ingreso, egreso
 	FechaCreacion        time.Time `json:"fecha_creacion"`
 	Estado               string    `json:"estado"` // pendiente, en proceso, completado
 	Mes                  int       `json:"mes"`    // 1 - 12
@@ -185,4 +185,3 @@ type ClonarPeriodoRequest struct {
 	AnioDestino int `json:"anio_destino"`
 	MesDestino  int `json:"mes_destino"`
 }
-

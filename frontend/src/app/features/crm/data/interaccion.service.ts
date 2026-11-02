@@ -35,22 +35,16 @@ export class InteraccionService {
 
   createInteraccion(
     personaId: number,
-    req: { interaccion: string }
+    req: { interaccion: string },
   ): Observable<InteraccionResponse> {
     return this.http.post<InteraccionResponse>(
       `${this.apiUrl}/personas/${personaId}/interacciones`,
-      req
+      req,
     );
   }
 
-  updateInteraccion(
-    id: number,
-    req: InteraccionUpdateRequest
-  ): Observable<InteraccionResponse> {
-    return this.http.put<InteraccionResponse>(
-      `${this.apiUrl}/interacciones/${id}`,
-      req
-    );
+  updateInteraccion(id: number, req: InteraccionUpdateRequest): Observable<InteraccionResponse> {
+    return this.http.put<InteraccionResponse>(`${this.apiUrl}/interacciones/${id}`, req);
   }
 
   deleteInteraccion(id: number): Observable<void> {

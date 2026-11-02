@@ -62,7 +62,12 @@ describe('ProjectDetails', () => {
   });
 
   describe('retrospectiva', () => {
-    const proyecto = { id: 5, nombre: 'Mudanza', para_que: 'Vivir cerca', estado: 'En Proceso' } as ProjectResponse;
+    const proyecto = {
+      id: 5,
+      nombre: 'Mudanza',
+      para_que: 'Vivir cerca',
+      estado: 'En Proceso',
+    } as ProjectResponse;
 
     beforeEach(() => {
       // Sin sesión en el test el recurso no existe: se reemplaza por un doble.
@@ -73,9 +78,14 @@ describe('ProjectDetails', () => {
     it('se guarda como documento y no se envía a la API de proyectos', () => {
       const docs = TestBed.inject(DocumentoService);
       const crear = vi.spyOn(docs, 'createDocumento').mockReturnValue(of({} as DocumentoProyecto));
-      component.saveEditProject({ estado: 'Completado', retrospectiva: { cumplido: 'Sí', aprendido: '' } });
+      component.saveEditProject({
+        estado: 'Completado',
+        retrospectiva: { cumplido: 'Sí', aprendido: '' },
+      });
 
-      expect(service.updateProject).toHaveBeenCalledWith(component['projectIdNumber'](), { estado: 'Completado' });
+      expect(service.updateProject).toHaveBeenCalledWith(component['projectIdNumber'](), {
+        estado: 'Completado',
+      });
       expect(crear).toHaveBeenCalledTimes(1);
       const [id, req] = crear.mock.calls[0];
       expect(id).toBe(5);

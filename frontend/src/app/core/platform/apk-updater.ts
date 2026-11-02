@@ -20,7 +20,7 @@ export const APK_UPDATER = new InjectionToken<ApkUpdaterPlugin>('APK_UPDATER', {
   // No inyectar el Proxy de Capacitor: Angular consultaría sus hooks de ciclo de
   // vida (ngOnDestroy) como si fueran métodos nativos del plugin.
   factory: () => ({
-    startDownload: options => plugin.startDownload(options),
+    startDownload: (options) => plugin.startDownload(options),
     getDownloadStatus: () => plugin.getDownloadStatus(),
     install: () => plugin.install(),
   }),

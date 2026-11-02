@@ -3,23 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PersonaRequest, PersonaResponse, PersonaUpdateRequest } from '../../data/persona.model';
 import { BackButtonService } from '../../../../core/platform/back-button.service';
-import {
-  LucideUserPlus,
-  LucidePencil,
-  LucideX,
-  LucideTag,
-} from '@lucide/angular';
+import { LucideUserPlus, LucidePencil, LucideX, LucideTag } from '@lucide/angular';
 
 @Component({
   selector: 'app-persona-modal',
-  imports: [
-    CommonModule,
-    FormsModule,
-    LucideUserPlus,
-    LucidePencil,
-    LucideX,
-    LucideTag,
-  ],
+  imports: [CommonModule, FormsModule, LucideUserPlus, LucidePencil, LucideX, LucideTag],
   templateUrl: './persona-modal.html',
 })
 export class PersonaModal {
@@ -36,7 +24,7 @@ export class PersonaModal {
   private readonly _backBtnEffect = this.backButtonService.registerEffect(
     () => this.isOpen(),
     () => this.close.emit(),
-    80
+    80,
   );
 
   // Internal form signals

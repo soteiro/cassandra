@@ -73,4 +73,3 @@ func (r *AuthRepository) GetUserIDByRefreshToken(ctx context.Context, token stri
 
 	return UserID, nil
 }
-

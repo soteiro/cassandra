@@ -6,7 +6,7 @@ import {
   LucideUser,
   LucideWalletMinimal,
   LucideMenu,
-  LucideX
+  LucideX,
 } from '@lucide/angular';
 import { useToggle } from '../../../shared/utils/use-toggle';
 
@@ -20,7 +20,7 @@ import { useToggle } from '../../../shared/utils/use-toggle';
     LucideUser,
     LucideWalletMinimal,
     LucideMenu,
-    LucideX
+    LucideX,
   ],
   templateUrl: './bottom-nav.html',
   styleUrl: './bottom-nav.css',

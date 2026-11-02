@@ -23,7 +23,7 @@ export class DocumentoService {
 
   public getDocumentosByProyectoId(
     proyectoId: () => string | number | null,
-    tipoFilter?: () => string | null
+    tipoFilter?: () => string | null,
   ) {
     if (!this.authService.isLoggedIn()) {
       return undefined;
@@ -45,7 +45,10 @@ export class DocumentoService {
   }
 
   createDocumento(proyectoId: number, req: CreateDocumentoRequest): Observable<DocumentoProyecto> {
-    return this.http.post<DocumentoProyecto>(`${this.apiUrl}/proyects/${proyectoId}/documentos`, req);
+    return this.http.post<DocumentoProyecto>(
+      `${this.apiUrl}/proyects/${proyectoId}/documentos`,
+      req,
+    );
   }
 
   updateDocumento(id: number, req: UpdateDocumentoRequest): Observable<DocumentoProyecto> {

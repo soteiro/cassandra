@@ -21,6 +21,12 @@ Hoy todos los imports son relativos (`../../../../shared/...`). Está decidido p
 3. Hacerlo en un solo PR mecánico, sin otros cambios, verificado con `ng build`, `ng test --watch=false` y `pnpm run e2e`.
 4. Actualizar la sección *Project Structure* de `AGENTS.md` (y sus copias en `.claude/`, `.gemini/`, `.github/` y `.cursor/`) para que el código nuevo use los alias.
 
+## Formato
+
+`pnpm run format` aplica Prettier a `src/` y `e2e/`, y CI lo verifica con `pnpm run format:check`. En el backend, CI exige `gofmt` (`gofmt -w .` lo corrige).
+
+Las plantillas usan `htmlWhitespaceSensitivity: "strict"` para que Prettier no agregue espacios visibles. Aun así, Prettier separa el texto que va pegado a un bloque `@if` (por ejemplo `actualización@if (...) {: ...}`) y le agrega un espacio. En esos casos, pon `<!-- prettier-ignore -->` antes del elemento, con un comentario que explique por qué (hay ejemplos en `sidebar.html` y `project-logs-tab.html`).
+
 ## Colores de la interfaz
 
 La paleta actual está centralizada en [`public/theme.css`](public/theme.css).

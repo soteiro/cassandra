@@ -12,8 +12,15 @@ import { ServerConfigService } from '../../server/server-config.service';
 describe('Sidebar', () => {
   let component: Sidebar;
   let fixture: ComponentFixture<Sidebar>;
-  let authService: { logout: ReturnType<typeof vi.fn>; isLoggedIn: ReturnType<typeof signal<boolean>> };
-  let serverConfig: { isNative: boolean; serverUrl: ReturnType<typeof signal<string | null>>; disconnect: ReturnType<typeof vi.fn> };
+  let authService: {
+    logout: ReturnType<typeof vi.fn>;
+    isLoggedIn: ReturnType<typeof signal<boolean>>;
+  };
+  let serverConfig: {
+    isNative: boolean;
+    serverUrl: ReturnType<typeof signal<string | null>>;
+    disconnect: ReturnType<typeof vi.fn>;
+  };
   let updates: {
     isNative: boolean;
     currentVersion: ReturnType<typeof signal<string | null>>;
@@ -71,7 +78,8 @@ describe('Sidebar', () => {
     Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button')).find((b) =>
       /actualizaciones|Buscando/.test(b.textContent ?? ''),
     );
-  const checkForUpdates = () => (component as unknown as { checkForUpdates: () => Promise<void> }).checkForUpdates();
+  const checkForUpdates = () =>
+    (component as unknown as { checkForUpdates: () => Promise<void> }).checkForUpdates();
 
   describe('en la web', () => {
     beforeEach(() => create(false));
@@ -82,7 +90,9 @@ describe('Sidebar', () => {
 
     it('opens settings and closes the mobile menu', () => {
       component.sidebar.open();
-      const link = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>('a[href="/configuracion"]');
+      const link = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>(
+        'a[href="/configuracion"]',
+      );
       expect(link?.textContent).toContain('Configuración');
       link!.dispatchEvent(new MouseEvent('click', { ctrlKey: true }));
       expect(component.sidebar.isOpen()).toBe(false);
@@ -128,7 +138,9 @@ describe('Sidebar', () => {
       updates.download.set({ status: 'downloading', progress: 42 });
       await fixture.whenStable();
       expect(updateButton()?.disabled).toBe(true);
-      expect((fixture.nativeElement as HTMLElement).querySelector('[role="status"]')?.textContent).toContain('42 %');
+      expect(
+        (fixture.nativeElement as HTMLElement).querySelector('[role="status"]')?.textContent,
+      ).toContain('42 %');
       updates.download.set({ status: 'paused', progress: 42 });
       await fixture.whenStable();
       expect((fixture.nativeElement as HTMLElement).textContent).toContain('Descarga en pausa');
@@ -137,8 +149,9 @@ describe('Sidebar', () => {
     it('should let the user open the installer again after cancelling it', async () => {
       updates.download.set({ status: 'ready' });
       await fixture.whenStable();
-      const button = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))
-        .find(b => b.textContent?.includes('Instalar actualización'));
+      const button = Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+      ).find((b) => b.textContent?.includes('Instalar actualización'));
       expect(button).toBeDefined();
       button!.click();
       expect(updates.installUpdate).toHaveBeenCalledOnce();
@@ -170,11 +183,16 @@ describe('Sidebar', () => {
     it('should confirm when the app is up to date', async () => {
       updates.checkForUpdate.mockResolvedValue({ status: 'up-to-date', current: '0.2.1' });
       await checkForUpdates();
-      expect(toast.toasts()[0]).toMatchObject({ type: 'success', message: 'Tienes la última versión (v0.2.1).' });
+      expect(toast.toasts()[0]).toMatchObject({
+        type: 'success',
+        message: 'Tienes la última versión (v0.2.1).',
+      });
     });
 
     it('should show the connected server', () => {
-      expect((fixture.nativeElement as HTMLElement).textContent).toContain('https://cassandra.midominio.com');
+      expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+        'https://cassandra.midominio.com',
+      );
     });
 
     it.each([
@@ -182,9 +200,9 @@ describe('Sidebar', () => {
       ['el servidor anterior no responde', () => throwError(() => new Error('offline'))],
     ])('Cambiar servidor cierra la sesión y vuelve a /servidor cuando %s', (_, logout) => {
       authService.logout.mockImplementation(logout);
-      const button = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button')).find(
-        (b) => b.textContent?.trim() === 'Cambiar servidor',
-      );
+      const button = Array.from(
+        (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+      ).find((b) => b.textContent?.trim() === 'Cambiar servidor');
       button!.click();
 
       expect(authService.logout).toHaveBeenCalled();

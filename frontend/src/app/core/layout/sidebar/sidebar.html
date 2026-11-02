@@ -1,7 +1,10 @@
 <aside
   class="fixed bg-surface inset-y-0 z-50 left-0 w-64 h-full flex flex-col justify-between p-4 border-r border-surface-border -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto shadow-2xl md:shadow-none"
   [class.translate-x-0]="sidebar.isOpen()"
-  style="padding-top: max(1rem, env(safe-area-inset-top)); padding-bottom: max(1rem, env(safe-area-inset-bottom));"
+  style="
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  "
 >
   <!-- HEADER / BRAND -->
   <div class="space-y-6">
@@ -43,7 +46,10 @@
         <svg lucideSearch class="w-4 h-4" />
         <span>Buscar proyecto</span>
       </span>
-      <span class="text-[10px] font-semibold text-text-muted/70 border border-surface-border rounded px-1.5 py-0.5">⌘ P</span>
+      <span
+        class="text-[10px] font-semibold text-text-muted/70 border border-surface-border rounded px-1.5 py-0.5"
+        >⌘ P</span
+      >
     </button>
 
     <!-- NAVEGACIÓN -->
@@ -163,6 +169,8 @@
         }
       </button>
       @if (updates.downloading()) {
+        <!-- Sin formatear: Prettier separaría "actualización" de ":" y agregaría un espacio visible -->
+        <!-- prettier-ignore -->
         <p role="status" class="px-3 text-xs text-text-muted">
           @if (updates.download().status === 'paused') {
             Descarga en pausa. Android la reanudará cuando sea posible.
@@ -187,7 +195,11 @@
     @if (serverConfig.isNative && serverConfig.serverUrl(); as server) {
       <div class="flex items-center justify-between gap-2 px-1 text-[11px] text-text-muted">
         <span class="truncate font-mono" [title]="server">{{ server }}</span>
-        <button type="button" (click)="changeServer()" class="shrink-0 underline hover:text-text-main cursor-pointer">
+        <button
+          type="button"
+          (click)="changeServer()"
+          class="shrink-0 underline hover:text-text-main cursor-pointer"
+        >
           Cambiar servidor
         </button>
       </div>

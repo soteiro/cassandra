@@ -61,7 +61,9 @@ export class TasksTab {
   isSubmittingQuickTask = signal(false);
   quickSubtaskInputs = signal<Record<number, string>>({});
   isSubmittingSubtask = signal<Record<number, boolean>>({});
-  taskFilter = signal<'all' | 'pending' | 'completed' | 'en_curso' | 'bloqueado' | 'abierto'>('pending');
+  taskFilter = signal<'all' | 'pending' | 'completed' | 'en_curso' | 'bloqueado' | 'abierto'>(
+    'pending',
+  );
 
   taskToDelete = signal<{ id: number; nombre: string; isSubtask: boolean } | null>(null);
   isDeletingTask = signal(false);
@@ -260,7 +262,8 @@ export class TasksTab {
 
   getTaskCountByStatus(tareas: Task[], status: string): number {
     if (!tareas) return 0;
-    return tareas.filter((t) => (t.estado || 'Abierto').toLowerCase() === status.toLowerCase()).length;
+    return tareas.filter((t) => (t.estado || 'Abierto').toLowerCase() === status.toLowerCase())
+      .length;
   }
 
   private getTaskStatusWeight(estado?: string): number {
@@ -320,7 +323,9 @@ export class TasksTab {
   getOverallStats(tareas: Task[]) {
     if (!tareas || tareas.length === 0) return { total: 0, completed: 0, percent: 0 };
     const total = tareas.length;
-    const completed = tareas.filter((t) => t.estado === 'Terminado' || t.estado === 'Completado').length;
+    const completed = tareas.filter(
+      (t) => t.estado === 'Terminado' || t.estado === 'Completado',
+    ).length;
     const percent = Math.round((completed / total) * 100);
     return { total, completed, percent };
   }

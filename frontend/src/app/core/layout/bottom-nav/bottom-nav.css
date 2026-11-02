@@ -2,6 +2,7 @@
   display: contents;
 }
 
-nav, nav * {
+nav,
+nav * {
   -webkit-tap-highlight-color: transparent;
 }

@@ -12,10 +12,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentoService } from '../../data/documento.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import {
-  DocumentoProyecto,
-  DocumentoTipo,
-} from '../../data/documento.model';
+import { DocumentoProyecto, DocumentoTipo } from '../../data/documento.model';
 import { parseMarkdown } from '../../../../shared/utils/markdown.util';
 import { MermaidDirective } from '../../../../shared/directives/mermaid.directive';
 import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
@@ -374,10 +371,7 @@ export class DocumentsTab {
 
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(
-        start + before.length,
-        start + before.length + selected.length
-      );
+      textarea.setSelectionRange(start + before.length, start + before.length + selected.length);
     }, 0);
   }
 }

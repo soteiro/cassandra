@@ -125,7 +125,9 @@ describe('Login en la app Android', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Conectado a https://cassandra.midominio.com');
 
-    Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Cambiar')!.click();
+    Array.from(el.querySelectorAll('button'))
+      .find((b) => b.textContent?.trim() === 'Cambiar')!
+      .click();
     expect(serverConfig.disconnect).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/servidor']);
   });

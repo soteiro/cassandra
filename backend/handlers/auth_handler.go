@@ -161,7 +161,7 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "token renovado"})
 }
 
-//logout
+// logout
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	// leer el refresh token desde la cookie
 	cookie, err := r.Cookie("refresh_token")

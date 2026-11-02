@@ -106,7 +106,10 @@ export function parseMarkdown(markdown: string): string {
     // Blockquotes (> cita)
     if (trimmed.startsWith('&gt;') || trimmed.startsWith('>')) {
       const quoteLines: string[] = [];
-      while (i < lines.length && (lines[i].trim().startsWith('&gt;') || lines[i].trim().startsWith('>'))) {
+      while (
+        i < lines.length &&
+        (lines[i].trim().startsWith('&gt;') || lines[i].trim().startsWith('>'))
+      ) {
         const cleaned = lines[i].trim().replace(/^(&gt;|>)\s?/, '');
         quoteLines.push(parseInline(cleaned));
         i++;
@@ -139,7 +142,7 @@ export function parseMarkdown(markdown: string): string {
             row
               .slice(1, -1)
               .split('|')
-              .map((c) => parseInline(c.trim()))
+              .map((c) => parseInline(c.trim())),
           );
 
           let tableHtml = `
@@ -157,7 +160,7 @@ export function parseMarkdown(markdown: string): string {
                     <tr class="hover:bg-surface-border/10 transition-colors">
                       ${row.map((cell) => `<td class="px-3 py-2">${cell}</td>`).join('')}
                     </tr>
-                  `
+                  `,
                     )
                     .join('')}
                 </tbody>
@@ -180,12 +183,12 @@ export function parseMarkdown(markdown: string): string {
         // Soporte de checkboxes de tareas: - [ ] o - [x]
         if (/^\[ \]\s+/.test(content)) {
           content = `<input type="checkbox" disabled class="mr-2 accent-primary rounded align-middle" /> ${parseInline(
-            content.replace(/^\[ \]\s+/, '')
+            content.replace(/^\[ \]\s+/, ''),
           )}`;
           listItems.push(`<li class="flex items-center list-none -ml-4">${content}</li>`);
         } else if (/^\[x\]\s+/i.test(content)) {
           content = `<input type="checkbox" checked disabled class="mr-2 accent-primary rounded align-middle" /> <span class="line-through text-text-muted">${parseInline(
-            content.replace(/^\[x\]\s+/i, '')
+            content.replace(/^\[x\]\s+/i, ''),
           )}</span>`;
           listItems.push(`<li class="flex items-center list-none -ml-4">${content}</li>`);
         } else {
@@ -264,13 +267,13 @@ function parseInline(text: string): string {
   // Imágenes: ![alt](url)
   result = result.replace(
     /!\[(.*?)\]\((.*?)\)/g,
-    '<img src="$2" alt="$1" class="my-3 max-w-full rounded-xl border border-surface-border shadow-md" loading="lazy" />'
+    '<img src="$2" alt="$1" class="my-3 max-w-full rounded-xl border border-surface-border shadow-md" loading="lazy" />',
   );
 
   // Enlaces: [texto](url)
   result = result.replace(
     /\[(.*?)\]\((.*?)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary-text hover:underline underline-offset-2 font-medium">$1</a>'
+    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary-text hover:underline underline-offset-2 font-medium">$1</a>',
   );
 
   // Negrita: **texto** o __texto__

@@ -116,8 +116,7 @@ describe('PersonaDetails', () => {
   it('passes an id getter bound to the route to the resources', () => {
     const idFn = personaService.getPersonaById.mock.calls[0][0] as () => string | null;
     const interIdFn = interaccionService.getInteraccionesByPersonaId.mock.calls[0][0] as () =>
-      | string
-      | null;
+      string | null;
     params.next(convertToParamMap({ id: '8' }));
     expect(idFn()).toBe('8');
     expect(interIdFn()).toBe('8');

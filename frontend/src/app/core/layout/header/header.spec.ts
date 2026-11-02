@@ -15,7 +15,8 @@ describe('Header', () => {
   let commandBar: CommandBarService;
 
   const el = () => fixture.nativeElement as HTMLElement;
-  const searchButton = () => el().querySelector('button[aria-label="Buscar proyecto"]') as HTMLButtonElement;
+  const searchButton = () =>
+    el().querySelector('button[aria-label="Buscar proyecto"]') as HTMLButtonElement;
   const menuButton = () => el().querySelector('button[aria-label="Menú"]') as HTMLButtonElement;
 
   beforeEach(async () => {

@@ -28,7 +28,7 @@ export class CommandBar {
   private readonly _backBtnEffect = this.backButtonService.registerEffect(
     () => this.commandBarService.state.isOpen(),
     () => this.close(),
-    90
+    90,
   );
 
   constructor() {

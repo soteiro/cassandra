@@ -84,9 +84,31 @@ describe('SemanaWidget', () => {
     resource.value.set(
       resumen({
         tareas_terminadas: [
-          { id: 1, nombre: 'Flete', prioridad: 'alta', proyecto_id: 7, proyecto_nombre: 'Mudanza', fecha_terminado: '' },
-          { id: 2, nombre: 'Cajas', prioridad: 'normal', proyecto_id: 7, proyecto_nombre: 'Mudanza', fecha_terminado: '', tarea_padre_id: 1 },
-          { id: 3, nombre: 'CI', prioridad: 'normal', proyecto_id: 9, proyecto_nombre: 'Cassandra', fecha_terminado: '' },
+          {
+            id: 1,
+            nombre: 'Flete',
+            prioridad: 'alta',
+            proyecto_id: 7,
+            proyecto_nombre: 'Mudanza',
+            fecha_terminado: '',
+          },
+          {
+            id: 2,
+            nombre: 'Cajas',
+            prioridad: 'normal',
+            proyecto_id: 7,
+            proyecto_nombre: 'Mudanza',
+            fecha_terminado: '',
+            tarea_padre_id: 1,
+          },
+          {
+            id: 3,
+            nombre: 'CI',
+            prioridad: 'normal',
+            proyecto_id: 9,
+            proyecto_nombre: 'Cassandra',
+            fecha_terminado: '',
+          },
         ],
         flujo: { creadas: 12, terminadas: 3 },
         otros: { interacciones: 2, personas_contactadas: 1, reflexiones: 1, notas: 0 },

@@ -16,7 +16,7 @@ import (
 )
 
 type InteraccionesHandler struct {
-	repo *repository.InteraccionesRepository
+	repo  *repository.InteraccionesRepository
 	owner *repository.Ownership
 }
 

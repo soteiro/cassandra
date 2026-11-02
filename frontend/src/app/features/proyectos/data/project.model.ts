@@ -1,11 +1,5 @@
 export type ProjectEstado =
-  | 'Idea'
-  | 'No Listado'
-  | 'Pendiente'
-  | 'En Proceso'
-  | 'Pausado'
-  | 'Completado'
-  | 'Cancelado';
+  'Idea' | 'No Listado' | 'Pendiente' | 'En Proceso' | 'Pausado' | 'Completado' | 'Cancelado';
 
 export type ProjectPrioridad = 'Baja' | 'Media' | 'Alta' | 'Critica';
 
@@ -81,4 +75,3 @@ export interface ProjectUpdateRequest {
   fecha_limite?: string;
   proyecto_padre_id?: number | null;
 }
-

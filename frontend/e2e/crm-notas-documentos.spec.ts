@@ -28,7 +28,9 @@ test.describe('CRM', () => {
 
     await page.getByRole('button', { name: 'Nueva Interacción' }).click();
     await page
-      .getByPlaceholder('Escribe los detalles de la reunión, llamada, acuerdo o notas de contacto...')
+      .getByPlaceholder(
+        'Escribe los detalles de la reunión, llamada, acuerdo o notas de contacto...',
+      )
       .fill('Café para hablar de compiladores');
     await page.getByRole('button', { name: 'Guardar Interacción' }).click();
     await expect(page.getByText('Interacción registrada')).toBeVisible();
@@ -36,7 +38,9 @@ test.describe('CRM', () => {
     await page.getByText('Café para hablar de compiladores').click();
     const panel = page.locator('app-interaccion-modal');
     await panel.getByRole('button', { name: 'Editar', exact: true }).click();
-    await panel.getByPlaceholder('Escribe la nota o detalle de la interacción...').fill('Café y COBOL');
+    await panel
+      .getByPlaceholder('Escribe la nota o detalle de la interacción...')
+      .fill('Café y COBOL');
     await panel.getByRole('button', { name: 'Guardar Cambios' }).click();
     await expect(page.getByText('Interacción actualizada')).toBeVisible();
     await expect(page.getByText('Café y COBOL').first()).toBeVisible();
@@ -64,7 +68,10 @@ test.describe('CRM', () => {
 });
 
 test.describe('notas de proyecto', () => {
-  test('crea una nota vinculada a una tarea, la edita y la elimina', async ({ page, request }, testInfo) => {
+  test('crea una nota vinculada a una tarea, la edita y la elimina', async ({
+    page,
+    request,
+  }, testInfo) => {
     const proyecto = await createProject(request, uniqueName('Notas', testInfo));
     const tarea = await createTask(request, proyecto.id, 'Tarea en curso', { estado: 'En Curso' });
     await page.goto(`/proyectos/${proyecto.id}`);
@@ -73,7 +80,9 @@ test.describe('notas de proyecto', () => {
     await page
       .getByPlaceholder('Escribe una nueva nota o cápsula de solución para este proyecto...')
       .fill('La caché se invalida al guardar');
-    await page.locator('select[name="newNotaTarea"]').selectOption({ label: `#${tarea.id} - Tarea en curso` });
+    await page
+      .locator('select[name="newNotaTarea"]')
+      .selectOption({ label: `#${tarea.id} - Tarea en curso` });
     await page.getByRole('button', { name: 'Añadir Nota' }).click();
 
     await expect(page.getByText('Nota guardada')).toBeVisible();
@@ -82,7 +91,9 @@ test.describe('notas de proyecto', () => {
 
     await page.getByRole('button', { name: 'Editar nota' }).click();
     // El textarea de edición es el único distinto al de "nueva nota".
-    await page.locator('textarea:not([name="newNotaText"])').fill('La caché se invalida al publicar');
+    await page
+      .locator('textarea:not([name="newNotaText"])')
+      .fill('La caché se invalida al publicar');
     await page.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(page.getByText('Nota actualizada')).toBeVisible();
     await expect(page.getByText('La caché se invalida al publicar')).toBeVisible();
@@ -101,21 +112,28 @@ test.describe('documentos de proyecto', () => {
     await page.getByRole('tab', { name: /Documentos/ }).click();
 
     await page.getByRole('button', { name: 'Nuevo Documento' }).click();
-    await page.getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...').fill('ADR 001');
-    await page.locator('select').filter({ has: page.locator('option', { hasText: 'Decisión' }) }).selectOption({ label: 'Decisión' });
+    await page
+      .getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...')
+      .fill('ADR 001');
+    await page
+      .locator('select')
+      .filter({ has: page.locator('option', { hasText: 'Decisión' }) })
+      .selectOption({ label: 'Decisión' });
     await page.getByPlaceholder('Ej: docker, go, auth').fill('e2e, go');
-    await page.getByPlaceholder(/^Escribe el contenido del documento en Markdown aquí/).fill(
-      [
-        '# Usar Postgres 18',
-        '',
-        'Elegimos **Postgres** por `pgcrypto`.',
-        '',
-        '- Simple',
-        '- Probado',
-        '',
-        '<img src=x onerror="window.__xss = true">',
-      ].join('\n'),
-    );
+    await page
+      .getByPlaceholder(/^Escribe el contenido del documento en Markdown aquí/)
+      .fill(
+        [
+          '# Usar Postgres 18',
+          '',
+          'Elegimos **Postgres** por `pgcrypto`.',
+          '',
+          '- Simple',
+          '- Probado',
+          '',
+          '<img src=x onerror="window.__xss = true">',
+        ].join('\n'),
+      );
     await page.getByRole('button', { name: 'Crear Documento' }).click();
 
     await expect(page.getByText('Documento creado con éxito')).toBeVisible();
@@ -123,17 +141,23 @@ test.describe('documentos de proyecto', () => {
 
     // Markdown renderizado y HTML del usuario escapado (no se ejecuta).
     const contenido = page.locator('.prose-container');
-    await expect(contenido.getByRole('heading', { level: 1, name: 'Usar Postgres 18' })).toBeVisible();
+    await expect(
+      contenido.getByRole('heading', { level: 1, name: 'Usar Postgres 18' }),
+    ).toBeVisible();
     await expect(contenido.locator('strong')).toHaveText('Postgres');
     await expect(contenido.locator('code')).toHaveText('pgcrypto');
     await expect(contenido.locator('li')).toHaveCount(2);
     await expect(contenido.locator('img')).toHaveCount(0);
     await expect(contenido).toContainText('<img src=x onerror="window.__xss = true">');
-    expect(await page.evaluate(() => (window as unknown as { __xss?: boolean }).__xss)).toBeUndefined();
+    expect(
+      await page.evaluate(() => (window as unknown as { __xss?: boolean }).__xss),
+    ).toBeUndefined();
 
     const docs = page.locator('app-documents-tab');
     await docs.getByRole('button', { name: 'Editar', exact: true }).click();
-    await page.getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...').fill('ADR 001 · aceptado');
+    await page
+      .getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...')
+      .fill('ADR 001 · aceptado');
     await page.getByRole('button', { name: 'Guardar Cambios' }).click();
     await expect(page.getByText('Documento actualizado')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1, name: 'ADR 001 · aceptado' })).toBeVisible();
@@ -141,38 +165,51 @@ test.describe('documentos de proyecto', () => {
     await docs.getByRole('button', { name: 'Eliminar', exact: true }).click();
     await page.getByRole('button', { name: 'Eliminar documento' }).click();
     await expect(page.getByText('Documento eliminado')).toBeVisible();
-    await expect(page.getByRole('heading', { level: 4, name: 'ADR 001 · aceptado' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 4, name: 'ADR 001 · aceptado' })).toHaveCount(
+      0,
+    );
   });
 
-  test('renderiza diagramas Mermaid y conserva el código si son inválidos', async ({ page, request }, testInfo) => {
+  test('renderiza diagramas Mermaid y conserva el código si son inválidos', async ({
+    page,
+    request,
+  }, testInfo) => {
     const proyecto = await createProject(request, uniqueName('Mermaid', testInfo));
     await page.goto(`/proyectos/${proyecto.id}`);
     await page.getByRole('tab', { name: /Documentos/ }).click();
 
     await page.getByRole('button', { name: 'Nuevo Documento' }).click();
-    await page.getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...').fill('Flujo de despliegue');
-    await page.getByPlaceholder(/^Escribe el contenido del documento en Markdown aquí/).fill(
-      [
-        '# Flujo',
-        '',
-        '```mermaid',
-        'graph TD',
-        '  Commit --> Build',
-        '  Build --> Deploy',
-        '```',
-        '',
-        '```mermaid',
-        'esto no es un diagrama',
-        '```',
-      ].join('\n'),
-    );
+    await page
+      .getByPlaceholder('Ej: Arquitectura de Eventos, Estrategia de Caching...')
+      .fill('Flujo de despliegue');
+    await page
+      .getByPlaceholder(/^Escribe el contenido del documento en Markdown aquí/)
+      .fill(
+        [
+          '# Flujo',
+          '',
+          '```mermaid',
+          'graph TD',
+          '  Commit --> Build',
+          '  Build --> Deploy',
+          '```',
+          '',
+          '```mermaid',
+          'esto no es un diagrama',
+          '```',
+        ].join('\n'),
+      );
 
     // La vista previa muestra el diagrama válido como SVG y el inválido con su código y el error.
     await page.getByRole('button', { name: 'Vista Previa' }).click();
     const preview = page.locator('.prose-container');
-    await expect(preview.getByRole('img', { name: 'Diagrama Mermaid' }).locator('svg')).toHaveCount(1);
+    await expect(preview.getByRole('img', { name: 'Diagrama Mermaid' }).locator('svg')).toHaveCount(
+      1,
+    );
     await expect(preview.locator('.mermaid-error')).toContainText('Diagrama inválido');
-    await expect(preview.locator('.mermaid-error + pre code')).toContainText('esto no es un diagrama');
+    await expect(preview.locator('.mermaid-error + pre code')).toContainText(
+      'esto no es un diagrama',
+    );
 
     await page.getByRole('button', { name: 'Crear Documento' }).click();
     await expect(page.getByText('Documento creado con éxito')).toBeVisible();

@@ -8,8 +8,13 @@
       <ol class="space-y-1.5 border-l border-surface-border pl-3">
         @for (item of dia.eventos; track item.evento.id) {
           <li class="text-xs flex items-baseline gap-2 min-w-0">
-            <time class="font-mono text-[10px] text-text-muted shrink-0">{{ item.evento.ocurrido_en | date: 'HH:mm' }}</time>
-            <span class="min-w-0" [class]="item.evento.eliminado ? 'text-text-muted' : 'text-text-main'">
+            <time class="font-mono text-[10px] text-text-muted shrink-0">{{
+              item.evento.ocurrido_en | date: 'HH:mm'
+            }}</time>
+            <span
+              class="min-w-0"
+              [class]="item.evento.eliminado ? 'text-text-muted' : 'text-text-main'"
+            >
               {{ item.texto }}
               @if (item.evento.entidad === 'nota' && item.evento.nombre && !item.evento.eliminado) {
                 <span class="block text-text-muted truncate">«{{ item.evento.nombre }}»</span>
@@ -19,7 +24,8 @@
               <span
                 class="text-[10px] text-text-muted/70 shrink-0"
                 title="Reconstruido a partir de fechas anteriores al registro de actividad"
-              >aprox.</span>
+                >aprox.</span
+              >
             }
           </li>
         }
@@ -27,7 +33,9 @@
     </section>
   } @empty {
     @if (!isLoading()) {
-      <p class="py-8 text-center text-xs text-text-muted">Todavía no hay actividad registrada en este proyecto.</p>
+      <p class="py-8 text-center text-xs text-text-muted"
+        >Todavía no hay actividad registrada en este proyecto.</p
+      >
     }
   }
 

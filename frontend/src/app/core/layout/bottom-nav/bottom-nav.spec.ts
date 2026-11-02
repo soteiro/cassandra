@@ -14,7 +14,8 @@ describe('BottomNav', () => {
 
   const el = () => fixture.nativeElement as HTMLElement;
   const links = () => Array.from(el().querySelectorAll<HTMLAnchorElement>('a'));
-  const menuButton = () => el().querySelector('button[aria-label="Más opciones"]') as HTMLButtonElement;
+  const menuButton = () =>
+    el().querySelector('button[aria-label="Más opciones"]') as HTMLButtonElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

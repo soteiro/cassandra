@@ -2,7 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ReflexionService } from './reflexion.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../../../testing/http-testing';
+import {
+  expectHttpCall,
+  HttpCase,
+  settle,
+  setupHttpTesting,
+} from '../../../../testing/http-testing';
 
 describe('ReflexionService', () => {
   let http: HttpTestingController;
@@ -50,8 +55,25 @@ describe('ReflexionService', () => {
   });
 
   it.each<HttpCase>([
-    { name: 'createReflexion', call: () => service.createReflexion({ contenido: 'x' } as never), method: 'POST', url: '/api/reflexiones', body: { contenido: 'x' } },
-    { name: 'updateReflexion', call: () => service.updateReflexion(3, { contenido: 'y' } as never), method: 'PUT', url: '/api/reflexiones/3', body: { contenido: 'y' } },
-    { name: 'deleteReflexion', call: () => service.deleteReflexion(3), method: 'DELETE', url: '/api/reflexiones/3' },
+    {
+      name: 'createReflexion',
+      call: () => service.createReflexion({ contenido: 'x' } as never),
+      method: 'POST',
+      url: '/api/reflexiones',
+      body: { contenido: 'x' },
+    },
+    {
+      name: 'updateReflexion',
+      call: () => service.updateReflexion(3, { contenido: 'y' } as never),
+      method: 'PUT',
+      url: '/api/reflexiones/3',
+      body: { contenido: 'y' },
+    },
+    {
+      name: 'deleteReflexion',
+      call: () => service.deleteReflexion(3),
+      method: 'DELETE',
+      url: '/api/reflexiones/3',
+    },
   ])('$name should call $method $url', (c) => expectHttpCall(http, c));
 });

@@ -12,13 +12,19 @@ export class TickTickService {
     return this.http.get<TickTickConnection>(`${this.server.apiUrl()}/connections/ticktick`);
   }
   authorize() {
-    return this.http.post<{ authorization_url: string }>(`${this.server.apiUrl()}/connections/ticktick/authorize`, {});
+    return this.http.post<{ authorization_url: string }>(
+      `${this.server.apiUrl()}/connections/ticktick/authorize`,
+      {},
+    );
   }
   disconnect() {
     return this.http.delete<TickTickConnection>(`${this.server.apiUrl()}/connections/ticktick`);
   }
   today(date: string, zone: string, refresh = false) {
-    const params = new HttpParams().set('date', date).set('time_zone', zone).set('refresh', refresh);
+    const params = new HttpParams()
+      .set('date', date)
+      .set('time_zone', zone)
+      .set('refresh', refresh);
     return this.http.get<TickTickToday>(`${this.server.apiUrl()}/ticktick/tasks/today`, { params });
   }
 }

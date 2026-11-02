@@ -4,16 +4,25 @@ import { AppearanceService } from './appearance.service';
 
 describe('AppearanceService', () => {
   let mediaChange: (event: { matches: boolean }) => void;
-  let media: { matches: boolean; addEventListener: ReturnType<typeof vi.fn>; removeEventListener: ReturnType<typeof vi.fn> };
+  let media: {
+    matches: boolean;
+    addEventListener: ReturnType<typeof vi.fn>;
+    removeEventListener: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     localStorage.removeItem(APPEARANCE_STORAGE_KEY);
     media = {
       matches: true,
-      addEventListener: vi.fn((_event, listener) => { mediaChange = listener; }),
+      addEventListener: vi.fn((_event, listener) => {
+        mediaChange = listener;
+      }),
       removeEventListener: vi.fn(),
     };
-    vi.stubGlobal('matchMedia', vi.fn(() => media));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => media),
+    );
     TestBed.configureTestingModule({});
   });
 
@@ -48,13 +57,16 @@ describe('AppearanceService', () => {
     expect(document.documentElement.dataset['mode']).toBe('light');
   });
 
-  it.each(['{invalid', 'null', '42', '{"palette":"unknown","mode":"unknown"}'])('ignores invalid saved settings: %s', value => {
-    localStorage.setItem(APPEARANCE_STORAGE_KEY, value);
-    const service = TestBed.inject(AppearanceService);
+  it.each(['{invalid', 'null', '42', '{"palette":"unknown","mode":"unknown"}'])(
+    'ignores invalid saved settings: %s',
+    (value) => {
+      localStorage.setItem(APPEARANCE_STORAGE_KEY, value);
+      const service = TestBed.inject(AppearanceService);
 
-    expect(service.palette()).toBe('amber');
-    expect(service.mode()).toBe('dark');
-  });
+      expect(service.palette()).toBe('amber');
+      expect(service.mode()).toBe('dark');
+    },
+  );
 
   it('applies and saves palette and mode independently', () => {
     const service = TestBed.inject(AppearanceService);
@@ -64,7 +76,10 @@ describe('AppearanceService', () => {
 
     expect(document.documentElement.dataset['palette']).toBe('violet');
     expect(document.documentElement.style.colorScheme).toBe('light');
-    expect(JSON.parse(localStorage.getItem(APPEARANCE_STORAGE_KEY)!)).toEqual({ palette: 'violet', mode: 'light' });
+    expect(JSON.parse(localStorage.getItem(APPEARANCE_STORAGE_KEY)!)).toEqual({
+      palette: 'violet',
+      mode: 'light',
+    });
     service.setPalette('unknown');
     service.setMode('unknown');
     expect(service.palette()).toBe('violet');
@@ -86,8 +101,12 @@ describe('AppearanceService', () => {
   });
 
   it('keeps working when reading or writing local storage is blocked', () => {
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
     const service = TestBed.inject(AppearanceService);
     service.setPalette('ocean');
     TestBed.tick();
@@ -99,10 +118,12 @@ describe('AppearanceService', () => {
 
   it('syncs a preference changed or cleared in another tab', () => {
     const service = TestBed.inject(AppearanceService);
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: APPEARANCE_STORAGE_KEY,
-      newValue: JSON.stringify({ palette: 'forest', mode: 'system' }),
-    }));
+    window.dispatchEvent(
+      new StorageEvent('storage', {
+        key: APPEARANCE_STORAGE_KEY,
+        newValue: JSON.stringify({ palette: 'forest', mode: 'system' }),
+      }),
+    );
     TestBed.tick();
     expect(service.palette()).toBe('forest');
     expect(service.mode()).toBe('system');

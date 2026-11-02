@@ -1,7 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { DOCUMENT } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+  TestRequest,
+} from '@angular/common/http/testing';
 import { APK_ASSET_NAME, APP_PLATFORM, AppPlatform, AppUpdateService } from './app-update.service';
 import { environment } from '../../../environments/environment';
 import { APK_UPDATER, ApkDownloadStatus, ApkUpdaterPlugin } from './apk-updater';
@@ -23,7 +27,12 @@ describe('AppUpdateService', () => {
   let http: HttpTestingController;
   let updater: { [K in keyof ApkUpdaterPlugin]: ReturnType<typeof vi.fn> };
 
-  function setup(native = true, version = '0.2.1', extraProviders: unknown[] = [], initialDownload: ApkDownloadStatus = { status: 'idle' }) {
+  function setup(
+    native = true,
+    version = '0.2.1',
+    extraProviders: unknown[] = [],
+    initialDownload: ApkDownloadStatus = { status: 'idle' },
+  ) {
     platform = {
       isNative: vi.fn().mockReturnValue(native),
       getVersion: vi.fn().mockResolvedValue(version),
@@ -86,7 +95,12 @@ describe('AppUpdateService', () => {
   it('should report an available update with the APK url', async () => {
     const service = setup();
     const result = await check(service, release('v0.2.2'));
-    expect(result).toEqual({ status: 'available', current: '0.2.1', latest: 'v0.2.2', downloadUrl: APK_URL });
+    expect(result).toEqual({
+      status: 'available',
+      current: '0.2.1',
+      latest: 'v0.2.2',
+      downloadUrl: APK_URL,
+    });
     expect(service.checking()).toBe(false);
   });
 
@@ -96,10 +110,16 @@ describe('AppUpdateService', () => {
     expect(result).toMatchObject({ status: 'available', downloadUrl: RELEASE_PAGE });
   });
 
-  it.each(['v0.2.1', 'v0.2.0'])('should be up to date when the latest release is %s', async (tag) => {
-    const service = setup();
-    expect(await check(service, release(tag))).toEqual({ status: 'up-to-date', current: '0.2.1' });
-  });
+  it.each(['v0.2.1', 'v0.2.0'])(
+    'should be up to date when the latest release is %s',
+    async (tag) => {
+      const service = setup();
+      expect(await check(service, release(tag))).toEqual({
+        status: 'up-to-date',
+        current: '0.2.1',
+      });
+    },
+  );
 
   it('should report an error if GitHub fails', async () => {
     const service = setup();
@@ -119,7 +139,9 @@ describe('AppUpdateService', () => {
   it('openDownload should navigate to the url on the web', () => {
     // jsdom no permite espiar location.assign: se usa un DOCUMENT falso.
     const assign = vi.fn();
-    const service = setup(false, '0.2.1', [{ provide: DOCUMENT, useValue: { location: { assign } } }]);
+    const service = setup(false, '0.2.1', [
+      { provide: DOCUMENT, useValue: { location: { assign } } },
+    ]);
     service.openDownload(APK_URL);
     expect(assign).toHaveBeenCalledWith(APK_URL);
   });
@@ -127,9 +149,12 @@ describe('AppUpdateService', () => {
   it('should download natively, track progress and offer installation only when ready', async () => {
     vi.useFakeTimers();
     const assign = vi.fn();
-    const service = setup(true, '0.2.1', [{ provide: DOCUMENT, useValue: { location: { assign } } }]);
+    const service = setup(true, '0.2.1', [
+      { provide: DOCUMENT, useValue: { location: { assign } } },
+    ]);
     await Promise.resolve();
-    updater.getDownloadStatus.mockResolvedValueOnce({ status: 'downloading', progress: 42 })
+    updater.getDownloadStatus
+      .mockResolvedValueOnce({ status: 'downloading', progress: 42 })
       .mockResolvedValueOnce({ status: 'ready' });
     service.openDownload(APK_URL);
     service.openDownload(APK_URL);
@@ -143,7 +168,9 @@ describe('AppUpdateService', () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(service.download().status).toBe('ready');
     expect(service.downloading()).toBe(false);
-    const toast = TestBed.inject(ToastService).toasts().find(t => t.action?.label === 'Instalar actualización');
+    const toast = TestBed.inject(ToastService)
+      .toasts()
+      .find((t) => t.action?.label === 'Instalar actualización');
     expect(toast).toBeDefined();
     await service.installUpdate();
     expect(updater.install).toHaveBeenCalledOnce();
@@ -183,14 +210,20 @@ describe('AppUpdateService', () => {
     await Promise.resolve();
     await service.installUpdate();
     expect(service.download().status).toBe('ready');
-    expect(TestBed.inject(ToastService).toasts().some(t => t.message.includes('Permitir desde esta fuente'))).toBe(true);
+    expect(
+      TestBed.inject(ToastService)
+        .toasts()
+        .some((t) => t.message.includes('Permitir desde esta fuente')),
+    ).toBe(true);
     await service.installUpdate();
     expect(updater.install).toHaveBeenCalledTimes(2);
   });
 
   it('should keep the browser fallback for a release without an APK', () => {
     const assign = vi.fn();
-    const service = setup(true, '0.2.1', [{ provide: DOCUMENT, useValue: { location: { assign } } }]);
+    const service = setup(true, '0.2.1', [
+      { provide: DOCUMENT, useValue: { location: { assign } } },
+    ]);
     service.openDownload(RELEASE_PAGE);
     expect(assign).toHaveBeenCalledWith(RELEASE_PAGE);
     expect(updater.startDownload).not.toHaveBeenCalled();

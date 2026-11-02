@@ -36,20 +36,19 @@ import { LucideListTodo, LucideRefreshCcw, LucideCheck } from '@lucide/angular';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-
 export class Home {
   private readonly taskService = inject(TaskService);
   private readonly toastService = inject(ToastService);
   readonly sortedTasks = computed(() => {
-  const tasks = this.tasksResource?.value() ?? [];
-  const priorityOrder = { urgente: 0, alta: 1, normal: 2, baja: 3 };
+    const tasks = this.tasksResource?.value() ?? [];
+    const priorityOrder = { urgente: 0, alta: 1, normal: 2, baja: 3 };
 
-  return [...tasks].sort(
-    (a, b) =>
-      (priorityOrder[a.prioridad?.toLowerCase() as keyof typeof priorityOrder] ?? 99) -
-      (priorityOrder[b.prioridad?.toLowerCase() as keyof typeof priorityOrder] ?? 99)
-  );
-});
+    return [...tasks].sort(
+      (a, b) =>
+        (priorityOrder[a.prioridad?.toLowerCase() as keyof typeof priorityOrder] ?? 99) -
+        (priorityOrder[b.prioridad?.toLowerCase() as keyof typeof priorityOrder] ?? 99),
+    );
+  });
   // Selected task for right-drawer modal
   selectedTask = signal<Task | null>(null);
 

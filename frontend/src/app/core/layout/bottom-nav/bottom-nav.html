@@ -1,6 +1,6 @@
 <nav
   class="fixed bottom-0 inset-x-0 z-40 bg-surface/95 backdrop-blur-xl border-t border-surface-border md:hidden select-none"
-  style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));"
+  style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))"
   aria-label="Navegación principal móvil"
 >
   <div class="grid grid-cols-5 items-center justify-around pt-1.5 px-1 max-w-lg mx-auto">
@@ -19,7 +19,11 @@
         [class.text-primary-text]="rlaHome.isActive"
         [class.text-text-muted]="!rlaHome.isActive"
       >
-        <svg lucideHouse class="w-5 h-5 transition-transform" [class.scale-110]="rlaHome.isActive" />
+        <svg
+          lucideHouse
+          class="w-5 h-5 transition-transform"
+          [class.scale-110]="rlaHome.isActive"
+        />
       </div>
       <span
         class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
@@ -45,7 +49,11 @@
         [class.text-primary-text]="rlaProyectos.isActive"
         [class.text-text-muted]="!rlaProyectos.isActive"
       >
-        <svg lucideFolder class="w-5 h-5 transition-transform" [class.scale-110]="rlaProyectos.isActive" />
+        <svg
+          lucideFolder
+          class="w-5 h-5 transition-transform"
+          [class.scale-110]="rlaProyectos.isActive"
+        />
       </div>
       <span
         class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
@@ -97,7 +105,11 @@
         [class.text-primary-text]="rlaFinanzas.isActive"
         [class.text-text-muted]="!rlaFinanzas.isActive"
       >
-        <svg lucideWalletMinimal class="w-5 h-5 transition-transform" [class.scale-110]="rlaFinanzas.isActive" />
+        <svg
+          lucideWalletMinimal
+          class="w-5 h-5 transition-transform"
+          [class.scale-110]="rlaFinanzas.isActive"
+        />
       </div>
       <span
         class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
