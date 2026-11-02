@@ -6,7 +6,7 @@ APK_MOBILE = cassandra-mobile.apk
 # JDK para Gradle (fallback si JAVA_HOME no existe o es inválido)
 JAVA_FALLBACK = $(HOME)/.jdks/jbr-21.0.11
 
-.PHONY: help migration build build-memory-mcp run dev-backend dev-frontend test test-frontend test-e2e test-all docs mobile mobile-sync mobile-install mobile-clean all
+.PHONY: help migration build build-memory-mcp run dev-backend dev-frontend test test-frontend test-e2e test-all docs mobile mobile-sync mobile-install mobile-waydroid mobile-clean all
 
 help: ## Muestra la lista de comandos disponibles
 	@echo "Comandos disponibles:"
@@ -25,6 +25,7 @@ help: ## Muestra la lista de comandos disponibles
 	@echo "  make mobile                 -> Compila Angular (mobile) + Capacitor + Gradle y deja listo ./$(APK_MOBILE)"
 	@echo "  make mobile-sync            -> Solo build Angular mobile + cap sync (sin compilar APK)"
 	@echo "  make mobile-install         -> Instala el APK en dispositivo/emulador conectado y lo abre"
+	@echo "  make mobile-waydroid        -> Compila el APK, abre Waydroid si está cerrado, lo instala y abre la app"
 	@echo "  make mobile-clean           -> Limpia el build de Android y el APK copiado"
 	@echo "  make all                    -> Compila todo: ./cassandra-app + ./$(APK_MOBILE)"
 migration: ## Crea una nueva migración secuencial (ej: make migration name=crear_tabla_x)
@@ -95,6 +96,14 @@ mobile-install: ## Instala el APK en el dispositivo/emulador conectado y lo abre
 		adb install -r $(APK_DEBUG_SRC); \
 	fi
 	@adb shell am start -n com.cassandra.app/.MainActivity
+
+mobile-waydroid: mobile ## Compila el APK, abre Waydroid si está cerrado, lo instala y abre la app
+	@waydroid status | grep -q 'Session:.*RUNNING' || (echo "🤖 Iniciando Waydroid..."; waydroid show-full-ui >/dev/null 2>&1 &)
+	@until waydroid status | grep -q 'Session:.*RUNNING'; do sleep 2; done
+	@# La primera vez Waydroid pide autorizar la depuración: aceptar el diálogo en su ventana.
+	@until adb connect $$(waydroid status | awk '/IP address/{print $$3}'):5555 | grep -q '^connected\|already connected'; do sleep 2; done
+	@until [ "$$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; do sleep 2; done
+	@$(MAKE) --no-print-directory mobile-install
 
 mobile-clean: ## Limpia builds de Android y el APK copiado
 	@if [ -x "$$JAVA_HOME/bin/java" ]; then JAVA="$$JAVA_HOME"; else JAVA="$(JAVA_FALLBACK)"; fi; \

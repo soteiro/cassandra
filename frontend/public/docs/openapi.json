@@ -21,6 +21,10 @@
       "description": "Operaciones de Actividad"
     },
     {
+      "name": "Api keys",
+      "description": "Operaciones de Api keys"
+    },
+    {
       "name": "Auth",
       "description": "Operaciones de Auth"
     },
@@ -39,6 +43,14 @@
     {
       "name": "Lista deseos",
       "description": "Operaciones de Lista deseos"
+    },
+    {
+      "name": "Logs proyectos",
+      "description": "Operaciones de Logs proyectos"
+    },
+    {
+      "name": "Memoria proyectos",
+      "description": "Operaciones de Memoria proyectos"
     },
     {
       "name": "Notas proyectos",
@@ -65,8 +77,20 @@
       "description": "Operaciones de Revision"
     },
     {
+      "name": "Sistema",
+      "description": "Operaciones de Sistema"
+    },
+    {
       "name": "Tareas",
       "description": "Operaciones de Tareas"
+    },
+    {
+      "name": "Tareas integracion",
+      "description": "Operaciones de Tareas integracion"
+    },
+    {
+      "name": "Ticktick",
+      "description": "Operaciones de Ticktick"
     },
     {
       "name": "Users",
@@ -74,23 +98,31 @@
     }
   ],
   "paths": {
-    "/api/proyects/{proyect_id}/actividad": {
+    "{base_url}/api/proyects/{proyecto_id}/actividad?limit=20": {
       "get": {
         "tags": [
           "Actividad"
         ],
         "summary": "Actividad de un proyecto",
-        "operationId": "get__api_proyects__proyect_id__actividad",
+        "operationId": "get__base_url__api_proyects__proyecto_id__actividad_limit_20",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -121,13 +153,24 @@
         ]
       }
     },
-    "/api/actividad/resumen": {
+    "{base_url}/api/actividad/resumen?desde={desde}&hasta={hasta}": {
       "get": {
         "tags": [
           "Actividad"
         ],
         "summary": "Resumen de actividad",
-        "operationId": "get__api_actividad_resumen",
+        "operationId": "get__base_url__api_actividad_resumen_desde__desde__hasta__hasta_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -156,13 +199,169 @@
         ]
       }
     },
-    "/api/auth/login": {
+    "{base_url}/api/api-keys": {
+      "post": {
+        "tags": [
+          "Api keys"
+        ],
+        "summary": "Crear clave",
+        "operationId": "post__base_url__api_api_keys",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Api keys"
+        ],
+        "summary": "Listar claves",
+        "operationId": "get__base_url__api_api_keys",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/api-keys/{api_key_id}": {
+      "delete": {
+        "tags": [
+          "Api keys"
+        ],
+        "summary": "Revocar clave",
+        "operationId": "delete__base_url__api_api_keys__api_key_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "api_key_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro api_key_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/auth/login": {
       "post": {
         "tags": [
           "Auth"
         ],
         "summary": "login",
-        "operationId": "post__api_auth_login",
+        "operationId": "post__base_url__api_auth_login",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -186,13 +385,24 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "{base_url}/api/auth/logout": {
       "post": {
         "tags": [
           "Auth"
         ],
         "summary": "logout",
-        "operationId": "post__api_auth_logout",
+        "operationId": "post__base_url__api_auth_logout",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -221,13 +431,70 @@
         ]
       }
     },
-    "/api/auth/refresh": {
+    "{base_url}/api/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Sesión actual",
+        "operationId": "get__base_url__api_auth_me",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/auth/refresh": {
       "post": {
         "tags": [
           "Auth"
         ],
         "summary": "refresh",
-        "operationId": "post__api_auth_refresh",
+        "operationId": "post__base_url__api_auth_refresh",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -251,23 +518,31 @@
         }
       }
     },
-    "/api/proyects/{proyect_id}/documentos": {
+    "{base_url}/api/proyects/{proyecto_id}/documentos": {
       "post": {
         "tags": [
           "Documentos proyectos"
         ],
         "summary": "Create documento",
-        "operationId": "post__api_proyects__proyect_id__documentos",
+        "operationId": "post__base_url__api_proyects__proyecto_id__documentos",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -302,17 +577,25 @@
           "Documentos proyectos"
         ],
         "summary": "Get all by proyecto",
-        "operationId": "get__api_proyects__proyect_id__documentos",
+        "operationId": "get__base_url__api_proyects__proyecto_id__documentos",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -343,23 +626,31 @@
         ]
       }
     },
-    "/api/documentos/{documento_id}": {
+    "{base_url}/api/documentos/{documento_id}": {
       "delete": {
         "tags": [
           "Documentos proyectos"
         ],
         "summary": "Delete documento",
-        "operationId": "delete__api_documentos__documento_id_",
+        "operationId": "delete__base_url__api_documentos__documento_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "documento_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de documento"
+            "description": "Parámetro documento_id"
           }
         ],
         "responses": {
@@ -394,17 +685,25 @@
           "Documentos proyectos"
         ],
         "summary": "Get by ID",
-        "operationId": "get__api_documentos__documento_id_",
+        "operationId": "get__base_url__api_documentos__documento_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "documento_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de documento"
+            "description": "Parámetro documento_id"
           }
         ],
         "responses": {
@@ -439,17 +738,25 @@
           "Documentos proyectos"
         ],
         "summary": "Update documento",
-        "operationId": "put__api_documentos__documento_id_",
+        "operationId": "put__base_url__api_documentos__documento_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "documento_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de documento"
+            "description": "Parámetro documento_id"
           }
         ],
         "responses": {
@@ -480,23 +787,31 @@
         ]
       }
     },
-    "/api/finanzas/bancos/{banco_id}": {
+    "{base_url}/api/finanzas/bancos/{banco_id}": {
       "put": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Actualizar Banco",
-        "operationId": "put__api_finanzas_bancos__banco_id_",
+        "operationId": "put__base_url__api_finanzas_bancos__banco_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "banco_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de banco"
+            "description": "Parámetro banco_id"
           }
         ],
         "responses": {
@@ -531,17 +846,78 @@
           "Finanzas"
         ],
         "summary": "Eliminar Banco",
-        "operationId": "delete__api_finanzas_bancos__banco_id_",
+        "operationId": "delete__base_url__api_finanzas_bancos__banco_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "banco_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de banco"
+            "description": "Parámetro banco_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Finanzas"
+        ],
+        "summary": "Obtener Banco por ID",
+        "operationId": "get__base_url__api_finanzas_bancos__banco_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "banco_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro banco_id"
           }
         ],
         "responses": {
@@ -572,23 +948,31 @@
         ]
       }
     },
-    "/api/finanzas/grupos/{grupo_id}": {
+    "{base_url}/api/finanzas/grupos/{grupo_item_id}": {
       "put": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Actualizar Grupo Finanzas",
-        "operationId": "put__api_finanzas_grupos__grupo_id_",
+        "operationId": "put__base_url__api_finanzas_grupos__grupo_item_id_",
         "parameters": [
           {
-            "name": "grupo_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de grupo"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "grupo_item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro grupo_item_id"
           }
         ],
         "responses": {
@@ -623,17 +1007,78 @@
           "Finanzas"
         ],
         "summary": "Eliminar Grupo Finanzas",
-        "operationId": "delete__api_finanzas_grupos__grupo_id_",
+        "operationId": "delete__base_url__api_finanzas_grupos__grupo_item_id_",
         "parameters": [
           {
-            "name": "grupo_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de grupo"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "grupo_item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro grupo_item_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Finanzas"
+        ],
+        "summary": "Obtener Grupo Finanzas por ID",
+        "operationId": "get__base_url__api_finanzas_grupos__grupo_item_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "grupo_item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro grupo_item_id"
           }
         ],
         "responses": {
@@ -664,23 +1109,31 @@
         ]
       }
     },
-    "/api/finanzas/plantilla/{plantilla_id}": {
+    "{base_url}/api/finanzas/plantilla/{plantilla_id}": {
       "put": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Actualizar Item Plantilla",
-        "operationId": "put__api_finanzas_plantilla__plantilla_id_",
+        "operationId": "put__base_url__api_finanzas_plantilla__plantilla_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "plantilla_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de plantilla"
+            "description": "Parámetro plantilla_id"
           }
         ],
         "responses": {
@@ -715,17 +1168,25 @@
           "Finanzas"
         ],
         "summary": "Eliminar Item Plantilla",
-        "operationId": "delete__api_finanzas_plantilla__plantilla_id_",
+        "operationId": "delete__base_url__api_finanzas_plantilla__plantilla_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "plantilla_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de plantilla"
+            "description": "Parámetro plantilla_id"
           }
         ],
         "responses": {
@@ -760,17 +1221,25 @@
           "Finanzas"
         ],
         "summary": "Obtener Item Plantilla por ID",
-        "operationId": "get__api_finanzas_plantilla__plantilla_id_",
+        "operationId": "get__base_url__api_finanzas_plantilla__plantilla_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "plantilla_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de plantilla"
+            "description": "Parámetro plantilla_id"
           }
         ],
         "responses": {
@@ -801,23 +1270,31 @@
         ]
       }
     },
-    "/api/finanzas/movimientos-esperados/{movimientos-esperado_id}": {
+    "{base_url}/api/finanzas/movimientos-esperados/{movimiento_esperado_id}": {
       "put": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Actualizar Movimiento Esperado",
-        "operationId": "put__api_finanzas_movimientos_esperados__movimientos_esperado_id_",
+        "operationId": "put__base_url__api_finanzas_movimientos_esperados__movimiento_esperado_id_",
         "parameters": [
           {
-            "name": "movimientos-esperado_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de movimientos-esperado"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "movimiento_esperado_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro movimiento_esperado_id"
           }
         ],
         "responses": {
@@ -852,17 +1329,78 @@
           "Finanzas"
         ],
         "summary": "Eliminar Movimiento Esperado",
-        "operationId": "delete__api_finanzas_movimientos_esperados__movimientos_esperado_id_",
+        "operationId": "delete__base_url__api_finanzas_movimientos_esperados__movimiento_esperado_id_",
         "parameters": [
           {
-            "name": "movimientos-esperado_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de movimientos-esperado"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "movimiento_esperado_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro movimiento_esperado_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Finanzas"
+        ],
+        "summary": "Obtener Movimiento Esperado por ID",
+        "operationId": "get__base_url__api_finanzas_movimientos_esperados__movimiento_esperado_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "movimiento_esperado_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro movimiento_esperado_id"
           }
         ],
         "responses": {
@@ -893,13 +1431,24 @@
         ]
       }
     },
-    "/api/finanzas/clonar": {
+    "{base_url}/api/finanzas/clonar": {
       "post": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Clonar Periodo",
-        "operationId": "post__api_finanzas_clonar",
+        "operationId": "post__base_url__api_finanzas_clonar",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -928,13 +1477,24 @@
         ]
       }
     },
-    "/api/finanzas/bancos": {
+    "{base_url}/api/finanzas/bancos": {
       "post": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Crear Banco",
-        "operationId": "post__api_finanzas_bancos",
+        "operationId": "post__base_url__api_finanzas_bancos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -967,7 +1527,18 @@
           "Finanzas"
         ],
         "summary": "Listar Bancos",
-        "operationId": "get__api_finanzas_bancos",
+        "operationId": "get__base_url__api_finanzas_bancos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -996,46 +1567,24 @@
         ]
       }
     },
-    "/api/finanzas/plantilla": {
+    "{base_url}/api/finanzas/plantilla": {
       "post": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Crear Ingreso",
-        "operationId": "post__api_finanzas_plantilla",
-        "responses": {
-          "200": {
-            "description": "Operación exitosa",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud inválida"
-          },
-          "401": {
-            "description": "No autorizado / Token inválido"
-          },
-          "500": {
-            "description": "Error interno del servidor"
-          }
-        },
-        "security": [
+        "operationId": "post__base_url__api_finanzas_plantilla",
+        "parameters": [
           {
-            "bearerAuth": []
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
           }
-        ]
-      },
-      "get": {
-        "tags": [
-          "Finanzas"
         ],
-        "summary": "Listar Plantilla por Periodo",
-        "operationId": "get__api_finanzas_plantilla",
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1064,13 +1613,24 @@
         ]
       }
     },
-    "/api/finanzas/grupos": {
+    "{base_url}/api/finanzas/grupos": {
       "post": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Crear Grupo Finanzas",
-        "operationId": "post__api_finanzas_grupos",
+        "operationId": "post__base_url__api_finanzas_grupos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1103,7 +1663,18 @@
           "Finanzas"
         ],
         "summary": "Listar Grupos Finanzas",
-        "operationId": "get__api_finanzas_grupos",
+        "operationId": "get__base_url__api_finanzas_grupos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1132,13 +1703,24 @@
         ]
       }
     },
-    "/api/finanzas/movimientos-esperados": {
+    "{base_url}/api/finanzas/movimientos-esperados": {
       "post": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Crear Movimiento Esperado",
-        "operationId": "post__api_finanzas_movimientos_esperados",
+        "operationId": "post__base_url__api_finanzas_movimientos_esperados",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1171,7 +1753,18 @@
           "Finanzas"
         ],
         "summary": "Listar Movimientos Esperados",
-        "operationId": "get__api_finanzas_movimientos_esperados",
+        "operationId": "get__base_url__api_finanzas_movimientos_esperados",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1200,13 +1793,70 @@
         ]
       }
     },
-    "/api/finanzas/resumen": {
+    "{base_url}/api/finanzas/plantilla?anio={anio}&mes={mes}": {
+      "get": {
+        "tags": [
+          "Finanzas"
+        ],
+        "summary": "Listar Plantilla por Periodo",
+        "operationId": "get__base_url__api_finanzas_plantilla_anio__anio__mes__mes_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/finanzas/resumen?anio={anio}&mes={mes}": {
       "get": {
         "tags": [
           "Finanzas"
         ],
         "summary": "Obtener Resumen y Balance",
-        "operationId": "get__api_finanzas_resumen",
+        "operationId": "get__base_url__api_finanzas_resumen_anio__anio__mes__mes_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1235,23 +1885,31 @@
         ]
       }
     },
-    "/api/personas/{persona_id}/interacciones": {
+    "{base_url}/api/personas/{persona_id}/interacciones": {
       "post": {
         "tags": [
           "Interacciones"
         ],
         "summary": "create interaccion by persona",
-        "operationId": "post__api_personas__persona_id__interacciones",
+        "operationId": "post__base_url__api_personas__persona_id__interacciones",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "persona_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de persona"
+            "description": "Parámetro persona_id"
           }
         ],
         "responses": {
@@ -1286,17 +1944,25 @@
           "Interacciones"
         ],
         "summary": "list interacciones by persona",
-        "operationId": "get__api_personas__persona_id__interacciones",
+        "operationId": "get__base_url__api_personas__persona_id__interacciones",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "persona_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de persona"
+            "description": "Parámetro persona_id"
           }
         ],
         "responses": {
@@ -1327,13 +1993,24 @@
         ]
       }
     },
-    "/api/interacciones": {
+    "{base_url}/api/interacciones": {
       "post": {
         "tags": [
           "Interacciones"
         ],
         "summary": "create interaccion",
-        "operationId": "post__api_interacciones",
+        "operationId": "post__base_url__api_interacciones",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1366,7 +2043,18 @@
           "Interacciones"
         ],
         "summary": "list interacciones",
-        "operationId": "get__api_interacciones",
+        "operationId": "get__base_url__api_interacciones",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1395,23 +2083,31 @@
         ]
       }
     },
-    "/api/interacciones/{interaccione_id}": {
+    "{base_url}/api/interacciones/{interaccion_id}": {
       "delete": {
         "tags": [
           "Interacciones"
         ],
         "summary": "delete interaccion by id",
-        "operationId": "delete__api_interacciones__interaccione_id_",
+        "operationId": "delete__base_url__api_interacciones__interaccion_id_",
         "parameters": [
           {
-            "name": "interaccione_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de interaccione"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "interaccion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro interaccion_id"
           }
         ],
         "responses": {
@@ -1446,17 +2142,25 @@
           "Interacciones"
         ],
         "summary": "get interaccion by id",
-        "operationId": "get__api_interacciones__interaccione_id_",
+        "operationId": "get__base_url__api_interacciones__interaccion_id_",
         "parameters": [
           {
-            "name": "interaccione_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de interaccione"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "interaccion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro interaccion_id"
           }
         ],
         "responses": {
@@ -1491,17 +2195,25 @@
           "Interacciones"
         ],
         "summary": "update interaccion by id",
-        "operationId": "put__api_interacciones__interaccione_id_",
+        "operationId": "put__base_url__api_interacciones__interaccion_id_",
         "parameters": [
           {
-            "name": "interaccione_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de interaccione"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "interaccion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro interaccion_id"
           }
         ],
         "responses": {
@@ -1532,23 +2244,31 @@
         ]
       }
     },
-    "/api/lista-deseos/{lista-deseo_id}": {
+    "{base_url}/api/lista-deseos/{deseo_id}": {
       "put": {
         "tags": [
           "Lista deseos"
         ],
         "summary": "Actualizar Item Lista Deseos",
-        "operationId": "put__api_lista_deseos__lista_deseo_id_",
+        "operationId": "put__base_url__api_lista_deseos__deseo_id_",
         "parameters": [
           {
-            "name": "lista-deseo_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 4
+              "type": "string"
             },
-            "description": "ID numérico de lista-deseo"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "deseo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro deseo_id"
           }
         ],
         "responses": {
@@ -1583,17 +2303,25 @@
           "Lista deseos"
         ],
         "summary": "Eliminar Item Lista Deseos",
-        "operationId": "delete__api_lista_deseos__lista_deseo_id_",
+        "operationId": "delete__base_url__api_lista_deseos__deseo_id_",
         "parameters": [
           {
-            "name": "lista-deseo_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 4
+              "type": "string"
             },
-            "description": "ID numérico de lista-deseo"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "deseo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro deseo_id"
           }
         ],
         "responses": {
@@ -1628,17 +2356,25 @@
           "Lista deseos"
         ],
         "summary": "Obtener Item Lista Deseos por ID",
-        "operationId": "get__api_lista_deseos__lista_deseo_id_",
+        "operationId": "get__base_url__api_lista_deseos__deseo_id_",
         "parameters": [
           {
-            "name": "lista-deseo_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 7
+              "type": "string"
             },
-            "description": "ID numérico de lista-deseo"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "deseo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro deseo_id"
           }
         ],
         "responses": {
@@ -1669,13 +2405,24 @@
         ]
       }
     },
-    "/api/lista-deseos": {
+    "{base_url}/api/lista-deseos": {
       "post": {
         "tags": [
           "Lista deseos"
         ],
         "summary": "Crear Item Lista Deseos",
-        "operationId": "post__api_lista_deseos",
+        "operationId": "post__base_url__api_lista_deseos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1708,7 +2455,18 @@
           "Lista deseos"
         ],
         "summary": "Listar Lista Deseos",
-        "operationId": "get__api_lista_deseos",
+        "operationId": "get__base_url__api_lista_deseos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -1737,23 +2495,555 @@
         ]
       }
     },
-    "/api/notas/{nota_id}": {
+    "{base_url}/api/logs/{log_id}": {
+      "put": {
+        "tags": [
+          "Logs proyectos"
+        ],
+        "summary": "Actualizar log",
+        "operationId": "put__base_url__api_logs__log_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "log_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro log_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Logs proyectos"
+        ],
+        "summary": "Eliminar log",
+        "operationId": "delete__base_url__api_logs__log_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "log_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro log_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Logs proyectos"
+        ],
+        "summary": "Obtener log",
+        "operationId": "get__base_url__api_logs__log_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "log_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro log_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/proyects/{proyecto_id}/logs": {
+      "post": {
+        "tags": [
+          "Logs proyectos"
+        ],
+        "summary": "Crear log",
+        "operationId": "post__base_url__api_proyects__proyecto_id__logs",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Logs proyectos"
+        ],
+        "summary": "Listar logs",
+        "operationId": "get__base_url__api_proyects__proyecto_id__logs",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/memory/projects/{proyecto_id}/entries": {
+      "get": {
+        "tags": [
+          "Memoria proyectos"
+        ],
+        "summary": "Buscar fichas",
+        "operationId": "get__base_url__api_memory_projects__proyecto_id__entries",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/memory/projects/{proyecto_id}/advances": {
+      "post": {
+        "tags": [
+          "Memoria proyectos"
+        ],
+        "summary": "Guardar avance",
+        "operationId": "post__base_url__api_memory_projects__proyecto_id__advances",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/memory/projects/{proyecto_id}": {
+      "get": {
+        "tags": [
+          "Memoria proyectos"
+        ],
+        "summary": "Obtener contexto",
+        "operationId": "get__base_url__api_memory_projects__proyecto_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/notas": {
+      "post": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "Crear nota por proyecto en el cuerpo",
+        "operationId": "post__base_url__api_notas",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Notas proyectos"
+        ],
+        "summary": "get all",
+        "operationId": "get__base_url__api_notas",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/notas/{nota_id}": {
       "delete": {
         "tags": [
           "Notas proyectos"
         ],
         "summary": "Delete",
-        "operationId": "delete__api_notas__nota_id_",
+        "operationId": "delete__base_url__api_notas__nota_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "nota_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 13
+              "type": "string"
             },
-            "description": "ID numérico de nota"
+            "description": "Parámetro nota_id"
           }
         ],
         "responses": {
@@ -1788,17 +3078,25 @@
           "Notas proyectos"
         ],
         "summary": "Get by ID",
-        "operationId": "get__api_notas__nota_id_",
+        "operationId": "get__base_url__api_notas__nota_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "nota_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 3
+              "type": "string"
             },
-            "description": "ID numérico de nota"
+            "description": "Parámetro nota_id"
           }
         ],
         "responses": {
@@ -1833,17 +3131,25 @@
           "Notas proyectos"
         ],
         "summary": "update nota",
-        "operationId": "put__api_notas__nota_id_",
+        "operationId": "put__base_url__api_notas__nota_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "nota_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 3
+              "type": "string"
             },
-            "description": "ID numérico de nota"
+            "description": "Parámetro nota_id"
           }
         ],
         "responses": {
@@ -1874,23 +3180,31 @@
         ]
       }
     },
-    "/api/proyects/{proyect_id}/notas": {
+    "{base_url}/api/proyects/{proyecto_id}/notas": {
       "get": {
         "tags": [
           "Notas proyectos"
         ],
         "summary": "Get all by proyect",
-        "operationId": "get__api_proyects__proyect_id__notas",
+        "operationId": "get__base_url__api_proyects__proyecto_id__notas",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -1925,17 +3239,25 @@
           "Notas proyectos"
         ],
         "summary": "create",
-        "operationId": "post__api_proyects__proyect_id__notas",
+        "operationId": "post__base_url__api_proyects__proyecto_id__notas",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -1966,23 +3288,31 @@
         ]
       }
     },
-    "/api/tareas/{tarea_id}/notas": {
+    "{base_url}/api/tareas/{tarea_id}/notas": {
       "get": {
         "tags": [
           "Tareas"
         ],
         "summary": "List Notas por Tarea",
-        "operationId": "get__api_tareas__tarea_id__notas",
+        "operationId": "get__base_url__api_tareas__tarea_id__notas",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "tarea_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de tarea"
+            "description": "Parámetro tarea_id"
           }
         ],
         "responses": {
@@ -2017,17 +3347,25 @@
           "Notas proyectos"
         ],
         "summary": "create nota vinculada a tarea",
-        "operationId": "post__api_tareas__tarea_id__notas",
+        "operationId": "post__base_url__api_tareas__tarea_id__notas",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "tarea_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de tarea"
+            "description": "Parámetro tarea_id"
           }
         ],
         "responses": {
@@ -2058,48 +3396,24 @@
         ]
       }
     },
-    "/api/notas": {
-      "get": {
-        "tags": [
-          "Notas proyectos"
-        ],
-        "summary": "get all",
-        "operationId": "get__api_notas",
-        "responses": {
-          "200": {
-            "description": "Operación exitosa",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud inválida"
-          },
-          "401": {
-            "description": "No autorizado / Token inválido"
-          },
-          "500": {
-            "description": "Error interno del servidor"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/personas": {
+    "{base_url}/api/personas": {
       "post": {
         "tags": [
           "Personas"
         ],
         "summary": "create persona",
-        "operationId": "post__api_personas",
+        "operationId": "post__base_url__api_personas",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2132,7 +3446,18 @@
           "Personas"
         ],
         "summary": "list personas",
-        "operationId": "get__api_personas",
+        "operationId": "get__base_url__api_personas",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2161,23 +3486,31 @@
         ]
       }
     },
-    "/api/personas/{persona_id}": {
+    "{base_url}/api/personas/{persona_id}": {
       "delete": {
         "tags": [
           "Personas"
         ],
         "summary": "delete persona by id",
-        "operationId": "delete__api_personas__persona_id_",
+        "operationId": "delete__base_url__api_personas__persona_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "persona_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de persona"
+            "description": "Parámetro persona_id"
           }
         ],
         "responses": {
@@ -2212,17 +3545,25 @@
           "Personas"
         ],
         "summary": "get persona by id",
-        "operationId": "get__api_personas__persona_id_",
+        "operationId": "get__base_url__api_personas__persona_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "persona_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de persona"
+            "description": "Parámetro persona_id"
           }
         ],
         "responses": {
@@ -2257,17 +3598,25 @@
           "Personas"
         ],
         "summary": "update persona by id",
-        "operationId": "put__api_personas__persona_id_",
+        "operationId": "put__base_url__api_personas__persona_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "persona_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de persona"
+            "description": "Parámetro persona_id"
           }
         ],
         "responses": {
@@ -2298,13 +3647,24 @@
         ]
       }
     },
-    "/api/pronosticos/planificacion": {
+    "{base_url}/api/pronosticos/planificacion": {
       "get": {
         "tags": [
           "Pronosticos"
         ],
         "summary": "Planificacion",
-        "operationId": "get__api_pronosticos_planificacion",
+        "operationId": "get__base_url__api_pronosticos_planificacion",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2333,23 +3693,31 @@
         ]
       }
     },
-    "/api/proyects/{proyect_id}/pronostico": {
+    "{base_url}/api/proyects/{proyecto_id}/pronostico": {
       "get": {
         "tags": [
           "Pronosticos"
         ],
         "summary": "Pronostico de un proyecto",
-        "operationId": "get__api_proyects__proyect_id__pronostico",
+        "operationId": "get__base_url__api_proyects__proyecto_id__pronostico",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -2380,23 +3748,121 @@
         ]
       }
     },
-    "/api/proyects/{proyect_id}": {
+    "{base_url}/api/proyects": {
+      "post": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "create proyect",
+        "operationId": "post__base_url__api_proyects",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Proyects"
+        ],
+        "summary": "list proyect by user loged",
+        "operationId": "get__base_url__api_proyects",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/proyects/{proyecto_id}": {
       "delete": {
         "tags": [
           "Proyects"
         ],
         "summary": "Delete by id",
-        "operationId": "delete__api_proyects__proyect_id_",
+        "operationId": "delete__base_url__api_proyects__proyecto_id_",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 6
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -2431,17 +3897,25 @@
           "Proyects"
         ],
         "summary": "Edit proyect by id",
-        "operationId": "put__api_proyects__proyect_id_",
+        "operationId": "put__base_url__api_proyects__proyecto_id_",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 2
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -2476,17 +3950,25 @@
           "Proyects"
         ],
         "summary": "Get Proyect by ID",
-        "operationId": "get__api_proyects__proyect_id_",
+        "operationId": "get__base_url__api_proyects__proyecto_id_",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 3
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -2517,46 +3999,33 @@
         ]
       }
     },
-    "/api/proyects": {
-      "post": {
-        "tags": [
-          "Proyects"
-        ],
-        "summary": "create proyect",
-        "operationId": "post__api_proyects",
-        "responses": {
-          "200": {
-            "description": "Operación exitosa",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud inválida"
-          },
-          "401": {
-            "description": "No autorizado / Token inválido"
-          },
-          "500": {
-            "description": "Error interno del servidor"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
+    "{base_url}/api/proyects/{proyecto_id}/subproyectos": {
       "get": {
         "tags": [
           "Proyects"
         ],
-        "summary": "list proyect by user loged",
-        "operationId": "get__api_proyects",
+        "summary": "Listar subproyectos",
+        "operationId": "get__base_url__api_proyects__proyecto_id__subproyectos",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2585,13 +4054,24 @@
         ]
       }
     },
-    "/api/reflexiones": {
+    "{base_url}/api/reflexiones": {
       "post": {
         "tags": [
           "Reflexiones"
         ],
         "summary": "create reflexion",
-        "operationId": "post__api_reflexiones",
+        "operationId": "post__base_url__api_reflexiones",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2624,7 +4104,18 @@
           "Reflexiones"
         ],
         "summary": "list reflexiones",
-        "operationId": "get__api_reflexiones",
+        "operationId": "get__base_url__api_reflexiones",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2653,23 +4144,31 @@
         ]
       }
     },
-    "/api/reflexiones/{reflexione_id}": {
+    "{base_url}/api/reflexiones/{reflexion_id}": {
       "delete": {
         "tags": [
           "Reflexiones"
         ],
         "summary": "delete reflexion by id",
-        "operationId": "delete__api_reflexiones__reflexione_id_",
+        "operationId": "delete__base_url__api_reflexiones__reflexion_id_",
         "parameters": [
           {
-            "name": "reflexione_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de reflexione"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "reflexion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro reflexion_id"
           }
         ],
         "responses": {
@@ -2704,17 +4203,25 @@
           "Reflexiones"
         ],
         "summary": "get reflexion by id",
-        "operationId": "get__api_reflexiones__reflexione_id_",
+        "operationId": "get__base_url__api_reflexiones__reflexion_id_",
         "parameters": [
           {
-            "name": "reflexione_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de reflexione"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "reflexion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro reflexion_id"
           }
         ],
         "responses": {
@@ -2749,17 +4256,25 @@
           "Reflexiones"
         ],
         "summary": "update reflexion by id",
-        "operationId": "put__api_reflexiones__reflexione_id_",
+        "operationId": "put__base_url__api_reflexiones__reflexion_id_",
         "parameters": [
           {
-            "name": "reflexione_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de reflexione"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "reflexion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro reflexion_id"
           }
         ],
         "responses": {
@@ -2790,13 +4305,24 @@
         ]
       }
     },
-    "/api/preferencias": {
+    "{base_url}/api/preferencias": {
       "put": {
         "tags": [
           "Revision"
         ],
         "summary": "Actualizar preferencias",
-        "operationId": "put__api_preferencias",
+        "operationId": "put__base_url__api_preferencias",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2829,7 +4355,18 @@
           "Revision"
         ],
         "summary": "Obtener preferencias",
-        "operationId": "get__api_preferencias",
+        "operationId": "get__base_url__api_preferencias",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2858,13 +4395,24 @@
         ]
       }
     },
-    "/api/revisiones": {
+    "{base_url}/api/revisiones": {
       "post": {
         "tags": [
           "Revision"
         ],
         "summary": "Crear revision",
-        "operationId": "post__api_revisiones",
+        "operationId": "post__base_url__api_revisiones",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2891,13 +4439,26 @@
             "bearerAuth": []
           }
         ]
-      },
+      }
+    },
+    "{base_url}/api/revisiones?limit=10": {
       "get": {
         "tags": [
           "Revision"
         ],
         "summary": "Listar revisiones",
-        "operationId": "get__api_revisiones",
+        "operationId": "get__base_url__api_revisiones_limit_10",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2926,13 +4487,24 @@
         ]
       }
     },
-    "/api/revision/estancadas": {
+    "{base_url}/api/revision/estancadas?dias=14": {
       "get": {
         "tags": [
           "Revision"
         ],
         "summary": "Tareas estancadas",
-        "operationId": "get__api_revision_estancadas",
+        "operationId": "get__base_url__api_revision_estancadas_dias_14",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -2961,13 +4533,162 @@
         ]
       }
     },
-    "/api/tareas": {
+    "{base_url}/api/": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Inicio API",
+        "operationId": "get__base_url__api_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/health": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Salud",
+        "operationId": "get__base_url__api_health",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/version": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Version",
+        "operationId": "get__base_url__api_version",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/tareas": {
       "post": {
         "tags": [
           "Tareas"
         ],
         "summary": "Create Tarea",
-        "operationId": "post__api_tareas",
+        "operationId": "post__base_url__api_tareas",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -3000,7 +4721,18 @@
           "Tareas"
         ],
         "summary": "List Tareas",
-        "operationId": "get__api_tareas",
+        "operationId": "get__base_url__api_tareas",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operación exitosa",
@@ -3029,23 +4761,31 @@
         ]
       }
     },
-    "/api/tareas/{tarea_id}": {
+    "{base_url}/api/tareas/{tarea_id}": {
       "delete": {
         "tags": [
           "Tareas"
         ],
         "summary": "Delete Tarea",
-        "operationId": "delete__api_tareas__tarea_id_",
+        "operationId": "delete__base_url__api_tareas__tarea_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "tarea_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de tarea"
+            "description": "Parámetro tarea_id"
           }
         ],
         "responses": {
@@ -3080,17 +4820,25 @@
           "Tareas"
         ],
         "summary": "Get Tarea",
-        "operationId": "get__api_tareas__tarea_id_",
+        "operationId": "get__base_url__api_tareas__tarea_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "tarea_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 7
+              "type": "string"
             },
-            "description": "ID numérico de tarea"
+            "description": "Parámetro tarea_id"
           }
         ],
         "responses": {
@@ -3125,17 +4873,25 @@
           "Tareas"
         ],
         "summary": "Update Tarea",
-        "operationId": "put__api_tareas__tarea_id_",
+        "operationId": "put__base_url__api_tareas__tarea_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "tarea_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 1
+              "type": "string"
             },
-            "description": "ID numérico de tarea"
+            "description": "Parámetro tarea_id"
           }
         ],
         "responses": {
@@ -3166,23 +4922,31 @@
         ]
       }
     },
-    "/api/proyects/{proyect_id}/tareas": {
+    "{base_url}/api/proyects/{proyecto_id}/tareas": {
       "get": {
         "tags": [
           "Tareas"
         ],
         "summary": "List Tareas por Proyecto",
-        "operationId": "get__api_proyects__proyect_id__tareas",
+        "operationId": "get__base_url__api_proyects__proyecto_id__tareas",
         "parameters": [
           {
-            "name": "proyect_id",
+            "name": "base_url",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 3
+              "type": "string"
             },
-            "description": "ID numérico de proyect"
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
           }
         ],
         "responses": {
@@ -3213,23 +4977,431 @@
         ]
       }
     },
-    "/api/users/{user_id}": {
+    "{base_url}/api/integrations/projects/{proyecto_id}/tasks/": {
+      "post": {
+        "tags": [
+          "Tareas integracion"
+        ],
+        "summary": "Crear tarea de integración",
+        "operationId": "post__base_url__api_integrations_projects__proyecto_id__tasks_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tareas integracion"
+        ],
+        "summary": "Listar tareas de integración",
+        "operationId": "get__base_url__api_integrations_projects__proyecto_id__tasks_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/integrations/projects/{proyecto_id}/tasks/{tarea_id}": {
+      "get": {
+        "tags": [
+          "Tareas integracion"
+        ],
+        "summary": "Obtener tarea de integración",
+        "operationId": "get__base_url__api_integrations_projects__proyecto_id__tasks__tarea_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          },
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro tarea_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/connections/ticktick/authorize": {
+      "post": {
+        "tags": [
+          "Ticktick"
+        ],
+        "summary": "Autorizar conexión",
+        "operationId": "post__base_url__api_connections_ticktick_authorize",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/connections/ticktick/callback": {
+      "get": {
+        "tags": [
+          "Ticktick"
+        ],
+        "summary": "Callback OAuth (manual)",
+        "operationId": "get__base_url__api_connections_ticktick_callback",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/connections/ticktick": {
+      "delete": {
+        "tags": [
+          "Ticktick"
+        ],
+        "summary": "Desconectar TickTick",
+        "operationId": "delete__base_url__api_connections_ticktick",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Ticktick"
+        ],
+        "summary": "Estado de conexión",
+        "operationId": "get__base_url__api_connections_ticktick",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/ticktick/tasks/today": {
+      "get": {
+        "tags": [
+          "Ticktick"
+        ],
+        "summary": "Tareas de hoy",
+        "operationId": "get__base_url__api_ticktick_tasks_today",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/users/{user_id}": {
       "put": {
         "tags": [
           "Users"
         ],
         "summary": "Update User",
-        "operationId": "put__api_users__user_id_",
+        "operationId": "put__base_url__api_users__user_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 8
+              "type": "string"
             },
-            "description": "ID numérico de user"
+            "description": "Parámetro user_id"
           }
         ],
         "responses": {
@@ -3264,17 +5436,25 @@
           "Users"
         ],
         "summary": "delete user by id",
-        "operationId": "delete__api_users__user_id_",
+        "operationId": "delete__base_url__api_users__user_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 3
+              "type": "string"
             },
-            "description": "ID numérico de user"
+            "description": "Parámetro user_id"
           }
         ],
         "responses": {
@@ -3309,17 +5489,25 @@
           "Users"
         ],
         "summary": "get user by id",
-        "operationId": "get__api_users__user_id_",
+        "operationId": "get__base_url__api_users__user_id_",
         "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
           {
             "name": "user_id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 8
+              "type": "string"
             },
-            "description": "ID numérico de user"
+            "description": "Parámetro user_id"
           }
         ],
         "responses": {
