@@ -36,8 +36,18 @@ describe('ActivityTab', () => {
 
   it('agrupa por día y describe cada evento', () => {
     render([
-      evento({ id: 3, accion: 'modificado', cambios: { estado: { antes: 'Abierto', despues: 'En Curso' } }, ocurrido_en: '2026-10-08T16:00:00' }),
-      evento({ id: 2, entidad: 'nota', nombre: 'Respaldar antes del deploy', ocurrido_en: '2026-10-08T10:00:00' }),
+      evento({
+        id: 3,
+        accion: 'modificado',
+        cambios: { estado: { antes: 'Abierto', despues: 'En Curso' } },
+        ocurrido_en: '2026-10-08T16:00:00',
+      }),
+      evento({
+        id: 2,
+        entidad: 'nota',
+        nombre: 'Respaldar antes del deploy',
+        ocurrido_en: '2026-10-08T10:00:00',
+      }),
       evento({ id: 1, ocurrido_en: '2026-10-01T09:00:00' }),
     ]);
     expect(el.querySelectorAll('section').length).toBe(2);

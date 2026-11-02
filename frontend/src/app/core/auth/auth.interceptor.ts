@@ -6,15 +6,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  catchError,
-  switchMap,
-  throwError,
-  filter,
-  take,
-  BehaviorSubject,
-  Observable,
-} from 'rxjs';
+import { catchError, switchMap, throwError, filter, take, BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
 // single-flight: si varias peticiones dan 401 a la vez (ej: al reanudar PC),
@@ -24,12 +16,7 @@ let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 // URL que NO disparan refresh (evitan recursion y logica inutil).
-const EXCLUDED_URLS = [
-  '/api/auth/login',
-  '/api/auth/refresh',
-  '/api/auth/me',
-  '/api/auth/logout',
-];
+const EXCLUDED_URLS = ['/api/auth/login', '/api/auth/refresh', '/api/auth/me', '/api/auth/logout'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);

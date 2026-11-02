@@ -30,7 +30,13 @@ describe('MainLayout', () => {
   });
 
   it('renders header, sidebar, bottom nav, command bar and router outlet', () => {
-    for (const sel of ['app-header', 'app-sidebar', 'app-bottom-nav', 'app-command-bar', 'router-outlet']) {
+    for (const sel of [
+      'app-header',
+      'app-sidebar',
+      'app-bottom-nav',
+      'app-command-bar',
+      'router-outlet',
+    ]) {
       expect(el().querySelector(sel)).not.toBeNull();
     }
   });
@@ -48,7 +54,9 @@ describe('MainLayout', () => {
   });
 
   it('bottom nav menu button toggles the same sidebar instance', async () => {
-    (el().querySelector('app-bottom-nav button[aria-label="Más opciones"]') as HTMLButtonElement).click();
+    (
+      el().querySelector('app-bottom-nav button[aria-label="Más opciones"]') as HTMLButtonElement
+    ).click();
     await fixture.whenStable();
     expect(component.sidebar.isOpen()).toBe(true);
   });

@@ -1,12 +1,20 @@
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  provideRouter,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
 import { serverConfiguredGuard } from './server-configured.guard';
 import { ServerConfigService } from './server-config.service';
 
 describe('serverConfiguredGuard', () => {
   function run(configured: boolean) {
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), { provide: ServerConfigService, useValue: { isConfigured: () => configured } }],
+      providers: [
+        provideRouter([]),
+        { provide: ServerConfigService, useValue: { isConfigured: () => configured } },
+      ],
     });
     return TestBed.runInInjectionContext(() =>
       serverConfiguredGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot),

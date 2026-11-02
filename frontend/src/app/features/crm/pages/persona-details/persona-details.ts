@@ -65,8 +65,9 @@ export class PersonaDetails {
 
   // Resources
   protected readonly personaResource = this.personaService.getPersonaById(this.id);
-  protected readonly interaccionesResource =
-    this.interaccionService.getInteraccionesByPersonaId(this.id);
+  protected readonly interaccionesResource = this.interaccionService.getInteraccionesByPersonaId(
+    this.id,
+  );
 
   // Edit Persona Modal signals
   showEditModal = signal(false);
@@ -114,18 +115,10 @@ export class PersonaDetails {
     ) {
       return 'bg-insight/15 text-insight-text border-insight/30';
     }
-    if (
-      val.includes('familia') ||
-      val.includes('pareja') ||
-      val.includes('hogar')
-    ) {
+    if (val.includes('familia') || val.includes('pareja') || val.includes('hogar')) {
       return 'bg-personal/15 text-personal-text border-personal/30';
     }
-    if (
-      val.includes('amigo') ||
-      val.includes('amistad') ||
-      val.includes('social')
-    ) {
+    if (val.includes('amigo') || val.includes('amistad') || val.includes('social')) {
       return 'bg-positive/15 text-positive-text border-positive/30';
     }
     if (
@@ -173,8 +166,7 @@ export class PersonaDetails {
         },
         error: (err) => {
           this.isSubmittingEdit.set(false);
-          const errorMsg =
-            getErrorMessage(err, 'Error al actualizar el perfil');
+          const errorMsg = getErrorMessage(err, 'Error al actualizar el perfil');
           this.toast.error(errorMsg);
         },
       });
@@ -202,8 +194,7 @@ export class PersonaDetails {
       },
       error: (err) => {
         this.isDeleting.set(false);
-        const errorMsg =
-          getErrorMessage(err, 'Error al eliminar la persona');
+        const errorMsg = getErrorMessage(err, 'Error al eliminar la persona');
         this.toast.error(errorMsg);
       },
     });
@@ -216,23 +207,20 @@ export class PersonaDetails {
     if (!text || !pId) return;
 
     this.isSubmittingInteraccion.set(true);
-    this.interaccionService
-      .createInteraccion(pId, { interaccion: text })
-      .subscribe({
-        next: () => {
-          this.toast.success('Interacción registrada');
-          this.nuevaInteraccionTexto.set('');
-          this.isSubmittingInteraccion.set(false);
-          this.showAddInteraccion.set(false);
-          this.interaccionesResource?.reload();
-        },
-        error: (err) => {
-          this.isSubmittingInteraccion.set(false);
-          const errorMsg =
-            getErrorMessage(err, 'Error al registrar interacción');
-          this.toast.error(errorMsg);
-        },
-      });
+    this.interaccionService.createInteraccion(pId, { interaccion: text }).subscribe({
+      next: () => {
+        this.toast.success('Interacción registrada');
+        this.nuevaInteraccionTexto.set('');
+        this.isSubmittingInteraccion.set(false);
+        this.showAddInteraccion.set(false);
+        this.interaccionesResource?.reload();
+      },
+      error: (err) => {
+        this.isSubmittingInteraccion.set(false);
+        const errorMsg = getErrorMessage(err, 'Error al registrar interacción');
+        this.toast.error(errorMsg);
+      },
+    });
   }
 
   // --- RIGHT DRAWER MODAL ---

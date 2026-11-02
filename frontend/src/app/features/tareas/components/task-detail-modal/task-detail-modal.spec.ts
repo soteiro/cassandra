@@ -49,7 +49,11 @@ describe('TaskDetailModal', () => {
     createNota: ReturnType<typeof vi.fn>;
     deleteNota: ReturnType<typeof vi.fn>;
   };
-  let toast: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn>; info: ReturnType<typeof vi.fn> };
+  let toast: {
+    success: ReturnType<typeof vi.fn>;
+    error: ReturnType<typeof vi.fn>;
+    info: ReturnType<typeof vi.fn>;
+  };
   let updatedSpy: Mock<(value?: unknown) => void>;
   let deletedSpy: Mock<(value?: unknown) => void>;
   let closeSpy: Mock<(value?: unknown) => void>;
@@ -273,7 +277,12 @@ describe('TaskDetailModal', () => {
       component.addSubtarea();
 
       expect(taskService.createTask).toHaveBeenCalledWith(
-        expect.objectContaining({ nombre: 'Sub', proyect_id: 3, tarea_padre_id: 5, prioridad: 'normal' }),
+        expect.objectContaining({
+          nombre: 'Sub',
+          proyect_id: 3,
+          tarea_padre_id: 5,
+          prioridad: 'normal',
+        }),
       );
       expect(component.subtareas()).toEqual([created]);
       expect(component.totalSubtareas()).toBe(1);

@@ -12,7 +12,9 @@
   <!-- 2. BARRA DE CONTROL DE VISTA Y AGRUPACIÓN (ANCHO COMPLETO) -->
   <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
     <!-- SUBPESTAÑAS: GASTOS (PRINCIPAL) VS INGRESOS -->
-    <div class="flex items-center bg-surface border border-surface-border rounded-xl p-1 text-xs shadow-xs">
+    <div
+      class="flex items-center bg-surface border border-surface-border rounded-xl p-1 text-xs shadow-xs"
+    >
       <button
         type="button"
         (click)="movimientosSubTab.set('egresos'); clearSelection()"
@@ -44,7 +46,9 @@
     <!-- CONTROLES DE AGRUPACIÓN Y ACCIONES -->
     <div class="flex items-center gap-2 flex-wrap text-xs">
       <!-- SELECTOR DE AGRUPACIÓN -->
-      <div class="flex items-center gap-1.5 bg-surface border border-surface-border rounded-xl px-3 py-1.5 shadow-xs">
+      <div
+        class="flex items-center gap-1.5 bg-surface border border-surface-border rounded-xl px-3 py-1.5 shadow-xs"
+      >
         <svg lucideLayers class="w-3.5 h-3.5 text-primary-text" />
         <span class="text-text-muted font-medium text-[11px]">Agrupar por:</span>
         <select
@@ -98,10 +102,17 @@
     <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl shadow-xs">
       <p class="text-xs text-text-muted animate-pulse">Cargando presupuesto del mes...</p>
     </div>
-  } @else if (currentGroupedList().length === 0 || (movimientosSubTab() === 'egresos' && egresos().length === 0) || (movimientosSubTab() === 'ingresos' && ingresos().length === 0)) {
-    <div class="p-12 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-3 shadow-xs">
+  } @else if (
+    currentGroupedList().length === 0 ||
+    (movimientosSubTab() === 'egresos' && egresos().length === 0) ||
+    (movimientosSubTab() === 'ingresos' && ingresos().length === 0)
+  ) {
+    <div
+      class="p-12 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-3 shadow-xs"
+    >
       <p class="text-sm font-medium text-text-main">
-        No hay {{ movimientosSubTab() === 'egresos' ? 'gastos' : 'ingresos' }} registrados para este período.
+        No hay {{ movimientosSubTab() === 'egresos' ? 'gastos' : 'ingresos' }} registrados para este
+        período.
       </p>
       <button
         type="button"
@@ -124,17 +135,27 @@
             title="Seleccionar / Deseleccionar todos los movimientos visibles"
           />
           <span class="font-medium text-[11px]">
-            Seleccionar todo ({{ movimientosSubTab() === 'egresos' ? egresos().length : ingresos().length }} movimientos)
+            Seleccionar todo ({{
+              movimientosSubTab() === 'egresos' ? egresos().length : ingresos().length
+            }}
+            movimientos)
           </span>
         </div>
         <div class="text-[11px]">
-          Total período: <strong class="text-text-main font-mono text-xs">{{ formatCLP(movimientosSubTab() === 'egresos' ? resumen().total_egresos : resumen().total_ingresos) }}</strong>
+          Total período:
+          <strong class="text-text-main font-mono text-xs">{{
+            formatCLP(
+              movimientosSubTab() === 'egresos' ? resumen().total_egresos : resumen().total_ingresos
+            )
+          }}</strong>
         </div>
       </div>
 
       <!-- LISTA DE GRUPOS TIPO PLANILLA -->
       @for (group of currentGroupedList(); track group.key) {
-        <div class="bg-surface border border-surface-border rounded-2xl overflow-hidden shadow-xs transition-all">
+        <div
+          class="bg-surface border border-surface-border rounded-2xl overflow-hidden shadow-xs transition-all"
+        >
           <!-- CABECERA DEL GRUPO (ACCORDION + SUBTOTALES) -->
           <div
             (click)="toggleGroupCollapse(group.key)"
@@ -161,7 +182,9 @@
                 <span class="text-sm font-bold text-text-main tracking-tight">
                   {{ group.title }}
                 </span>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-background text-text-muted border border-surface-border">
+                <span
+                  class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-background text-text-muted border border-surface-border"
+                >
                   {{ group.items.length }} {{ group.items.length === 1 ? 'ítem' : 'ítems' }}
                 </span>
               </div>
@@ -172,17 +195,26 @@
               <!-- PÍLDORAS DE ESTADO SUMARIZADO -->
               <div class="hidden sm:flex items-center gap-1.5 text-[11px]">
                 @if (group.totalCompletado > 0) {
-                  <span class="text-positive-text font-semibold bg-positive/10 px-2 py-0.5 rounded-md border border-positive/20" title="Total completado en este grupo">
+                  <span
+                    class="text-positive-text font-semibold bg-positive/10 px-2 py-0.5 rounded-md border border-positive/20"
+                    title="Total completado en este grupo"
+                  >
                     ✓ {{ formatCLP(group.totalCompletado) }}
                   </span>
                 }
                 @if (group.totalEnProceso > 0) {
-                  <span class="text-warning-text font-semibold bg-warning/10 px-2 py-0.5 rounded-md border border-warning/20" title="Total en proceso en este grupo">
+                  <span
+                    class="text-warning-text font-semibold bg-warning/10 px-2 py-0.5 rounded-md border border-warning/20"
+                    title="Total en proceso en este grupo"
+                  >
                     ⏱ {{ formatCLP(group.totalEnProceso) }}
                   </span>
                 }
                 @if (group.totalPendiente > 0) {
-                  <span class="text-text-muted font-medium bg-background px-2 py-0.5 rounded-md border border-surface-border" title="Total pendiente en este grupo">
+                  <span
+                    class="text-text-muted font-medium bg-background px-2 py-0.5 rounded-md border border-surface-border"
+                    title="Total pendiente en este grupo"
+                  >
                     ○ {{ formatCLP(group.totalPendiente) }}
                   </span>
                 }
@@ -190,7 +222,9 @@
 
               <!-- SUBTOTAL DEL GRUPO -->
               <div class="flex items-baseline gap-1.5 pl-2 border-l border-surface-border">
-                <span class="text-text-muted text-[11px] uppercase font-sans font-bold">Subtotal:</span>
+                <span class="text-text-muted text-[11px] uppercase font-sans font-bold"
+                  >Subtotal:</span
+                >
                 <span class="text-sm font-bold text-text-main font-mono">
                   {{ formatCLP(group.total) }}
                 </span>
@@ -243,7 +277,11 @@
   <app-confirm-modal
     [isOpen]="showBulkDeleteModal()"
     title="Eliminar Movimientos Seleccionados"
-    [message]="'¿Estás seguro de eliminar los ' + selectedCount() + ' movimientos seleccionados? Esta acción no se puede deshacer.'"
+    [message]="
+      '¿Estás seguro de eliminar los ' +
+      selectedCount() +
+      ' movimientos seleccionados? Esta acción no se puede deshacer.'
+    "
     confirmText="Eliminar Seleccionados"
     variant="danger"
     [isProcessing]="isBulkProcessing()"
@@ -273,7 +311,11 @@
   <app-confirm-modal
     [isOpen]="itemToDelete() !== null"
     title="Eliminar Movimiento"
-    [message]="'¿Estás seguro de eliminar ' + (itemToDelete()?.nombre || '') + '? Esta acción no se puede deshacer.'"
+    [message]="
+      '¿Estás seguro de eliminar ' +
+      (itemToDelete()?.nombre || '') +
+      '? Esta acción no se puede deshacer.'
+    "
     confirmText="Eliminar"
     variant="danger"
     [isProcessing]="isDeletingItem()"

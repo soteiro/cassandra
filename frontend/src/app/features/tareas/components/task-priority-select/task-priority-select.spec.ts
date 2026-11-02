@@ -57,7 +57,9 @@ describe('TaskPrioritySelect (inputs and classes)', () => {
   });
 
   it('renders options from TASK_PRIORITY_OPTIONS with labels', () => {
-    const labels = Array.from(select().querySelectorAll('option')).map((o) => o.textContent?.trim());
+    const labels = Array.from(select().querySelectorAll('option')).map((o) =>
+      o.textContent?.trim(),
+    );
     expect(labels).toEqual(['Baja', 'Normal', 'Alta', 'Urgente']);
     expect(select().value).toBe('normal');
   });

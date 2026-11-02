@@ -59,7 +59,10 @@ export class Sidebar {
         this.toast.info(`Tienes la v${result.current}. Descarga e instala la nueva versión.`, {
           title: `Nueva versión ${result.latest} disponible`,
           duration: 0,
-          action: { label: 'Descargar', onClick: () => this.updates.openDownload(result.downloadUrl) },
+          action: {
+            label: 'Descargar',
+            onClick: () => this.updates.openDownload(result.downloadUrl),
+          },
         });
         break;
       case 'up-to-date':

@@ -8,21 +8,38 @@ import { ProjectService } from '../../../proyectos/data/project.service';
 import { ApiKeys } from './api-keys';
 
 const key: APIKey = {
-  id: 1, nombre: 'Asistente', prefijo: 'cass_mem_prefijo', scopes: ['memory:read'], proyecto_ids: [12],
-  fecha_creacion: '2026-10-18T12:00:00Z', expira_en: null, revocada_en: null, ultimo_uso: null,
+  id: 1,
+  nombre: 'Asistente',
+  prefijo: 'cass_mem_prefijo',
+  scopes: ['memory:read'],
+  proyecto_ids: [12],
+  fecha_creacion: '2026-10-18T12:00:00Z',
+  expira_en: null,
+  revocada_en: null,
+  ultimo_uso: null,
 };
 const issued: IssuedAPIKey = { ...key, token: 'cass_mem_fake_secret_only_for_testing' };
 
 describe('ApiKeys', () => {
   let fixture: ComponentFixture<ApiKeys>;
   let el: HTMLElement;
-  let api: { list: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn>; revoke: ReturnType<typeof vi.fn> };
+  let api: {
+    list: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    revoke: ReturnType<typeof vi.fn>;
+  };
   const resource = {
     value: signal<{ id: number; nombre: string }[]>([]),
-    isLoading: signal(false), error: signal<unknown>(undefined), reload: vi.fn(),
+    isLoading: signal(false),
+    error: signal<unknown>(undefined),
+    reload: vi.fn(),
   };
-  const render = async () => { await fixture.whenStable(); fixture.detectChanges(); };
-  const button = (text: string) => Array.from(el.querySelectorAll('button')).find(b => b.textContent?.trim() === text)!;
+  const render = async () => {
+    await fixture.whenStable();
+    fixture.detectChanges();
+  };
+  const button = (text: string) =>
+    Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === text)!;
   const fill = async () => {
     const name = el.querySelector<HTMLInputElement>('#key-name')!;
     name.value = '  Mi asistente  ';
@@ -37,21 +54,31 @@ describe('ApiKeys', () => {
   };
 
   beforeEach(async () => {
-    api = { list: vi.fn().mockReturnValue(of([])), create: vi.fn().mockReturnValue(of(issued)), revoke: vi.fn().mockReturnValue(of(undefined)) };
+    api = {
+      list: vi.fn().mockReturnValue(of([])),
+      create: vi.fn().mockReturnValue(of(issued)),
+      revoke: vi.fn().mockReturnValue(of(undefined)),
+    };
     resource.value.set([{ id: 12, nombre: 'Cassandra' }]);
     resource.isLoading.set(false);
     resource.error.set(undefined);
     resource.reload.mockClear();
     await TestBed.configureTestingModule({
-      imports: [ApiKeys], providers: [provideRouter([]),
-        { provide: APIKeyService, useValue: api }, { provide: ProjectService, useValue: { projectsResource: resource } },
+      imports: [ApiKeys],
+      providers: [
+        provideRouter([]),
+        { provide: APIKeyService, useValue: api },
+        { provide: ProjectService, useValue: { projectsResource: resource } },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(ApiKeys);
     el = fixture.nativeElement;
     await render();
   });
-  afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   it('requires a name and a project before making a request', async () => {
     expect(el.querySelector('#name-error')).toBeNull();
@@ -68,7 +95,11 @@ describe('ApiKeys', () => {
     button('Generar clave').click();
     await render();
     const request = api.create.mock.calls[0][0];
-    expect(request).toMatchObject({ nombre: 'Mi asistente', scopes: ['memory:read'], proyecto_ids: [12] });
+    expect(request).toMatchObject({
+      nombre: 'Mi asistente',
+      scopes: ['memory:read'],
+      proyecto_ids: [12],
+    });
     expect(new Date(request.expira_en).getTime()).toBeGreaterThanOrEqual(before + 90 * 86_400_000);
     const input = el.querySelector<HTMLInputElement>('#issued-key')!;
     expect(input.value).toBe(issued.token);
@@ -90,7 +121,11 @@ describe('ApiKeys', () => {
     button('Generar clave').click();
     await render();
     el.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
-    expect(api.create).toHaveBeenCalledExactlyOnceWith({ nombre: 'Mi asistente', scopes: ['memory:read', 'memory:write'], proyecto_ids: [12] });
+    expect(api.create).toHaveBeenCalledExactlyOnceWith({
+      nombre: 'Mi asistente',
+      scopes: ['memory:read', 'memory:write'],
+      proyecto_ids: [12],
+    });
     expect(button('Generando…').disabled).toBe(true);
     response.next(issued);
     response.complete();
@@ -120,7 +155,9 @@ describe('ApiKeys', () => {
     button('Generar clave').click();
     await render();
     expect(api.create).toHaveBeenCalledExactlyOnceWith({
-      nombre: 'Mi asistente', scopes: ['tasks:read', 'tasks:create'], proyecto_ids: [12],
+      nombre: 'Mi asistente',
+      scopes: ['tasks:read', 'tasks:create'],
+      proyecto_ids: [12],
     });
   });
 
@@ -130,7 +167,11 @@ describe('ApiKeys', () => {
     select('key-tasks', 'read');
     button('Generar clave').click();
     await render();
-    expect(api.create.mock.calls[0][0].scopes).toEqual(['memory:read', 'memory:write', 'tasks:read']);
+    expect(api.create.mock.calls[0][0].scopes).toEqual([
+      'memory:read',
+      'memory:write',
+      'tasks:read',
+    ]);
   });
 
   it('requires at least one permission and preserves the selected projects', async () => {
@@ -139,20 +180,24 @@ describe('ApiKeys', () => {
     button('Generar clave').click();
     await render();
     expect(api.create).not.toHaveBeenCalled();
-    expect(el.querySelector('[role="alert"]')?.textContent).toContain('Selecciona al menos un permiso');
+    expect(el.querySelector('[role="alert"]')?.textContent).toContain(
+      'Selecciona al menos un permiso',
+    );
     expect(el.querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked).toBe(true);
   });
 
   it('shows the actual permissions for tasks-only and combined keys', async () => {
     fixture.destroy();
-    api.list.mockReturnValue(of([
-      { ...key, scopes: ['tasks:create'] },
-      { ...key, id: 2, scopes: ['memory:read', 'memory:write', 'tasks:read', 'tasks:create'] },
-    ]));
+    api.list.mockReturnValue(
+      of([
+        { ...key, scopes: ['tasks:create'] },
+        { ...key, id: 2, scopes: ['memory:read', 'memory:write', 'tasks:read', 'tasks:create'] },
+      ]),
+    );
     fixture = TestBed.createComponent(ApiKeys);
     el = fixture.nativeElement;
     await render();
-    const permissions = Array.from(el.querySelectorAll('li dl')).map(node => node.textContent);
+    const permissions = Array.from(el.querySelectorAll('li dl')).map((node) => node.textContent);
     expect(permissions[0]).toContain('Crear tareas');
     expect(permissions[0]).not.toContain('Leer memoria');
     expect(permissions[0]).not.toContain('Leer tareas');
@@ -171,23 +216,35 @@ describe('ApiKeys', () => {
     expect(el.textContent).toContain('Clave copiada.');
   });
 
-  it.each([false, true])('offers manual selection when clipboard is unavailable or denied (%s)', async denied => {
-    vi.stubGlobal('navigator', denied ? { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } } : {});
-    await fill();
-    button('Generar clave').click();
-    await render();
-    button('Copiar clave').click();
-    await render();
-    expect(el.textContent).toContain('cópiala manualmente');
-    expect(el.textContent).not.toContain('Clave copiada.');
-    const input = el.querySelector<HTMLInputElement>('#issued-key')!;
-    expect(document.activeElement).toBe(input);
-    expect(input.selectionEnd).toBe(issued.token.length);
-  });
+  it.each([false, true])(
+    'offers manual selection when clipboard is unavailable or denied (%s)',
+    async (denied) => {
+      vi.stubGlobal(
+        'navigator',
+        denied ? { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } } : {},
+      );
+      await fill();
+      button('Generar clave').click();
+      await render();
+      button('Copiar clave').click();
+      await render();
+      expect(el.textContent).toContain('cópiala manualmente');
+      expect(el.textContent).not.toContain('Clave copiada.');
+      const input = el.querySelector<HTMLInputElement>('#issued-key')!;
+      expect(document.activeElement).toBe(input);
+      expect(input.selectionEnd).toBe(issued.token.length);
+    },
+  );
 
   it('never restores a secret from the metadata list on a new visit', async () => {
     fixture.destroy();
-    api.list.mockReturnValue(of([key, { ...key, id: 2, revocada_en: '2026-10-18T12:00:00Z' }, { ...key, id: 3, expira_en: '2020-01-01T00:00:00Z' }]));
+    api.list.mockReturnValue(
+      of([
+        key,
+        { ...key, id: 2, revocada_en: '2026-10-18T12:00:00Z' },
+        { ...key, id: 3, expira_en: '2020-01-01T00:00:00Z' },
+      ]),
+    );
     fixture = TestBed.createComponent(ApiKeys);
     el = fixture.nativeElement;
     await render();

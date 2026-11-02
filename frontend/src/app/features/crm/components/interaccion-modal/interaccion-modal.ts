@@ -56,7 +56,7 @@ export class InteraccionModal {
         this.onClose();
       }
     },
-    80
+    80,
   );
 
   // Cached item for smooth exit slide animation
@@ -116,22 +116,19 @@ export class InteraccionModal {
     if (!current) return;
 
     this.isSubmitting.set(true);
-    this.interaccionService
-      .updateInteraccion(current.id, { interaccion: text })
-      .subscribe({
-        next: () => {
-          this.toast.success('Interacción actualizada');
-          this.isSubmitting.set(false);
-          this.isEditing.set(false);
-          this.updated.emit();
-        },
-        error: (err) => {
-          this.isSubmitting.set(false);
-          const errorMsg =
-            getErrorMessage(err, 'Error al actualizar interacción');
-          this.toast.error(errorMsg);
-        },
-      });
+    this.interaccionService.updateInteraccion(current.id, { interaccion: text }).subscribe({
+      next: () => {
+        this.toast.success('Interacción actualizada');
+        this.isSubmitting.set(false);
+        this.isEditing.set(false);
+        this.updated.emit();
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        const errorMsg = getErrorMessage(err, 'Error al actualizar interacción');
+        this.toast.error(errorMsg);
+      },
+    });
   }
 
   openDeleteModal() {
@@ -157,8 +154,7 @@ export class InteraccionModal {
       },
       error: (err) => {
         this.isDeleting.set(false);
-        const errorMsg =
-          getErrorMessage(err, 'Error al eliminar interacción');
+        const errorMsg = getErrorMessage(err, 'Error al eliminar interacción');
         this.toast.error(errorMsg);
       },
     });

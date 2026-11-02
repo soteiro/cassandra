@@ -1,6 +1,11 @@
 import '@angular/compiler';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createEnvironmentInjector, EnvironmentInjector, runInInjectionContext, NgZone } from '@angular/core';
+import {
+  createEnvironmentInjector,
+  EnvironmentInjector,
+  runInInjectionContext,
+  NgZone,
+} from '@angular/core';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { Location } from '@angular/common';
 import { Subject } from 'rxjs';
@@ -38,12 +43,15 @@ describe('BackButtonService', () => {
       run: (fn: Function) => fn(),
     };
 
-    const injector = createEnvironmentInjector([
-      { provide: Router, useValue: mockRouter },
-      { provide: Location, useValue: mockLocation },
-      { provide: ToastService, useValue: mockToastService },
-      { provide: NgZone, useValue: mockNgZone },
-    ], {} as EnvironmentInjector);
+    const injector = createEnvironmentInjector(
+      [
+        { provide: Router, useValue: mockRouter },
+        { provide: Location, useValue: mockLocation },
+        { provide: ToastService, useValue: mockToastService },
+        { provide: NgZone, useValue: mockNgZone },
+      ],
+      {} as EnvironmentInjector,
+    );
 
     service = runInInjectionContext(injector, () => new BackButtonService());
     exitApp = vi.spyOn(service as any, 'exitApp').mockResolvedValue(undefined);

@@ -28,7 +28,9 @@ export class LimiteEnCursoService {
       next: ({ tareas, pref }) => {
         const n = tareas?.length ?? 0;
         if (n > pref.limite_en_curso) {
-          this.toast.info(`Tienes ${n} tareas en curso y tu límite es ${pref.limite_en_curso}. ¿Cuál pausas?`);
+          this.toast.info(
+            `Tienes ${n} tareas en curso y tu límite es ${pref.limite_en_curso}. ¿Cuál pausas?`,
+          );
         }
       },
       // Es solo un aviso: si falla, no molesta.

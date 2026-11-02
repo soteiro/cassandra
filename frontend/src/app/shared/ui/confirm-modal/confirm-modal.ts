@@ -25,7 +25,7 @@ export class ConfirmModal {
   private readonly _backBtnEffect = this.backButtonService.registerEffect(
     () => this.isOpen(),
     () => this.onCancel(),
-    100
+    100,
   );
 
   onBackdropClick(event: MouseEvent) {

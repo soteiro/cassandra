@@ -10,7 +10,9 @@
       <!-- HEADER DEL MODAL -->
       <div class="flex justify-between items-start pb-4 border-b border-surface-border">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center shrink-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 text-primary-text flex items-center justify-center shrink-0"
+          >
             @if (mode() === 'edit') {
               <svg lucidePencil class="w-5 h-5" />
             } @else if (mode() === 'create-subproject') {
@@ -31,7 +33,8 @@
             </h3>
             <p class="text-xs text-text-muted mt-0.5">
               @if (mode() === 'create-subproject' && parentProject()) {
-                Vinculado al proyecto padre: <strong class="text-primary-text">{{ parentProject()?.nombre }}</strong>
+                Vinculado al proyecto padre:
+                <strong class="text-primary-text">{{ parentProject()?.nombre }}</strong>
               } @else if (mode() === 'edit') {
                 Ajusta objetivos, prioridades o estado de finalización.
               } @else {
@@ -59,14 +62,20 @@
         <!-- NOMBRE -->
         <div>
           <label class="block text-text-main font-medium mb-1">
-            {{ mode() === 'create-subproject' ? 'Nombre del Subproyecto *' : 'Nombre del Proyecto *' }}
+            {{
+              mode() === 'create-subproject' ? 'Nombre del Subproyecto *' : 'Nombre del Proyecto *'
+            }}
           </label>
           <input
             type="text"
             [ngModel]="nombre()"
             (ngModelChange)="nombre.set($event)"
             name="nombre"
-            [placeholder]="mode() === 'create-subproject' ? 'Ej: Portafolio Web / Linktree' : 'Ej: Sistema de Monitoreo Cassie'"
+            [placeholder]="
+              mode() === 'create-subproject'
+                ? 'Ej: Portafolio Web / Linktree'
+                : 'Ej: Sistema de Monitoreo Cassie'
+            "
             class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 outline-none transition-colors"
           />
         </div>
@@ -106,7 +115,10 @@
         @if (mode() === 'create' && potentialParents().length > 0) {
           <div>
             <label class="block text-text-main font-medium mb-1">
-              ¿Es un Subproyecto? <span class="text-text-muted font-normal">(Opcional: agrupar bajo un proyecto paraguas)</span>
+              ¿Es un Subproyecto?
+              <span class="text-text-muted font-normal"
+                >(Opcional: agrupar bajo un proyecto paraguas)</span
+              >
             </label>
             <select
               [ngModel]="proyecto_padre_id()"
@@ -114,7 +126,9 @@
               name="proyecto_padre_id"
               class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
             >
-              <option [ngValue]="null" class="bg-background text-text-main">Ninguno — Es un Proyecto Principal</option>
+              <option [ngValue]="null" class="bg-background text-text-main"
+                >Ninguno — Es un Proyecto Principal</option
+              >
               @for (parent of potentialParents(); track parent.id) {
                 <option [ngValue]="parent.id" class="bg-background text-text-main">
                   ↳ Subproyecto de: {{ parent.nombre }}
@@ -127,7 +141,8 @@
         <!-- CRITERIO DE FINALIZACIÓN -->
         <div>
           <label class="block text-text-main font-medium mb-1">
-            Criterio de Finalización * <span class="text-text-muted font-normal">(¿Cuándo se considera 100% terminado?)</span>
+            Criterio de Finalización *
+            <span class="text-text-muted font-normal">(¿Cuándo se considera 100% terminado?)</span>
           </label>
           <input
             type="text"
@@ -141,14 +156,19 @@
 
         @if (proyectosEnMarcha() > 0) {
           <p class="text-[11px] text-text-muted">
-            Tienes {{ proyectosEnMarcha() }} {{ proyectosEnMarcha() === 1 ? 'proyecto' : 'proyectos' }} en proceso. Si este entra en marcha, ¿alguno puede esperar?
+            Tienes {{ proyectosEnMarcha() }}
+            {{ proyectosEnMarcha() === 1 ? 'proyecto' : 'proyectos' }} en proceso. Si este entra en
+            marcha, ¿alguno puede esperar?
           </p>
         }
 
         <!-- PRE-MORTEM (OPCIONAL) -->
         <div>
           <label class="block text-text-main font-medium mb-1">
-            ¿Por qué podría fracasar? <span class="text-text-muted font-normal">(Opcional: imagina que fracasó, ¿qué pasó?)</span>
+            ¿Por qué podría fracasar?
+            <span class="text-text-muted font-normal"
+              >(Opcional: imagina que fracasó, ¿qué pasó?)</span
+            >
           </label>
           <textarea
             rows="2"
@@ -210,7 +230,10 @@
               <p class="mt-1.5 text-[11px] text-text-muted leading-snug">
                 {{ pista.texto }}
                 @if (pista.fecha) {
-                  <strong class="text-text-main font-medium">{{ pista.fecha | date: 'dd/MM/yyyy' }}</strong>.
+                  <strong class="text-text-main font-medium">{{
+                    pista.fecha | date: 'dd/MM/yyyy'
+                  }}</strong
+                  >.
                 }
               </p>
             }
@@ -221,11 +244,13 @@
         @if (cerrandoProyecto()) {
           <div class="p-3 rounded-xl border border-primary/30 bg-primary/5 space-y-3">
             <p class="text-xs text-text-muted">
-              Antes de cerrarlo, dos preguntas opcionales. Se guardan como documento «Retrospectiva» del proyecto.
+              Antes de cerrarlo, dos preguntas opcionales. Se guardan como documento «Retrospectiva»
+              del proyecto.
             </p>
             @if (initialData()?.premortem) {
               <p class="text-xs text-text-muted">
-                <strong class="text-text-main font-medium">Tu pre-mortem decía:</strong> {{ initialData()?.premortem }}
+                <strong class="text-text-main font-medium">Tu pre-mortem decía:</strong>
+                {{ initialData()?.premortem }}
               </p>
             }
             <div>
@@ -253,7 +278,9 @@
 
         <!-- DESCRIPCIÓN ADICIONAL -->
         <div>
-          <label class="block text-text-main font-medium mb-1">Descripción o Notas Adicionales (Opcional)</label>
+          <label class="block text-text-main font-medium mb-1"
+            >Descripción o Notas Adicionales (Opcional)</label
+          >
           <textarea
             rows="2"
             [ngModel]="descripcion()"
@@ -282,7 +309,13 @@
               <span class="animate-spin text-xs">⠋</span>
               <span>Guardando...</span>
             } @else {
-              <span>{{ mode() === 'edit' ? 'Guardar Cambios' : (mode() === 'create-subproject' ? 'Crear Subproyecto' : 'Crear Proyecto') }}</span>
+              <span>{{
+                mode() === 'edit'
+                  ? 'Guardar Cambios'
+                  : mode() === 'create-subproject'
+                    ? 'Crear Subproyecto'
+                    : 'Crear Proyecto'
+              }}</span>
             }
           </button>
         </div>

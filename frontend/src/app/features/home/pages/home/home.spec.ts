@@ -178,7 +178,9 @@ describe('Home', () => {
 
   it('completar una tarea recarga también «Esta semana»', () => {
     fixture.detectChanges();
-    const semana = fixture.debugElement.query((d) => d.name === 'app-semana-widget').componentInstance;
+    const semana = fixture.debugElement.query(
+      (d) => d.name === 'app-semana-widget',
+    ).componentInstance;
     const recargar = vi.spyOn(semana, 'recargar');
     const t = task({ id: 4, estado: 'En Curso' });
     resource.value.set([t]);

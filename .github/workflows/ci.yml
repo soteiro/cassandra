@@ -56,6 +56,14 @@ jobs:
       # main.go embebe dist/* (el build de Angular); en CI basta un placeholder.
       - name: Placeholder del frontend embebido
         run: mkdir -p dist && echo '<!doctype html>' > dist/index.html
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "Archivos sin formato (corre: gofmt -w .):"
+            echo "$unformatted"
+            exit 1
+          fi
       - run: go vet ./...
       - name: go test
         run: go test -race -count=1 ./...
@@ -80,6 +88,8 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      # Si falla, corre: pnpm run format
+      - run: pnpm run format:check
       - run: pnpm run test:ci
       - run: pnpm run build
 

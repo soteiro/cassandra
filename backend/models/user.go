@@ -32,6 +32,6 @@ type UserResponse struct {
 
 type UserUpdateRequest struct {
 	Nombre string `json:"nombre"`
-	Alias string `json:"alias"`
-	Email string `json:"email"`
+	Alias  string `json:"alias"`
+	Email  string `json:"email"`
 }

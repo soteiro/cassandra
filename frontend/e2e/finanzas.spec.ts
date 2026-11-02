@@ -2,8 +2,18 @@ import { expect, Locator, Page, test } from '@playwright/test';
 import { createMovimiento, Periodo, periodoExclusivo } from './support/api';
 
 const MESES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
 ];
 
 /** Monto en formato es-CL sin depender del espacio entre "$" y la cifra. */
@@ -11,8 +21,14 @@ const clp = (n: number) => new RegExp(`\\$\\s?${n.toLocaleString('es-CL').replac
 
 async function irAPeriodo(page: Page, { mes, anio }: Periodo) {
   await page.goto('/finanzas');
-  const selectMes = page.locator('select').filter({ has: page.locator('option', { hasText: 'Enero' }) }).first();
-  const selectAnio = page.locator('select').filter({ has: page.locator('option', { hasText: '2027' }) }).first();
+  const selectMes = page
+    .locator('select')
+    .filter({ has: page.locator('option', { hasText: 'Enero' }) })
+    .first();
+  const selectAnio = page
+    .locator('select')
+    .filter({ has: page.locator('option', { hasText: '2027' }) })
+    .first();
   await selectAnio.selectOption({ label: String(anio) });
   await selectMes.selectOption({ label: MESES[mes - 1] });
   await expect(page.getByText(`${MESES[mes - 1]} ${anio}`, { exact: true })).toBeVisible();
@@ -84,7 +100,11 @@ test.describe('finanzas · presupuesto', () => {
 
   test('aplica acciones en lote a los seleccionados', async ({ page, request }, testInfo) => {
     const periodo = periodoExclusivo(testInfo, 3);
-    for (const [nombre, monto] of [['Agua', 20_000], ['Gas', 30_000], ['Internet', 25_000]] as const) {
+    for (const [nombre, monto] of [
+      ['Agua', 20_000],
+      ['Gas', 30_000],
+      ['Internet', 25_000],
+    ] as const) {
       await createMovimiento(request, periodo, { nombre, monto });
     }
     await irAPeriodo(page, periodo);

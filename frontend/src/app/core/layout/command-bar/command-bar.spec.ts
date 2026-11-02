@@ -3,7 +3,10 @@ import { provideRouter, Router } from '@angular/router';
 
 import { CommandBar } from './command-bar';
 import { CommandBarService } from './command-bar.service';
-import { ProjectMatch, ProjectSearchService } from '../../../features/proyectos/data/project-search.service';
+import {
+  ProjectMatch,
+  ProjectSearchService,
+} from '../../../features/proyectos/data/project-search.service';
 import { BackButtonService } from '../../platform/back-button.service';
 import { ProjectResponse } from '../../../features/proyectos/data/project.model';
 

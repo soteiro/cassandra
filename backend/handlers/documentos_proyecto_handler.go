@@ -16,7 +16,7 @@ import (
 )
 
 type DocumentosProyectoHandler struct {
-	Repo *repository.DocumentosProyectoRepository
+	Repo  *repository.DocumentosProyectoRepository
 	owner *repository.Ownership
 }
 

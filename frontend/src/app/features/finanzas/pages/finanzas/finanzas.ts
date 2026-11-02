@@ -112,13 +112,9 @@ export class Finanzas implements OnInit {
   // Computados
   mesNombre = computed(() => this.meses[this.selectedMes() - 1]);
 
-  ingresos = computed(() =>
-    this.items().filter((i) => i.tipo === 'ingreso')
-  );
+  ingresos = computed(() => this.items().filter((i) => i.tipo === 'ingreso'));
 
-  egresos = computed(() =>
-    this.items().filter((i) => i.tipo === 'egreso')
-  );
+  egresos = computed(() => this.items().filter((i) => i.tipo === 'egreso'));
 
   porcentajeReal = computed(() => {
     const ing = this.resumen().total_ingresos;
@@ -136,20 +132,29 @@ export class Finanzas implements OnInit {
   loadCatalogs(): void {
     this.pendingCatalogs.update((count) => count + 3);
     const catalogLoaded = () => this.pendingCatalogs.update((count) => count - 1);
-    this.finanzasService.getBancos().pipe(finalize(catalogLoaded)).subscribe({
-      next: (b) => this.bancos.set(b || []),
-      error: (err) => console.error('Error cargando bancos:', err),
-    });
+    this.finanzasService
+      .getBancos()
+      .pipe(finalize(catalogLoaded))
+      .subscribe({
+        next: (b) => this.bancos.set(b || []),
+        error: (err) => console.error('Error cargando bancos:', err),
+      });
 
-    this.finanzasService.getGrupos().pipe(finalize(catalogLoaded)).subscribe({
-      next: (g) => this.grupos.set(g || []),
-      error: (err) => console.error('Error cargando categorías:', err),
-    });
+    this.finanzasService
+      .getGrupos()
+      .pipe(finalize(catalogLoaded))
+      .subscribe({
+        next: (g) => this.grupos.set(g || []),
+        error: (err) => console.error('Error cargando categorías:', err),
+      });
 
-    this.finanzasService.getMovimientosEsperados().pipe(finalize(catalogLoaded)).subscribe({
-      next: (m) => this.movimientosEsperados.set(m || []),
-      error: (err) => console.error('Error cargando movimientos esperados:', err),
-    });
+    this.finanzasService
+      .getMovimientosEsperados()
+      .pipe(finalize(catalogLoaded))
+      .subscribe({
+        next: (m) => this.movimientosEsperados.set(m || []),
+        error: (err) => console.error('Error cargando movimientos esperados:', err),
+      });
   }
 
   // Carga en curso del período. Se cancela al pedir otro período para que una
@@ -165,42 +170,45 @@ export class Finanzas implements OnInit {
     this.periodoSub = new Subscription();
     this.isLoadingResumen.set(true);
 
-    this.periodoSub.add(this.finanzasService.getPlantilla(anio, mes).subscribe({
-      next: (items) => {
-        this.items.set(items || []);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error cargando plantilla:', err);
-        this.toastService.error('Error al cargar movimientos del período');
-        this.isLoading.set(false);
-      },
-    }));
+    this.periodoSub.add(
+      this.finanzasService.getPlantilla(anio, mes).subscribe({
+        next: (items) => {
+          this.items.set(items || []);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Error cargando plantilla:', err);
+          this.toastService.error('Error al cargar movimientos del período');
+          this.isLoading.set(false);
+        },
+      }),
+    );
 
-    this.periodoSub.add(this.finanzasService.getResumen(anio, mes).pipe(
-      finalize(() => this.isLoadingResumen.set(false))
-    ).subscribe({
-      next: (res) => {
-        this.resumen.set(
-          res || {
-            mes,
-            anio,
-            total_ingresos: 0,
-            total_egresos: 0,
-            balance: 0,
-          }
-        );
-      },
-      error: (err) => console.error('Error cargando resumen:', err),
-    }));
+    this.periodoSub.add(
+      this.finanzasService
+        .getResumen(anio, mes)
+        .pipe(finalize(() => this.isLoadingResumen.set(false)))
+        .subscribe({
+          next: (res) => {
+            this.resumen.set(
+              res || {
+                mes,
+                anio,
+                total_ingresos: 0,
+                total_egresos: 0,
+                balance: 0,
+              },
+            );
+          },
+          error: (err) => console.error('Error cargando resumen:', err),
+        }),
+    );
   }
 
   loadListaDeseosCount(): void {
     this.finanzasService.getListaDeseos().subscribe({
       next: (deseos) => {
-        this.deseosPendientesCount.set(
-          (deseos || []).filter((d) => !d.comprado).length
-        );
+        this.deseosPendientesCount.set((deseos || []).filter((d) => !d.comprado).length);
       },
       error: (err) => console.error('Error cargando contador de deseos:', err),
     });

@@ -1,5 +1,5 @@
 <aside
-  class="fixed top-2 right-0 z-9999 flex flex-col gap-2.5 max-w-lg pointer-events-none md:top-2 md:right-2 "
+  class="fixed top-2 right-0 z-9999 flex flex-col gap-2.5 max-w-lg pointer-events-none md:top-2 md:right-2"
   aria-label="Notificaciones"
   aria-live="polite"
 >
@@ -102,7 +102,9 @@
 
       <!-- Barra de progreso de auto-cierre -->
       @if (toast.duration > 0) {
-        <div class="absolute bottom-0 left-0 right-0 h-[2.5px] bg-surface-border/40 overflow-hidden">
+        <div
+          class="absolute bottom-0 left-0 right-0 h-[2.5px] bg-surface-border/40 overflow-hidden"
+        >
           <div
             class="toast-progress h-full w-full"
             [class]="getProgressBarClass(toast.type)"

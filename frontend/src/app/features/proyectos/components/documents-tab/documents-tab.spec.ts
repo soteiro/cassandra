@@ -111,7 +111,9 @@ describe('DocumentsTab', () => {
     });
 
     it('should render document cards and open detail on click', async () => {
-      fixture.componentRef.setInput('documentos', [makeDoc({ id: 3, titulo: 'Arquitectura X', tipo: 'arquitectura' })]);
+      fixture.componentRef.setInput('documentos', [
+        makeDoc({ id: 3, titulo: 'Arquitectura X', tipo: 'arquitectura' }),
+      ]);
       await render();
       expect(el.textContent).toContain('Arquitectura X');
       const card = Array.from(el.querySelectorAll('div.cursor-pointer')).find((d) =>
@@ -126,7 +128,13 @@ describe('DocumentsTab', () => {
   describe('filteredDocs', () => {
     const docs = [
       makeDoc({ id: 1, titulo: 'Caching', tipo: 'arquitectura', contenido: 'redis' }),
-      makeDoc({ id: 2, titulo: 'Guía deploy', tipo: 'guia', contenido: 'podman', tags: 'docker, go' }),
+      makeDoc({
+        id: 2,
+        titulo: 'Guía deploy',
+        tipo: 'guia',
+        contenido: 'podman',
+        tags: 'docker, go',
+      }),
       makeDoc({ id: 3, titulo: 'Idea loca', tipo: 'idea', contenido: 'nada' }),
     ];
     const ids = () => component.filteredDocs().map((d) => d.id);

@@ -73,19 +73,34 @@ export class FinanzasService {
   // MOVIMIENTOS ESPERADOS
   // ==========================================
   getMovimientosEsperados(): Observable<MovimientoEsperadoFinanzas[]> {
-    return this.http.get<MovimientoEsperadoFinanzas[]>(`${this.apiUrl}/finanzas/movimientos-esperados`);
+    return this.http.get<MovimientoEsperadoFinanzas[]>(
+      `${this.apiUrl}/finanzas/movimientos-esperados`,
+    );
   }
 
-  createMovimientoEsperado(req: MovimientoEsperadoFinanzasRequest): Observable<MovimientoEsperadoFinanzas> {
-    return this.http.post<MovimientoEsperadoFinanzas>(`${this.apiUrl}/finanzas/movimientos-esperados`, req);
+  createMovimientoEsperado(
+    req: MovimientoEsperadoFinanzasRequest,
+  ): Observable<MovimientoEsperadoFinanzas> {
+    return this.http.post<MovimientoEsperadoFinanzas>(
+      `${this.apiUrl}/finanzas/movimientos-esperados`,
+      req,
+    );
   }
 
-  updateMovimientoEsperado(id: number, req: Partial<MovimientoEsperadoFinanzasRequest>): Observable<MovimientoEsperadoFinanzas> {
-    return this.http.put<MovimientoEsperadoFinanzas>(`${this.apiUrl}/finanzas/movimientos-esperados/${id}`, req);
+  updateMovimientoEsperado(
+    id: number,
+    req: Partial<MovimientoEsperadoFinanzasRequest>,
+  ): Observable<MovimientoEsperadoFinanzas> {
+    return this.http.put<MovimientoEsperadoFinanzas>(
+      `${this.apiUrl}/finanzas/movimientos-esperados/${id}`,
+      req,
+    );
   }
 
   deleteMovimientoEsperado(id: number): Observable<{ mensaje: string }> {
-    return this.http.delete<{ mensaje: string }>(`${this.apiUrl}/finanzas/movimientos-esperados/${id}`);
+    return this.http.delete<{ mensaje: string }>(
+      `${this.apiUrl}/finanzas/movimientos-esperados/${id}`,
+    );
   }
 
   // ==========================================
@@ -108,7 +123,10 @@ export class FinanzasService {
     return this.http.post<FinanzasPlantillaItem>(`${this.apiUrl}/finanzas/plantilla`, req);
   }
 
-  updatePlantillaItem(id: number, req: FinanzasPlantillaUpdateRequest): Observable<FinanzasPlantillaItem> {
+  updatePlantillaItem(
+    id: number,
+    req: FinanzasPlantillaUpdateRequest,
+  ): Observable<FinanzasPlantillaItem> {
     return this.http.put<FinanzasPlantillaItem>(`${this.apiUrl}/finanzas/plantilla/${id}`, req);
   }
 
@@ -128,7 +146,10 @@ export class FinanzasService {
     return forkJoin(calls);
   }
 
-  batchUpdateCategoria(ids: number[], grupoItemId: number | null): Observable<FinanzasPlantillaItem[]> {
+  batchUpdateCategoria(
+    ids: number[],
+    grupoItemId: number | null,
+  ): Observable<FinanzasPlantillaItem[]> {
     if (!ids || ids.length === 0) return of([]);
     const calls = ids.map((id) => this.updatePlantillaItem(id, { grupo_item_id: grupoItemId }));
     return forkJoin(calls);
@@ -152,11 +173,18 @@ export class FinanzasService {
     });
   }
 
-  clonarPeriodo(req: ClonarPeriodoRequest): Observable<{ mensaje: string; registros_clonados: number; mes_destino: number; anio_destino: number }> {
-    return this.http.post<{ mensaje: string; registros_clonados: number; mes_destino: number; anio_destino: number }>(
-      `${this.apiUrl}/finanzas/clonar`,
-      req
-    );
+  clonarPeriodo(req: ClonarPeriodoRequest): Observable<{
+    mensaje: string;
+    registros_clonados: number;
+    mes_destino: number;
+    anio_destino: number;
+  }> {
+    return this.http.post<{
+      mensaje: string;
+      registros_clonados: number;
+      mes_destino: number;
+      anio_destino: number;
+    }>(`${this.apiUrl}/finanzas/clonar`, req);
   }
 
   // ==========================================

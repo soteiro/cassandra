@@ -138,4 +138,3 @@ export interface UpdateListaDeseosRequest {
   grupo_item_finanzas_id?: number | null;
   eliminado?: boolean;
 }
-

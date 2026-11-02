@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"net/http"
-	"strings"
+	"cassandra/utils"
 	"context"
 	"log"
-	"cassandra/utils"
+	"net/http"
+	"strings"
 )
 
 type contextKey string
@@ -31,14 +31,14 @@ func AuthMiddleware(jwtSecret string, users ActiveUsers) func(http.Handler) http
 				return
 			}
 
-// 2. Validar el jwt
-		userId, err := utils.ValidateAccessToken(tokenStr, jwtSecret)
-		if err != nil {
-			// No se registra el token: en los logs permitiría reutilizar sesiones vigentes.
-			log.Printf("[AUTH] token inválido (len=%d, origen=%s): %v", len(tokenStr), origenToken(r), err)
-			http.Error(w, "Token invalido", http.StatusUnauthorized)
-			return
-		}
+			// 2. Validar el jwt
+			userId, err := utils.ValidateAccessToken(tokenStr, jwtSecret)
+			if err != nil {
+				// No se registra el token: en los logs permitiría reutilizar sesiones vigentes.
+				log.Printf("[AUTH] token inválido (len=%d, origen=%s): %v", len(tokenStr), origenToken(r), err)
+				http.Error(w, "Token invalido", http.StatusUnauthorized)
+				return
+			}
 
 			active, err := users.IsActive(r.Context(), userId)
 			if err != nil {

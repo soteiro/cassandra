@@ -39,4 +39,3 @@ export interface PersonaUpdateRequest {
   eliminado?: boolean;
   es_yo?: boolean;
 }
-

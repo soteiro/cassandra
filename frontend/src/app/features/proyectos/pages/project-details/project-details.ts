@@ -79,10 +79,15 @@ export class ProjectDetails {
   protected readonly documentosResource = this.documentoService.getDocumentosByProyectoId(this.id);
   protected readonly pronosticoResource = this.pronosticoService.getPronosticoProyecto(this.id);
   protected readonly actividadLimit = signal(30);
-  protected readonly actividadResource = this.actividadService.getActividadProyecto(this.id, this.actividadLimit);
+  protected readonly actividadResource = this.actividadService.getActividadProyecto(
+    this.id,
+    this.actividadLimit,
+  );
   /** Si llegó el límite completo puede haber más (el backend acepta hasta 100). */
   protected readonly hayMasActividad = computed(
-    () => (this.actividadResource?.value()?.length ?? 0) >= this.actividadLimit() && this.actividadLimit() < 100,
+    () =>
+      (this.actividadResource?.value()?.length ?? 0) >= this.actividadLimit() &&
+      this.actividadLimit() < 100,
   );
 
   // Tabs
@@ -100,31 +105,53 @@ export class ProjectDetails {
     if (this.projectResource?.isLoading()) return true;
     if (this.projectResource?.error()) return false;
     switch (this.activeTab()) {
-      case 'subproyectos': return this.subproyectosResource?.isLoading() ?? false;
-      case 'notas': return (this.notasResource?.isLoading() ?? false) || (this.tasksResource?.isLoading() ?? false);
-      case 'documentos': return false; // Cada subpestaña gestiona su carga y sus errores.
-      case 'actividad': return this.actividadResource?.isLoading() ?? false;
-      default: return this.tasksResource?.isLoading() ?? false;
+      case 'subproyectos':
+        return this.subproyectosResource?.isLoading() ?? false;
+      case 'notas':
+        return (
+          (this.notasResource?.isLoading() ?? false) || (this.tasksResource?.isLoading() ?? false)
+        );
+      case 'documentos':
+        return false; // Cada subpestaña gestiona su carga y sus errores.
+      case 'actividad':
+        return this.actividadResource?.isLoading() ?? false;
+      default:
+        return this.tasksResource?.isLoading() ?? false;
     }
   });
 
   protected readonly activeTabError = computed(() => {
     switch (this.activeTab()) {
-      case 'subproyectos': return this.subproyectosResource?.error();
-      case 'notas': return this.notasResource?.error() || this.tasksResource?.error();
-      case 'documentos': return undefined;
-      case 'actividad': return this.actividadResource?.error();
-      default: return this.tasksResource?.error();
+      case 'subproyectos':
+        return this.subproyectosResource?.error();
+      case 'notas':
+        return this.notasResource?.error() || this.tasksResource?.error();
+      case 'documentos':
+        return undefined;
+      case 'actividad':
+        return this.actividadResource?.error();
+      default:
+        return this.tasksResource?.error();
     }
   });
 
   protected retryActiveTab(): void {
     switch (this.activeTab()) {
-      case 'subproyectos': this.subproyectosResource?.reload(); break;
-      case 'notas': this.notasResource?.reload(); this.tasksResource?.reload(); break;
-      case 'documentos': this.documentosResource?.reload(); break;
-      case 'actividad': this.actividadResource?.reload(); break;
-      default: this.tasksResource?.reload();
+      case 'subproyectos':
+        this.subproyectosResource?.reload();
+        break;
+      case 'notas':
+        this.notasResource?.reload();
+        this.tasksResource?.reload();
+        break;
+      case 'documentos':
+        this.documentosResource?.reload();
+        break;
+      case 'actividad':
+        this.actividadResource?.reload();
+        break;
+      default:
+        this.tasksResource?.reload();
     }
   }
 
@@ -156,7 +183,9 @@ export class ProjectDetails {
 
   saveEditProject(payload: any) {
     this.isSubmittingEditProject.set(true);
-    const { retrospectiva, ...cambios } = payload as ProjectUpdateRequest & { retrospectiva?: RespuestasRetrospectiva };
+    const { retrospectiva, ...cambios } = payload as ProjectUpdateRequest & {
+      retrospectiva?: RespuestasRetrospectiva;
+    };
     const proyecto = this.projectResource?.value();
 
     this.projectService.updateProject(this.projectIdNumber(), cambios).subscribe({
@@ -181,7 +210,11 @@ export class ProjectDetails {
   }
 
   /** La retrospectiva se guarda como documento del proyecto, después del cambio de estado. */
-  private guardarRetrospectiva(proyecto: ProjectResponse, estado: string, respuestas: RespuestasRetrospectiva) {
+  private guardarRetrospectiva(
+    proyecto: ProjectResponse,
+    estado: string,
+    respuestas: RespuestasRetrospectiva,
+  ) {
     this.documentoService
       .createDocumento(proyecto.id, {
         titulo: `Retrospectiva: ${proyecto.nombre}`.slice(0, 200),
@@ -190,7 +223,13 @@ export class ProjectDetails {
       })
       .subscribe({
         next: () => this.documentosResource?.reload(),
-        error: (err) => this.toast.error(getErrorMessage(err, 'El proyecto se actualizó, pero no se pudo guardar la retrospectiva')),
+        error: (err) =>
+          this.toast.error(
+            getErrorMessage(
+              err,
+              'El proyecto se actualizó, pero no se pudo guardar la retrospectiva',
+            ),
+          ),
       });
   }
 

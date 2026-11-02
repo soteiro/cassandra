@@ -130,11 +130,11 @@ describe('ProjectModal', () => {
 
     expect(saveSpy).toHaveBeenCalledTimes(1);
     const payload = saveSpy.mock.calls[0][0] as Record<string, unknown>;
-    expect(payload["nombre"]).toBe('Nuevo');
-    expect(payload["prioridad"]).toBe('Media');
-    expect(payload["fecha_limite"]).toBe(new Date('2026-12-31').toISOString());
+    expect(payload['nombre']).toBe('Nuevo');
+    expect(payload['prioridad']).toBe('Media');
+    expect(payload['fecha_limite']).toBe(new Date('2026-12-31').toISOString());
     expect(payload).not.toHaveProperty('estado');
-    expect(payload["proyecto_padre_id"]).toBeUndefined();
+    expect(payload['proyecto_padre_id']).toBeUndefined();
   });
 
   it('should include proyecto_padre_id in create-subproject payload', async () => {
@@ -145,8 +145,8 @@ describe('ProjectModal', () => {
     });
     fillRequired();
     component.onSubmit();
-    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)["proyecto_padre_id"]).toBe(5);
-    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)["fecha_limite"]).toBeUndefined();
+    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)['proyecto_padre_id']).toBe(5);
+    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)['fecha_limite']).toBeUndefined();
   });
 
   it('should include estado but not proyecto_padre_id in edit payload', async () => {
@@ -154,7 +154,7 @@ describe('ProjectModal', () => {
     component.estado.set('Completado');
     component.onSubmit();
     const payload = saveSpy.mock.calls[0][0] as Record<string, unknown>;
-    expect(payload["estado"]).toBe('Completado');
+    expect(payload['estado']).toBe('Completado');
     expect(payload).not.toHaveProperty('proyecto_padre_id');
   });
 
@@ -163,12 +163,18 @@ describe('ProjectModal', () => {
     fillRequired();
     component.premortem.set('  me quedo sin tiempo  ');
     component.onSubmit();
-    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)['premortem']).toBe('me quedo sin tiempo');
+    expect((saveSpy.mock.calls[0][0] as Record<string, unknown>)['premortem']).toBe(
+      'me quedo sin tiempo',
+    );
   });
 
   describe('retrospectiva al cerrar', () => {
     it('aparece solo al pasar a Completado o Cancelado', async () => {
-      await setInputs({ isOpen: true, mode: 'edit', initialData: makeProject({ premortem: 'Sin tiempo' }) });
+      await setInputs({
+        isOpen: true,
+        mode: 'edit',
+        initialData: makeProject({ premortem: 'Sin tiempo' }),
+      });
       expect(component.cerrandoProyecto()).toBe(false);
       component.estado.set('Cancelado');
       fixture.detectChanges();
@@ -178,7 +184,11 @@ describe('ProjectModal', () => {
     });
 
     it('no aparece si el proyecto ya estaba cerrado', async () => {
-      await setInputs({ isOpen: true, mode: 'edit', initialData: makeProject({ estado: 'Completado' }) });
+      await setInputs({
+        isOpen: true,
+        mode: 'edit',
+        initialData: makeProject({ estado: 'Completado' }),
+      });
       component.estado.set('Completado');
       expect(component.cerrandoProyecto()).toBe(false);
     });
@@ -201,7 +211,10 @@ describe('ProjectModal', () => {
   it('should list potential parents only in create mode', async () => {
     await setInputs({
       isOpen: true,
-      potentialParents: [makeProject({ id: 1, nombre: 'P1' }), makeProject({ id: 2, nombre: 'P2' })],
+      potentialParents: [
+        makeProject({ id: 1, nombre: 'P1' }),
+        makeProject({ id: 2, nombre: 'P2' }),
+      ],
     });
     expect(el.textContent).toContain('P1');
     expect(el.textContent).toContain('P2');

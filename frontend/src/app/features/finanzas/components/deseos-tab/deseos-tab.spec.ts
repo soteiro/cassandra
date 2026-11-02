@@ -33,9 +33,33 @@ describe('DeseosTab', () => {
   let pendingSpy: import('vitest').Mock<(v: number) => void>;
 
   const initial: ListaDeseosItem[] = [
-    deseo({ id: 1, nombre: 'Bicicleta', presupuesto: 300, valor_estimado: 250, comprado: false, grupo_item_finanzas_id: 10, grupo_item_finanzas_nombre: 'Deporte' }),
-    deseo({ id: 2, nombre: 'Monitor', presupuesto: 200, valor_estimado: 180, gasto_real: 160, comprado: true, justificacion: 'Para trabajar', grupo_item_finanzas_id: 20 }),
-    deseo({ id: 3, nombre: 'Libro', presupuesto: 20, valor_estimado: 15, comprado: false, grupo_item_finanzas_id: 20 }),
+    deseo({
+      id: 1,
+      nombre: 'Bicicleta',
+      presupuesto: 300,
+      valor_estimado: 250,
+      comprado: false,
+      grupo_item_finanzas_id: 10,
+      grupo_item_finanzas_nombre: 'Deporte',
+    }),
+    deseo({
+      id: 2,
+      nombre: 'Monitor',
+      presupuesto: 200,
+      valor_estimado: 180,
+      gasto_real: 160,
+      comprado: true,
+      justificacion: 'Para trabajar',
+      grupo_item_finanzas_id: 20,
+    }),
+    deseo({
+      id: 3,
+      nombre: 'Libro',
+      presupuesto: 20,
+      valor_estimado: 15,
+      comprado: false,
+      grupo_item_finanzas_id: 20,
+    }),
   ];
 
   async function setup(list: ListaDeseosItem[] | null = initial) {
@@ -103,7 +127,9 @@ describe('DeseosTab', () => {
       ]);
       await fixture.whenStable();
       const host = fixture.nativeElement as HTMLElement;
-      const cards = [...host.querySelectorAll('h3[title]')].map((heading) => heading.closest('.flex-col')!);
+      const cards = [...host.querySelectorAll('h3[title]')].map((heading) =>
+        heading.closest('.flex-col')!,
+      );
 
       expect(cards[0].textContent).toMatch(/Gasto real:\s*\$\s*0/);
       expect(cards[1].textContent).toMatch(/Gasto real:\s*Sin registrar/);
@@ -179,7 +205,9 @@ describe('DeseosTab', () => {
     it('should distinguish an empty expense input from zero', async () => {
       component.openCreateDeseoModal();
       await fixture.whenStable();
-      const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#deseo-gasto-real')!;
+      const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
+        '#deseo-gasto-real',
+      )!;
 
       input.value = '0';
       input.dispatchEvent(new Event('input'));
@@ -244,21 +272,28 @@ describe('DeseosTab', () => {
 
         component.saveDeseo();
 
-        expect(finanzas['createListaDeseos']).toHaveBeenCalledWith(expect.objectContaining({ gasto_real: gasto }));
+        expect(finanzas['createListaDeseos']).toHaveBeenCalledWith(
+          expect.objectContaining({ gasto_real: gasto }),
+        );
         expect(component.listaDeseos()[0].gasto_real).toBe(gasto);
       });
 
-      it.each([1.5, 2147483648, -2147483649, Number.NaN])('should reject an invalid expense of %s', (gasto) => {
-        component.openCreateDeseoModal();
-        component.formDeseoNombre.set('Compra');
-        component.formDeseoGastoReal.set(gasto);
+      it.each([1.5, 2147483648, -2147483649, Number.NaN])(
+        'should reject an invalid expense of %s',
+        (gasto) => {
+          component.openCreateDeseoModal();
+          component.formDeseoNombre.set('Compra');
+          component.formDeseoGastoReal.set(gasto);
 
-        component.saveDeseo();
+          component.saveDeseo();
 
-        expect(toast.error).toHaveBeenCalledWith('Ingresa un gasto real entero válido en pesos chilenos');
-        expect(finanzas['createListaDeseos']).not.toHaveBeenCalled();
-        expect(component.isSubmittingDeseo()).toBe(false);
-      });
+          expect(toast.error).toHaveBeenCalledWith(
+            'Ingresa un gasto real entero válido en pesos chilenos',
+          );
+          expect(finanzas['createListaDeseos']).not.toHaveBeenCalled();
+          expect(component.isSubmittingDeseo()).toBe(false);
+        },
+      );
 
       it('should show an error toast when creation fails', () => {
         finanzas['createListaDeseos'].mockReturnValue(throwError(() => new Error('x')));
@@ -305,7 +340,10 @@ describe('DeseosTab', () => {
 
         component.saveDeseo();
 
-        expect(finanzas['updateListaDeseos']).toHaveBeenCalledWith(2, expect.objectContaining({ gasto_real: 0 }));
+        expect(finanzas['updateListaDeseos']).toHaveBeenCalledWith(
+          2,
+          expect.objectContaining({ gasto_real: 0 }),
+        );
         expect(component.totalGastoRealCompradoDeseos()).toBe(0);
       });
 
@@ -316,7 +354,10 @@ describe('DeseosTab', () => {
 
         component.saveDeseo();
 
-        expect(finanzas['updateListaDeseos']).toHaveBeenCalledWith(2, expect.objectContaining({ gasto_real: null }));
+        expect(finanzas['updateListaDeseos']).toHaveBeenCalledWith(
+          2,
+          expect.objectContaining({ gasto_real: null }),
+        );
         expect(component.listaDeseos().find((item) => item.id === 2)?.gasto_real).toBe(160);
       });
 

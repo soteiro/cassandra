@@ -4,10 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FinanzasService } from '../../data/finanzas.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import {
-  GrupoItemFinanzas,
-  ListaDeseosItem,
-} from '../../data/finanzas.model';
+import { GrupoItemFinanzas, ListaDeseosItem } from '../../data/finanzas.model';
 import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 import { BackButtonService } from '../../../../core/platform/back-button.service';
 import {
@@ -64,7 +61,7 @@ export class DeseosTab implements OnInit {
   private readonly _backBtnDeseo = this.backButtonService.registerEffect(
     () => this.showDeseoModal(),
     () => this.closeDeseoModal(),
-    80
+    80,
   );
   isEditingDeseo = signal<boolean>(false);
   editingDeseoId = signal<number | null>(null);
@@ -91,7 +88,7 @@ export class DeseosTab implements OnInit {
         (d) =>
           d.nombre.toLowerCase().includes(q) ||
           (d.justificacion && d.justificacion.toLowerCase().includes(q)) ||
-          (d.grupo_item_finanzas_nombre && d.grupo_item_finanzas_nombre.toLowerCase().includes(q))
+          (d.grupo_item_finanzas_nombre && d.grupo_item_finanzas_nombre.toLowerCase().includes(q)),
       );
     }
     const f = this.filtroDeseos();
@@ -108,33 +105,35 @@ export class DeseosTab implements OnInit {
   });
 
   totalPresupuestoDeseos = computed(() =>
-    this.listaDeseos().reduce((acc, d) => acc + (d.presupuesto || 0), 0)
+    this.listaDeseos().reduce((acc, d) => acc + (d.presupuesto || 0), 0),
   );
 
   totalEstimadoPendienteDeseos = computed(() =>
-    this.listaDeseos().filter((d) => !d.comprado).reduce((acc, d) => acc + (d.valor_estimado || 0), 0)
+    this.listaDeseos()
+      .filter((d) => !d.comprado)
+      .reduce((acc, d) => acc + (d.valor_estimado || 0), 0),
   );
 
   totalGastoRealCompradoDeseos = computed(() =>
-    this.listaDeseos().filter((d) => d.comprado).reduce((acc, d) => acc + (d.gasto_real ?? 0), 0)
+    this.listaDeseos()
+      .filter((d) => d.comprado)
+      .reduce((acc, d) => acc + (d.gasto_real ?? 0), 0),
   );
 
-  deseosCompradosSinGastoCount = computed(() =>
-    this.listaDeseos().filter((d) => d.comprado && d.gasto_real == null).length
+  deseosCompradosSinGastoCount = computed(
+    () => this.listaDeseos().filter((d) => d.comprado && d.gasto_real == null).length,
   );
 
   gastoRealInvalido = computed(() => {
     const gasto = this.formDeseoGastoReal();
-    return gasto !== null && (!Number.isInteger(gasto) || gasto < -2147483648 || gasto > 2147483647);
+    return (
+      gasto !== null && (!Number.isInteger(gasto) || gasto < -2147483648 || gasto > 2147483647)
+    );
   });
 
-  deseosPendientesCount = computed(
-    () => this.listaDeseos().filter((d) => !d.comprado).length
-  );
+  deseosPendientesCount = computed(() => this.listaDeseos().filter((d) => !d.comprado).length);
 
-  deseosCompradosCount = computed(
-    () => this.listaDeseos().filter((d) => d.comprado).length
-  );
+  deseosCompradosCount = computed(() => this.listaDeseos().filter((d) => d.comprado).length);
 
   ngOnInit(): void {
     this.loadListaDeseos();
@@ -214,9 +213,7 @@ export class DeseosTab implements OnInit {
         })
         .subscribe({
           next: (updated) => {
-            this.listaDeseos.update((items) =>
-              items.map((i) => (i.id === id ? updated : i))
-            );
+            this.listaDeseos.update((items) => items.map((i) => (i.id === id ? updated : i)));
             this.toastService.success('Deseo actualizado correctamente');
             this.closeDeseoModal();
             this.isSubmittingDeseo.set(false);
@@ -259,25 +256,21 @@ export class DeseosTab implements OnInit {
   toggleCompradoDeseo(item: ListaDeseosItem, event?: Event): void {
     if (event) event.stopPropagation();
     const nuevoEstado = !item.comprado;
-    this.finanzasService
-      .updateListaDeseos(item.id, { comprado: nuevoEstado })
-      .subscribe({
-        next: (updated) => {
-          this.listaDeseos.update((items) =>
-            items.map((i) => (i.id === item.id ? updated : i))
-          );
-          if (nuevoEstado) {
-            this.toastService.success(`¡Deseo cumplido! "${item.nombre}" marcado como comprado.`);
-          } else {
-            this.toastService.info(`"${item.nombre}" vuelto a marcar como pendiente.`);
-          }
-          this.pendingCountChange.emit(this.deseosPendientesCount());
-        },
-        error: (err) => {
-          console.error('Error cambiando estado del deseo:', err);
-          this.toastService.error('Error al cambiar estado');
-        },
-      });
+    this.finanzasService.updateListaDeseos(item.id, { comprado: nuevoEstado }).subscribe({
+      next: (updated) => {
+        this.listaDeseos.update((items) => items.map((i) => (i.id === item.id ? updated : i)));
+        if (nuevoEstado) {
+          this.toastService.success(`¡Deseo cumplido! "${item.nombre}" marcado como comprado.`);
+        } else {
+          this.toastService.info(`"${item.nombre}" vuelto a marcar como pendiente.`);
+        }
+        this.pendingCountChange.emit(this.deseosPendientesCount());
+      },
+      error: (err) => {
+        console.error('Error cambiando estado del deseo:', err);
+        this.toastService.error('Error al cambiar estado');
+      },
+    });
   }
 
   promptDeleteDeseo(item: ListaDeseosItem, event?: Event): void {

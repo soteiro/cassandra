@@ -15,7 +15,7 @@ import (
 
 // TareasHandler maneja las solicitudes HTTP para las tareas
 type TareasHandler struct {
-	repo *repository.TareasRepository
+	repo  *repository.TareasRepository
 	owner *repository.Ownership
 }
 
@@ -291,5 +291,3 @@ func (h *TareasHandler) GetTareasByProyecto(w http.ResponseWriter, r *http.Reque
 	log.Printf("[HANDLER:Tareas.GetTareasByProyecto] Éxito: %d tareas obtenidas | proyecto_id=%d user_id=%d", len(tareas), projectID, userID)
 	json.NewEncoder(w).Encode(tareas)
 }
-
-

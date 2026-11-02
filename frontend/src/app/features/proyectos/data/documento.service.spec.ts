@@ -34,13 +34,37 @@ describe('DocumentoService', () => {
     http.expectNone(() => true);
 
     TestBed.inject(AuthService).isLoggedIn.set(false);
-    expect(TestBed.runInInjectionContext(() => service.getDocumentosByProyectoId(() => 3))).toBeUndefined();
+    expect(
+      TestBed.runInInjectionContext(() => service.getDocumentosByProyectoId(() => 3)),
+    ).toBeUndefined();
   });
 
   it.each<HttpCase>([
-    { name: 'getDocumentoById', call: () => service.getDocumentoById(1), method: 'GET', url: '/api/documentos/1' },
-    { name: 'createDocumento', call: () => service.createDocumento(3, { titulo: 'd' } as never), method: 'POST', url: '/api/proyects/3/documentos', body: { titulo: 'd' } },
-    { name: 'updateDocumento', call: () => service.updateDocumento(1, { titulo: 'e' } as never), method: 'PUT', url: '/api/documentos/1', body: { titulo: 'e' } },
-    { name: 'deleteDocumento', call: () => service.deleteDocumento(1), method: 'DELETE', url: '/api/documentos/1' },
+    {
+      name: 'getDocumentoById',
+      call: () => service.getDocumentoById(1),
+      method: 'GET',
+      url: '/api/documentos/1',
+    },
+    {
+      name: 'createDocumento',
+      call: () => service.createDocumento(3, { titulo: 'd' } as never),
+      method: 'POST',
+      url: '/api/proyects/3/documentos',
+      body: { titulo: 'd' },
+    },
+    {
+      name: 'updateDocumento',
+      call: () => service.updateDocumento(1, { titulo: 'e' } as never),
+      method: 'PUT',
+      url: '/api/documentos/1',
+      body: { titulo: 'e' },
+    },
+    {
+      name: 'deleteDocumento',
+      call: () => service.deleteDocumento(1),
+      method: 'DELETE',
+      url: '/api/documentos/1',
+    },
   ])('$name should call $method $url', (c) => expectHttpCall(http, c));
 });

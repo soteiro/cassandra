@@ -7,7 +7,10 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
 describe('Servidor', () => {
   let fixture: ComponentFixture<Servidor>;
-  let serverConfig: { serverUrl: ReturnType<typeof signal<string | null>>; connect: ReturnType<typeof vi.fn> };
+  let serverConfig: {
+    serverUrl: ReturnType<typeof signal<string | null>>;
+    connect: ReturnType<typeof vi.fn>;
+  };
   let router: Router;
 
   beforeEach(async () => {
@@ -33,7 +36,9 @@ describe('Servidor', () => {
   }
 
   it('should have an accessible, labelled address field and disable submit while empty', () => {
-    expect(el().querySelector('label[for="server-address"]')?.textContent).toContain('Dirección del servidor');
+    expect(el().querySelector('label[for="server-address"]')?.textContent).toContain(
+      'Dirección del servidor',
+    );
     expect(submit().disabled).toBe(true);
   });
 
@@ -47,7 +52,9 @@ describe('Servidor', () => {
 
     await vi.waitFor(() => expect(router.navigate).toHaveBeenCalledWith(['/login']));
     expect(serverConfig.connect).toHaveBeenCalledWith('cassandra.midominio.com');
-    expect(TestBed.inject(ToastService).toasts()[0].message).toContain('https://cassandra.midominio.com');
+    expect(TestBed.inject(ToastService).toasts()[0].message).toContain(
+      'https://cassandra.midominio.com',
+    );
   });
 
   it('should show the error and stay on the page', async () => {
@@ -55,7 +62,9 @@ describe('Servidor', () => {
     await type('http://inseguro.com');
     submit().click();
 
-    await vi.waitFor(() => expect(el().querySelector('[role="alert"]')?.textContent).toContain('https://'));
+    await vi.waitFor(() =>
+      expect(el().querySelector('[role="alert"]')?.textContent).toContain('https://'),
+    );
     expect(input().getAttribute('aria-invalid')).toBe('true');
     expect(router.navigate).not.toHaveBeenCalled();
   });

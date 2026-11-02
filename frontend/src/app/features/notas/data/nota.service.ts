@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { ServerConfigService } from '../../../core/server/server-config.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotaService {
   private readonly serverConfig = inject(ServerConfigService);
@@ -53,4 +53,3 @@ export class NotaService {
     return this.http.delete<void>(`${this.apiUrl}/notas/${id}`);
   }
 }
-

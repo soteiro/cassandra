@@ -83,10 +83,7 @@ export class BackButtonService {
    * Higher priority executes first. Equal priority uses LIFO order.
    * If a handler returns false, the event continues to lower priority handlers or navigation.
    */
-  register(
-    priority: number,
-    fn: () => boolean | void | Promise<boolean | void>
-  ): () => void {
+  register(priority: number, fn: () => boolean | void | Promise<boolean | void>): () => void {
     const id = this.nextHandlerId++;
     const handler: BackButtonHandler = { id, priority, fn };
 
@@ -105,7 +102,7 @@ export class BackButtonService {
   registerEffect(
     isOpenSignal: () => boolean,
     action: () => boolean | void | Promise<boolean | void>,
-    priority = 80
+    priority = 80,
   ) {
     return effect((onCleanup) => {
       if (isOpenSignal()) {
@@ -185,7 +182,13 @@ export class BackButtonService {
 
   private isRootRoute(url: string): boolean {
     const clean = this.cleanUrl(url);
-    return clean === '/home' || clean === '/login' || clean === '/servidor' || clean === '/' || clean === '';
+    return (
+      clean === '/home' ||
+      clean === '/login' ||
+      clean === '/servidor' ||
+      clean === '/' ||
+      clean === ''
+    );
   }
 
   private getCurrentCleanUrl(): string {

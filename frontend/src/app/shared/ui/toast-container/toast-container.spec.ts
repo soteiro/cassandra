@@ -82,7 +82,9 @@ describe('ToastContainer', () => {
   it('close button removes the toast', () => {
     toastService.info('bye', { duration: 0 });
     render();
-    (items()[0].querySelector('button[aria-label="Cerrar notificación"]') as HTMLButtonElement).click();
+    (
+      items()[0].querySelector('button[aria-label="Cerrar notificación"]') as HTMLButtonElement
+    ).click();
     render();
     expect(toastService.toasts().length).toBe(0);
     expect(items().length).toBe(0);

@@ -207,4 +207,3 @@ func (r *PersonaRepository) Delete(ctx context.Context, id int, userID int) erro
 
 	return nil
 }
-

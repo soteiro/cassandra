@@ -30,11 +30,18 @@ describe('Revision', () => {
   let fixture: ComponentFixture<Revision>;
   let component: Revision;
   let tasks: { updateTask: ReturnType<typeof vi.fn>; deleteTask: ReturnType<typeof vi.fn> };
-  let proyectos: { projectsResource: { value: ReturnType<typeof signal> }; updateProject: ReturnType<typeof vi.fn>; reload: ReturnType<typeof vi.fn> };
+  let proyectos: {
+    projectsResource: { value: ReturnType<typeof signal> };
+    updateProject: ReturnType<typeof vi.fn>;
+    reload: ReturnType<typeof vi.fn>;
+  };
   let revision: { crearRevision: ReturnType<typeof vi.fn> } & Record<string, unknown>;
 
   beforeEach(async () => {
-    tasks = { updateTask: vi.fn().mockReturnValue(of({})), deleteTask: vi.fn().mockReturnValue(of(undefined)) };
+    tasks = {
+      updateTask: vi.fn().mockReturnValue(of({})),
+      deleteTask: vi.fn().mockReturnValue(of(undefined)),
+    };
     proyectos = {
       projectsResource: {
         value: signal<ProjectResponse[]>([
@@ -46,9 +53,16 @@ describe('Revision', () => {
       reload: vi.fn(),
     };
     revision = {
-      preferenciasResource: { value: signal({ dia_revision: 0, limite_en_curso: 5 }), reload: vi.fn() },
+      preferenciasResource: {
+        value: signal({ dia_revision: 0, limite_en_curso: 5 }),
+        reload: vi.fn(),
+      },
       revisionesResource: { value: signal([]), reload: vi.fn() },
-      getEstancadas: () => ({ value: signal([estancada(1), estancada(2), estancada(3)]), isLoading: signal(false), error: signal(undefined) }),
+      getEstancadas: () => ({
+        value: signal([estancada(1), estancada(2), estancada(3)]),
+        isLoading: signal(false),
+        error: signal(undefined),
+      }),
       crearRevision: vi.fn().mockReturnValue(of({})),
       actualizarPreferencias: vi.fn().mockReturnValue(of({})),
     };
@@ -65,7 +79,12 @@ describe('Revision', () => {
           provide: ActividadService,
           useValue: {
             getResumen: () => ({
-              value: signal({ flujo: { creadas: 5, terminadas: 3 }, tareas_terminadas: [], proyectos_completados: [], otros: { interacciones: 0, personas_contactadas: 0, reflexiones: 0, notas: 0 } }),
+              value: signal({
+                flujo: { creadas: 5, terminadas: 3 },
+                tareas_terminadas: [],
+                proyectos_completados: [],
+                otros: { interacciones: 0, personas_contactadas: 0, reflexiones: 0, notas: 0 },
+              }),
               isLoading: signal(false),
               error: signal(undefined),
               reload: vi.fn(),

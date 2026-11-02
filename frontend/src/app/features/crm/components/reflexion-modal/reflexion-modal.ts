@@ -41,7 +41,7 @@ export class ReflexionModal {
   private readonly _backBtnEffect = this.backButtonService.registerEffect(
     () => this.isOpen(),
     () => this.close.emit(),
-    80
+    80,
   );
 
   // Internal form signals

@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectRequest, ProjectResponse, ProjectUpdateRequest } from '../../data/project.model';
@@ -6,23 +15,11 @@ import { BackButtonService } from '../../../../core/platform/back-button.service
 import { PronosticoService } from '../../data/pronostico.service';
 import { ProjectService } from '../../data/project.service';
 import { fechaProbable, formatoFactor } from '../../utils/pronostico.util';
-import {
-  LucideSparkles,
-  LucidePencil,
-  LucideLayers,
-  LucideX,
-} from '@lucide/angular';
+import { LucideSparkles, LucidePencil, LucideLayers, LucideX } from '@lucide/angular';
 
 @Component({
   selector: 'app-project-modal',
-  imports: [
-    CommonModule,
-    FormsModule,
-    LucideSparkles,
-    LucidePencil,
-    LucideLayers,
-    LucideX,
-  ],
+  imports: [CommonModule, FormsModule, LucideSparkles, LucidePencil, LucideLayers, LucideX],
   templateUrl: './project-modal.html',
 })
 export class ProjectModal {
@@ -43,7 +40,7 @@ export class ProjectModal {
   private readonly _backBtnEffect = this.backButtonService.registerEffect(
     () => this.isOpen(),
     () => this.onClose(),
-    80
+    80,
   );
 
   // Internal form signals
@@ -71,7 +68,8 @@ export class ProjectModal {
   /** Al crear: cuántos proyectos tienes en marcha (para decidir si sumar otro). */
   readonly proyectosEnMarcha = computed(() => {
     if (this.mode() === 'edit') return 0;
-    return (this.proyectos.projectsResource.value() ?? []).filter((p) => p.estado === 'En Proceso').length;
+    return (this.proyectos.projectsResource.value() ?? []).filter((p) => p.estado === 'En Proceso')
+      .length;
   });
 
   /** Se está cerrando el proyecto en esta edición: toca la retrospectiva. */
@@ -84,10 +82,16 @@ export class ProjectModal {
     const plan = this.pronosticoService.planificacionResource.value();
     const fecha = this.fecha_limite();
     if (!plan?.factor || !fecha) return null;
-    const inicio = this.mode() === 'edit' && this.initialData() ? new Date(this.initialData()!.fecha_creacion) : new Date();
+    const inicio =
+      this.mode() === 'edit' && this.initialData()
+        ? new Date(this.initialData()!.fecha_creacion)
+        : new Date();
     const limite = new Date(fecha + 'T00:00:00');
     if (plan.factor < 1.1) {
-      return { texto: `Sueles cumplir tus fechas (mediana de ${plan.proyectos} proyectos).`, fecha: null };
+      return {
+        texto: `Sueles cumplir tus fechas (mediana de ${plan.proyectos} proyectos).`,
+        fecha: null,
+      };
     }
     return {
       texto: `Tus proyectos suelen tardar ${formatoFactor(plan.factor)}× lo estimado (mediana de ${plan.proyectos}). A ese ritmo terminaría cerca del`,
@@ -190,7 +194,9 @@ export class ProjectModal {
     }
 
     if (this.mode() === 'create' || this.mode() === 'create-subproject') {
-      payload.proyecto_padre_id = this.proyecto_padre_id() ? Number(this.proyecto_padre_id()) : undefined;
+      payload.proyecto_padre_id = this.proyecto_padre_id()
+        ? Number(this.proyecto_padre_id())
+        : undefined;
     }
 
     this.save.emit(payload);

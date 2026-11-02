@@ -1,6 +1,15 @@
 import {
-  afterRenderEffect, ChangeDetectionStrategy, Component, computed, effect,
-  ElementRef, inject, input, signal, viewChild, viewChildren,
+  afterRenderEffect,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  signal,
+  viewChild,
+  viewChildren,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ProjectLog } from '../../data/project-log.model';
@@ -21,9 +30,20 @@ export class ProjectLogsTab {
   protected readonly selected = signal<ProjectLog | null>(null);
   protected readonly copyStatus = signal('');
   protected readonly copying = signal(false);
-  protected readonly resource = inject(ProjectLogService).getByProyectoId(this.projectId, this.query, this.offset);
-  protected readonly logs = computed(() => this.resource.error() ? [] : (this.resource.value() ?? []).slice(0, LOG_PAGE_SIZE));
-  protected readonly hasMore = computed(() => !this.resource.error() && (this.resource.value()?.length ?? 0) > LOG_PAGE_SIZE && this.offset() + LOG_PAGE_SIZE <= 10000);
+  protected readonly resource = inject(ProjectLogService).getByProyectoId(
+    this.projectId,
+    this.query,
+    this.offset,
+  );
+  protected readonly logs = computed(() =>
+    this.resource.error() ? [] : (this.resource.value() ?? []).slice(0, LOG_PAGE_SIZE),
+  );
+  protected readonly hasMore = computed(
+    () =>
+      !this.resource.error() &&
+      (this.resource.value()?.length ?? 0) > LOG_PAGE_SIZE &&
+      this.offset() + LOG_PAGE_SIZE <= 10000,
+  );
   protected readonly html = computed(() => parseMarkdown(this.selected()?.contenido_raw ?? ''));
   private readonly detailTitle = viewChild<ElementRef<HTMLHeadingElement>>('detailTitle');
   private readonly logButtons = viewChildren<ElementRef<HTMLButtonElement>>('logButton');
@@ -41,7 +61,9 @@ export class ProjectLogsTab {
     afterRenderEffect(() => this.detailTitle()?.nativeElement.focus());
     afterRenderEffect(() => {
       if (this.restoreFocus() && !this.selected()) {
-        this.logButtons().find(button => button.nativeElement.dataset['logId'] === String(this.lastSelected()))?.nativeElement.focus();
+        this.logButtons()
+          .find((button) => button.nativeElement.dataset['logId'] === String(this.lastSelected()))
+          ?.nativeElement.focus();
       }
     });
   }
@@ -54,7 +76,7 @@ export class ProjectLogsTab {
 
   protected page(direction: -1 | 1): void {
     this.restoreFocus.set(false);
-    this.offset.update(offset => Math.max(0, offset + direction * LOG_PAGE_SIZE));
+    this.offset.update((offset) => Math.max(0, offset + direction * LOG_PAGE_SIZE));
   }
 
   protected open(log: ProjectLog): void {
@@ -77,7 +99,8 @@ export class ProjectLogsTab {
       await navigator.clipboard.writeText(log.contenido_raw);
       if (this.selected()?.id === log.id) this.copyStatus.set('Markdown copiado.');
     } catch {
-      if (this.selected()?.id === log.id) this.copyStatus.set('No se pudo copiar al portapapeles. Intenta de nuevo.');
+      if (this.selected()?.id === log.id)
+        this.copyStatus.set('No se pudo copiar al portapapeles. Intenta de nuevo.');
     } finally {
       this.copying.set(false);
     }

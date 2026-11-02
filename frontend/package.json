@@ -10,6 +10,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false",
+    "format": "prettier --write \"src/**/*.{ts,html,css}\" \"e2e/**/*.{ts,mjs}\" \"*.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css}\" \"e2e/**/*.{ts,mjs}\" \"*.ts\"",
     "build:mobile": "ng build --configuration mobile",
     "cap:sync": "cap sync android",
     "cap:open": "cap open android",

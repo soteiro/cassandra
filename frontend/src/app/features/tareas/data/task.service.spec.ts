@@ -4,7 +4,12 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { TaskService } from './task.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { LimiteEnCursoService } from './limite-en-curso.service';
-import { expectHttpCall, HttpCase, settle, setupHttpTesting } from '../../../../testing/http-testing';
+import {
+  expectHttpCall,
+  HttpCase,
+  settle,
+  setupHttpTesting,
+} from '../../../../testing/http-testing';
 
 describe('TaskService', () => {
   let http: HttpTestingController;
@@ -52,14 +57,38 @@ describe('TaskService', () => {
   });
 
   it.each<HttpCase>([
-    { name: 'getTaskById', call: () => service.getTaskById(9), method: 'GET', url: '/api/tareas/9' },
-    { name: 'createTask', call: () => service.createTask({ titulo: 'T' } as never), method: 'POST', url: '/api/tareas', body: { titulo: 'T' } },
-    { name: 'updateTask', call: () => service.updateTask(9, { estado: 'Terminado' } as never), method: 'PUT', url: '/api/tareas/9', body: { estado: 'Terminado' } },
-    { name: 'deleteTask', call: () => service.deleteTask(9), method: 'DELETE', url: '/api/tareas/9' },
+    {
+      name: 'getTaskById',
+      call: () => service.getTaskById(9),
+      method: 'GET',
+      url: '/api/tareas/9',
+    },
+    {
+      name: 'createTask',
+      call: () => service.createTask({ titulo: 'T' } as never),
+      method: 'POST',
+      url: '/api/tareas',
+      body: { titulo: 'T' },
+    },
+    {
+      name: 'updateTask',
+      call: () => service.updateTask(9, { estado: 'Terminado' } as never),
+      method: 'PUT',
+      url: '/api/tareas/9',
+      body: { estado: 'Terminado' },
+    },
+    {
+      name: 'deleteTask',
+      call: () => service.deleteTask(9),
+      method: 'DELETE',
+      url: '/api/tareas/9',
+    },
   ])('$name should call $method $url', (c) => expectHttpCall(http, c));
 
   it('poner una tarea En Curso verifica el límite; otros estados no', () => {
-    const verificar = vi.spyOn(TestBed.inject(LimiteEnCursoService), 'verificar').mockImplementation(() => {});
+    const verificar = vi
+      .spyOn(TestBed.inject(LimiteEnCursoService), 'verificar')
+      .mockImplementation(() => {});
     service.updateTask(9, { estado: 'Terminado' } as never).subscribe();
     http.expectOne('/api/tareas/9').flush({});
     expect(verificar).not.toHaveBeenCalled();

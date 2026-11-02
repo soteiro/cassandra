@@ -121,7 +121,9 @@ describe('ProjectHeader', () => {
     beforeEach(() => localStorage.removeItem('cassandra.proyecto.mostrarProposito'));
 
     const boton = () =>
-      [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('propósito')) as HTMLButtonElement;
+      [...el.querySelectorAll('button')].find((b) =>
+        b.textContent?.includes('propósito'),
+      ) as HTMLButtonElement;
 
     it('viene plegado y se abre y cierra con un click', async () => {
       await render({ por_que: 'Porque sí', para_que: 'Para algo' });
@@ -153,20 +155,29 @@ describe('ProjectHeader', () => {
   describe('pronóstico', () => {
     const conPronostico = async (pronostico: object, overrides: Partial<ProjectResponse> = {}) => {
       fixture.componentRef.setInput('pronostico', {
-        tareas_abiertas: 8, terminadas_ventana: 8, semanas_ventana: 8, cambios_fecha_limite: 0, ...pronostico,
+        tareas_abiertas: 8,
+        terminadas_ventana: 8,
+        semanas_ventana: 8,
+        cambios_fecha_limite: 0,
+        ...pronostico,
       });
       await render(overrides);
     };
 
     it('muestra el rango cuando hay datos', async () => {
       await conPronostico({ semanas_min: 3, semanas_max: 6 });
-      expect(el.textContent).toContain('Al ritmo actual, entre 3 y 6 semanas para las 8 tareas abiertas');
+      expect(el.textContent).toContain(
+        'Al ritmo actual, entre 3 y 6 semanas para las 8 tareas abiertas',
+      );
     });
 
     it('avisa si la fecha límite cae antes del rango', async () => {
       const pronto = new Date();
       pronto.setDate(pronto.getDate() + 7);
-      await conPronostico({ semanas_min: 3, semanas_max: 6 }, { fecha_limite: pronto.toISOString() });
+      await conPronostico(
+        { semanas_min: 3, semanas_max: 6 },
+        { fecha_limite: pronto.toISOString() },
+      );
       expect(el.textContent).toContain('la fecha límite cae antes');
     });
 

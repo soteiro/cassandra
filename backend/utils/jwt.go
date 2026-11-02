@@ -21,8 +21,7 @@ func GenerateAccessToken(UserID int, secret string) (string, error) {
 
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
-			IssuedAt: jwt.NewNumericDate(time.Now()),
-
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
@@ -32,7 +31,7 @@ func GenerateAccessToken(UserID int, secret string) (string, error) {
 
 // validar firma del token y devuelve userID si es valido
 func ValidateAccessToken(tokenStr string, secret string) (int, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &UserClaims{}, func(t *jwt.Token) (any, error){
+	token, err := jwt.ParseWithClaims(tokenStr, &UserClaims{}, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("metodo de firma invalido")
 		}
@@ -45,7 +44,7 @@ func ValidateAccessToken(tokenStr string, secret string) (int, error) {
 	}
 
 	claims, ok := token.Claims.(*UserClaims)
-	if !ok || !token.Valid{
+	if !ok || !token.Valid {
 		return 0, errors.New("token invalido")
 	}
 
@@ -62,5 +61,3 @@ func GenerateRefreshToken() (string, error) {
 
 	return base64.URLEncoding.EncodeToString(bytes), nil
 }
-
-

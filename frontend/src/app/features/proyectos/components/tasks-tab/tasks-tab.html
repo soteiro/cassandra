@@ -29,11 +29,9 @@
                 ? 'bg-surface text-primary-text font-semibold shadow-xs'
                 : 'text-text-muted hover:text-text-main'
             "
-            class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer "
+            class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
           >
-            Pendientes ({{
-              getOverallStats(tareas()).total - getOverallStats(tareas()).completed
-            }})
+            Pendientes ({{ getOverallStats(tareas()).total - getOverallStats(tareas()).completed }})
           </button>
           <button
             type="button"
@@ -108,7 +106,9 @@
               <strong class="text-text-main">{{ getOverallStats(tareas()).completed }}</strong>
               de {{ getOverallStats(tareas()).total }} tareas completadas
             </span>
-            <span class="font-bold text-primary-text">{{ getOverallStats(tareas()).percent }}%</span>
+            <span class="font-bold text-primary-text"
+              >{{ getOverallStats(tareas()).percent }}%</span
+            >
           </div>
           <div
             class="w-full bg-background rounded-full h-2 overflow-hidden border border-surface-border"
@@ -200,10 +200,7 @@
                 @if (isExpanded(t.id)) {
                   <svg lucideChevronDown class="w-4 h-4 text-primary-text transition-transform" />
                 } @else {
-                  <svg
-                    lucideChevronRight
-                    class="w-4 h-4 text-text-muted transition-transform"
-                  />
+                  <svg lucideChevronRight class="w-4 h-4 text-text-muted transition-transform" />
                 }
               </button>
 
@@ -225,7 +222,9 @@
               <!-- TÍTULO DE LA TAREA -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-mono text-text-muted bg-background px-1.5 py-0.5 rounded-md border border-surface-border shrink-0">
+                  <span
+                    class="text-xs font-mono text-text-muted bg-background px-1.5 py-0.5 rounded-md border border-surface-border shrink-0"
+                  >
                     #{{ t.id }}
                   </span>
                   <h4
@@ -246,7 +245,9 @@
                 }
                 @if (t.comentario) {
                   <p class="text-xs text-text-muted/80 truncate mt-0.5 flex items-center gap-1">
-                    <span class="text-primary-text/70"><svg lucideMessageCircleMore class="text-primary-text w-3.5 h-3.5" /></span>
+                    <span class="text-primary-text/70"
+                      ><svg lucideMessageCircleMore class="text-primary-text w-3.5 h-3.5"
+                    /></span>
                     <span>{{ t.comentario }}</span>
                   </p>
                 }
@@ -317,9 +318,7 @@
 
           <!-- RAMA DEL ÁRBOL DE SUBTAREAS (DESPLEGABLE INLINE) -->
           @if (isExpanded(t.id)) {
-            <div
-              class="pl-6 ml-3 border-l-2 border-primary/25 space-y-2 pt-2 pb-1 transition-all"
-            >
+            <div class="pl-6 ml-3 border-l-2 border-primary/25 space-y-2 pt-2 pb-1 transition-all">
               <!-- LISTA DE SUBTAREAS -->
               @for (sub of getSortedSubtasks(t.subtareas); track sub.id) {
                 <div
@@ -344,7 +343,9 @@
                       <svg lucideCheck class="w-3 h-3 stroke-3" />
                     </button>
 
-                    <span class="text-[10px] font-mono text-text-muted bg-surface px-1.5 py-0.5 rounded border border-surface-border shrink-0">
+                    <span
+                      class="text-[10px] font-mono text-text-muted bg-surface px-1.5 py-0.5 rounded border border-surface-border shrink-0"
+                    >
                       #{{ sub.id }}
                     </span>
 
@@ -418,21 +419,16 @@
           }
         </div>
       } @empty {
-        <div
-          class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-3"
-        >
+        <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl space-y-3">
           <div
             class="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary-text"
           >
             <svg lucideListTodo class="w-6 h-6" />
           </div>
           <div>
-            <h4 class="text-base font-semibold text-text-main">
-              No hay tareas creadas todavía
-            </h4>
+            <h4 class="text-base font-semibold text-text-main"> No hay tareas creadas todavía </h4>
             <p class="text-xs text-text-muted mt-1">
-              Usa la barra de arriba para añadir tu primera tarea directamente con la tecla
-              Enter.
+              Usa la barra de arriba para añadir tu primera tarea directamente con la tecla Enter.
             </p>
           </div>
         </div>

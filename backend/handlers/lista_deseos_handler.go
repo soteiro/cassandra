@@ -18,7 +18,7 @@ import (
 )
 
 type ListaDeseosHandler struct {
-	repo *repository.ListaDeseosRepository
+	repo  *repository.ListaDeseosRepository
 	owner *repository.Ownership
 }
 

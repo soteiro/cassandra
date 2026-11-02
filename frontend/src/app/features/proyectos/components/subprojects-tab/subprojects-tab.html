@@ -5,7 +5,9 @@
     </div>
   } @else {
     <!-- HEADER DE SUBPROYECTOS -->
-    <div class="bg-surface border border-surface-border rounded-2xl p-5 shadow-lg flex flex-wrap items-center justify-between gap-4">
+    <div
+      class="bg-surface border border-surface-border rounded-2xl p-5 shadow-lg flex flex-wrap items-center justify-between gap-4"
+    >
       <div>
         <h3 class="text-lg font-bold text-text-main flex items-center gap-2">
           <svg lucideLayers class="w-5 h-5 text-primary-text" />
@@ -31,14 +33,21 @@
       @for (sub of getSortedSubprojects(); track sub.id) {
         <app-project-card [project]="sub" [isSubproject]="true" />
       } @empty {
-        <div class="col-span-full p-10 text-center bg-surface border border-surface-border rounded-2xl space-y-3">
-          <div class="w-10 h-10 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-text">
+        <div
+          class="col-span-full p-10 text-center bg-surface border border-surface-border rounded-2xl space-y-3"
+        >
+          <div
+            class="w-10 h-10 mx-auto rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-text"
+          >
             <svg lucideFolderPlus class="w-5 h-5" />
           </div>
           <div>
-            <h4 class="text-sm font-semibold text-text-main">No hay subproyectos en este proyecto</h4>
+            <h4 class="text-sm font-semibold text-text-main"
+              >No hay subproyectos en este proyecto</h4
+            >
             <p class="text-xs text-text-muted mt-1 max-w-sm mx-auto">
-              Si este proyecto es una iniciativa paraguas, puedes dividirlo en subproyectos específicos con sus propios repos y tareas.
+              Si este proyecto es una iniciativa paraguas, puedes dividirlo en subproyectos
+              específicos con sus propios repos y tareas.
             </p>
           </div>
           <div>

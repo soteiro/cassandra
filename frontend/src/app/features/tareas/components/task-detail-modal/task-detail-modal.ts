@@ -1,4 +1,14 @@
-import { Component, effect, inject, input, output, signal, computed, HostListener, OnDestroy } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  computed,
+  HostListener,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task, TaskPrioridad } from '../../data/task.model';
@@ -58,7 +68,7 @@ export class TaskDetailModal {
   private readonly _backBtnEffect = this.backButtonService.registerEffect(
     () => this.isOpen(),
     () => this.onClose(),
-    80
+    80,
   );
 
   // Visibility & Render state for smooth transitions
@@ -103,7 +113,9 @@ export class TaskDetailModal {
   // Subtareas computadas
   subtareas = computed(() => this.currentTask()?.subtareas || []);
   totalSubtareas = computed(() => this.subtareas().length);
-  completadasCount = computed(() => this.subtareas().filter((s) => s.estado === 'Terminado').length);
+  completadasCount = computed(
+    () => this.subtareas().filter((s) => s.estado === 'Terminado').length,
+  );
 
   porcentajeProgreso = computed(() => {
     const total = this.totalSubtareas();
