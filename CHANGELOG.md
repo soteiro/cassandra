@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.1](https://github.com/soteiro/cassandra/compare/v0.19.0...v0.19.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **frontend:** remove redundant optional chaining flagged by NG8107 ([a3b03c8](https://github.com/soteiro/cassandra/commit/a3b03c86cfe40c272aba42fe1848395829d644df))
+* **frontend:** remove redundant optional chaining flagged by NG8107 ([4aaa6ed](https://github.com/soteiro/cassandra/commit/4aaa6edb3e49585861114ae4de3a0f94d40c00e8))
+
 ## [0.19.0](https://github.com/soteiro/cassandra/compare/v0.18.0...v0.19.0) (2026-10-29)
 
 
