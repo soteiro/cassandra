@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.19.3](https://github.com/soteiro/cassandra/compare/v0.19.2...v0.19.3) (2026-11-02)
+
+
+### Bug Fixes
+
+* **android:** readable select list without the Capacitor logo ([ae76487](https://github.com/soteiro/cassandra/commit/ae764871407955e8458af12ce68fc474301ade37))
+* **android:** stop native views from inheriting the splash background ([5c4b3d7](https://github.com/soteiro/cassandra/commit/5c4b3d7c2a89f0fe110fa73eec58dec6a7d8e736))
+* **android:** stop native views from inheriting the splash background ([5f6906f](https://github.com/soteiro/cassandra/commit/5f6906fc020982b920ae6d4db12c9d50d8dd3ac4))
+
+## [0.19.2](https://github.com/soteiro/cassandra/compare/v0.19.1...v0.19.2) (2026-11-02)
+
+
+### Bug Fixes
+
+* **android:** follow the appearance in system bars and native selects ([0b4d5b8](https://github.com/soteiro/cassandra/commit/0b4d5b8c3b792aaf1d16f8f51ba2470176a3e337))
+* **android:** follow the appearance in system bars and native selects ([bffaebb](https://github.com/soteiro/cassandra/commit/bffaebbffcbf63a83f2066c28de0ef5c611d3565))
+
+## [0.19.1](https://github.com/soteiro/cassandra/compare/v0.19.0...v0.19.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **frontend:** remove redundant optional chaining flagged by NG8107 ([a3b03c8](https://github.com/soteiro/cassandra/commit/a3b03c86cfe40c272aba42fe1848395829d644df))
+* **frontend:** remove redundant optional chaining flagged by NG8107 ([4aaa6ed](https://github.com/soteiro/cassandra/commit/4aaa6edb3e49585861114ae4de3a0f94d40c00e8))
+
+## [0.19.0](https://github.com/soteiro/cassandra/compare/v0.18.0...v0.19.0) (2026-10-29)
+
+
+### Features
+
+* **ticktick:** add read-only today tasks and personal OAuth connections ([13e4486](https://github.com/soteiro/cassandra/commit/13e448676f471390ff8f27338ada649303f9d5b7))
+* **ticktick:** tareas de hoy e Inbox en Home ([34430b4](https://github.com/soteiro/cassandra/commit/34430b439d9e60b885351c12b0467375cdda0aff))
+
+## [0.18.0](https://github.com/soteiro/cassandra/compare/v0.17.0...v0.18.0) (2026-10-28)
+
+
+### Features
+
+* **mcp:** crear y consultar tareas por proyecto ([5d6d575](https://github.com/soteiro/cassandra/commit/5d6d575d333a9f9494ef5aa0365cc33f525bb414))
+* **mcp:** create and read project tasks ([771ee65](https://github.com/soteiro/cassandra/commit/771ee658e1a8ae654c8eda351eb162570814903b))
+
+
+### Bug Fixes
+
+* add semanaARevisar function and integrate into SemanaWidget ([6239695](https://github.com/soteiro/cassandra/commit/62396955576ddde24e287070ac8cd623c4197707))
+
 ## [0.17.0](https://github.com/soteiro/cassandra/compare/v0.16.2...v0.17.0) (2026-10-28)
 
 
