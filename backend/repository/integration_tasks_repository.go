@@ -70,13 +70,13 @@ func (r *IntegrationTasksRepository) Create(ctx context.Context, userID, project
 	}
 	task, err := insertTarea(ctx, tx, &models.TareaRequest{
 		Nombre: req.Nombre, Descripcion: req.Descripcion, Comentario: req.Comentario,
-		Prioridad: &req.Prioridad, ProyectID: projectID, UserID: userID, TareaPadreID: req.TareaPadreID,
+		Prioridad: &req.Prioridad, ProjectID: projectID, UserID: userID, TareaPadreID: req.TareaPadreID,
 	})
 	if err != nil {
 		return nil, err
 	}
 	out := &models.IntegrationTask{
-		ID: task.ID, ProyectoID: task.ProyectID, Nombre: task.Nombre, Descripcion: task.Descripcion,
+		ID: task.ID, ProyectoID: task.ProjectID, Nombre: task.Nombre, Descripcion: task.Descripcion,
 		Comentario: task.Comentario, Estado: *task.Estado, Prioridad: task.Prioridad, TareaPadreID: task.TareaPadreID,
 		FechaCreacion: task.FechaCreacion, FechaActualizacion: task.FechaActualizacion, FechaTerminado: task.FechaTerminado,
 	}

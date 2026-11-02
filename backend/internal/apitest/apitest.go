@@ -5,7 +5,7 @@
 //	ana := api.User("ana@cassandra.test")
 //	res := api.Do(ana, http.MethodPost, "/api/proyects", map[string]any{"nombre": "X", ...})
 //	res.Expect(t, http.StatusCreated)
-//	var p models.ProyectResponse
+//	var p models.ProjectResponse
 //	res.JSON(t, &p)
 package apitest
 
