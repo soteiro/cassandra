@@ -1,0 +1,283 @@
+<div class="space-y-6">
+  <!-- 1. BARRA DE CREACIÓN RÁPIDA DE MOVIMIENTO (ZERO FRICTION) -->
+  <app-movimiento-quick-add
+    [mes]="selectedMes()"
+    [anio]="selectedAnio()"
+    [bancos]="bancos()"
+    [grupos]="grupos()"
+    [(statusFilter)]="statusFilter"
+    (created)="reload.emit()"
+  />
+
+  <!-- 2. BARRA DE CONTROL DE VISTA Y AGRUPACIÓN (ANCHO COMPLETO) -->
+  <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+    <!-- SUBPESTAÑAS: GASTOS (PRINCIPAL) VS INGRESOS -->
+    <div class="flex items-center bg-surface border border-surface-border rounded-xl p-1 text-xs shadow-xs">
+      <button
+        type="button"
+        (click)="movimientosSubTab.set('egresos'); clearSelection()"
+        [class]="
+          movimientosSubTab() === 'egresos'
+            ? 'bg-danger/20 text-danger font-bold shadow-xs'
+            : 'text-text-muted hover:text-text-main'
+        "
+        class="px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2"
+      >
+        <span class="w-2.5 h-2.5 rounded-full bg-danger"></span>
+        <span>Gastos y Egresos ({{ egresos().length }})</span>
+      </button>
+      <button
+        type="button"
+        (click)="movimientosSubTab.set('ingresos'); clearSelection()"
+        [class]="
+          movimientosSubTab() === 'ingresos'
+            ? 'bg-success/20 text-success font-bold shadow-xs'
+            : 'text-text-muted hover:text-text-main'
+        "
+        class="px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2"
+      >
+        <span class="w-2.5 h-2.5 rounded-full bg-success"></span>
+        <span>Ingresos ({{ ingresos().length }})</span>
+      </button>
+    </div>
+
+    <!-- CONTROLES DE AGRUPACIÓN Y ACCIONES -->
+    <div class="flex items-center gap-2 flex-wrap text-xs">
+      <!-- SELECTOR DE AGRUPACIÓN -->
+      <div class="flex items-center gap-1.5 bg-surface border border-surface-border rounded-xl px-3 py-1.5 shadow-xs">
+        <svg lucideLayers class="w-3.5 h-3.5 text-primary-text" />
+        <span class="text-text-muted font-medium text-[11px]">Agrupar por:</span>
+        <select
+          [ngModel]="groupMode()"
+          (ngModelChange)="groupMode.set($event)"
+          class="bg-transparent border-none text-text-main text-xs font-semibold outline-none cursor-pointer"
+        >
+          <option value="categoria">Categoría</option>
+          <option value="banco">Cuenta / Banco</option>
+          <option value="mecanismo">Mecanismo de Pago</option>
+          <option value="estado">Estado</option>
+          <option value="ninguno">Sin agrupar</option>
+        </select>
+      </div>
+
+      @if (groupMode() !== 'ninguno') {
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            (click)="expandAllGroups()"
+            class="px-2.5 py-1.5 rounded-xl border border-surface-border text-text-muted hover:text-text-main bg-surface text-[11px] cursor-pointer shadow-xs"
+            title="Expandir todos los grupos"
+          >
+            Expandir
+          </button>
+          <button
+            type="button"
+            (click)="collapseAllGroups()"
+            class="px-2.5 py-1.5 rounded-xl border border-surface-border text-text-muted hover:text-text-main bg-surface text-[11px] cursor-pointer shadow-xs"
+            title="Colapsar todos los grupos"
+          >
+            Colapsar
+          </button>
+        </div>
+      }
+
+      <!-- BOTÓN NUEVO MOVIMIENTO EN DETALLE -->
+      <button
+        type="button"
+        (click)="openCreateModal(movimientosSubTab() === 'egresos' ? 'egreso' : 'ingreso')"
+        class="px-3 py-1.5 bg-primary hover:bg-primary-hover text-on-primary rounded-xl font-medium text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+      >
+        <svg lucidePlus class="w-3.5 h-3.5 stroke-[2.5]" />
+        <span>Nuevo {{ movimientosSubTab() === 'egresos' ? 'Gasto' : 'Ingreso' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. PLANILLA / TABLA DE ALTA DENSIDAD CON AGRUPACIÓN -->
+  @if (isLoading() && items().length === 0) {
+    <div class="p-12 text-center bg-surface border border-surface-border rounded-2xl shadow-xs">
+      <p class="text-xs text-text-muted animate-pulse">Cargando presupuesto del mes...</p>
+    </div>
+  } @else if (currentGroupedList().length === 0 || (movimientosSubTab() === 'egresos' && egresos().length === 0) || (movimientosSubTab() === 'ingresos' && ingresos().length === 0)) {
+    <div class="p-12 text-center bg-surface border border-dashed border-surface-border rounded-2xl space-y-3 shadow-xs">
+      <p class="text-sm font-medium text-text-main">
+        No hay {{ movimientosSubTab() === 'egresos' ? 'gastos' : 'ingresos' }} registrados para este período.
+      </p>
+      <button
+        type="button"
+        (click)="openCreateModal(movimientosSubTab() === 'egresos' ? 'egreso' : 'ingreso')"
+        class="text-xs text-primary-text hover:underline cursor-pointer font-medium"
+      >
+        + Agregar el primer {{ movimientosSubTab() === 'egresos' ? 'gasto' : 'ingreso' }}
+      </button>
+    </div>
+  } @else {
+    <div class="space-y-4">
+      <!-- BARRA DE SELECCIÓN GLOBAL VISIBLE Y SUBTOTALES -->
+      <div class="flex items-center justify-between px-2 text-xs text-text-muted">
+        <div class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            [checked]="isAllVisibleSelected()"
+            (change)="toggleSelectAllVisible($event)"
+            class="w-4 h-4 rounded border-surface-border text-primary-text focus:ring-primary cursor-pointer accent-primary"
+            title="Seleccionar / Deseleccionar todos los movimientos visibles"
+          />
+          <span class="font-medium text-[11px]">
+            Seleccionar todo ({{ movimientosSubTab() === 'egresos' ? egresos().length : ingresos().length }} movimientos)
+          </span>
+        </div>
+        <div class="text-[11px]">
+          Total período: <strong class="text-text-main font-mono text-xs">{{ formatCLP(movimientosSubTab() === 'egresos' ? resumen().total_egresos : resumen().total_ingresos) }}</strong>
+        </div>
+      </div>
+
+      <!-- LISTA DE GRUPOS TIPO PLANILLA -->
+      @for (group of currentGroupedList(); track group.key) {
+        <div class="bg-surface border border-surface-border rounded-2xl overflow-hidden shadow-xs transition-all">
+          <!-- CABECERA DEL GRUPO (ACCORDION + SUBTOTALES) -->
+          <div
+            (click)="toggleGroupCollapse(group.key)"
+            class="p-3 bg-surface hover:bg-surface-border/30 border-b border-surface-border flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none transition-colors"
+          >
+            <!-- IZQUIERDA: CHECKBOX DE GRUPO + CHEVRON + NOMBRE + CANTIDAD -->
+            <div class="flex items-center gap-3">
+              <input
+                type="checkbox"
+                [checked]="isGroupAllSelected(group)"
+                (click)="$event.stopPropagation()"
+                (change)="toggleSelectGroup(group, $event)"
+                class="w-4 h-4 rounded border-surface-border text-primary-text focus:ring-primary cursor-pointer accent-primary"
+                title="Seleccionar todos los movimientos de este grupo"
+              />
+              <button
+                type="button"
+                class="p-1 rounded-md text-text-muted hover:text-text-main transition-transform"
+                [class.rotate-180]="isGroupCollapsed(group.key)"
+              >
+                <svg lucideChevronDown class="w-4 h-4" />
+              </button>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-text-main tracking-tight">
+                  {{ group.title }}
+                </span>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-background text-text-muted border border-surface-border">
+                  {{ group.items.length }} {{ group.items.length === 1 ? 'ítem' : 'ítems' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- DERECHA: SUBTOTALES Y DESGLOSE DE PAGO -->
+            <div class="flex items-center gap-3 text-xs font-mono">
+              <!-- PÍLDORAS DE ESTADO SUMARIZADO -->
+              <div class="hidden sm:flex items-center gap-1.5 text-[11px]">
+                @if (group.totalCompletado > 0) {
+                  <span class="text-positive-text font-semibold bg-positive/10 px-2 py-0.5 rounded-md border border-positive/20" title="Total completado en este grupo">
+                    ✓ {{ formatCLP(group.totalCompletado) }}
+                  </span>
+                }
+                @if (group.totalEnProceso > 0) {
+                  <span class="text-warning-text font-semibold bg-warning/10 px-2 py-0.5 rounded-md border border-warning/20" title="Total en proceso en este grupo">
+                    ⏱ {{ formatCLP(group.totalEnProceso) }}
+                  </span>
+                }
+                @if (group.totalPendiente > 0) {
+                  <span class="text-text-muted font-medium bg-background px-2 py-0.5 rounded-md border border-surface-border" title="Total pendiente en este grupo">
+                    ○ {{ formatCLP(group.totalPendiente) }}
+                  </span>
+                }
+              </div>
+
+              <!-- SUBTOTAL DEL GRUPO -->
+              <div class="flex items-baseline gap-1.5 pl-2 border-l border-surface-border">
+                <span class="text-text-muted text-[11px] uppercase font-sans font-bold">Subtotal:</span>
+                <span class="text-sm font-bold text-text-main font-mono">
+                  {{ formatCLP(group.total) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CUERPO DE LA TABLA (FILAS DE MOVIMIENTOS) -->
+          @if (!isGroupCollapsed(group.key)) {
+            <div class="divide-y divide-surface-border/50">
+              @for (item of group.items; track item.id) {
+                <app-movimiento-row
+                  [movimiento]="item"
+                  [selected]="isItemSelected(item.id)"
+                  [menuOpen]="statusMenuOpenId() === item.id"
+                  [groupMode]="groupMode()"
+                  (selectToggle)="toggleSelectItem(item.id)"
+                  (menuToggle)="toggleStatusMenu(item.id)"
+                  (estadoChange)="setItemEstado(item, $event)"
+                  (nombreChange)="updateNombre(item, $event)"
+                  (montoChange)="updateMonto(item, $event)"
+                  (edit)="openEditModal(item)"
+                  (remove)="requestDelete(item)"
+                />
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- BARRA FLOTANTE DE ACCIONES EN LOTE (BULK ACTIONS) -->
+  @if (selectedCount() > 0) {
+    <app-bulk-actions-bar
+      [count]="selectedCount()"
+      [total]="selectedTotalMonto()"
+      [processing]="isBulkProcessing()"
+      [bancos]="bancos()"
+      [grupos]="grupos()"
+      (estadoChange)="bulkSetEstado($event)"
+      (categoriaChange)="bulkSetCategoria($event)"
+      (bancoChange)="bulkSetBanco($event)"
+      (remove)="requestBulkDelete()"
+      (clear)="clearSelection()"
+    />
+  }
+
+  <!-- CONFIRM BULK DELETE MODAL -->
+  <app-confirm-modal
+    [isOpen]="showBulkDeleteModal()"
+    title="Eliminar Movimientos Seleccionados"
+    [message]="'¿Estás seguro de eliminar los ' + selectedCount() + ' movimientos seleccionados? Esta acción no se puede deshacer.'"
+    confirmText="Eliminar Seleccionados"
+    variant="danger"
+    [isProcessing]="isBulkProcessing()"
+    (confirm)="confirmBulkDelete()"
+    (cancel)="cancelBulkDelete()"
+  />
+
+  <!-- MODAL: CREAR / EDITAR MOVIMIENTO -->
+  <app-movimiento-form-modal
+    [mes]="selectedMes()"
+    [anio]="selectedAnio()"
+    [bancos]="bancos()"
+    [grupos]="grupos()"
+    [movimientosEsperados]="movimientosEsperados()"
+    (saved)="reload.emit()"
+  />
+
+  <!-- MODAL: CLONAR MES HACIA OTRO PERÍODO -->
+  <app-clonar-periodo-modal
+    [mes]="selectedMes()"
+    [anio]="selectedAnio()"
+    [meses]="meses()"
+    (cloned)="periodoChange.emit($event)"
+  />
+
+  <!-- CONFIRM DELETE MODAL -->
+  <app-confirm-modal
+    [isOpen]="itemToDelete() !== null"
+    title="Eliminar Movimiento"
+    [message]="'¿Estás seguro de eliminar ' + (itemToDelete()?.nombre || '') + '? Esta acción no se puede deshacer.'"
+    confirmText="Eliminar"
+    variant="danger"
+    [isProcessing]="isDeletingItem()"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  />
+</div>

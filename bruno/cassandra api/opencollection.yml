@@ -1,5 +1,4 @@
 opencollection: 1.0.0
-
 info:
   name: cassandra api
 config:
@@ -7,20 +6,16 @@ config:
     inherit: true
     config:
       protocol: http
-      hostname: ""
-      port: ""
+      hostname: ''
+      port: ''
       auth:
-        username: ""
-        password: ""
-      bypassProxy: ""
-
+        username: ''
+        password: ''
+      bypassProxy: ''
 request:
-  headers:
-    - name: Authorization
-      value: Bearer {{access_token}}
   auth:
     type: bearer
-    token: "{{access_token}}"
+    token: '{{access_token}}'
 bundled: false
 extensions:
   bruno:

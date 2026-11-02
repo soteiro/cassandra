@@ -1,0 +1,20 @@
+info:
+  name: Crear log
+  type: http
+  seq: 1
+http:
+  method: POST
+  url: '{{base_url}}/api/proyects/{{proyecto_id}}/logs'
+  body:
+    type: json
+    data: |-
+      {
+        "titulo": "Registro de trabajo",
+        "contenido_raw": "Notas en crudo de la sesión de desarrollo."
+      }
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

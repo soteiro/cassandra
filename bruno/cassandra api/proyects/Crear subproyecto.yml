@@ -1,0 +1,26 @@
+info:
+  name: Crear subproyecto
+  type: http
+  seq: 13
+http:
+  method: POST
+  url: '{{base_url}}/api/proyects'
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Subproyecto de prueba",
+        "descripcion": "Trabajo dependiente del proyecto principal.",
+        "por_que": "Separar una parte del trabajo con un propósito claro.",
+        "para_que": "Completar una entrega independiente.",
+        "criterio_finalizacion": "Entrega validada.",
+        "prioridad": "Media",
+        "proyecto_padre_id": {{proyecto_id}},
+        "premortem": "Falta de tiempo disponible."
+      }
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

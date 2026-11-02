@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/proyects/3
+  url: "{{base_url}}/api/proyects/{{proyecto_id}}"
   auth: inherit
 
 settings:

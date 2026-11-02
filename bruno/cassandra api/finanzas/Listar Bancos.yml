@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/finanzas/bancos
+  url: "{{base_url}}/api/finanzas/bancos"
   body:
     type: none
   auth: inherit

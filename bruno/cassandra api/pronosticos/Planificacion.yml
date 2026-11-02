@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/pronosticos/planificacion
+  url: "{{base_url}}/api/pronosticos/planificacion"
   body:
     type: none
   auth: inherit

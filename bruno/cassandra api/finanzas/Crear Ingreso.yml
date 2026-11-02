@@ -5,17 +5,17 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/finanzas/plantilla
+  url: "{{base_url}}/api/finanzas/plantilla"
   body:
     type: json
     data: |-
       {
         "tipo": "ingreso",
-        "mes": 3,
-        "anio": 2026,
+        "mes": {{mes}},
+        "anio": {{anio}},
         "nombre": "Sueldo",
         "monto": 600000,
-        "banco_id": 1
+        "banco_id": {{banco_id}}
       }
   auth: inherit
 

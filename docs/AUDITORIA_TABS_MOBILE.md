@@ -37,7 +37,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 1. [P1] Filtros de estado del presupuesto fuera de pantalla
 
-- **Archivo:** `frontend/src/app/pages/finanzas/components/presupuesto-tab/presupuesto-tab.html:11`.
+- **Archivo:** `frontend/src/app/features/finanzas/components/presupuesto-tab/presupuesto-tab.html:11`.
 - **Controles:** Todos, Pendientes, En Proceso y Completados.
 - **Prueba:** barra de aproximadamente 333 px dentro de un espacio útil de 254 px en viewport de 320 px y de 294 px en 360 px. Su borde derecho llega a x=366; el botón Completados queda parcialmente fuera de pantalla en ambos tamaños.
 - **Impacto:** el usuario necesita desplazar horizontalmente el contenido para alcanzar y leer completamente el último filtro. En 390 px ya cabe en pantalla, pero la barra todavía rebasa el área interior de la tarjeta en unos 9 px.
@@ -47,7 +47,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 2. [P1] Pestañas principales de Finanzas exceden el ancho en 320 px
 
-- **Archivo:** `frontend/src/app/pages/finanzas/finanzas.html:36`.
+- **Archivo:** `frontend/src/app/features/finanzas/pages/finanzas/finanzas.html:36`.
 - **Controles:** Presupuesto, Lista de Deseos y Cuentas & Categorías.
 - **Prueba:** barra de aproximadamente 317 px frente a 288 px disponibles. En la vista inicial de Presupuesto su borde derecho llega a x=333 en una pantalla de 320 px; Cuentas & Categorías queda parcialmente fuera.
 - **Impacto:** la navegación principal desborda y el último destino requiere desplazamiento horizontal. En 360–412 px cabe, pero las etiquetas se comprimen en varias líneas.
@@ -57,7 +57,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 3. [P1] Los filtros de Tareas vuelven a desbordar a 768 px
 
-- **Archivo:** `frontend/src/app/pages/proyect-details/components/tasks-tab/tasks-tab.html:22`.
+- **Archivo:** `frontend/src/app/features/proyectos/components/tasks-tab/tasks-tab.html:22`.
 - **Controles:** Pendientes, En Curso, Bloqueadas, Abiertas, Completadas y Todas.
 - **Prueba:** a 768 px, la barra tiene 420 px de ancho interior y 493 px de contenido. El área principal presenta 27 px de exceso horizontal y Todas queda parcialmente fuera de pantalla.
 - **Impacto:** el cambio a tablet/escritorio empeora una barra que funciona en móvil. También afecta ventanas estrechas y orientación horizontal alrededor de ese breakpoint.
@@ -67,7 +67,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 4. [P2] Filtros de Proyectos rebasan su tarjeta en 320 px
 
-- **Archivo:** `frontend/src/app/pages/proyectos/proyectos.html:94`.
+- **Archivo:** `frontend/src/app/features/proyectos/pages/proyectos/proyectos.html:94`.
 - **Controles:** Todos, Activos, Terminados y Alta Prioridad, con contadores.
 - **Prueba:** barra de aproximadamente 295 px en una tarjeta de 288 px de ancho exterior. Comienza en x=29 y termina en x=324: invade el padding, sobresale de la tarjeta y genera 4 px de exceso horizontal en el área principal.
 - **Impacto:** el borde de la barra queda recortado y se pierde la alineación. Con los contadores de prueba, los botones permanecen dentro de pantalla; el efecto es menor que en Finanzas.
@@ -77,7 +77,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ### 5. [P2] Historial de Reflexiones invade el margen derecho en 320 px
 
-- **Archivo:** `frontend/src/app/components/reflexiones-view/reflexiones-view.html:168`.
+- **Archivo:** `frontend/src/app/features/crm/components/reflexiones-view/reflexiones-view.html:168`.
 - **Controles:** Todas, Reflexiones, Memorias y Eventos.
 - **Prueba:** barra de aproximadamente 305 px frente a 288 px disponibles; termina en x=321. Produce aproximadamente 1 px de exceso horizontal en el área principal y consume el margen derecho.
 - **Impacto:** el contorno queda recortado y la barra pierde su margen. Los textos de los botones permanecen visibles en el caso probado; no se observó un bloqueo de navegación.
@@ -87,7 +87,7 @@ Los resultados prueban el comportamiento del frontend con esos datos y anchos; n
 
 ## Controles que se ajustaron correctamente
 
-- **Pestañas principales de detalle de proyecto**, `proyect-details.html:19`: usan una columna en móvil y filas que pueden envolver desde `md`.
+- **Pestañas principales de detalle de proyecto**, `project-details.html:19`: usan una columna en móvil y filas que pueden envolver desde `md`.
 - **Filtros de Tareas en 320–412 px**: la cuadrícula de dos columnas evita el desborde. El problema aparece al cambiar a `md:flex`.
 - **Filtros de Notas**, `notes-tab.html:45`: `flex-wrap` distribuye los botones dentro del espacio disponible.
 - **Categorías de Documentos**, `documents-tab.html:62`: los botones saltan de línea.

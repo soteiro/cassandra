@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/proyects/1/pronostico
+  url: "{{base_url}}/api/proyects/{{proyecto_id}}/pronostico"
   body:
     type: none
   auth: inherit

@@ -1,0 +1,20 @@
+info:
+  name: Obtener contexto
+  type: http
+  seq: 1
+http:
+  method: GET
+  url: '{{base_url}}/api/memory/projects/{{proyecto_id}}'
+  auth: inherit
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.setEnvVar('memory_revision', String(res.getBody().revision));
+        }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

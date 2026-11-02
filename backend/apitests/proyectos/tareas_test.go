@@ -20,7 +20,7 @@ func TestTareaCRUD(t *testing.T) {
 	if tr.Nombre != "Comprar pintura" || tr.Descripcion != "blanca" || tr.Comentario != "2 litros" {
 		t.Errorf("create no recorta espacios: %+v", tr)
 	}
-	if str(tr.Estado) != "Abierto" || tr.Prioridad != "normal" || tr.ProyectID != p.ID || tr.UserID != ana.ID ||
+	if str(tr.Estado) != "Abierto" || tr.Prioridad != "normal" || tr.ProjectID != p.ID || tr.UserID != ana.ID ||
 		tr.FechaTerminado != nil || tr.TareaPadreID != nil {
 		t.Errorf("defaults inesperados: %+v (estado=%s)", tr, str(tr.Estado))
 	}
@@ -30,7 +30,7 @@ func TestTareaCRUD(t *testing.T) {
 	}
 
 	got := getTarea(t, api, ana, tr.ID)
-	if got.Nombre != "Comprar pintura" || got.ProyectID != p.ID || len(got.Subtareas) != 0 {
+	if got.Nombre != "Comprar pintura" || got.ProjectID != p.ID || len(got.Subtareas) != 0 {
 		t.Errorf("GET tras crear: %+v", got)
 	}
 	expectIDs(t, "GET /api/tareas", tareaIDs(listarTareas(t, api, ana, "")), tr.ID, otra.ID)

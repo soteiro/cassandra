@@ -5,7 +5,7 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:8080/api/finanzas/movimientos-esperados/1
+  url: "{{base_url}}/api/finanzas/movimientos-esperados/{{movimiento_esperado_id}}"
   body:
     type: none
   auth: inherit

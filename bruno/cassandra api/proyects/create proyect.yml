@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/proyects
+  url: "{{base_url}}/api/proyects"
   body:
     type: json
     data: |-
@@ -16,7 +16,9 @@ http:
         "por_que": "Para organizar mejor mis ideas y tareas centralizadas sin saturarme de proyectos impulsivos",
         "para_que": "Tener una plataforma personal de seguimiento de proyectos con propósitos claros",
         "criterio_finalizacion": "Despliegue exitoso del MVP con autenticación y gestión de tareas por proyecto",
-        "prioridad": "Alta"
+        "prioridad": "Alta",
+        "premortem": "El alcance podría crecer sin una entrega clara.",
+        "fecha_limite": null
       }
   auth: inherit
 

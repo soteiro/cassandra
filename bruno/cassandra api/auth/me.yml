@@ -1,0 +1,35 @@
+info:
+  name: Sesión actual
+  type: http
+  seq: 2
+http:
+  method: GET
+  url: '{{base_url}}/api/auth/me'
+  headers:
+    - name: Cookie
+      value: access_token={{access_token}}; refresh_token={{refresh_token}}
+  auth: null
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          const header = res.getHeader('set-cookie');
+          const cookies = Array.isArray(header) ? header.join('; ') : (header || '');
+          for (const name of ['access_token', 'refresh_token']) {
+            const match = cookies.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
+            if (match) {
+              bru.setEnvVar(name, match[1]);
+            }
+          }
+        }
+        if (res.status === 200) {
+          bru.setEnvVar('user_id', String(res.getBody().user_id));
+        }
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Esta ruta usa cookies. Guarda user_id para las peticiones de users y captura el token si se renueva.

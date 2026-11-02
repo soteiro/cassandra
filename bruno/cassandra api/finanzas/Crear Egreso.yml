@@ -5,19 +5,19 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/finanzas/plantilla
+  url: "{{base_url}}/api/finanzas/plantilla"
   body:
     type: json
     data: |-
       {
         "tipo": "egreso",
-        "mes": 3,
-        "anio": 2026,
+        "mes": {{mes}},
+        "anio": {{anio}},
         "nombre": "Arriendo",
         "monto": 135000,
-        "banco_id": 1,
-        "grupo_item_id": 1,
-        "movimiento_esperado_id": 1,
+        "banco_id": {{banco_id}},
+        "grupo_item_id": {{grupo_item_id}},
+        "movimiento_esperado_id": {{movimiento_esperado_id}},
         "estado": "pendiente"
       }
   auth: inherit

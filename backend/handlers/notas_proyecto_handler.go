@@ -47,12 +47,12 @@ func (h *NotasProyectoHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Si proyect_id viene en los parámetros de la URL
-	proyectIDStr := chi.URLParam(r, "proyect_id")
-	if proyectIDStr == "" {
-		proyectIDStr = chi.URLParam(r, "proyecto_id")
+	projectIDStr := chi.URLParam(r, "proyect_id")
+	if projectIDStr == "" {
+		projectIDStr = chi.URLParam(r, "proyecto_id")
 	}
-	if proyectIDStr != "" {
-		if pID, err := atoi32(proyectIDStr); err == nil && pID > 0 {
+	if projectIDStr != "" {
+		if pID, err := atoi32(projectIDStr); err == nil && pID > 0 {
 			req.ProyectoID = pID
 		}
 	}

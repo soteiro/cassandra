@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/proyects/1/actividad?limit=20
+  url: "{{base_url}}/api/proyects/{{proyecto_id}}/actividad?limit=20"
   params:
     - name: limit
       value: "20"

@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8080/api/revisiones?limit=10
+  url: "{{base_url}}/api/revisiones?limit=10"
   body:
     type: none
   auth: inherit

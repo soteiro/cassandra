@@ -1,0 +1,88 @@
+import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  ReflexionResponse,
+  ReflexionTipo,
+  ReflexionUpdateRequest,
+} from '../../data/reflexion.model';
+import { BackButtonService } from '../../../../core/platform/back-button.service';
+import {
+  LucidePencil,
+  LucideX,
+  LucideBrain,
+  LucideCalendar,
+  LucideSparkles,
+} from '@lucide/angular';
+
+@Component({
+  selector: 'app-reflexion-modal',
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucidePencil,
+    LucideX,
+    LucideBrain,
+    LucideCalendar,
+    LucideSparkles,
+  ],
+  templateUrl: './reflexion-modal.html',
+})
+export class ReflexionModal {
+  private readonly backButtonService = inject(BackButtonService);
+
+  isOpen = input<boolean>(false);
+  initialData = input<ReflexionResponse | null>(null);
+  isSubmitting = input<boolean>(false);
+
+  save = output<ReflexionUpdateRequest>();
+  close = output<void>();
+
+  private readonly _backBtnEffect = this.backButtonService.registerEffect(
+    () => this.isOpen(),
+    () => this.close.emit(),
+    80
+  );
+
+  // Internal form signals
+  texto = signal('');
+  tipo = signal<ReflexionTipo>('reflexion');
+  errorMessage = signal('');
+
+  constructor() {
+    effect(() => {
+      if (this.isOpen()) {
+        this.errorMessage.set('');
+        const data = this.initialData();
+        if (data) {
+          this.texto.set(data.reflexion || '');
+          this.tipo.set(data.tipo || 'reflexion');
+        } else {
+          this.texto.set('');
+          this.tipo.set('reflexion');
+        }
+      }
+    });
+  }
+
+  setTipo(t: ReflexionTipo) {
+    this.tipo.set(t);
+  }
+
+  onSubmit() {
+    const txt = this.texto().trim();
+    if (!txt) {
+      this.errorMessage.set('El contenido no puede estar vacío');
+      return;
+    }
+
+    this.save.emit({
+      reflexion: txt,
+      tipo: this.tipo(),
+    });
+  }
+
+  onClose() {
+    this.close.emit();
+  }
+}

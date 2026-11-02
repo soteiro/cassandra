@@ -1,0 +1,19 @@
+info:
+  name: Autorizar conexión
+  type: http
+  seq: 2
+http:
+  method: POST
+  url: '{{base_url}}/api/connections/ticktick/authorize'
+  body:
+    type: json
+    data: |-
+      {}
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Abre authorization_url de la respuesta en el navegador. El proveedor llama al callback automáticamente.

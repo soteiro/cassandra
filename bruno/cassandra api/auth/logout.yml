@@ -1,13 +1,22 @@
 info:
   name: logout
   type: http
-  seq: 3
-
+  seq: 4
 http:
   method: POST
-  url: http://localhost:8080/api/auth/logout
-  auth: inherit
-
+  url: '{{base_url}}/api/auth/logout'
+  headers:
+    - name: Cookie
+      value: refresh_token={{refresh_token}}
+  auth: null
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200) {
+          bru.setEnvVar('access_token', '');
+          bru.setEnvVar('refresh_token', '');
+        }
 settings:
   encodeUrl: true
   timeout: 0

@@ -2,6 +2,5 @@ info:
   name: auth
   type: folder
   seq: 3
-
 request:
-  auth: inherit
+  auth: null

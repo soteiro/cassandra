@@ -16,7 +16,7 @@ func TestProyectoCRUD(t *testing.T) {
 	p := crearProyecto(t, api, ana, "Huerto", nil)
 
 	// Create recorta espacios y aplica defaults.
-	var c models.ProyectResponse
+	var c models.ProjectResponse
 	api.Do(ana, http.MethodPost, "/api/proyects", map[string]any{
 		"nombre": "  Cocina  ", "por_que": " p ", "para_que": " q ", "criterio_finalizacion": " c ", "comentario": " ojo ",
 		"fecha_limite": limite,
@@ -38,7 +38,7 @@ func TestProyectoCRUD(t *testing.T) {
 	expectIDs(t, "listado", proyectoIDs(listarProyectos(t, api, ana)), p.ID, c.ID)
 
 	// PUT parcial: solo cambia lo enviado.
-	var upd models.ProyectUpdateResponse
+	var upd models.ProjectUpdateResponse
 	api.Do(ana, http.MethodPut, apitest.Path("/api/proyects/%d", c.ID), map[string]any{
 		"nombre": " Cocina nueva ", "descripcion": "otra", "estado": "En Proceso", "prioridad": "Alta",
 	}).Expect(t, http.StatusOK).JSON(t, &upd)
@@ -167,7 +167,7 @@ func TestProyectoSubproyectos(t *testing.T) {
 		t.Errorf("hijo: %+v (nombre_padre=%s)", gotH1, str(gotH1.NombrePadre))
 	}
 
-	var subs []models.ProyectResponse
+	var subs []models.ProjectResponse
 	api.Do(ana, http.MethodGet, apitest.Path("/api/proyects/%d/subproyectos", padre.ID), nil).Expect(t, http.StatusOK).JSON(t, &subs)
 	if len(subs) != 2 || subs[0].ID != h1.ID || subs[1].ID != h2.ID {
 		t.Fatalf("subproyectos = %v, se esperaban [%d %d] en orden", proyectoIDs(subs), h1.ID, h2.ID)
@@ -220,7 +220,7 @@ func TestProyectoFechaTerminado(t *testing.T) {
 	p := crearProyecto(t, api, ana, "Terminable", nil)
 	path := apitest.Path("/api/proyects/%d", p.ID)
 
-	var upd models.ProyectUpdateResponse
+	var upd models.ProjectUpdateResponse
 	api.Do(ana, http.MethodPut, path, map[string]any{"estado": "Completado"}).Expect(t, http.StatusOK).JSON(t, &upd)
 	if upd.FechaTerminado == nil {
 		t.Fatal("PUT estado=Completado: fecha_terminado vacía")

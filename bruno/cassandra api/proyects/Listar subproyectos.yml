@@ -1,0 +1,13 @@
+info:
+  name: Listar subproyectos
+  type: http
+  seq: 12
+http:
+  method: GET
+  url: '{{base_url}}/api/proyects/{{proyecto_id}}/subproyectos'
+  auth: inherit
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

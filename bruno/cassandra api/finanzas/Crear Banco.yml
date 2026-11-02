@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/finanzas/bancos
+  url: "{{base_url}}/api/finanzas/bancos"
   body:
     type: json
     data: |-

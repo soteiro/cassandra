@@ -107,13 +107,13 @@ func proyectoBody(nombre string) map[string]any {
 	}
 }
 
-func crearProyecto(t *testing.T, api *apitest.API, u *apitest.User, nombre string, extra map[string]any) models.ProyectResponse {
+func crearProyecto(t *testing.T, api *apitest.API, u *apitest.User, nombre string, extra map[string]any) models.ProjectResponse {
 	t.Helper()
 	body := proyectoBody(nombre)
 	for k, v := range extra {
 		body[k] = v
 	}
-	var p models.ProyectResponse
+	var p models.ProjectResponse
 	api.Do(u, http.MethodPost, "/api/proyects", body).Expect(t, http.StatusCreated).JSON(t, &p)
 	if p.ID == 0 || p.Nombre != nombre {
 		t.Fatalf("proyecto creado inesperado: %+v", p)
@@ -121,16 +121,16 @@ func crearProyecto(t *testing.T, api *apitest.API, u *apitest.User, nombre strin
 	return p
 }
 
-func getProyecto(t *testing.T, api *apitest.API, u *apitest.User, id int) models.ProyectResponse {
+func getProyecto(t *testing.T, api *apitest.API, u *apitest.User, id int) models.ProjectResponse {
 	t.Helper()
-	var p models.ProyectResponse
+	var p models.ProjectResponse
 	api.Do(u, http.MethodGet, apitest.Path("/api/proyects/%d", id), nil).Expect(t, http.StatusOK).JSON(t, &p)
 	return p
 }
 
-func listarProyectos(t *testing.T, api *apitest.API, u *apitest.User) []models.ProyectResponse {
+func listarProyectos(t *testing.T, api *apitest.API, u *apitest.User) []models.ProjectResponse {
 	t.Helper()
-	var ps []models.ProyectResponse
+	var ps []models.ProjectResponse
 	api.Do(u, http.MethodGet, "/api/proyects", nil).Expect(t, http.StatusOK).JSON(t, &ps)
 	return ps
 }
@@ -230,8 +230,8 @@ func ids[T any](items []T, id func(T) int) []int {
 	return out
 }
 
-func proyectoIDs(ps []models.ProyectResponse) []int {
-	return ids(ps, func(p models.ProyectResponse) int { return p.ID })
+func proyectoIDs(ps []models.ProjectResponse) []int {
+	return ids(ps, func(p models.ProjectResponse) int { return p.ID })
 }
 
 func tareaIDs(ts []models.TareaResponse) []int {

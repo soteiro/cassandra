@@ -9,7 +9,7 @@ export default defineConfig({
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   workers: process.env['CI'] ? 2 : undefined,
-  // En CI, ng serve (modo dev) con dos workers puede tardar más de 5 s en pintar una página fría.
+  // Margen extra para runners de CI más lentos que una máquina local.
   expect: { timeout: process.env['CI'] ? 15_000 : 5_000 },
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
   use: {
@@ -49,7 +49,9 @@ export default defineConfig({
       stderr: 'pipe',
     },
     {
-      command: `pnpm exec ng serve --port ${FRONTEND_PORT} --proxy-config proxy.e2e.conf.json`,
+      // Build de producción: en desarrollo Vite sirve @lucide/angular completo (~22 MB) y cada
+      // contexto nuevo de navegador lo vuelve a descargar y parsear, lo que provocaba timeouts.
+      command: `pnpm exec ng serve --configuration production --port ${FRONTEND_PORT} --proxy-config proxy.e2e.conf.json`,
       url: BASE_URL,
       reuseExistingServer: !process.env['CI'],
       timeout: 180_000,

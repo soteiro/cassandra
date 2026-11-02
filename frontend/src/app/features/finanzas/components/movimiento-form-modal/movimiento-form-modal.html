@@ -1,0 +1,166 @@
+@if (showItemModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
+    <div class="bg-surface border border-surface-border rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4">
+      <div class="flex items-center justify-between p-5 border-b border-surface-border">
+        <h3 class="text-base font-bold text-text-main flex items-center gap-2">
+          <svg lucideWallet class="w-5 h-5 text-primary-text" />
+          <span>{{ isEditingItem() ? 'Editar Movimiento' : 'Nuevo Movimiento' }}</span>
+        </h3>
+        <button
+          type="button"
+          (click)="closeItemModal()"
+          class="text-text-muted hover:text-text-main p-1 rounded-lg transition-colors cursor-pointer"
+        >
+          <svg lucideX class="w-5 h-5" />
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveItem()" class="p-5 space-y-4 text-xs">
+        <!-- TIPO DE MOVIMIENTO -->
+        <div>
+          <label class="block text-text-muted font-medium mb-1">Tipo de Movimiento</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              (click)="formTipo.set('egreso')"
+              [class]="
+                formTipo() === 'egreso'
+                  ? 'bg-danger/20 text-danger border-danger/40 font-bold'
+                  : 'bg-background text-text-muted border-surface-border'
+              "
+              class="py-2.5 rounded-xl border transition-all cursor-pointer text-center"
+            >
+              Egreso (Gasto)
+            </button>
+            <button
+              type="button"
+              (click)="formTipo.set('ingreso')"
+              [class]="
+                formTipo() === 'ingreso'
+                  ? 'bg-success/20 text-success border-success/40 font-bold'
+                  : 'bg-background text-text-muted border-surface-border'
+              "
+              class="py-2.5 rounded-xl border transition-all cursor-pointer text-center"
+            >
+              Ingreso (Entrante)
+            </button>
+          </div>
+        </div>
+
+        <!-- NOMBRE / CONCEPTO -->
+        <div>
+          <label class="block text-text-muted font-medium mb-1">Concepto *</label>
+          <input
+            type="text"
+            [ngModel]="formNombre()"
+            (ngModelChange)="formNombre.set($event)"
+            name="formNombre"
+            placeholder="Ej. Arriendo, Supermercado, Sueldo..."
+            required
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 text-xs outline-none"
+          />
+        </div>
+
+        <!-- MONTO EN CLP -->
+        <div>
+          <label class="block text-text-muted font-medium mb-1">Monto CLP ($) *</label>
+          <input
+            type="number"
+            [ngModel]="formMonto()"
+            (ngModelChange)="formMonto.set($event)"
+            name="formMonto"
+            placeholder="Ej. 135000"
+            required
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main placeholder-text-muted/60 rounded-xl p-2.5 text-xs outline-none font-mono"
+          />
+        </div>
+
+        <!-- SELECTORES EN GRID: CUENTA Y CATEGORÍA -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-text-muted font-medium mb-1">Cuenta / Banco</label>
+            <select
+              [ngModel]="formBancoId()"
+              (ngModelChange)="formBancoId.set($event)"
+              name="formBancoId"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer"
+            >
+              <option [ngValue]="null">Sin especificar</option>
+              @for (b of bancos(); track b.id) {
+                <option [ngValue]="b.id">{{ b.nombre }} ({{ b.tipo }})</option>
+              }
+            </select>
+          </div>
+
+          @if (formTipo() === 'egreso') {
+            <div>
+              <label class="block text-text-muted font-medium mb-1">Categoría</label>
+              <select
+                [ngModel]="formGrupoItemId()"
+                (ngModelChange)="formGrupoItemId.set($event)"
+                name="formGrupoItemId"
+                class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer"
+              >
+                <option [ngValue]="null">Sin categoría</option>
+                @for (g of grupos(); track g.id) {
+                  <option [ngValue]="g.id">{{ g.nombre }}</option>
+                }
+              </select>
+            </div>
+          }
+        </div>
+
+        <!-- DESTINO / MECANISMO DE PAGO (SOLO EGRESOS) -->
+        @if (formTipo() === 'egreso') {
+          <div>
+            <label class="block text-text-muted font-medium mb-1">Mecanismo / Destino de Pago</label>
+            <select
+              [ngModel]="formMovimientoEsperadoId()"
+              (ngModelChange)="formMovimientoEsperadoId.set($event)"
+              name="formMovimientoEsperadoId"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer"
+            >
+              <option [ngValue]="null">Sin especificar</option>
+              @for (m of movimientosEsperados(); track m.id) {
+                <option [ngValue]="m.id">{{ m.nombre }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- ESTADO -->
+        <div>
+          <label class="block text-text-muted font-medium mb-1">Estado</label>
+          <select
+            [ngModel]="formEstado()"
+            (ngModelChange)="formEstado.set($event)"
+            name="formEstado"
+            class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 text-xs outline-none cursor-pointer font-medium"
+          >
+            <option value="pendiente">Pendiente</option>
+            <option value="en proceso">En Proceso</option>
+            <option value="completado">Completado</option>
+          </select>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-surface-border">
+          <button
+            type="button"
+            (click)="closeItemModal()"
+            class="px-4 py-2 rounded-xl text-text-muted hover:text-text-main border border-surface-border transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="isSubmittingItem() || !formNombre().trim()"
+            class="bg-primary hover:bg-primary-hover text-on-primary px-5 py-2 rounded-xl font-medium transition-all disabled:opacity-40 cursor-pointer"
+          >
+            {{ isSubmittingItem() ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

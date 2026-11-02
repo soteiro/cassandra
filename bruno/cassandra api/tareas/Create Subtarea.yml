@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/tareas
+  url: "{{base_url}}/api/tareas"
   body:
     type: json
     data: |-
@@ -15,8 +15,8 @@ http:
         "comentario": "Comentario de la subtarea",
         "estado": "En Curso",
         "prioridad": "normal",
-        "proyect_id": 3,
-        "tarea_padre_id": 1
+        "proyect_id": {{proyecto_id}},
+        "tarea_padre_id": {{tarea_padre_id}}
       }
   auth: inherit
 

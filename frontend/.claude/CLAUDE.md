@@ -51,3 +51,58 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Project Structure
+
+`src/app` is organized by feature, not by file type. Do NOT recreate top-level `components/`, `pages/`, `services/`, `models/` or `utils/` folders.
+
+```
+src/app/
+├── app.ts, app.config.ts, app.routes.ts
+├── core/                 # App-wide singletons and the app shell
+│   ├── auth/             # auth service, guard, interceptor and models
+│   ├── server/           # server config service and guard
+│   ├── platform/         # Capacitor/Android: back button, app updates
+│   └── layout/           # main-layout, sidebar, header, bottom-nav, command-bar
+├── shared/               # Reusable code with no domain logic
+│   ├── ui/               # confirm-modal, toast-container, loading-indicator
+│   └── directives/, services/, models/, utils/
+└── features/
+    └── <feature>/
+        ├── <feature>.routes.ts   # only if the feature has pages
+        ├── pages/<page>/         # routed components
+        ├── components/<name>/    # components of this feature (incl. widgets used elsewhere)
+        ├── data/                 # services and models (API contract)
+        └── utils/                # pure functions
+```
+
+- Features with pages: `auth`, `configuracion`, `crm`, `docs`, `finanzas`, `home`, `proyectos`, `revision`, `ticktick`.
+- Cross-cutting features without routes: `actividad`, `notas`, `tareas`.
+
+### Where new code goes
+
+- New code goes in the feature that owns it, even if it is a single file.
+- Move code to `shared/` only when a second feature needs it AND it has no domain logic (generic UI, date helpers, HTTP errors).
+- Domain code used by several features becomes its own feature (as `tareas`, `notas` and `actividad`), not part of `shared/`.
+- Keep specs next to the file they test (`*.spec.ts`). Shared test helpers live in `src/testing/`.
+
+### Dependency rules
+
+- `features → shared, core`. `shared` and `core` never import from `features/`.
+  - Only exception: `core/layout/command-bar` uses `features/proyectos/data/project-search.service`.
+- A feature may import another feature's `data/` or components for composition (e.g. `home` shows widgets from `revision`, `actividad`, `tareas` and `ticktick`).
+- Never create cycles between features. If two features need each other, extract the shared part into its own feature (that is why `notas` is separate from `tareas` and `proyectos`).
+
+### Routing
+
+- Each feature with pages exports `<feature>Routes` from `<feature>.routes.ts`, and `app.routes.ts` loads it with `loadChildren`.
+- Use absolute paths (`/crm/persona/1`) in `routerLink` and `router.navigate`, so nesting routes does not change navigation.
+- Exceptions:
+  - `auth`: `login` and `servidor` stay as `loadComponent` in `app.routes.ts`, because they live outside the main layout and have their own guards.
+  - `ticktick`: its page is routed from `configuracion.routes.ts` (`/configuracion/ticktick`).
+
+### Naming
+
+- Feature folders use the same Spanish names as the URLs (`proyectos`, `finanzas`, `configuracion`).
+- Inside a feature, keep the language the area already uses (`ProjectService`, `Task`, `PersonaService`).
+- Do not rename backend contract names in the frontend alone: the `/api/proyects` endpoint and the `proyect_id` field are kept as they are.

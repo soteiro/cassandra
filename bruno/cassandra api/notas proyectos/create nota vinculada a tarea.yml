@@ -5,13 +5,13 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8080/api/tareas/1/notas
+  url: "{{base_url}}/api/tareas/{{tarea_id}}/notas"
   body:
     type: json
     data: |-
       {
         "nota": "Cápsula de solución documentada directamente desde la tarea",
-        "proyecto_id": 1
+        "proyecto_id": {{proyecto_id}}
       }
   auth: inherit
 

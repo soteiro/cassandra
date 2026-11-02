@@ -1,0 +1,10 @@
+info:
+  name: memoria proyectos
+  type: folder
+  seq: 16
+request:
+  auth:
+    type: bearer
+    token: '{{api_key}}'
+docs: |-
+  Usa api_key con permisos memory:read y memory:write para proyecto_id. También admite JWT cambiando el token a access_token.

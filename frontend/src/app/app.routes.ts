@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './guards/auth.guard';
-import { serverConfiguredGuard } from './guards/server-configured.guard';
+import { authGuard } from './core/auth/auth.guard';
+import { serverConfiguredGuard } from './core/server/server-configured.guard';
 
 export const routes: Routes = [
   {
@@ -10,37 +10,30 @@ export const routes: Routes = [
   },
   {
     path: 'servidor',
-    loadComponent: () => import('./pages/servidor/servidor').then((m) => m.Servidor),
+    loadComponent: () => import('./features/auth/pages/servidor/servidor').then((m) => m.Servidor),
   },
   {
     path: 'login',
     canActivate: [serverConfiguredGuard],
-    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
+    loadComponent: () => import('./features/auth/pages/login/login').then((m) => m.Login),
   },
   {
     path: '',
     canActivate: [serverConfiguredGuard, authGuard],
-    loadComponent: () =>
-      import('./layouts/main-layout/main-layout/main-layout').then((m) => m.MainLayout),
+    loadComponent: () => import('./core/layout/main-layout/main-layout').then((m) => m.MainLayout),
     children: [
-      { path: 'home', loadComponent: () => import('./pages/home/home').then((m) => m.Home) },
+      {
+        path: 'home',
+        loadChildren: () => import('./features/home/home.routes').then((m) => m.homeRoutes),
+      },
       {
         path: 'proyectos',
-        loadComponent: () => import('./pages/proyectos/proyectos').then((m) => m.Proyectos),
+        loadChildren: () =>
+          import('./features/proyectos/proyectos.routes').then((m) => m.proyectosRoutes),
       },
-      {
-        path: 'proyectos/:id',
-        loadComponent: () =>
-          import('./pages/proyect-details/proyect-details').then((m) => m.ProyectDetails),
-      }, // ruta dinamica de proyectos
       {
         path: 'crm',
-        loadComponent: () => import('./pages/crm/crm').then((m) => m.Crm),
-      },
-      {
-        path: 'crm/persona/:id',
-        loadComponent: () =>
-          import('./pages/persona-details/persona-details').then((m) => m.PersonaDetails),
+        loadChildren: () => import('./features/crm/crm.routes').then((m) => m.crmRoutes),
       },
       {
         path: 'persona/:id',
@@ -48,25 +41,20 @@ export const routes: Routes = [
       },
       {
         path: 'finanzas',
-        loadComponent: () => import('./pages/finanzas/finanzas').then((m) => m.Finanzas),
+        loadChildren: () =>
+          import('./features/finanzas/finanzas.routes').then((m) => m.finanzasRoutes),
       },
       {
         path: 'revision',
-        loadComponent: () => import('./pages/revision/revision').then((m) => m.Revision),
-      },
-      {
-        path: 'configuracion/claves-api',
-        loadComponent: () =>
-          import('./pages/configuracion/api-keys-page').then((m) => m.ApiKeysPage),
-      },
-      {
-        path: 'configuracion/ticktick',
-        loadComponent: () => import('./pages/configuracion/ticktick-page').then((m) => m.TickTickPage),
+        loadChildren: () =>
+          import('./features/revision/revision.routes').then((m) => m.revisionRoutes),
       },
       {
         path: 'configuracion',
-        loadComponent: () =>
-          import('./pages/configuracion/configuracion').then((m) => m.Configuracion),
+        loadChildren: () =>
+          import('./features/configuracion/configuracion.routes').then(
+            (m) => m.configuracionRoutes,
+          ),
       },
       {
         path: 'claves-api',
@@ -75,7 +63,7 @@ export const routes: Routes = [
       },
       {
         path: 'docs',
-        loadComponent: () => import('./pages/docs/docs').then((m) => m.Docs),
+        loadChildren: () => import('./features/docs/docs.routes').then((m) => m.docsRoutes),
       },
     ],
   },
@@ -83,5 +71,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: '/home',
   },
-  
 ];

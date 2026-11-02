@@ -236,13 +236,13 @@ func TestUltimaActividadDelProyecto(t *testing.T) {
 	fijar(t, api, "UPDATE eventos SET ocurrido_en = $1", time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC))
 	ok(t, api.Do(ana, http.MethodPut, apitest.Path("/api/tareas/%d", tt), map[string]any{"estado": "En Curso"}))
 
-	var lista []models.ProyectResponse
+	var lista []models.ProjectResponse
 	api.Do(ana, http.MethodGet, "/api/proyects", nil).Expect(t, http.StatusOK).JSON(t, &lista)
 	if len(lista) != 1 || lista[0].UltimaActividad == nil || time.Since(*lista[0].UltimaActividad) > time.Minute {
 		t.Errorf("ultima_actividad debe ser el cambio de la tarea (ahora): %+v", lista)
 	}
 
-	var detalle models.ProyectResponse
+	var detalle models.ProjectResponse
 	api.Do(ana, http.MethodGet, apitest.Path("/api/proyects/%d", p), nil).Expect(t, http.StatusOK).JSON(t, &detalle)
 	if detalle.UltimaActividad == nil {
 		t.Error("el detalle del proyecto debe incluir ultima_actividad")
