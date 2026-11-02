@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.19.3](https://github.com/soteiro/cassandra/compare/v0.19.2...v0.19.3) (2026-11-02)
+
+
+### Bug Fixes
+
+* **android:** readable select list without the Capacitor logo ([ae76487](https://github.com/soteiro/cassandra/commit/ae764871407955e8458af12ce68fc474301ade37))
+* **android:** stop native views from inheriting the splash background ([5c4b3d7](https://github.com/soteiro/cassandra/commit/5c4b3d7c2a89f0fe110fa73eec58dec6a7d8e736))
+* **android:** stop native views from inheriting the splash background ([5f6906f](https://github.com/soteiro/cassandra/commit/5f6906fc020982b920ae6d4db12c9d50d8dd3ac4))
+
 ## [0.19.2](https://github.com/soteiro/cassandra/compare/v0.19.1...v0.19.2) (2026-11-02)
 
 
