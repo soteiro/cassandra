@@ -11,12 +11,12 @@ import {
 import { EstadoFinanzas, FinanzasPlantillaItem } from '../../data/finanzas.model';
 import {
   FinanzasGroupMode,
-  formatCLP,
   getMontoColorClass,
   getRowClass,
   getStatusBadgeClass,
   siguienteEstado,
 } from '../../utils/presupuesto.util';
+import { formatCLP } from '../../utils/moneda.util';
 
 /**
  * Fila de un movimiento: selección, estado (clic para avanzar o menú), edición inline de

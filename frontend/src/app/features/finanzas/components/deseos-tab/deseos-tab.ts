@@ -19,6 +19,7 @@ import {
   LucideTrash2,
   LucideClock,
 } from '@lucide/angular';
+import { formatCLP } from '../../utils/moneda.util';
 
 @Component({
   selector: 'app-deseos-tab',
@@ -41,6 +42,8 @@ import {
   templateUrl: './deseos-tab.html',
 })
 export class DeseosTab implements OnInit {
+  protected readonly formatCLP = formatCLP;
+
   grupos = input<GrupoItemFinanzas[]>([]);
 
   pendingCountChange = output<number>();
@@ -300,13 +303,5 @@ export class DeseosTab implements OnInit {
 
   cancelDeleteDeseo(): void {
     this.deseoToDelete.set(null);
-  }
-
-  formatCurrency(val: number): string {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0,
-    }).format(val || 0);
   }
 }

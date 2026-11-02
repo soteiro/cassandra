@@ -432,11 +432,6 @@ describe('DeseosTab', () => {
         expect(component.isDeletingDeseo()).toBe(false);
       });
     });
-
-    it('formatCurrency should format CLP and treat falsy as 0', () => {
-      expect(component.formatCurrency(1500)).toMatch(/1\.500/);
-      expect(component.formatCurrency(0)).toMatch(/0/);
-    });
   });
 
   it('should handle a null list from the API', async () => {

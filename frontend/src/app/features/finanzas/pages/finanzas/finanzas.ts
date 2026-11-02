@@ -30,6 +30,7 @@ import {
 import { PresupuestoTab } from '../../components/presupuesto-tab/presupuesto-tab';
 import { DeseosTab } from '../../components/deseos-tab/deseos-tab';
 import { CatalogosTab } from '../../components/catalogos-tab/catalogos-tab';
+import { formatCLP } from '../../utils/moneda.util';
 
 @Component({
   selector: 'app-finanzas',
@@ -58,6 +59,8 @@ import { CatalogosTab } from '../../components/catalogos-tab/catalogos-tab';
   styleUrl: './finanzas.css',
 })
 export class Finanzas implements OnInit {
+  protected readonly formatCLP = formatCLP;
+
   readonly presupuestoTab = viewChild(PresupuestoTab);
   readonly deseosTab = viewChild(DeseosTab);
 
@@ -265,13 +268,5 @@ export class Finanzas implements OnInit {
     this.selectedMes.set(event.mes);
     this.selectedAnio.set(event.anio);
     this.loadPeriodo();
-  }
-
-  formatCurrency(val: number): string {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0,
-    }).format(val || 0);
   }
 }
