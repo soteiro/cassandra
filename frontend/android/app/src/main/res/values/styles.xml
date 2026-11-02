@@ -12,6 +12,9 @@
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <!-- BridgeActivity aplica este tema encima de NoActionBarLaunch: sin anularlo, todas las
+             vistas nativas (como la lista de un select) heredarían el fondo @drawable/splash. -->
+        <item name="android:background">@null</item>
         <item name="android:windowBackground">@color/app_background</item>
         <item name="android:statusBarColor">@color/app_background</item>
         <item name="android:navigationBarColor">@color/app_background</item>
