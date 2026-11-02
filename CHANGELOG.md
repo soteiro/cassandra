@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.2](https://github.com/soteiro/cassandra/compare/v0.19.1...v0.19.2) (2026-11-02)
+
+
+### Bug Fixes
+
+* **android:** follow the appearance in system bars and native selects ([0b4d5b8](https://github.com/soteiro/cassandra/commit/0b4d5b8c3b792aaf1d16f8f51ba2470176a3e337))
+* **android:** follow the appearance in system bars and native selects ([bffaebb](https://github.com/soteiro/cassandra/commit/bffaebbffcbf63a83f2066c28de0ef5c611d3565))
+
 ## [0.19.1](https://github.com/soteiro/cassandra/compare/v0.19.0...v0.19.1) (2026-11-02)
 
 
