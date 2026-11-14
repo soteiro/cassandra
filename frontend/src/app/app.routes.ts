@@ -45,6 +45,11 @@ export const routes: Routes = [
           import('./features/finanzas/finanzas.routes').then((m) => m.finanzasRoutes),
       },
       {
+        path: 'calendario',
+        loadChildren: () =>
+          import('./features/calendario/calendario.routes').then((m) => m.calendarioRoutes),
+      },
+      {
         path: 'revision',
         loadChildren: () =>
           import('./features/revision/revision.routes').then((m) => m.revisionRoutes),

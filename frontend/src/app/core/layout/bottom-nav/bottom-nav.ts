@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
   LucideHouse,
   LucideFolder,
+  LucideCalendarDays,
   LucideUser,
   LucideWalletMinimal,
   LucideMenu,
@@ -17,6 +18,7 @@ import { useToggle } from '../../../shared/utils/use-toggle';
     RouterLinkActive,
     LucideHouse,
     LucideFolder,
+    LucideCalendarDays,
     LucideUser,
     LucideWalletMinimal,
     LucideMenu,

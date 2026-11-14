@@ -36,9 +36,12 @@ type Preferencias struct {
 	// 0 = domingo … 6 = sábado.
 	DiaRevision   int `json:"dia_revision"`
 	LimiteEnCurso int `json:"limite_en_curso"`
+	// Capa de deadlines oculta en el calendario.
+	OcultarDeadlines bool `json:"ocultar_deadlines"`
 }
 
 type PreferenciasUpdate struct {
-	DiaRevision   *int `json:"dia_revision"`
-	LimiteEnCurso *int `json:"limite_en_curso"`
+	DiaRevision      *int  `json:"dia_revision"`
+	LimiteEnCurso    *int  `json:"limite_en_curso"`
+	OcultarDeadlines *bool `json:"ocultar_deadlines"`
 }

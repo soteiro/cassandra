@@ -63,6 +63,7 @@ func NewRouter(opts Options) http.Handler {
 	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
 	pronosticosHandler := handlers.NewPronosticosHandler(repository.NewPronosticosRepository(db), owner)
 	revisionHandler := handlers.NewRevisionHandler(repository.NewRevisionRepository(db))
+	calendarioHandler := handlers.NewCalendarioHandler(repository.NewCalendarioRepository(db), owner)
 	ticktickHandler := handlers.NewTickTickHandler(repository.NewTickTickRepository(db), cfg.TickTick, opts.TickTickClient)
 
 	r := chi.NewRouter()
@@ -156,6 +157,22 @@ func NewRouter(opts Options) http.Handler {
 		r.Post("/api/revisiones", revisionHandler.Create)
 		r.Get("/api/preferencias", revisionHandler.Preferencias)
 		r.Put("/api/preferencias", revisionHandler.UpdatePreferencias)
+
+		// Calendario: deadlines, turnos y actividades
+		r.Get("/api/calendario", calendarioHandler.Rango)
+		r.Get("/api/calendarios", calendarioHandler.List)
+		r.Post("/api/calendarios", calendarioHandler.Create)
+		r.Put("/api/calendarios/{id}", calendarioHandler.Update)
+		r.Delete("/api/calendarios/{id}", calendarioHandler.Delete)
+		r.Put("/api/calendarios/{id}/ciclo", calendarioHandler.SetCiclo)
+		r.Put("/api/calendarios/{id}/excepciones/{fecha}", calendarioHandler.SetExcepcion)
+		r.Delete("/api/calendarios/{id}/excepciones/{fecha}", calendarioHandler.DeleteExcepcion)
+		r.Post("/api/calendarios/{id}/actividades", calendarioHandler.CreateActividad)
+		r.Get("/api/calendario/actividades/{id}", calendarioHandler.GetActividad)
+		r.Put("/api/calendario/actividades/{id}", calendarioHandler.UpdateActividad)
+		r.Delete("/api/calendario/actividades/{id}", calendarioHandler.DeleteActividad)
+		r.Put("/api/calendario/actividades/{id}/cancelaciones/{fecha}", calendarioHandler.Cancelar)
+		r.Delete("/api/calendario/actividades/{id}/cancelaciones/{fecha}", calendarioHandler.Restaurar)
 
 		// Rutas de Logs en Crudo de Proyectos
 		r.Post("/api/proyects/{proyect_id}/logs", logsHandler.CreateLog)

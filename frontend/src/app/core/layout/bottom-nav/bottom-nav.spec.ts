@@ -42,10 +42,11 @@ describe('BottomNav', () => {
     expect(component.sidebar).toBe(sidebar);
   });
 
-  it('renders the four navigation links with correct hrefs', () => {
+  it('renders the five navigation links with correct hrefs', () => {
     expect(links().map((a) => a.getAttribute('href'))).toEqual([
       '/home',
       '/proyectos',
+      '/calendario',
       '/crm',
       '/finanzas',
     ]);
@@ -76,7 +77,7 @@ describe('BottomNav', () => {
     await TestBed.inject(Router).navigateByUrl('/crm');
     await fixture.whenStable();
     const wrappers = links().map((a) => a.querySelector('div') as HTMLElement);
-    expect(wrappers[2].classList.contains('text-primary-text')).toBe(true);
+    expect(wrappers[3].classList.contains('text-primary-text')).toBe(true);
     expect(wrappers[0].classList.contains('text-primary-text')).toBe(false);
   });
 });

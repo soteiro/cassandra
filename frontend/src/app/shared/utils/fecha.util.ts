@@ -34,3 +34,16 @@ export function haceCuanto(
   const anios = Math.floor(dias / 365);
   return `hace ${anios} ${anios === 1 ? 'año' : 'años'}`;
 }
+
+/**
+ * Fechas de calendario guardadas como medianoche UTC del día (fecha_limite, fecha_inicio).
+ * "2026-11-30" → "2026-11-30T00:00:00.000Z"; vacío → null.
+ */
+export function diaAISO(dia: string): string | null {
+  return /^\d{4}-\d{2}-\d{2}$/.test(dia) ? `${dia}T00:00:00.000Z` : null;
+}
+
+/** Inverso de diaAISO: "2026-11-30T00:00:00Z" → "2026-11-30" (sin pasar por la hora local). */
+export function isoADia(iso: string | null | undefined): string {
+  return iso ? iso.slice(0, 10) : '';
+}

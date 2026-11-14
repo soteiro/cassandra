@@ -16,6 +16,7 @@ const NOMBRE_CAMPO: Record<string, string> = {
   tipo: 'tipo',
   tags: 'etiquetas',
   fecha_limite: 'fecha límite',
+  fecha_inicio: 'fecha de inicio',
   tarea_padre_id: 'tarea padre',
   proyecto_padre_id: 'proyecto padre',
   tarea_id: 'tarea asociada',
