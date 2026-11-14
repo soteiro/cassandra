@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.20.0](https://github.com/soteiro/cassandra/compare/v0.19.3...v0.20.0) (2026-11-14)
+
+
+### Features
+
+* **calendario:** add dates to tasks and projects and the calendar API ([cc3385e](https://github.com/soteiro/cassandra/commit/cc3385e914a5ebcb3f98bbda61d696c9d7bd3429))
+* **calendario:** add the calendar page ([e0af648](https://github.com/soteiro/cassandra/commit/e0af64857e7ce56f5c9907b74b3e6b8c319e31f5))
+* **calendario:** calendar with deadlines, shifts and activities ([7f2f047](https://github.com/soteiro/cassandra/commit/7f2f0472cf068a3e58aa79d7b33e9a62e8c371ab))
+* **calendario:** edit calendars and choose from more colors ([75c1efd](https://github.com/soteiro/cassandra/commit/75c1efd02daa5d9286b5078b5904837045c210d1))
+* **tareas:** edit start and due dates of tasks and projects ([03bb3f7](https://github.com/soteiro/cassandra/commit/03bb3f790053e147ba4ed97ffd3473783d77ee5c))
+
+
+### Bug Fixes
+
+* **calendario:** wrap the layer filters on phones ([bcf049b](https://github.com/soteiro/cassandra/commit/bcf049bf858ad060b76a248498dadfee31e742f7))
+
 ## [0.19.3](https://github.com/soteiro/cassandra/compare/v0.19.2...v0.19.3) (2026-11-02)
 
 
