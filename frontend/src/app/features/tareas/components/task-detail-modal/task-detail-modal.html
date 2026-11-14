@@ -81,6 +81,44 @@
           </div>
         </div>
 
+        <!-- FECHAS: SE VEN COMO BARRA EN EL CALENDARIO -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label
+              for="taskFechaInicio"
+              class="block text-xs font-semibold text-text-muted uppercase tracking-wider"
+            >
+              Inicio
+            </label>
+            <input
+              id="taskFechaInicio"
+              type="date"
+              [ngModel]="fechaInicio()"
+              (ngModelChange)="fechaInicio.set($event ?? '')"
+              name="taskFechaInicio"
+              [max]="fechaLimite() || null"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label
+              for="taskFechaLimite"
+              class="block text-xs font-semibold text-text-muted uppercase tracking-wider"
+            >
+              Fecha límite
+            </label>
+            <input
+              id="taskFechaLimite"
+              type="date"
+              [ngModel]="fechaLimite()"
+              (ngModelChange)="fechaLimite.set($event ?? '')"
+              name="taskFechaLimite"
+              [min]="fechaInicio() || null"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl px-3 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-primary/30"
+            />
+          </div>
+        </div>
+
         <!-- DESCRIPCIÓN -->
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider">

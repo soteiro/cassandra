@@ -15,6 +15,7 @@ export interface Project {
   premortem?: string;
   prioridad: ProjectPrioridad | string;
   fecha_limite?: string;
+  fecha_inicio?: string;
   user_id: number;
   fecha_creacion: string;
   fecha_terminado?: string | null;
@@ -36,6 +37,7 @@ export interface ProjectRequest {
   premortem?: string;
   prioridad: string;
   fecha_limite?: string;
+  fecha_inicio?: string;
   user_id?: number;
   proyecto_padre_id?: number | null;
 }
@@ -54,6 +56,7 @@ export interface ProjectResponse {
   premortem?: string;
   prioridad: string;
   fecha_limite?: string;
+  fecha_inicio?: string;
   proyecto_padre_id?: number | null;
   subproyectos_count?: number;
   nombre_padre?: string;
@@ -73,5 +76,9 @@ export interface ProjectUpdateRequest {
   premortem?: string;
   prioridad?: string;
   fecha_limite?: string;
+  fecha_inicio?: string;
   proyecto_padre_id?: number | null;
+  /** true quita la fecha al actualizar. */
+  clear_fecha_inicio?: boolean;
+  clear_fecha_limite?: boolean;
 }
