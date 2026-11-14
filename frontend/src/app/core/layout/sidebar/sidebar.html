@@ -90,6 +90,20 @@
       </a>
       <a
         (click)="sidebar.close()"
+        routerLink="/calendario"
+        routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
+        #calendarLink="routerLinkActive"
+        [class.text-on-primary]="calendarLink.isActive"
+        [class.text-text-main]="!calendarLink.isActive"
+        [class]="calendarLink.isActive ? 'hover:bg-primary-hover' : 'hover:bg-surface-border/60'"
+        ariaCurrentWhenActive="page"
+        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent transition-all text-sm font-medium group cursor-pointer"
+      >
+        <svg lucideCalendarDays class="w-4 h-4 group-hover:scale-105 transition-transform" />
+        <span>Calendario</span>
+      </a>
+      <a
+        (click)="sidebar.close()"
         routerLink="/crm"
         routerLinkActive="bg-primary font-semibold border-primary/30 shadow-xs"
         #crmLink="routerLinkActive"

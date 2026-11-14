@@ -1,0 +1,280 @@
+<div class="max-w-7xl mx-auto flex flex-col gap-3.5 pb-20 md:pb-0">
+  <header class="flex items-center justify-between gap-3">
+    <h1 class="text-2xl font-bold text-text-main">Calendario</h1>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="nuevaActividad()"
+        class="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover"
+      >
+        <svg lucidePlus class="w-4 h-4" aria-hidden="true" />
+        Nueva actividad
+      </button>
+      <button
+        type="button"
+        (click)="irAHoy()"
+        class="h-10 px-4 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-surface"
+      >
+        Hoy
+      </button>
+    </div>
+  </header>
+
+  <div class="flex flex-col md:flex-row md:items-center gap-3">
+    <div class="flex items-center gap-2 md:flex-1">
+      <button
+        type="button"
+        (click)="mover(-1)"
+        aria-label="Anterior"
+        class="w-11 h-11 rounded-lg border border-surface-border flex items-center justify-center text-text-main hover:bg-surface"
+      >
+        <svg lucideChevronLeft class="w-5 h-5" aria-hidden="true" />
+      </button>
+      <h2
+        aria-live="polite"
+        class="flex-1 md:flex-none md:min-w-56 text-center text-[17px] md:text-xl font-semibold text-text-main"
+      >
+        {{ periodo() }}
+      </h2>
+      <button
+        type="button"
+        (click)="mover(1)"
+        aria-label="Siguiente"
+        class="w-11 h-11 rounded-lg border border-surface-border flex items-center justify-center text-text-main hover:bg-surface"
+      >
+        <svg lucideChevronRight class="w-5 h-5" aria-hidden="true" />
+      </button>
+    </div>
+    <div
+      role="group"
+      aria-label="Vista"
+      class="flex gap-1 p-1 rounded-xl bg-surface border border-surface-border md:w-96"
+    >
+      @for (v of vistas; track v.valor) {
+        <button
+          type="button"
+          [attr.aria-pressed]="vista() === v.valor"
+          (click)="cambiarVista(v.valor)"
+          class="flex-1 h-9 rounded-lg text-[13px] font-semibold transition-colors"
+          [class.bg-primary]="vista() === v.valor"
+          [class.text-on-primary]="vista() === v.valor"
+          [class.text-text-muted]="vista() !== v.valor"
+        >
+          {{ v.nombre }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <app-calendario-capas
+    [capas]="capas()"
+    (alternar)="alternarCapa($event)"
+    (ciclo)="abrirCiclo($event)"
+    (gestionar)="abrirGestion()"
+  />
+
+  @if (resumen(); as r) {
+    <app-calendario-franja [resumen]="r" [hoy]="hoy" (abrirDia)="abrirDia($event)" />
+  }
+
+  @if (sinCalendarios()) {
+    <p class="text-sm text-text-muted">
+      Ya ves tus deadlines. Para sumar turnos u horarios,
+      <button
+        type="button"
+        class="font-semibold text-primary-text hover:underline"
+        (click)="abrirGestion()"
+      >
+        crea un calendario</button
+      >.
+    </p>
+  }
+
+  @if (error()) {
+    <p class="text-sm text-danger" role="alert">{{ error() }}</p>
+  }
+
+  @if (rango(); as r) {
+    <div
+      class="flex flex-col gap-5 lg:grid lg:gap-6 lg:items-start"
+      [class]="conAgenda() ? 'lg:grid-cols-[minmax(0,1fr)_20rem]' : ''"
+      [class.opacity-60]="cargando()"
+      [attr.aria-busy]="cargando()"
+    >
+      <div class="min-w-0">
+        @switch (vista()) {
+          @case ('mes') {
+            <app-calendario-mes
+              [rango]="r"
+              [dias]="dias()"
+              [visibles]="visibles()"
+              [cursor]="cursor()"
+              [seleccionado]="cursor()"
+              [hoy]="hoy"
+              (elegir)="elegirDia($event)"
+              (abrirDia)="abrirDia($event)"
+            />
+          }
+          @case ('tres') {
+            <app-calendario-tres-meses
+              [rango]="r"
+              [dias]="dias()"
+              [visibles]="visibles()"
+              [cursor]="cursor()"
+              [hoy]="hoy"
+              (abrirDia)="abrirDia($event)"
+            />
+          }
+          @case ('sem') {
+            <app-calendario-semana
+              [rango]="r"
+              [dias]="dias()"
+              [visibles]="visibles()"
+              [cursor]="cursor()"
+              [hoy]="hoy"
+              [frente]="frente()"
+              (abrirDia)="abrirDia($event)"
+              (tocarBloque)="tocarBloque($event)"
+            />
+          }
+          @case ('dia') {
+            <div class="flex flex-col md:flex-row-reverse gap-4 md:items-start">
+              <div class="md:w-80 shrink-0">
+                <app-calendario-agenda
+                  [info]="seleccionado()"
+                  [hoy]="hoy"
+                  (abrirTurno)="abrirTurno($event)"
+                  (abrirActividad)="abrirOcurrencia($event)"
+                  (abrirDeadline)="abrirDeadline($event)"
+                />
+              </div>
+              <div class="flex-1 min-w-0">
+                <app-calendario-dia
+                  [fecha]="cursor()"
+                  [dias]="dias()"
+                  [turnosVisibles]="turnosVisibles()"
+                  [frente]="frente()"
+                  (tocarBloque)="tocarBloque($event)"
+                />
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      @if (conAgenda()) {
+        <aside
+          class="border-t border-surface-border pt-3 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6"
+        >
+          <app-calendario-agenda
+            [info]="seleccionado()"
+            [hoy]="hoy"
+            (abrirTurno)="abrirTurno($event)"
+            (abrirActividad)="abrirOcurrencia($event)"
+            (abrirDeadline)="abrirDeadline($event)"
+          />
+        </aside>
+      }
+    </div>
+  } @else if (cargando()) {
+    <p class="text-sm text-text-muted" role="status">Cargando calendario…</p>
+  }
+</div>
+
+<button
+  type="button"
+  (click)="nuevaActividad()"
+  aria-label="Nueva actividad"
+  class="md:hidden fixed right-4 bottom-24 z-30 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center"
+>
+  <svg lucidePlus class="w-6 h-6" aria-hidden="true" />
+</button>
+
+@if (hoja(); as h) {
+  <app-calendario-hoja [titulo]="tituloHoja()" (cerrar)="cerrarHoja()">
+    @switch (h.tipo) {
+      @case ('gestion') {
+        <app-calendario-gestion
+          [calendarios]="calendarios()"
+          [guardando]="guardando()"
+          (crear)="crearCalendario($event)"
+          (eliminar)="eliminarCalendario($event)"
+          (ciclo)="abrirCiclo($event.id)"
+        />
+      }
+      @case ('ciclo') {
+        @if (h.tipo === 'ciclo') {
+          <app-calendario-form-ciclo
+            [calendario]="h.calendario"
+            [sugerido]="cursor()"
+            [guardando]="guardando()"
+            (guardar)="guardarCiclo(h.calendario, $event)"
+            (cancelar)="cerrarHoja()"
+          />
+        }
+      }
+      @case ('turno') {
+        @if (h.tipo === 'turno') {
+          <app-calendario-form-turno-dia
+            [calendario]="h.calendario"
+            [turno]="turnoDeHoja()"
+            [guardando]="guardando()"
+            (elegir)="elegirTurno(h.calendario, h.fecha, $event)"
+            (volver)="volverAlCiclo(h.calendario, h.fecha)"
+            (ajustarCiclo)="abrirCiclo(h.calendario.id)"
+          />
+        }
+      }
+      @case ('actividad') {
+        @if (h.tipo === 'actividad') {
+          <app-calendario-form-actividad
+            [calendarios]="calendariosActividades()"
+            [actividad]="h.actividad"
+            [fechaInicial]="h.fecha"
+            [ocupado]="ocupado"
+            [guardando]="guardando()"
+            (guardar)="guardarActividad($event)"
+            (cancelar)="cerrarHoja()"
+          />
+        }
+      }
+      @case ('ocurrencia') {
+        @if (h.tipo === 'ocurrencia') {
+          <div class="flex flex-col gap-3">
+            <p class="text-sm text-text-muted">{{ rotuloOcurrencia(h.actividad) }}</p>
+            @if (h.actividad.choques.length && !h.actividad.cancelada) {
+              <p class="text-sm font-semibold text-danger">
+                Choca con {{ h.actividad.choques.join(' y ') }}
+              </p>
+            }
+            @if (h.actividad.semanal) {
+              <button
+                type="button"
+                [disabled]="guardando()"
+                (click)="alternarCancelacion(h.actividad)"
+                class="min-h-11 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-background"
+              >
+                {{ h.actividad.cancelada ? 'Sí ocurre este día' : 'No ocurre este día' }}
+              </button>
+            }
+            <button
+              type="button"
+              (click)="editarActividad(h.actividad)"
+              class="min-h-11 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-background"
+            >
+              Editar actividad
+            </button>
+            <button
+              type="button"
+              [disabled]="guardando()"
+              (click)="eliminarActividad(h.actividad)"
+              class="min-h-11 rounded-lg border border-danger/40 text-sm font-semibold text-danger hover:bg-danger/10"
+            >
+              {{ h.actividad.semanal ? 'Eliminar todas las semanas' : 'Eliminar actividad' }}
+            </button>
+          </div>
+        }
+      }
+    }
+  </app-calendario-hoja>
+}

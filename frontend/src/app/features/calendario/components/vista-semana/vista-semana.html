@@ -1,0 +1,115 @@
+<div
+  class="border border-surface-border rounded-xl overflow-hidden bg-background [--h:30px] [--ind:10px] md:[--h:40px] md:[--ind:16px]"
+>
+  <div
+    class="grid grid-cols-[1.625rem_repeat(7,minmax(0,1fr))] md:grid-cols-[3rem_repeat(7,minmax(0,1fr))] bg-surface border-b border-surface-border"
+  >
+    <span></span>
+    @for (d of semana(); track d.fecha) {
+      <button
+        type="button"
+        (click)="abrirDia.emit(d.fecha)"
+        [attr.aria-label]="d.aria"
+        class="min-h-11 min-w-0 flex flex-col items-center md:items-start justify-center gap-px py-1 md:px-2 border-l border-surface-border hover:bg-background/60"
+        [class.bg-background]="d.hoy"
+      >
+        <span
+          class="text-[11px] md:text-sm leading-4 font-semibold text-text-main whitespace-nowrap capitalize"
+          [class.font-bold]="d.hoy"
+          >{{ d.nombre.slice(0, 2) }}<span class="hidden md:inline">{{ d.nombre.slice(2) }}</span>
+          {{ d.numero }}</span
+        >
+        <span class="flex gap-1" aria-hidden="true">
+          @for (t of d.turnos; track t.clave) {
+            <span
+              class="text-[10px] md:text-xs leading-3 font-bold"
+              [class.underline]="t.cambio"
+              [class.decoration-dotted]="t.cambio"
+              [style.color]="t.trabaja ? t.color : 'var(--theme-text-muted)'"
+              >{{ t.corto }}</span
+            >
+          }
+        </span>
+      </button>
+    }
+  </div>
+
+  @if (banda().filas) {
+    <div
+      class="grid grid-cols-[1.625rem_minmax(0,1fr)] md:grid-cols-[3rem_minmax(0,1fr)] border-b border-surface-border py-1"
+    >
+      <span></span>
+      <div
+        class="grid grid-cols-[repeat(168,minmax(0,1fr))] auto-rows-[18px] items-center"
+        aria-label="Deadlines de la semana"
+        role="list"
+      >
+        @for (b of banda().barras; track $index) {
+          <div
+            class="min-w-0 overflow-hidden flex items-center box-border"
+            [style]="b.estilo"
+            role="listitem"
+          >
+            <span
+              class="px-1 text-[10px] md:text-[11px] leading-3 font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
+              >{{ b.etiqueta }}</span
+            >
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div #scroll class="h-[470px] md:h-[600px] overflow-y-auto">
+    <div class="relative h-[calc(var(--h)*24)]">
+      @for (h of horas; track h.h) {
+        <div
+          class="absolute inset-x-0 h-(--h) border-t border-surface-border/50"
+          [style.top]="'calc(var(--h) * ' + h.h + ')'"
+        >
+          <span
+            class="block pl-1 md:pl-2 pt-px text-[10px] md:text-[11px] text-text-muted tabular-nums"
+            >{{ h.corto }}<span class="hidden md:inline">:00</span></span
+          >
+        </div>
+      }
+      <div class="absolute inset-y-0 left-[1.625rem] md:left-12 right-0 grid grid-cols-7">
+        @for (d of semana(); track d.fecha) {
+          <div class="relative border-l border-surface-border" [class.bg-surface/40]="d.hoy">
+            @for (t of d.tramos; track t.clave) {
+              <div
+                class="absolute w-1 rounded-full"
+                [style]="t.estilo"
+                role="img"
+                [attr.aria-label]="t.aria"
+              ></div>
+            }
+            @for (b of d.bloques; track b.clave) {
+              <button
+                type="button"
+                (click)="tocarBloque.emit(b)"
+                [attr.aria-label]="b.aria"
+                class="absolute right-0.5 flex flex-col items-stretch gap-px min-w-0 overflow-hidden text-left rounded md:rounded-md px-[3px] py-px md:px-1 md:py-0.5 text-text-main"
+                [style]="estilo(b)"
+              >
+                <span
+                  class="block text-[10px] md:text-[11px] leading-3 md:leading-[14px] font-semibold truncate"
+                  [class.line-through]="b.actividad.cancelada"
+                  >{{ b.actividad.titulo }}</span
+                >
+                <span
+                  class="hidden md:block text-[10px] leading-3 text-text-muted whitespace-nowrap"
+                  >{{ b.actividad.hora_inicio }}–{{ b.actividad.hora_fin }}</span
+                >
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+<p class="mt-2 text-xs text-text-muted">
+  Si dos actividades se solapan, la que empieza después se monta corrida a la derecha; toca la de
+  atrás para traerla al frente y tócala otra vez para ver sus opciones.
+</p>

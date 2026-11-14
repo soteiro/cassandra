@@ -9,6 +9,7 @@ import { useToggle } from '../../../shared/utils/use-toggle';
 import {
   LucideHouse,
   LucideFolder,
+  LucideCalendarDays,
   LucideLogOut,
   LucideSearch,
   LucideX,
@@ -26,6 +27,7 @@ import {
     RouterLinkActive,
     LucideHouse,
     LucideFolder,
+    LucideCalendarDays,
     LucideLogOut,
     LucideSearch,
     LucideX,

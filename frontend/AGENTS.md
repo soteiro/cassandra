@@ -76,7 +76,7 @@ src/app/
         └── utils/                # pure functions
 ```
 
-- Features with pages: `auth`, `configuracion`, `crm`, `docs`, `finanzas`, `home`, `proyectos`, `revision`, `ticktick`.
+- Features with pages: `auth`, `calendario`, `configuracion`, `crm`, `docs`, `finanzas`, `home`, `proyectos`, `revision`, `ticktick`.
 - Cross-cutting features without routes: `actividad`, `notas`, `tareas`.
 
 ### Where new code goes
