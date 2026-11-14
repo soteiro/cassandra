@@ -137,3 +137,35 @@ test.describe('calendario', () => {
     await expect(agenda.getByText(`Fono ${sufijo}`, { exact: true })).toBeVisible();
   });
 });
+
+test('ninguna vista se sale de la pantalla a lo ancho', async ({ page, request }, testInfo) => {
+  const sufijo = uniqueName('ancho', testInfo);
+  // Varios calendarios con nombres largos: es lo que hacía desbordar los filtros.
+  await sembrar(request, `con un nombre bastante largo ${sufijo}`, diaBase(testInfo, 3));
+  await post(request, '/api/calendarios', {
+    nombre: `Mamá · actividades ${sufijo}`,
+    tipo: 'actividades',
+  });
+  await page.goto('/calendario');
+  const ancho = page.viewportSize()!.width;
+  const filtros = page.getByRole('group', { name: 'Calendarios visibles' }).getByRole('button');
+  await expect(filtros.last()).toBeVisible();
+  for (const filtro of await filtros.all()) {
+    const caja = (await filtro.boundingBox())!;
+    expect(caja.x + caja.width, `${await filtro.textContent()} se sale`).toBeLessThanOrEqual(ancho);
+  }
+  for (const vista of ['3 meses', 'Mes', 'Semana', 'Día']) {
+    await page.getByRole('button', { name: vista, exact: true }).click();
+    const desborde = await page.evaluate(() =>
+      [document.documentElement, ...document.querySelectorAll('main')].some(
+        (el) => el.scrollWidth > el.clientWidth + 1,
+      ),
+    );
+    expect(desborde, `la vista ${vista} se sale a lo ancho`).toBe(false);
+    if (process.env['CAPTURAS_DIR'] && vista === 'Mes') {
+      await page.screenshot({
+        path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-filtros.png`,
+      });
+    }
+  }
+});
