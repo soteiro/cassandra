@@ -169,3 +169,34 @@ test('ninguna vista se sale de la pantalla a lo ancho', async ({ page, request }
     }
   }
 });
+
+test('edita el nombre y el color de un calendario', async ({ page, request }, testInfo) => {
+  const sufijo = uniqueName('editar', testInfo);
+  const cal = await post<{ id: number; nombre: string }>(request, '/api/calendarios', {
+    nombre: `Hijo ${sufijo}`,
+    tipo: 'actividades',
+    color: '#58a6ff',
+  });
+  await page.goto('/calendario');
+  await page.getByRole('button', { name: 'Calendarios…' }).click();
+  const hoja = page.getByRole('dialog', { name: 'Calendarios' });
+  await hoja.getByRole('button', { name: `Editar ${cal.nombre}` }).click();
+  const form = hoja.getByRole('form', { name: `Editar ${cal.nombre}` });
+  await form.getByLabel('Nombre').fill(`Hijo terapias ${sufijo}`);
+  await form.getByRole('button', { name: 'Fucsia' }).click();
+  if (process.env['CAPTURAS_DIR']) {
+    await page.screenshot({
+      path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-editar.png`,
+    });
+  }
+  await form.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page.getByText('Calendario actualizado')).toBeVisible();
+
+  const filtro = page
+    .getByRole('group', { name: 'Calendarios visibles' })
+    .getByRole('button', { name: `Hijo terapias ${sufijo}` });
+  await expect(filtro).toBeVisible();
+  const res = await request.get('/api/calendarios');
+  const guardado = (await res.json()).find((c: { id: number }) => c.id === cal.id);
+  expect(guardado).toMatchObject({ nombre: `Hijo terapias ${sufijo}`, color: '#db61a2' });
+});

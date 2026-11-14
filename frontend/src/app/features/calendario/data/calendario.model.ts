@@ -102,12 +102,23 @@ export const TURNOS: Record<CodigoTurno, InfoTurno> = {
 
 export const CICLO_CUARTO_TURNO: CodigoTurno[] = ['L', 'N', 'S', 'F'];
 
-/** Colores para calendarios propios: distintos entre sí también en luminosidad. */
-export const COLORES_CALENDARIO = [
-  '#c297ff',
-  '#58a6ff',
-  '#3fb9a0',
-  '#f778ba',
-  '#ff9e64',
-  '#a5b4c4',
+/**
+ * Colores para calendarios propios, con nombre para lectores de pantalla. Evitan el amarillo
+ * y el rojo, que ya significan deadline y vencido.
+ */
+export const PALETA_CALENDARIO: { color: string; nombre: string }[] = [
+  { color: '#c297ff', nombre: 'Violeta' },
+  { color: '#8b93ff', nombre: 'Índigo' },
+  { color: '#58a6ff', nombre: 'Azul' },
+  { color: '#56d4dd', nombre: 'Celeste' },
+  { color: '#3fb9a0', nombre: 'Turquesa' },
+  { color: '#7ee787', nombre: 'Verde' },
+  { color: '#b5bd68', nombre: 'Oliva' },
+  { color: '#f778ba', nombre: 'Rosa' },
+  { color: '#db61a2', nombre: 'Fucsia' },
+  { color: '#ff9e64', nombre: 'Naranja' },
+  { color: '#b08968', nombre: 'Café' },
+  { color: '#a5b4c4', nombre: 'Gris' },
 ];
+
+export const COLORES_CALENDARIO = PALETA_CALENDARIO.map((p) => p.color);

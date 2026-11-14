@@ -50,7 +50,10 @@ import {
   CalendarioFormActividad,
   GuardarActividad,
 } from '../../components/form-actividad/form-actividad';
-import { CalendarioGestion } from '../../components/gestion-calendarios/gestion-calendarios';
+import {
+  CalendarioGestion,
+  EditarCalendario,
+} from '../../components/gestion-calendarios/gestion-calendarios';
 
 type Vista = 'tres' | 'mes' | 'sem' | 'dia';
 
@@ -460,6 +463,15 @@ export class CalendarioPage {
       // Un calendario de turnos sin ciclo no tiene días: se pide de inmediato.
       if (cal.tipo === 'turnos') this.hoja.set({ tipo: 'ciclo', calendario: cal });
     });
+  }
+
+  /** La hoja sigue abierta para seguir ajustando otros calendarios. */
+  actualizarCalendario(e: EditarCalendario) {
+    this.ejecutar(
+      this.service.actualizarCalendario(e.id, { nombre: e.nombre, color: e.color }),
+      'Calendario actualizado',
+      () => {},
+    );
   }
 
   eliminarCalendario(cal: Calendario) {
