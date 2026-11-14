@@ -1,0 +1,89 @@
+<div class="flex flex-col md:border md:border-surface-border md:rounded-xl md:overflow-hidden">
+  <div
+    class="grid grid-cols-7 md:bg-surface md:border-b md:border-surface-border"
+    aria-hidden="true"
+  >
+    @for (d of cabecera; track $index) {
+      <div
+        class="py-1 md:px-2 md:py-2 text-center md:text-left text-xs font-semibold text-text-muted capitalize"
+      >
+        <span class="md:hidden">{{ d.charAt(0) }}</span>
+        <span class="hidden md:inline">{{ d }}</span>
+      </div>
+    }
+  </div>
+
+  @for (s of semanas(); track s.lunes) {
+    <div class="relative" [style.--alto-barras]="s.altoBarras + 'px'">
+      <div class="grid grid-cols-7">
+        @for (c of s.celdas; track c.fecha) {
+          <button
+            type="button"
+            [attr.aria-label]="c.aria"
+            [attr.aria-pressed]="c.seleccionada"
+            (click)="elegir.emit(c.fecha)"
+            (dblclick)="abrirDia.emit(c.fecha)"
+            class="min-w-0 flex flex-col items-center md:items-stretch gap-[3px] pt-[3px] pb-1 md:px-1 rounded-lg md:rounded-none md:border-r md:border-b md:border-surface-border min-h-[calc(3.125rem+var(--alto-barras))] md:min-h-[calc(5.5rem+var(--alto-barras))] transition-colors"
+            [class.opacity-40]="!c.enMes"
+            [class.bg-surface]="c.seleccionada"
+            [class.ring-1]="c.seleccionada"
+            [class.ring-inset]="c.seleccionada"
+            [class.ring-text-muted]="c.seleccionada"
+          >
+            <span
+              class="w-[26px] h-[26px] shrink-0 self-center md:self-start rounded-full flex items-center justify-center text-sm"
+              [class.bg-primary]="c.hoy"
+              [class.text-on-primary]="c.hoy"
+              [class.font-bold]="c.hoy"
+              [class.text-text-main]="!c.hoy"
+              >{{ c.numero }}</span
+            >
+            <span class="block shrink-0 h-(--alto-barras)" aria-hidden="true"></span>
+
+            <!-- Celular: puntos por calendario. Escritorio: las primeras actividades. -->
+            <span class="flex md:hidden gap-[3px] h-[7px] items-center" aria-hidden="true">
+              @for (p of c.puntos; track p.clave) {
+                <span class="w-[5px] h-[5px] rounded-full" [style.background]="p.color"></span>
+              }
+              @if (c.choque) {
+                <span class="w-[7px] h-[7px] rounded-full border-[1.5px] border-danger"></span>
+              }
+            </span>
+            <span class="hidden md:flex flex-col gap-0.5 min-w-0" aria-hidden="true">
+              @for (a of c.chips; track a.actividad_id) {
+                <span
+                  class="block text-xs leading-4 px-1.5 py-0.5 rounded-md truncate text-text-main"
+                  [class.ring-1]="a.choques.length"
+                  [class.ring-danger]="a.choques.length"
+                  [style.background]="
+                    'color-mix(in srgb, ' + a.color + ' 22%, var(--theme-background))'
+                  "
+                  >{{ a.hora_inicio }} {{ a.titulo }}</span
+                >
+              }
+            </span>
+            @if (c.mas) {
+              <span class="text-[10px] md:text-[11px] leading-3 text-text-muted md:px-1.5"
+                >+{{ c.mas }}<span class="hidden md:inline"> más</span></span
+              >
+            }
+          </button>
+        }
+      </div>
+
+      <div
+        aria-hidden="true"
+        class="absolute inset-x-0 top-[32px] grid grid-cols-[repeat(168,minmax(0,1fr))] auto-rows-[18px] items-center pointer-events-none"
+      >
+        @for (b of s.barras; track $index) {
+          <div class="min-w-0 overflow-hidden flex items-center box-border" [style]="b.estilo">
+            <span
+              class="px-1 text-[10px] md:text-[11px] leading-3 font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
+              >{{ b.etiqueta }}</span
+            >
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

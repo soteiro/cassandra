@@ -1,0 +1,15 @@
+info:
+  name: Cancelar un dia
+  type: http
+  seq: 13
+
+http:
+  method: PUT
+  url: "{{base_url}}/api/calendario/actividades/1/cancelaciones/2026-11-27"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

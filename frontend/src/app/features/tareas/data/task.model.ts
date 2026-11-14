@@ -15,6 +15,9 @@ export interface Task {
   fecha_terminado?: string | null;
   fecha_actualizacion?: string;
   tarea_padre_id?: number | null;
+  /** Medianoche UTC del día (ver diaAISO). */
+  fecha_inicio?: string | null;
+  fecha_limite?: string | null;
   subtareas?: Task[];
 }
 
@@ -27,4 +30,9 @@ export interface TaskRequest {
   user_id?: number;
   proyect_id: number;
   tarea_padre_id?: number | null;
+  fecha_inicio?: string;
+  fecha_limite?: string;
+  /** true quita la fecha al actualizar. */
+  clear_fecha_inicio?: boolean;
+  clear_fecha_limite?: boolean;
 }

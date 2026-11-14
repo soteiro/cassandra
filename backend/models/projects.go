@@ -20,6 +20,7 @@ type Projects struct {
 	Premortem       string     `json:"premortem"`
 	Prioridad       string     `json:"prioridad"`
 	FechaLimite     *time.Time `json:"fecha_limite"`
+	FechaInicio     *time.Time `json:"fecha_inicio"`
 	ProyectoPadreID *int       `json:"proyecto_padre_id"`
 }
 
@@ -35,6 +36,7 @@ type ProjectRequest struct {
 	Premortem            string     `json:"premortem"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	FechaInicio          *time.Time `json:"fecha_inicio"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
 
@@ -54,6 +56,7 @@ type ProjectResponse struct {
 	Premortem            string     `json:"premortem"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	FechaInicio          *time.Time `json:"fecha_inicio"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 	SubproyectosCount    int        `json:"subproyectos_count"`
 	NombrePadre          *string    `json:"nombre_padre,omitempty"`
@@ -73,7 +76,11 @@ type ProjectUpdateRequest struct {
 	Premortem            *string    `json:"premortem"`
 	Prioridad            *string    `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	FechaInicio          *time.Time `json:"fecha_inicio"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
+	// true quita la fecha (con COALESCE no se puede mandar null).
+	ClearFechaInicio *bool `json:"clear_fecha_inicio,omitempty"`
+	ClearFechaLimite *bool `json:"clear_fecha_limite,omitempty"`
 }
 
 type ProjectUpdateResponse struct {
@@ -89,5 +96,6 @@ type ProjectUpdateResponse struct {
 	Premortem            string     `json:"premortem"`
 	Prioridad            string     `json:"prioridad"`
 	FechaLimite          *time.Time `json:"fecha_limite"`
+	FechaInicio          *time.Time `json:"fecha_inicio"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }

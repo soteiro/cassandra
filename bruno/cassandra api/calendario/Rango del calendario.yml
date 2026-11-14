@@ -1,0 +1,15 @@
+info:
+  name: Rango del calendario
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/api/calendario?desde=2026-11-16&hasta=2026-11-22&hoy=2026-11-14"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

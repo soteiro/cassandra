@@ -15,6 +15,7 @@ import { BackButtonService } from '../../../../core/platform/back-button.service
 import { PronosticoService } from '../../data/pronostico.service';
 import { ProjectService } from '../../data/project.service';
 import { fechaProbable, formatoFactor } from '../../utils/pronostico.util';
+import { diaAISO, isoADia } from '../../../../shared/utils/fecha.util';
 import { LucideSparkles, LucidePencil, LucideLayers, LucideX } from '@lucide/angular';
 
 @Component({
@@ -57,6 +58,7 @@ export class ProjectModal {
   prioridad = signal('Media');
   estado = signal('No Listado');
   fecha_limite = signal('');
+  fecha_inicio = signal('');
   proyecto_padre_id = signal<number | null>(null);
 
   errorMessage = signal('');
@@ -122,6 +124,7 @@ export class ProjectModal {
           this.prioridad.set(data.prioridad || 'Media');
           this.estado.set(data.estado || 'No Listado');
           this.fecha_limite.set(data.fecha_limite ? data.fecha_limite.split('T')[0] : '');
+          this.fecha_inicio.set(isoADia(data.fecha_inicio));
           this.proyecto_padre_id.set(data.proyecto_padre_id || null);
         } else if (m === 'create-subproject' && parent) {
           this.nombre.set('');
@@ -134,6 +137,7 @@ export class ProjectModal {
           this.prioridad.set('Media');
           this.estado.set('No Listado');
           this.fecha_limite.set('');
+          this.fecha_inicio.set('');
           this.proyecto_padre_id.set(parent.id);
         } else {
           // create mode
@@ -147,6 +151,7 @@ export class ProjectModal {
           this.prioridad.set('Media');
           this.estado.set('No Listado');
           this.fecha_limite.set('');
+          this.fecha_inicio.set('');
           this.proyecto_padre_id.set(null);
         }
       }
@@ -181,10 +186,22 @@ export class ProjectModal {
       premortem: this.premortem().trim(),
       prioridad: this.prioridad(),
       fecha_limite: this.fecha_limite() ? new Date(this.fecha_limite()).toISOString() : undefined,
+      fecha_inicio: diaAISO(this.fecha_inicio()) ?? undefined,
     };
+    if (
+      payload.fecha_inicio &&
+      payload.fecha_limite &&
+      payload.fecha_inicio > payload.fecha_limite
+    ) {
+      this.errorMessage.set('La fecha de inicio no puede ser posterior a la fecha límite');
+      return;
+    }
 
     if (this.mode() === 'edit') {
       payload.estado = this.estado();
+      // Con COALESCE no se puede mandar null: borrar la fecha va con su bandera.
+      if (!payload.fecha_inicio) payload.clear_fecha_inicio = true;
+      if (!payload.fecha_limite) payload.clear_fecha_limite = true;
       const cumplido = this.retroParaQue().trim();
       const aprendido = this.retroAprendizaje().trim();
       if (this.cerrandoProyecto() && (cumplido || aprendido)) {

@@ -1,4 +1,4 @@
-import { haceCuanto, inicioDeSemana, sumarSemanas } from './fecha.util';
+import { diaAISO, haceCuanto, inicioDeSemana, isoADia, sumarSemanas } from './fecha.util';
 
 describe('inicioDeSemana', () => {
   it('devuelve el lunes 00:00 local', () => {
@@ -42,5 +42,18 @@ describe('haceCuanto', () => {
   it('sin fecha o inválida devuelve vacío', () => {
     expect(haceCuanto(null, ahora)).toBe('');
     expect(haceCuanto('no-es-fecha', ahora)).toBe('');
+  });
+});
+
+describe('diaAISO / isoADia', () => {
+  it('convierte un día a la medianoche UTC y de vuelta sin correrse por la zona horaria', () => {
+    expect(diaAISO('2026-11-30')).toBe('2026-11-30T00:00:00.000Z');
+    expect(isoADia('2026-11-30T00:00:00Z')).toBe('2026-11-30');
+  });
+
+  it('trata lo vacío o inválido como sin fecha', () => {
+    expect(diaAISO('')).toBeNull();
+    expect(diaAISO('30/11/2026')).toBeNull();
+    expect(isoADia(null)).toBe('');
   });
 });

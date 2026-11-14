@@ -87,8 +87,8 @@ func (r *RevisionRepository) List(ctx context.Context, userID, limit int) ([]mod
 
 func (r *RevisionRepository) Preferencias(ctx context.Context, userID int) (*models.Preferencias, error) {
 	var p models.Preferencias
-	err := r.db.QueryRow(ctx, `SELECT dia_revision, limite_en_curso FROM users WHERE id = $1 AND eliminado = false`, userID).
-		Scan(&p.DiaRevision, &p.LimiteEnCurso)
+	err := r.db.QueryRow(ctx, `SELECT dia_revision, limite_en_curso, calendario_ocultar_deadlines FROM users WHERE id = $1 AND eliminado = false`, userID).
+		Scan(&p.DiaRevision, &p.LimiteEnCurso, &p.OcultarDeadlines)
 	if err != nil {
 		return nil, err
 	}
@@ -98,10 +98,11 @@ func (r *RevisionRepository) Preferencias(ctx context.Context, userID int) (*mod
 func (r *RevisionRepository) UpdatePreferencias(ctx context.Context, userID int, req *models.PreferenciasUpdate) (*models.Preferencias, error) {
 	var p models.Preferencias
 	err := r.db.QueryRow(ctx, `
-		UPDATE users SET dia_revision = COALESCE($1, dia_revision), limite_en_curso = COALESCE($2, limite_en_curso)
+		UPDATE users SET dia_revision = COALESCE($1, dia_revision), limite_en_curso = COALESCE($2, limite_en_curso),
+			calendario_ocultar_deadlines = COALESCE($4, calendario_ocultar_deadlines)
 		WHERE id = $3 AND eliminado = false
-		RETURNING dia_revision, limite_en_curso`, req.DiaRevision, req.LimiteEnCurso, userID).
-		Scan(&p.DiaRevision, &p.LimiteEnCurso)
+		RETURNING dia_revision, limite_en_curso, calendario_ocultar_deadlines`, req.DiaRevision, req.LimiteEnCurso, userID, req.OcultarDeadlines).
+		Scan(&p.DiaRevision, &p.LimiteEnCurso, &p.OcultarDeadlines)
 	if err != nil {
 		log.Printf("[REPO:Revision.UpdatePreferencias] Error en SQL: %v | user_id=%d", err, userID)
 		return nil, err

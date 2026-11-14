@@ -1,0 +1,15 @@
+info:
+  name: Restaurar un dia
+  type: http
+  seq: 14
+
+http:
+  method: DELETE
+  url: "{{base_url}}/api/calendario/actividades/1/cancelaciones/2026-11-27"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

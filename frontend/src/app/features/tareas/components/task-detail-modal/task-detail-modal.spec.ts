@@ -197,6 +197,28 @@ describe('TaskDetailModal', () => {
       expect(taskService.updateTask).not.toHaveBeenCalled();
     });
 
+    it('sends the dates as UTC midnight and rejects a start after the due date', () => {
+      open(makeTask({ fecha_limite: '2026-11-30T00:00:00Z' }));
+      expect(component.fechaLimite()).toBe('2026-11-30');
+
+      component.fechaInicio.set('2026-12-01');
+      component.saveTask();
+      expect(toast.error).toHaveBeenCalledWith(
+        'La fecha de inicio no puede ser posterior a la fecha límite',
+      );
+      expect(taskService.updateTask).not.toHaveBeenCalled();
+
+      component.fechaInicio.set('2026-11-20');
+      component.saveTask();
+      expect(taskService.updateTask).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({
+          fecha_inicio: '2026-11-20T00:00:00.000Z',
+          fecha_limite: '2026-11-30T00:00:00.000Z',
+        }),
+      );
+    });
+
     it('should update the task, mutate it locally, emit and close', () => {
       const task = makeTask();
       open(task);
@@ -210,6 +232,9 @@ describe('TaskDetailModal', () => {
         comentario: 'com',
         estado: 'Terminado',
         prioridad: 'alta',
+        // Sin fechas: se piden vacías explícitamente (COALESCE no acepta null).
+        clear_fecha_inicio: true,
+        clear_fecha_limite: true,
       });
       expect(task.nombre).toBe('Renombrada');
       expect(task.estado).toBe('Terminado');

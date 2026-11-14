@@ -30,6 +30,7 @@ import {
 import { TaskStatusSelect } from '../task-status-select/task-status-select';
 import { TaskPrioritySelect } from '../task-priority-select/task-priority-select';
 import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
+import { diaAISO, isoADia } from '../../../../shared/utils/fecha.util';
 
 @Component({
   selector: 'app-task-detail-modal',
@@ -82,6 +83,9 @@ export class TaskDetailModal {
   comentario = signal('');
   estado = signal('Abierto');
   prioridad = signal<TaskPrioridad>('normal');
+  /** "YYYY-MM-DD" o vacío. */
+  fechaInicio = signal('');
+  fechaLimite = signal('');
 
   isSaving = signal(false);
   isDeleting = signal(false);
@@ -162,6 +166,8 @@ export class TaskDetailModal {
     this.comentario.set(t.comentario || '');
     this.estado.set(t.estado || 'Abierto');
     this.prioridad.set((t.prioridad as TaskPrioridad) || 'normal');
+    this.fechaInicio.set(isoADia(t.fecha_inicio));
+    this.fechaLimite.set(isoADia(t.fecha_limite));
     this.nuevaSubtareaNombre.set('');
     this.isSaving.set(false);
     this.isDeleting.set(false);
@@ -194,6 +200,13 @@ export class TaskDetailModal {
       return;
     }
 
+    const inicio = diaAISO(this.fechaInicio());
+    const limite = diaAISO(this.fechaLimite());
+    if (inicio && limite && inicio > limite) {
+      this.toastService.error('La fecha de inicio no puede ser posterior a la fecha límite');
+      return;
+    }
+
     this.isSaving.set(true);
 
     this.taskService
@@ -203,6 +216,8 @@ export class TaskDetailModal {
         comentario: this.comentario().trim(),
         estado: this.estado(),
         prioridad: this.prioridad(),
+        ...(inicio ? { fecha_inicio: inicio } : { clear_fecha_inicio: true }),
+        ...(limite ? { fecha_limite: limite } : { clear_fecha_limite: true }),
       })
       .subscribe({
         next: () => {
@@ -213,6 +228,8 @@ export class TaskDetailModal {
           t.comentario = this.comentario().trim();
           t.estado = this.estado();
           t.prioridad = this.prioridad();
+          t.fecha_inicio = inicio;
+          t.fecha_limite = limite;
           this.taskUpdated.emit();
           this.onClose();
         },

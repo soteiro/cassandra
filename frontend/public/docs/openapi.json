@@ -29,6 +29,10 @@
       "description": "Operaciones de Auth"
     },
     {
+      "name": "Calendario",
+      "description": "Operaciones de Calendario"
+    },
+    {
       "name": "Documentos proyectos",
       "description": "Operaciones de Documentos proyectos"
     },
@@ -516,6 +520,748 @@
             "description": "Error interno del servidor"
           }
         }
+      }
+    },
+    "{base_url}/api/calendario/actividades/{actividade_id}": {
+      "put": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Actualizar actividad",
+        "operationId": "put__base_url__api_calendario_actividades__actividade_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "actividade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de actividade"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Eliminar actividad",
+        "operationId": "delete__base_url__api_calendario_actividades__actividade_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "actividade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de actividade"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Obtener actividad",
+        "operationId": "get__base_url__api_calendario_actividades__actividade_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "actividade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de actividade"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendarios/{calendario_id}": {
+      "put": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Actualizar calendario",
+        "operationId": "put__base_url__api_calendarios__calendario_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "calendario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Eliminar calendario",
+        "operationId": "delete__base_url__api_calendarios__calendario_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "calendario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendario/actividades/{actividade_id}/cancelaciones/2026-11-27": {
+      "put": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Cancelar un dia",
+        "operationId": "put__base_url__api_calendario_actividades__actividade_id__cancelaciones_2026_11_27",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "actividade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de actividade"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Restaurar un dia",
+        "operationId": "delete__base_url__api_calendario_actividades__actividade_id__cancelaciones_2026_11_27",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "actividade_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de actividade"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendarios/{calendario_id}/actividades": {
+      "post": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Crear actividad",
+        "operationId": "post__base_url__api_calendarios__calendario_id__actividades",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "calendario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 2
+            },
+            "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendarios": {
+      "post": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Crear calendario",
+        "operationId": "post__base_url__api_calendarios",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Listar calendarios",
+        "operationId": "get__base_url__api_calendarios",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendarios/{calendario_id}/ciclo": {
+      "put": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Fijar ciclo",
+        "operationId": "put__base_url__api_calendarios__calendario_id__ciclo",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "calendario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendarios/{calendario_id}/excepciones/2026-11-15": {
+      "put": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Marcar excepcion",
+        "operationId": "put__base_url__api_calendarios__calendario_id__excepciones_2026_11_15",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "calendario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Quitar excepcion",
+        "operationId": "delete__base_url__api_calendarios__calendario_id__excepciones_2026_11_15",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "calendario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendario?desde=2026-11-16&hasta=2026-11-22&hoy=2026-11-14": {
+      "get": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Rango del calendario",
+        "operationId": "get__base_url__api_calendario_desde_2026_11_16_hasta_2026_11_22_hoy_2026_11_14",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "{base_url}/api/proyects/{proyecto_id}/documentos": {

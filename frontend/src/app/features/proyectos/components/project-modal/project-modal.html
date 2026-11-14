@@ -218,6 +218,24 @@
           }
 
           <div [class.col-span-2]="mode() !== 'edit'">
+            <label for="proyectoFechaInicio" class="block text-text-main font-medium mb-1"
+              >Fecha de inicio (Opcional)</label
+            >
+            <input
+              id="proyectoFechaInicio"
+              type="date"
+              [ngModel]="fecha_inicio()"
+              (ngModelChange)="fecha_inicio.set($event ?? '')"
+              name="fecha_inicio"
+              [max]="fecha_limite() || null"
+              class="w-full bg-background border border-surface-border focus:border-primary text-text-main rounded-xl p-2.5 outline-none transition-colors cursor-pointer"
+            />
+            <p class="mt-1.5 text-[11px] text-text-muted leading-snug">
+              Con inicio y límite, el proyecto se ve como una barra en el calendario.
+            </p>
+          </div>
+
+          <div [class.col-span-2]="mode() !== 'edit'">
             <label class="block text-text-main font-medium mb-1">Fecha Límite (Opcional)</label>
             <input
               type="date"
