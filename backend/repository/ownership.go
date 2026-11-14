@@ -18,6 +18,8 @@ const (
 	Banco              Recurso = "banco"
 	GrupoFinanzas      Recurso = "grupo de finanzas"
 	MovimientoEsperado Recurso = "movimiento esperado"
+	Calendario         Recurso = "calendario"
+	ActividadCal       Recurso = "actividad del calendario"
 )
 
 // Consultas fijas por recurso: nada del SQL proviene de la petición.
@@ -28,6 +30,9 @@ var ownershipQueries = map[Recurso]string{
 	Banco:              `SELECT EXISTS (SELECT 1 FROM banco WHERE id = $1 AND user_id = $2 AND eliminado = false)`,
 	GrupoFinanzas:      `SELECT EXISTS (SELECT 1 FROM grupo_item_finanzas WHERE id = $1 AND user_id = $2 AND eliminado = false)`,
 	MovimientoEsperado: `SELECT EXISTS (SELECT 1 FROM movimiento_esperado_finanzas WHERE id = $1 AND user_id = $2 AND eliminado = false)`,
+	Calendario:         `SELECT EXISTS (SELECT 1 FROM calendarios WHERE id = $1 AND user_id = $2 AND eliminado = false)`,
+	ActividadCal: `SELECT EXISTS (SELECT 1 FROM calendario_actividades a JOIN calendarios c ON c.id = a.calendario_id
+		WHERE a.id = $1 AND c.user_id = $2 AND a.eliminado = false AND c.eliminado = false)`,
 }
 
 // ErrNoEncontrado: el recurso referenciado no existe, está borrado o es de otro usuario.

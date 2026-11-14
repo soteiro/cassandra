@@ -1,0 +1,19 @@
+info:
+  name: Crear actividad
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{base_url}}/api/calendarios/2/actividades"
+  body:
+    type: json
+    data: |-
+      {"titulo": "Colegio", "fecha": "2026-03-02", "hora_inicio": "08:00", "hora_fin": "13:00", "dias_semana": [0, 1, 2, 3, 4], "hasta": "2026-12-18"}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

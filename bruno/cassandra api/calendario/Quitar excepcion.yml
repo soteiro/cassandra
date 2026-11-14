@@ -1,0 +1,15 @@
+info:
+  name: Quitar excepcion
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{base_url}}/api/calendarios/1/excepciones/2026-11-15"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

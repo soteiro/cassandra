@@ -1,0 +1,19 @@
+info:
+  name: Fijar ciclo
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: "{{base_url}}/api/calendarios/1/ciclo"
+  body:
+    type: json
+    data: |-
+      {"primer_largo": "2026-11-02"}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -23,10 +23,10 @@ func (r *ProjectRepository) Create(ctx context.Context, req *models.ProjectReque
 	var project models.ProjectResponse
 	query := `
 		INSERT INTO proyectos (
-			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id, premortem
+			nombre, descripcion, comentario, user_id, por_que, para_que, criterio_finalizacion, prioridad, fecha_limite, proyecto_padre_id, premortem, fecha_inicio
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NULLIF($11, ''))
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, por_que, para_que, criterio_finalizacion, COALESCE(premortem, ''), prioridad, fecha_limite, proyecto_padre_id
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NULLIF($11, ''), $12)
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, por_que, para_que, criterio_finalizacion, COALESCE(premortem, ''), prioridad, fecha_limite, fecha_inicio, proyecto_padre_id
 	`
 
 	if req.Prioridad == "" {
@@ -47,6 +47,7 @@ func (r *ProjectRepository) Create(ctx context.Context, req *models.ProjectReque
 		req.FechaLimite,
 		req.ProyectoPadreID,
 		req.Premortem,
+		req.FechaInicio,
 	).Scan(
 		&project.ID,
 		&project.Nombre,
@@ -62,6 +63,7 @@ func (r *ProjectRepository) Create(ctx context.Context, req *models.ProjectReque
 		&project.Premortem,
 		&project.Prioridad,
 		&project.FechaLimite,
+		&project.FechaInicio,
 		&project.ProyectoPadreID,
 	)
 
@@ -89,6 +91,7 @@ func (r *ProjectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 		COALESCE(p.premortem, ''),
 		p.prioridad,
 		p.fecha_limite,
+		p.fecha_inicio,
 		p.proyecto_padre_id,
 		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count,
 		padre.nombre as nombre_padre,
@@ -130,6 +133,7 @@ func (r *ProjectRepository) GetAll(ctx context.Context, UserID int) ([]models.Pr
 			&p.Premortem,
 			&p.Prioridad,
 			&p.FechaLimite,
+			&p.FechaInicio,
 			&p.ProyectoPadreID,
 			&p.SubproyectosCount,
 			&p.NombrePadre,
@@ -166,6 +170,7 @@ func (r *ProjectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 		COALESCE(p.premortem, ''),
 		p.prioridad,
 		p.fecha_limite,
+		p.fecha_inicio,
 		p.proyecto_padre_id,
 		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count,
 		padre.nombre as nombre_padre,
@@ -209,6 +214,7 @@ func (r *ProjectRepository) GetSubproyectos(ctx context.Context, parentID int, u
 			&p.Premortem,
 			&p.Prioridad,
 			&p.FechaLimite,
+			&p.FechaInicio,
 			&p.ProyectoPadreID,
 			&p.SubproyectosCount,
 			&p.NombrePadre,
@@ -266,7 +272,8 @@ func (r *ProjectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		p.criterio_finalizacion,
 		COALESCE(p.premortem, ''),
 		p.prioridad, 
-		p.fecha_limite, 
+		p.fecha_limite,
+		p.fecha_inicio,
 		p.proyecto_padre_id, 
 		(SELECT COUNT(*) FROM proyectos sub WHERE sub.proyecto_padre_id = p.id AND sub.user_id = p.user_id AND sub.eliminado = false) as subproyectos_count, 
 		padre.nombre as nombre_padre,
@@ -297,6 +304,7 @@ func (r *ProjectRepository) GetById(ctx context.Context, id int, userID int) (*m
 		&p.Premortem,
 		&p.Prioridad,
 		&p.FechaLimite,
+		&p.FechaInicio,
 		&p.ProyectoPadreID,
 		&p.SubproyectosCount,
 		&p.NombrePadre,
@@ -334,7 +342,8 @@ func (r *ProjectRepository) Update(ctx context.Context, id int, userID int, req 
 			para_que = COALESCE($6, para_que),
 			criterio_finalizacion = COALESCE($7, criterio_finalizacion),
 			prioridad = COALESCE($8, prioridad),
-			fecha_limite = COALESCE($9, fecha_limite),
+			fecha_limite = CASE WHEN $16 THEN NULL ELSE COALESCE($9, fecha_limite) END,
+			fecha_inicio = CASE WHEN $15 THEN NULL ELSE COALESCE($17, fecha_inicio) END,
 			proyecto_padre_id = COALESCE($10, proyecto_padre_id),
 			premortem = COALESCE($14, premortem),
 			fecha_terminado = CASE
@@ -345,7 +354,7 @@ func (r *ProjectRepository) Update(ctx context.Context, id int, userID int, req 
 		WHERE id = $12
 		AND user_id = $13
 		AND eliminado = false
-		RETURNING id, nombre, descripcion, comentario, estado, fecha_terminado, por_que, para_que, criterio_finalizacion, COALESCE(premortem, ''), prioridad, fecha_limite, proyecto_padre_id
+		RETURNING id, nombre, descripcion, comentario, estado, fecha_terminado, por_que, para_que, criterio_finalizacion, COALESCE(premortem, ''), prioridad, fecha_limite, fecha_inicio, proyecto_padre_id
 	`
 	err := r.db.QueryRow(
 		ctx,
@@ -364,6 +373,9 @@ func (r *ProjectRepository) Update(ctx context.Context, id int, userID int, req 
 		id,
 		userID,
 		req.Premortem,
+		req.ClearFechaInicio != nil && *req.ClearFechaInicio,
+		req.ClearFechaLimite != nil && *req.ClearFechaLimite,
+		req.FechaInicio,
 	).Scan(
 		&p.ID,
 		&p.Nombre,
@@ -377,6 +389,7 @@ func (r *ProjectRepository) Update(ctx context.Context, id int, userID int, req 
 		&p.Premortem,
 		&p.Prioridad,
 		&p.FechaLimite,
+		&p.FechaInicio,
 		&p.ProyectoPadreID,
 	)
 
