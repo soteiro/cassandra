@@ -96,7 +96,7 @@ describe('CalendarioPage', () => {
     expect(component.rango()?.calendarios).toHaveLength(2);
     const texto = fixture.nativeElement.textContent as string;
     expect(texto).toContain('Calendario');
-    expect(texto).toContain('1 vencidos');
+    expect(texto).toContain('1 vencido ·');
     expect(texto).toContain('1 choque');
   });
 
