@@ -1,66 +1,70 @@
 <div
   class="border border-surface-border rounded-xl overflow-hidden bg-background [--h:30px] [--ind:10px] md:[--h:40px] md:[--ind:16px]"
 >
-  <div
-    class="grid grid-cols-[1.625rem_repeat(7,minmax(0,1fr))] md:grid-cols-[3rem_repeat(7,minmax(0,1fr))] bg-surface border-b border-surface-border"
-  >
-    <span></span>
-    @for (d of semana(); track d.fecha) {
-      <button
-        type="button"
-        (click)="abrirDia.emit(d.fecha)"
-        [attr.aria-label]="d.aria"
-        class="min-h-11 min-w-0 flex flex-col items-center md:items-start justify-center gap-px py-1 md:px-2 border-l border-surface-border hover:bg-background/60"
-        [class.bg-background]="d.hoy"
-      >
-        <span
-          class="text-[11px] md:text-sm leading-4 font-semibold text-text-main whitespace-nowrap capitalize"
-          [class.font-bold]="d.hoy"
-          >{{ d.nombre.slice(0, 2) }}<span class="hidden md:inline">{{ d.nombre.slice(2) }}</span>
-          {{ d.numero }}</span
-        >
-        <span class="flex gap-1" aria-hidden="true">
-          @for (t of d.turnos; track t.clave) {
-            <span
-              class="text-[10px] md:text-xs leading-3 font-bold"
-              [class.underline]="t.cambio"
-              [class.decoration-dotted]="t.cambio"
-              [style.color]="t.trabaja ? t.color : 'var(--theme-text-muted)'"
-              >{{ t.corto }}</span
-            >
-          }
-        </span>
-      </button>
-    }
-  </div>
-
-  @if (banda().filas) {
-    <div
-      class="grid grid-cols-[1.625rem_minmax(0,1fr)] md:grid-cols-[3rem_minmax(0,1fr)] border-b border-surface-border py-1"
-    >
-      <span></span>
+  <!-- Encabezados y banda viven dentro del scroll (fijos arriba) para compartir el ancho con
+       la grilla: fuera de él, la barra de scroll angostaba las columnas y se desfasaban. -->
+  <div #scroll class="h-[470px] md:h-[600px] overflow-y-auto">
+    <div class="sticky top-0 z-50 bg-background">
       <div
-        class="grid grid-cols-[repeat(168,minmax(0,1fr))] auto-rows-[18px] items-center"
-        aria-label="Deadlines de la semana"
-        role="list"
+        class="grid grid-cols-[1.625rem_repeat(7,minmax(0,1fr))] md:grid-cols-[3rem_repeat(7,minmax(0,1fr))] bg-surface border-b border-surface-border"
       >
-        @for (b of banda().barras; track $index) {
-          <div
-            class="min-w-0 overflow-hidden flex items-center box-border"
-            [style]="b.estilo"
-            role="listitem"
+        <span></span>
+        @for (d of semana(); track d.fecha) {
+          <button
+            type="button"
+            (click)="abrirDia.emit(d.fecha)"
+            [attr.aria-label]="d.aria"
+            data-cabecera-dia
+            class="min-h-11 min-w-0 flex flex-col items-center md:items-start justify-center gap-px py-1 md:px-2 border-l border-surface-border hover:bg-background/60"
+            [class.bg-background]="d.hoy"
           >
             <span
-              class="px-1 text-[10px] md:text-[11px] leading-3 font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
-              >{{ b.etiqueta }}</span
+              class="text-[11px] md:text-sm leading-4 font-semibold text-text-main whitespace-nowrap capitalize"
+              [class.font-bold]="d.hoy"
+              >{{ d.nombre.slice(0, 2)
+              }}<span class="hidden md:inline">{{ d.nombre.slice(2) }}</span> {{ d.numero }}</span
             >
-          </div>
+            <span class="flex gap-1" aria-hidden="true">
+              @for (t of d.turnos; track t.clave) {
+                <span
+                  class="text-[10px] md:text-xs leading-3 font-bold"
+                  [class.underline]="t.cambio"
+                  [class.decoration-dotted]="t.cambio"
+                  [style.color]="t.trabaja ? t.color : 'var(--theme-text-muted)'"
+                  >{{ t.corto }}</span
+                >
+              }
+            </span>
+          </button>
         }
       </div>
-    </div>
-  }
 
-  <div #scroll class="h-[470px] md:h-[600px] overflow-y-auto">
+      @if (banda().filas) {
+        <div
+          class="grid grid-cols-[1.625rem_minmax(0,1fr)] md:grid-cols-[3rem_minmax(0,1fr)] border-b border-surface-border py-1"
+        >
+          <span></span>
+          <div
+            class="grid grid-cols-[repeat(168,minmax(0,1fr))] auto-rows-[18px] items-center"
+            aria-label="Deadlines de la semana"
+            role="list"
+          >
+            @for (b of banda().barras; track $index) {
+              <div
+                class="min-w-0 overflow-hidden flex items-center box-border"
+                [style]="b.estilo"
+                role="listitem"
+              >
+                <span
+                  class="px-1 text-[10px] md:text-[11px] leading-3 font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
+                  >{{ b.etiqueta }}</span
+                >
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
     <div class="relative h-[calc(var(--h)*24)]">
       @for (h of horas; track h.h) {
         <div
@@ -75,7 +79,11 @@
       }
       <div class="absolute inset-y-0 left-[1.625rem] md:left-12 right-0 grid grid-cols-7">
         @for (d of semana(); track d.fecha) {
-          <div class="relative border-l border-surface-border" [class.bg-surface/40]="d.hoy">
+          <div
+            data-columna-dia
+            class="relative border-l border-surface-border"
+            [class.bg-surface/40]="d.hoy"
+          >
             @for (t of d.tramos; track t.clave) {
               <div
                 class="absolute w-1 rounded-full"

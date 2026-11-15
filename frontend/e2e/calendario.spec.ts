@@ -1,6 +1,9 @@
 import { APIRequestContext, expect, test, TestInfo } from '@playwright/test';
 import { createProject, createTask, uniqueName } from './support/api';
 
+// Barras de scroll reales (headless las oculta): ocupan ancho y pueden desfasar columnas.
+test.use({ launchOptions: { ignoreDefaultArgs: ['--hide-scrollbars'] } });
+
 /**
  * Cada test y proyecto de Playwright usa su propio día (corren en paralelo con el mismo
  * usuario): así los choques y turnos de uno no se mezclan con los de otro.
@@ -103,6 +106,13 @@ test.describe('calendario', () => {
       }),
     ).toBeVisible();
 
+    // Los encabezados de día quedan alineados con las columnas de la grilla.
+    const bordes = async (sel: string) =>
+      page
+        .locator(sel)
+        .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().left)));
+    expect(await bordes('[data-cabecera-dia]')).toEqual(await bordes('[data-columna-dia]'));
+
     await page.getByRole('button', { name: 'Día', exact: true }).click();
     const reunion = page.getByRole('button', { name: new RegExp(`^Reunión ${sufijo}, 16:30`) });
     const terapia = page.getByRole('button', { name: new RegExp(`^Terapia ${sufijo}, 16:00`) });
@@ -130,6 +140,16 @@ test.describe('calendario', () => {
     await hoja.getByLabel('Término').fill('17:00');
     await expect(hoja.getByText(/choca con Terapia/)).toBeVisible();
     await hoja.getByLabel('Se repite cada semana').check();
+    // Por defecto se repite sin fin.
+    await expect(hoja.getByRole('button', { name: 'Nunca' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    if (process.env['CAPTURAS_DIR']) {
+      await page.screenshot({
+        path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-nueva.png`,
+      });
+    }
     await hoja.getByRole('button', { name: 'Guardar' }).click();
 
     await expect(page.getByText('Actividad creada')).toBeVisible();

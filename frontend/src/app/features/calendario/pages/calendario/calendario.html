@@ -1,38 +1,31 @@
-<div class="max-w-7xl mx-auto flex flex-col gap-3.5 pb-20 md:pb-0">
-  <header class="flex items-center justify-between gap-3">
-    <h1 class="text-2xl font-bold text-text-main">Calendario</h1>
-    <div class="flex items-center gap-2">
-      <button
-        type="button"
-        (click)="nuevaActividad()"
-        class="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover"
-      >
-        <svg lucidePlus class="w-4 h-4" aria-hidden="true" />
-        Nueva actividad
-      </button>
-      <button
-        type="button"
-        (click)="irAHoy()"
-        class="h-10 px-4 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-surface"
-      >
-        Hoy
-      </button>
-    </div>
+<div class="max-w-7xl mx-auto flex flex-col gap-2.5 md:gap-3.5 pb-20 md:pb-0">
+  <!-- En el celular el título solo existe para lectores de pantalla: el header de la app ya
+       dice dónde estás, y así el calendario empieza más arriba. -->
+  <header class="contents md:flex md:items-center md:justify-between md:gap-3">
+    <h1 class="sr-only md:not-sr-only md:text-2xl md:font-bold md:text-text-main">Calendario</h1>
+    <button
+      type="button"
+      (click)="nuevaActividad()"
+      class="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover"
+    >
+      <svg lucidePlus class="w-4 h-4" aria-hidden="true" />
+      Nueva actividad
+    </button>
   </header>
 
-  <div class="flex flex-col md:flex-row md:items-center gap-3">
-    <div class="flex items-center gap-2 md:flex-1">
+  <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+    <div class="flex items-center gap-1.5 md:gap-2 md:flex-1">
       <button
         type="button"
         (click)="mover(-1)"
         aria-label="Anterior"
-        class="w-11 h-11 rounded-lg border border-surface-border flex items-center justify-center text-text-main hover:bg-surface"
+        class="w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-lg border border-surface-border flex items-center justify-center text-text-main hover:bg-surface"
       >
         <svg lucideChevronLeft class="w-5 h-5" aria-hidden="true" />
       </button>
       <h2
         aria-live="polite"
-        class="flex-1 md:flex-none md:min-w-56 text-center text-[17px] md:text-xl font-semibold text-text-main"
+        class="flex-1 md:flex-none md:min-w-56 min-w-0 truncate text-center text-base md:text-xl font-semibold text-text-main"
       >
         {{ periodo() }}
       </h2>
@@ -40,22 +33,29 @@
         type="button"
         (click)="mover(1)"
         aria-label="Siguiente"
-        class="w-11 h-11 rounded-lg border border-surface-border flex items-center justify-center text-text-main hover:bg-surface"
+        class="w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-lg border border-surface-border flex items-center justify-center text-text-main hover:bg-surface"
       >
         <svg lucideChevronRight class="w-5 h-5" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        (click)="irAHoy()"
+        class="h-10 md:h-11 px-3 md:px-4 shrink-0 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-surface"
+      >
+        Hoy
       </button>
     </div>
     <div
       role="group"
       aria-label="Vista"
-      class="flex gap-1 p-1 rounded-xl bg-surface border border-surface-border md:w-96"
+      class="flex gap-1 p-0.5 md:p-1 rounded-xl bg-surface border border-surface-border md:w-96"
     >
       @for (v of vistas; track v.valor) {
         <button
           type="button"
           [attr.aria-pressed]="vista() === v.valor"
           (click)="cambiarVista(v.valor)"
-          class="flex-1 h-9 rounded-lg text-[13px] font-semibold transition-colors"
+          class="flex-1 h-8 md:h-9 rounded-lg text-[13px] font-semibold transition-colors"
           [class.bg-primary]="vista() === v.valor"
           [class.text-on-primary]="vista() === v.valor"
           [class.text-text-muted]="vista() !== v.valor"

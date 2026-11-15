@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { LucideSlidersHorizontal } from '@lucide/angular';
 
 export interface Capa {
@@ -11,19 +11,22 @@ export interface Capa {
   turnosId?: number;
 }
 
-/** Botones para mostrar u ocultar cada calendario. */
+/**
+ * Filtros compactos para mostrar u ocultar cada calendario. Las acciones (ajustar el ciclo
+ * de turnos y gestionar calendarios) van al final, separadas de los filtros.
+ */
 @Component({
   selector: 'app-calendario-capas',
   imports: [LucideSlidersHorizontal],
   template: `
-    <div role="group" aria-label="Calendarios visibles" class="flex flex-wrap gap-1.5 md:gap-2">
-      @for (c of capas(); track c.clave) {
-        <div class="flex items-center gap-1 min-w-0 max-w-full">
+    <div class="flex flex-wrap items-center gap-1.5">
+      <div role="group" aria-label="Calendarios visibles" class="contents">
+        @for (c of capas(); track c.clave) {
           <button
             type="button"
             [attr.aria-pressed]="c.visible"
             (click)="alternar.emit(c)"
-            class="inline-flex items-center gap-2 min-w-0 h-9 md:h-10 px-3 md:px-3.5 rounded-full border text-[13px] font-medium transition-colors"
+            class="inline-flex items-center gap-1.5 min-w-0 max-w-44 h-8 px-2.5 rounded-full border text-xs font-medium transition-colors"
             [class.border-surface-border]="!c.visible"
             [class.text-text-muted]="!c.visible"
             [class.bg-surface]="c.visible"
@@ -31,30 +34,35 @@ export interface Capa {
             [class.border-text-muted]="c.visible"
           >
             <span
-              class="w-2.5 h-2.5 rounded-full shrink-0 border-[1.5px]"
+              class="w-2 h-2 rounded-full shrink-0 border-[1.5px]"
               [style.border-color]="c.color"
               [style.background]="c.visible ? c.color : 'transparent'"
               aria-hidden="true"
             ></span>
             <span class="truncate">{{ c.nombre }}</span>
           </button>
-          @if (c.turnosId) {
-            <button
-              type="button"
-              (click)="ciclo.emit(c.turnosId)"
-              [attr.aria-label]="'Ajustar el ciclo de ' + c.nombre"
-              class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full border border-surface-border flex items-center justify-center hover:bg-surface transition-colors"
-              [style.color]="c.color"
-            >
-              <svg lucideSlidersHorizontal class="w-4 h-4" aria-hidden="true" />
-            </button>
-          }
-        </div>
+        }
+      </div>
+      @for (t of turnos(); track t.clave) {
+        <button
+          type="button"
+          (click)="ciclo.emit(t.turnosId!)"
+          [attr.aria-label]="'Ajustar el ciclo de ' + t.nombre"
+          class="inline-flex items-center gap-1.5 min-w-0 max-w-44 h-8 px-2.5 rounded-full border border-dashed border-surface-border text-xs font-medium text-text-muted hover:text-text-main transition-colors"
+        >
+          <svg
+            lucideSlidersHorizontal
+            class="w-3.5 h-3.5 shrink-0"
+            [style.color]="t.color"
+            aria-hidden="true"
+          />
+          <span class="truncate">{{ turnos().length > 1 ? 'Ciclo · ' + t.nombre : 'Ciclo' }}</span>
+        </button>
       }
       <button
         type="button"
         (click)="gestionar.emit()"
-        class="inline-flex items-center h-9 md:h-10 px-3 md:px-3.5 rounded-full border border-dashed border-surface-border text-[13px] font-medium text-text-muted hover:text-text-main whitespace-nowrap shrink-0 transition-colors"
+        class="inline-flex items-center h-8 px-2.5 rounded-full border border-dashed border-surface-border text-xs font-medium text-text-muted hover:text-text-main whitespace-nowrap shrink-0 transition-colors"
       >
         Calendarios…
       </button>
@@ -66,4 +74,6 @@ export class CalendarioCapas {
   readonly alternar = output<Capa>();
   readonly ciclo = output<number>();
   readonly gestionar = output<void>();
+
+  readonly turnos = computed(() => this.capas().filter((c) => c.turnosId));
 }

@@ -24,7 +24,7 @@ interface FilaFranja {
           [attr.aria-expanded]="abierta()"
           aria-controls="calendario-franja-lista"
           (click)="abierta.set(!abierta())"
-          class="w-full min-h-11 flex items-center gap-2.5 px-3.5 text-left text-sm font-medium text-text-main"
+          class="w-full min-h-10 md:min-h-11 flex items-center gap-2.5 px-3 md:px-3.5 text-left text-[13px] md:text-sm font-medium text-text-main"
         >
           <svg
             lucideCircleAlert
@@ -93,8 +93,10 @@ export class CalendarioFranja {
   readonly texto = computed(() => {
     const r = this.resumen();
     const partes = [];
-    if (r.vencidos.length) partes.push(`${r.vencidos.length} vencidos`);
-    if (r.proximos.length) partes.push(`${r.proximos.length} vencen en 7 días`);
+    const n = (cuantos: number, uno: string, varios: string) =>
+      `${cuantos} ${cuantos === 1 ? uno : varios}`;
+    if (r.vencidos.length) partes.push(n(r.vencidos.length, 'vencido', 'vencidos'));
+    if (r.proximos.length) partes.push(n(r.proximos.length, 'vence en 7 días', 'vencen en 7 días'));
     if (r.choques.length)
       partes.push(`${r.choques.length} ${r.choques.length === 1 ? 'choque' : 'choques'}`);
     return partes.join(' · ');
