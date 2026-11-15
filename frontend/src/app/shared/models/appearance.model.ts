@@ -7,6 +7,10 @@ export const PALETTES = [
   { value: 'nord', label: 'Nord' },
   { value: 'rose-pine', label: 'Rosé Pine' },
   { value: 'solarized', label: 'Solarized' },
+  { value: 'gruvbox', label: 'Gruvbox' },
+  { value: 'tokyo-night', label: 'Tokyo Night' },
+  { value: 'dracula', label: 'Dracula' },
+  { value: 'everforest', label: 'Everforest' },
 ] as const;
 
 export const COLOR_MODES = [
