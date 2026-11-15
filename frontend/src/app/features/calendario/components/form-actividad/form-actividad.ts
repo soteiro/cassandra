@@ -20,7 +20,7 @@ const CAMPO =
       <label class="flex flex-col gap-1.5 text-sm font-medium text-text-main">
         Calendario
         <select
-          [class]="campo"
+          [class]="campoSelect"
           [disabled]="!!actividad()"
           (change)="calendarioId.set(+$any($event.target).value)"
         >
@@ -40,16 +40,16 @@ const CAMPO =
           (input)="titulo.set($any($event.target).value)"
         />
       </label>
-      <div class="grid grid-cols-3 gap-2">
-        <label class="flex flex-col gap-1.5 text-sm font-medium text-text-main min-w-0">
-          {{ semanal() ? 'Desde' : 'Fecha' }}
-          <input
-            type="date"
-            [class]="campo"
-            [value]="fecha()"
-            (input)="fecha.set($any($event.target).value)"
-          />
-        </label>
+      <label class="flex flex-col gap-1.5 text-sm font-medium text-text-main min-w-0">
+        {{ semanal() ? 'Desde' : 'Fecha' }}
+        <input
+          type="date"
+          [class]="campo"
+          [value]="fecha()"
+          (input)="fecha.set($any($event.target).value)"
+        />
+      </label>
+      <div class="grid grid-cols-2 gap-2">
         <label class="flex flex-col gap-1.5 text-sm font-medium text-text-main min-w-0">
           Inicio
           <input
@@ -100,16 +100,51 @@ const CAMPO =
             }
           </div>
         </fieldset>
-        <label class="flex flex-col gap-1.5 text-sm font-medium text-text-main">
-          Hasta (opcional)
-          <input
-            type="date"
-            [class]="campo"
-            [min]="fecha()"
-            [value]="hasta()"
-            (input)="hasta.set($any($event.target).value)"
-          />
-        </label>
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="text-sm font-medium text-text-main mb-1.5">Termina</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              [attr.aria-pressed]="!conFin()"
+              (click)="conFin.set(false)"
+              class="min-h-11 rounded-lg border text-sm font-semibold"
+              [class.bg-primary]="!conFin()"
+              [class.text-on-primary]="!conFin()"
+              [class.border-primary]="!conFin()"
+              [class.border-surface-border]="conFin()"
+              [class.text-text-main]="conFin()"
+            >
+              Nunca
+            </button>
+            <button
+              type="button"
+              [attr.aria-pressed]="conFin()"
+              (click)="conFin.set(true)"
+              class="min-h-11 rounded-lg border text-sm font-semibold"
+              [class.bg-primary]="conFin()"
+              [class.text-on-primary]="conFin()"
+              [class.border-primary]="conFin()"
+              [class.border-surface-border]="!conFin()"
+              [class.text-text-main]="!conFin()"
+            >
+              En una fecha
+            </button>
+          </div>
+        </fieldset>
+        @if (conFin()) {
+          <label class="flex flex-col gap-1.5 text-sm font-medium text-text-main">
+            Último día
+            <input
+              type="date"
+              [class]="campo"
+              [min]="fecha()"
+              [value]="hasta()"
+              (input)="hasta.set($any($event.target).value)"
+            />
+          </label>
+        } @else {
+          <p class="text-xs text-text-muted">Se repite todas las semanas, sin fecha de término.</p>
+        }
       }
       @if (choque()) {
         <p
@@ -155,6 +190,9 @@ export class CalendarioFormActividad {
   readonly cancelar = output<void>();
 
   readonly campo = CAMPO;
+  // Sin alto fijo: con appearance base-select el texto queda arriba si no hay padding vertical.
+  readonly campoSelect =
+    'min-h-11 w-full min-w-0 px-3 py-2 rounded-lg border border-surface-border bg-background text-text-main outline-none focus:border-primary cursor-pointer disabled:cursor-default disabled:opacity-70';
   readonly diasSemana = DIAS_CORTOS.map((nombre, i) => ({ i, nombre, corto: nombre.charAt(0) }));
 
   readonly calendarioId = linkedSignal(
@@ -167,6 +205,8 @@ export class CalendarioFormActividad {
   readonly dias = linkedSignal(() => this.actividad()?.dias_semana ?? []);
   readonly semanal = linkedSignal(() => (this.actividad()?.dias_semana.length ?? 0) > 0);
   readonly hasta = linkedSignal(() => this.actividad()?.hasta ?? '');
+  /** false = se repite sin fin (hasta = null). */
+  readonly conFin = linkedSignal(() => !!this.actividad()?.hasta);
   readonly error = signal('');
 
   readonly choque = computed(() => {
@@ -206,6 +246,8 @@ export class CalendarioFormActividad {
     if (!this.horaInicio() || !this.horaFin() || this.horaFin() <= this.horaInicio())
       return this.error.set('La hora de término debe ser posterior a la de inicio.');
     if (this.semanal() && !this.dias().length) return this.error.set('Elige al menos un día.');
+    if (this.semanal() && this.conFin() && !this.hasta())
+      return this.error.set('Elige el último día o marca que no termina.');
     this.error.set('');
     this.guardar.emit({
       calendarioId: this.calendarioId(),
@@ -216,7 +258,7 @@ export class CalendarioFormActividad {
         hora_inicio: this.horaInicio(),
         hora_fin: this.horaFin(),
         dias_semana: this.semanal() ? this.dias() : [],
-        hasta: this.semanal() && this.hasta() ? this.hasta() : null,
+        hasta: this.semanal() && this.conFin() && this.hasta() ? this.hasta() : null,
       },
     });
   }

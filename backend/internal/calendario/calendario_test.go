@@ -82,6 +82,19 @@ func TestOcurrenciasSemanal(t *testing.T) {
 	}
 }
 
+func TestOcurrenciasSemanalSinFin(t *testing.T) {
+	// Sin "hasta" se repite siempre: un año después sigue ocurriendo los martes.
+	r := Regla{Fecha: dia(t, "2026-11-17"), Dias: []int{1}}
+	got := Ocurrencias(r, dia(t, "2027-11-15"), dia(t, "2027-11-21"))
+	if len(got) != 1 || got[0].Format(Layout) != "2027-11-16" {
+		t.Fatalf("ocurrencias %v, se esperaba el martes 2027-11-16", got)
+	}
+	// Y no ocurre antes de su fecha de inicio.
+	if got := Ocurrencias(r, dia(t, "2026-11-09"), dia(t, "2026-11-15")); len(got) != 0 {
+		t.Fatalf("antes de empezar: %v", got)
+	}
+}
+
 func TestDiaSemana(t *testing.T) {
 	if d := DiaSemana(dia(t, "2026-11-16")); d != 0 {
 		t.Errorf("lunes: %d", d)

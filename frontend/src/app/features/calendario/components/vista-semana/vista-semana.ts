@@ -50,7 +50,9 @@ export class CalendarioVistaSemana {
     // Arranca en las 07:00: la madrugada queda arriba, a un scroll.
     afterNextRender(() => {
       const el = this.scroll().nativeElement;
-      el.scrollTop = (el.scrollHeight * 7) / 24;
+      // El encabezado fijo va dentro del scroll: las 24 horas son el resto del alto.
+      const cabecera = (el.firstElementChild as HTMLElement | null)?.offsetHeight ?? 0;
+      el.scrollTop = ((el.scrollHeight - cabecera) * 7) / 24;
     });
   }
 
