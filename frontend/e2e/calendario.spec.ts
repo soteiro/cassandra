@@ -1,6 +1,9 @@
 import { APIRequestContext, expect, test, TestInfo } from '@playwright/test';
 import { createProject, createTask, uniqueName } from './support/api';
 
+// Barras de scroll reales (headless las oculta): ocupan ancho y pueden desfasar columnas.
+test.use({ launchOptions: { ignoreDefaultArgs: ['--hide-scrollbars'] } });
+
 /**
  * Cada test y proyecto de Playwright usa su propio día (corren en paralelo con el mismo
  * usuario): así los choques y turnos de uno no se mezclan con los de otro.
@@ -102,6 +105,13 @@ test.describe('calendario', () => {
         name: new RegExp(`^Reunión ${sufijo}, 16:30 a 17:30, choca con`),
       }),
     ).toBeVisible();
+
+    // Los encabezados de día quedan alineados con las columnas de la grilla.
+    const bordes = async (sel: string) =>
+      page
+        .locator(sel)
+        .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().left)));
+    expect(await bordes('[data-cabecera-dia]')).toEqual(await bordes('[data-columna-dia]'));
 
     await page.getByRole('button', { name: 'Día', exact: true }).click();
     const reunion = page.getByRole('button', { name: new RegExp(`^Reunión ${sufijo}, 16:30`) });
