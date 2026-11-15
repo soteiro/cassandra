@@ -130,6 +130,16 @@ test.describe('calendario', () => {
     await hoja.getByLabel('Término').fill('17:00');
     await expect(hoja.getByText(/choca con Terapia/)).toBeVisible();
     await hoja.getByLabel('Se repite cada semana').check();
+    // Por defecto se repite sin fin.
+    await expect(hoja.getByRole('button', { name: 'Nunca' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    if (process.env['CAPTURAS_DIR']) {
+      await page.screenshot({
+        path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-nueva.png`,
+      });
+    }
     await hoja.getByRole('button', { name: 'Guardar' }).click();
 
     await expect(page.getByText('Actividad creada')).toBeVisible();
