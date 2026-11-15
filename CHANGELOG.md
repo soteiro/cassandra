@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.21.0](https://github.com/soteiro/cassandra/compare/v0.20.0...v0.21.0) (2026-11-15)
+
+
+### Features
+
+* agrega cuatro temas a configuracion ([da964b1](https://github.com/soteiro/cassandra/commit/da964b17e2a2cd79ff3547a3c84e73b40ac7593d))
+* agrega cuatro temas en Configuración ([afc6f8e](https://github.com/soteiro/cassandra/commit/afc6f8ece261d5ea68cc37069be44161e4fd4fbb))
+
+
+### Bug Fixes
+
+* **calendario:** align the week day headers with the grid columns ([1b342e7](https://github.com/soteiro/cassandra/commit/1b342e763fb50763c68d9c6089d48188b85cb964))
+* **calendario:** endless repeats, compact controls and aligned week view ([126150c](https://github.com/soteiro/cassandra/commit/126150c12b0ccaa8388ec1490dd4927d2ebd83c2))
+* **calendario:** repeat activities forever and fix the activity form layout ([77342f1](https://github.com/soteiro/cassandra/commit/77342f195a6a98b1078283d4a3606a92cfbfae62))
+
 ## [0.20.0](https://github.com/soteiro/cassandra/compare/v0.19.3...v0.20.0) (2026-11-14)
 
 
