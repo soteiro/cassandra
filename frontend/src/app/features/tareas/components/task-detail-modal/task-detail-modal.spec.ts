@@ -219,6 +219,21 @@ describe('TaskDetailModal', () => {
       );
     });
 
+    it('keeps the estimate made by the assistant and sends the chosen one', () => {
+      const task = makeTask({ estimacion_min: 100 });
+      open(task);
+      expect(component.estimacion()).toBe(100);
+      expect(component.opcionesEstimacion().map((o) => o.valor)).toContain(100);
+
+      component.estimacion.set(90);
+      component.saveTask();
+      expect(taskService.updateTask).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ estimacion_min: 90 }),
+      );
+      expect(task.estimacion_min).toBe(90);
+    });
+
     it('should update the task, mutate it locally, emit and close', () => {
       const task = makeTask();
       open(task);
@@ -235,6 +250,7 @@ describe('TaskDetailModal', () => {
         // Sin fechas: se piden vacías explícitamente (COALESCE no acepta null).
         clear_fecha_inicio: true,
         clear_fecha_limite: true,
+        clear_estimacion: true,
       });
       expect(task.nombre).toBe('Renombrada');
       expect(task.estado).toBe('Terminado');

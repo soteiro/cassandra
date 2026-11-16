@@ -5,14 +5,17 @@ import { LucideChevronLeft, LucideChevronRight, LucidePlus } from '@lucide/angul
 import { CalendarioService, RangoParams } from '../../data/calendario.service';
 import {
   Actividad,
+  BloqueTrabajo,
   Calendario,
   CalendarioRango,
   CalendarioRequest,
   CodigoTurno,
   Deadline,
+  FranjaHorario,
 } from '../../data/calendario.model';
 import {
   ActividadDia,
+  CAPA_PLANIFICADO,
   construirDias,
   DiaInfo,
   diaVacio,
@@ -32,7 +35,7 @@ import {
   sumarDias,
   sumarMeses,
 } from '../../utils/dias.util';
-import { COLOR_DEADLINE } from '../../utils/estilo.util';
+import { COLOR_DEADLINE, COLOR_PLANIFICADO } from '../../utils/estilo.util';
 import { Bloque } from '../../utils/timeline.util';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { getErrorMessage } from '../../../../shared/utils/http-error.util';
@@ -54,6 +57,7 @@ import {
   CalendarioGestion,
   EditarCalendario,
 } from '../../components/gestion-calendarios/gestion-calendarios';
+import { CalendarioHorarioBase } from '../../components/horario-base/horario-base';
 
 type Vista = 'tres' | 'mes' | 'sem' | 'dia';
 
@@ -62,9 +66,13 @@ type Hoja =
   | { tipo: 'ciclo'; calendario: Calendario }
   | { tipo: 'turno'; calendario: Calendario; fecha: string }
   | { tipo: 'actividad'; actividad: Actividad | null; fecha: string }
-  | { tipo: 'ocurrencia'; actividad: ActividadDia };
+  | { tipo: 'ocurrencia'; actividad: ActividadDia }
+  | { tipo: 'trabajo'; actividad: ActividadDia; bloque: BloqueTrabajo }
+  | { tipo: 'horario'; franjas: FranjaHorario[] };
 
 const CLAVE_VISTA = 'cassandra.calendario.vista';
+/** La capa Planificado se recuerda en el navegador: no es un calendario del servidor. */
+const CLAVE_PLANIFICADO = 'cassandra.calendario.planificado';
 const VISTAS: { valor: Vista; nombre: string }[] = [
   { valor: 'tres', nombre: '3 meses' },
   { valor: 'mes', nombre: 'Mes' },
@@ -78,6 +86,14 @@ function vistaDe(v: string | null): Vista | null {
 
 function fechaValida(f: string | null): string | null {
   return f && /^\d{4}-\d{2}-\d{2}$/.test(f) ? f : null;
+}
+
+function leerPlanificado(): boolean {
+  try {
+    return localStorage.getItem(CLAVE_PLANIFICADO) !== 'oculto';
+  } catch {
+    return true;
+  }
 }
 
 function leerVista(): Vista {
@@ -110,6 +126,7 @@ function leerVista(): Vista {
     CalendarioFormTurnoDia,
     CalendarioFormActividad,
     CalendarioGestion,
+    CalendarioHorarioBase,
   ],
   templateUrl: './calendario.html',
 })
@@ -130,6 +147,8 @@ export class CalendarioPage {
   readonly guardando = signal(false);
   /** Visibilidad cambiada aquí mientras el servidor confirma. */
   private readonly visibilidadLocal = signal<Record<string, boolean>>({});
+  /** Capa de bloques de trabajo (guardada en el navegador). */
+  readonly planificadoVisible = signal(leerPlanificado());
 
   constructor() {
     effect(() => {
@@ -182,6 +201,7 @@ export class CalendarioPage {
     const local = this.visibilidadLocal();
     return {
       deadlines: local['deadlines'] ?? !rango.ocultar_deadlines,
+      planificado: this.planificadoVisible(),
       calendarios: new Set(
         rango.calendarios.filter((c) => local[String(c.id)] ?? !c.oculto).map((c) => c.id),
       ),
@@ -190,7 +210,9 @@ export class CalendarioPage {
 
   readonly visibles = computed<Visibilidad>(() => {
     const r = this.rango();
-    return r ? this.visibilidadDe(r) : { deadlines: true, calendarios: new Set() };
+    return r
+      ? this.visibilidadDe(r)
+      : { deadlines: true, planificado: true, calendarios: new Set() };
   });
 
   readonly dias = computed(() => {
@@ -216,8 +238,20 @@ export class CalendarioPage {
 
   readonly capas = computed<Capa[]>(() => {
     const vis = this.visibles();
+    // Planificado solo aparece si hay bloques en el rango (o está oculta, para poder volver).
+    const conBloques = !!this.rango()?.bloques?.length || !vis.planificado;
     return [
       { clave: 'deadlines', nombre: 'Deadlines', color: COLOR_DEADLINE, visible: vis.deadlines },
+      ...(conBloques
+        ? [
+            {
+              clave: 'planificado',
+              nombre: CAPA_PLANIFICADO,
+              color: COLOR_PLANIFICADO,
+              visible: vis.planificado,
+            },
+          ]
+        : []),
       ...this.calendarios().map((c) => ({
         clave: String(c.id),
         nombre: c.nombre,
@@ -260,6 +294,8 @@ export class CalendarioPage {
     switch (h.tipo) {
       case 'gestion':
         return 'Calendarios';
+      case 'horario':
+        return 'Horario de trabajo';
       case 'ciclo':
         return `Ciclo · ${h.calendario.nombre}`;
       case 'turno':
@@ -267,6 +303,7 @@ export class CalendarioPage {
       case 'actividad':
         return h.actividad ? 'Editar actividad' : 'Nueva actividad';
       case 'ocurrencia':
+      case 'trabajo':
         return h.actividad.titulo;
     }
   });
@@ -333,7 +370,7 @@ export class CalendarioPage {
   /** Primer toque: trae el bloque al frente. Segundo: abre sus opciones. */
   tocarBloque(b: Bloque) {
     if (this.frente() === b.clave) {
-      this.hoja.set({ tipo: 'ocurrencia', actividad: b.actividad });
+      this.abrirOcurrencia(b.actividad);
     } else {
       this.frente.set(b.clave);
     }
@@ -343,6 +380,15 @@ export class CalendarioPage {
 
   alternarCapa(capa: Capa) {
     const visible = !capa.visible;
+    if (capa.clave === 'planificado') {
+      this.planificadoVisible.set(visible);
+      try {
+        localStorage.setItem(CLAVE_PLANIFICADO, visible ? 'visible' : 'oculto');
+      } catch {
+        // Sin almacenamiento la capa solo dura la sesión.
+      }
+      return;
+    }
     this.visibilidadLocal.update((v) => ({ ...v, [capa.clave]: visible }));
     const peticion: Observable<unknown> =
       capa.clave === 'deadlines'
@@ -366,6 +412,19 @@ export class CalendarioPage {
     this.hoja.set({ tipo: 'gestion' });
   }
 
+  abrirHorario() {
+    this.service.horarioBase().subscribe({
+      next: (franjas) => this.hoja.set({ tipo: 'horario', franjas }),
+      error: (err) => this.toast.error(getErrorMessage(err, 'No se pudo abrir el horario')),
+    });
+  }
+
+  guardarHorario(franjas: FranjaHorario[]) {
+    this.ejecutar(this.service.guardarHorarioBase(franjas), 'Horario guardado', () =>
+      this.abrirGestion(),
+    );
+  }
+
   abrirCiclo(calendarioId: number) {
     const cal = this.calendarios().find((c) => c.id === calendarioId);
     if (cal) this.hoja.set({ tipo: 'ciclo', calendario: cal });
@@ -385,7 +444,24 @@ export class CalendarioPage {
   }
 
   abrirOcurrencia(a: ActividadDia) {
-    this.hoja.set({ tipo: 'ocurrencia', actividad: a });
+    this.hoja.set(
+      a.trabajo
+        ? { tipo: 'trabajo', actividad: a, bloque: a.trabajo }
+        : { tipo: 'ocurrencia', actividad: a },
+    );
+  }
+
+  abrirProyecto(b: BloqueTrabajo) {
+    this.router.navigate(['/proyectos', b.proyecto_id]);
+  }
+
+  quitarBloque(b: BloqueTrabajo) {
+    if (!confirm(`¿Quitar el bloque de «${b.tarea}»? La tarea no se modifica.`)) return;
+    this.ejecutar(this.service.quitarBloque(b.id), 'Bloque quitado');
+  }
+
+  rotuloTrabajo(b: BloqueTrabajo): string {
+    return `${b.proyecto_nombre} · ${diaCorto(b.fecha)} · ${b.hora_inicio}–${b.hora_fin}`;
   }
 
   private ejecutar<T>(peticion: Observable<T>, exito: string, despues?: (r: T) => void) {
@@ -468,7 +544,11 @@ export class CalendarioPage {
   /** La hoja sigue abierta para seguir ajustando otros calendarios. */
   actualizarCalendario(e: EditarCalendario) {
     this.ejecutar(
-      this.service.actualizarCalendario(e.id, { nombre: e.nombre, color: e.color }),
+      this.service.actualizarCalendario(e.id, {
+        nombre: e.nombre,
+        color: e.color,
+        disponibilidad: e.disponibilidad,
+      }),
       'Calendario actualizado',
       () => {},
     );

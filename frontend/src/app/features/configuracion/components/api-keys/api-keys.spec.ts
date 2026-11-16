@@ -5,6 +5,7 @@ import { of, Subject, throwError } from 'rxjs';
 import { APIKey, IssuedAPIKey } from '../../data/api-key.model';
 import { APIKeyService } from '../../data/api-key.service';
 import { ProjectService } from '../../../proyectos/data/project.service';
+import { CalendarioService } from '../../../calendario/data/calendario.service';
 import { ApiKeys } from './api-keys';
 
 const key: APIKey = {
@@ -69,6 +70,18 @@ describe('ApiKeys', () => {
         provideRouter([]),
         { provide: APIKeyService, useValue: api },
         { provide: ProjectService, useValue: { projectsResource: resource } },
+        {
+          provide: CalendarioService,
+          useValue: {
+            calendariosResource: () => ({
+              value: signal([
+                { id: 3, nombre: 'Colegio', color: '#58a6ff' },
+                { id: 4, nombre: 'Terapias', color: '#f778ba' },
+              ]),
+              error: signal(undefined),
+            }),
+          },
+        },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(ApiKeys);
@@ -158,6 +171,25 @@ describe('ApiKeys', () => {
       nombre: 'Mi asistente',
       scopes: ['tasks:read', 'tasks:create'],
       proyecto_ids: [12],
+    });
+  });
+
+  it('issues a planning key that sees only the chosen calendars', async () => {
+    await fill();
+    select('key-access', 'none');
+    select('key-tasks', 'manage');
+    expect(el.textContent).not.toContain('Calendarios visibles con detalle');
+    select('key-calendar', 'read');
+    await render();
+    const colegio = Array.from(el.querySelectorAll('label')).find((l) =>
+      l.textContent?.includes('Colegio'),
+    )!;
+    colegio.querySelector('input')!.click();
+    button('Generar clave').click();
+    await render();
+    expect(api.create.mock.calls[0][0]).toMatchObject({
+      scopes: ['tasks:read', 'tasks:create', 'tasks:manage', 'calendar:read'],
+      calendario_ids: [3],
     });
   });
 

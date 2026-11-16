@@ -168,11 +168,57 @@
                 <option value="none">Sin acceso a tareas</option>
                 <option value="read">Solo leer tareas</option>
                 <option value="create">Leer y crear tareas</option>
+                <option value="manage">Leer, crear, cerrar y planificar tareas</option>
               </select>
               <p id="tasks-help" class="text-xs text-text-muted mt-2"
-                >Permite consultar o crear tareas. Las claves no permiten editarlas, completarlas ni
-                eliminarlas.</p
+                >Planificar permite cambiar estado, fechas y estimación, y reservar bloques de
+                trabajo en el calendario. Las claves no permiten renombrar ni eliminar tareas.</p
               >
+            </div>
+            <div>
+              <label for="key-calendar" class="block text-sm font-medium mb-2">Calendario</label>
+              <select
+                id="key-calendar"
+                formControlName="calendario"
+                class="field"
+                aria-describedby="calendar-help"
+              >
+                <option value="none">Sin acceso al calendario</option>
+                <option value="read">Ver mi tiempo libre</option>
+              </select>
+              <p id="calendar-help" class="text-xs text-text-muted mt-2"
+                >El asistente ve tus huecos libres y deadlines para planificar. Solo ve el detalle
+                de los calendarios que elijas; los demás aparecen como «Ocupado».</p
+              >
+              @if (calendarioValue() === 'read') {
+                <fieldset class="mt-3">
+                  <legend class="text-sm font-medium mb-2">Calendarios visibles con detalle</legend>
+                  @if (calendarios().length === 0) {
+                    <p class="text-sm text-text-muted">No tienes calendarios propios.</p>
+                  } @else {
+                    <div class="rounded-xl border border-surface-border bg-background p-1">
+                      @for (cal of calendarios(); track cal.id) {
+                        <label
+                          class="flex gap-3 items-center min-h-11 p-3 text-sm cursor-pointer rounded-lg hover:bg-surface-border/50"
+                        >
+                          <input
+                            type="checkbox"
+                            class="size-4 shrink-0 accent-primary"
+                            [checked]="selectedCalendars().includes(cal.id)"
+                            (change)="toggleCalendar(cal.id)"
+                          />
+                          <span
+                            class="size-2.5 rounded-full shrink-0"
+                            [style.background]="cal.color"
+                            aria-hidden="true"
+                          ></span>
+                          <span class="min-w-0 break-words">{{ cal.nombre }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+                </fieldset>
+              }
             </div>
             <div>
               <label for="key-expiry" class="block text-sm font-medium mb-2">Vencimiento</label>

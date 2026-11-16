@@ -16,6 +16,7 @@ import { RouterLink } from '@angular/router';
 import { APIKey, APIKeyScope, CreateAPIKeyRequest } from '../../data/api-key.model';
 import { APIKeyService } from '../../data/api-key.service';
 import { ProjectService } from '../../../proyectos/data/project.service';
+import { CalendarioService } from '../../../calendario/data/calendario.service';
 import { getErrorMessage } from '../../../../shared/utils/http-error.util';
 
 @Component({
@@ -32,6 +33,8 @@ export class ApiKeys {
   protected readonly projects = computed(() =>
     this.projectsResource.error() ? [] : (this.projectsResource.value() ?? []),
   );
+  /** Calendarios que la clave ve con su contenido; el resto solo cuenta como ocupado. */
+  protected readonly selectedCalendars = signal<number[]>([]);
   protected readonly keys = signal<APIKey[]>([]);
   protected readonly loading = signal(false);
   protected readonly loadError = signal('');
@@ -53,8 +56,18 @@ export class ApiKeys {
     nombre: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/\S/)]],
     acceso: ['read'],
     tareas: ['none'],
+    calendario: ['none'],
     dias: ['90'],
   });
+  protected readonly calendarioValue = signal('none');
+  /** Los calendarios se piden solo al elegir acceso al calendario. */
+  protected readonly calendariosResource = inject(CalendarioService).calendariosResource(
+    () => this.calendarioValue() === 'read',
+  );
+  protected readonly calendarios = computed(() =>
+    this.calendariosResource.error() ? [] : (this.calendariosResource.value() ?? []),
+  );
+
   private readonly secretInput = viewChild<ElementRef<HTMLInputElement>>('secretInput');
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
   private readonly revokeConfirm = viewChild<ElementRef<HTMLButtonElement>>('revokeConfirm');
@@ -77,6 +90,9 @@ export class ApiKeys {
       if (this.restoreRevokeFocus() && !this.pendingRevoke()) this.revokeTrigger?.focus();
     });
     this.destroyRef.onDestroy(() => this.issued.set(null));
+    this.form.controls.calendario.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((v) => this.calendarioValue.set(v));
   }
 
   protected loadKeys(): void {
@@ -100,6 +116,12 @@ export class ApiKeys {
       });
   }
 
+  protected toggleCalendar(id: number): void {
+    this.selectedCalendars.update((ids) =>
+      ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id],
+    );
+  }
+
   protected toggleProject(id: number): void {
     this.selectedProjects.update((ids) =>
       ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id],
@@ -119,14 +141,16 @@ export class ApiKeys {
       this.projectsResource.error()
     )
       return;
-    const { nombre, acceso, tareas, dias } = this.form.getRawValue();
+    const { nombre, acceso, tareas, calendario, dias } = this.form.getRawValue();
     const scopes: APIKeyScope[] = [];
     if (acceso === 'read' || acceso === 'write') scopes.push('memory:read');
     if (acceso === 'write') scopes.push('memory:write');
-    if (tareas === 'read' || tareas === 'create') scopes.push('tasks:read');
-    if (tareas === 'create') scopes.push('tasks:create');
+    if (tareas !== 'none') scopes.push('tasks:read');
+    if (tareas === 'create' || tareas === 'manage') scopes.push('tasks:create');
+    if (tareas === 'manage') scopes.push('tasks:manage');
+    if (calendario === 'read') scopes.push('calendar:read');
     if (scopes.length === 0) {
-      this.createError.set('Selecciona al menos un permiso de memoria o tareas.');
+      this.createError.set('Selecciona al menos un permiso de memoria, tareas o calendario.');
       return;
     }
     const request: CreateAPIKeyRequest = {
@@ -134,6 +158,7 @@ export class ApiKeys {
       scopes,
       proyecto_ids: [...this.selectedProjects()],
     };
+    if (calendario === 'read') request.calendario_ids = [...this.selectedCalendars()];
     if (dias !== 'never')
       request.expira_en = new Date(Date.now() + Number(dias) * 86_400_000).toISOString();
     this.focusName.set(false);
@@ -149,8 +174,16 @@ export class ApiKeys {
           this.copyFailed.set(false);
           this.notice.set('');
           this.saving.set(false);
-          this.form.reset({ nombre: '', acceso: 'read', tareas: 'none', dias: '90' });
+          this.form.reset({
+            nombre: '',
+            acceso: 'read',
+            tareas: 'none',
+            calendario: 'none',
+            dias: '90',
+          });
+          this.calendarioValue.set('none');
           this.selectedProjects.set([]);
+          this.selectedCalendars.set([]);
           this.submitted.set(false);
         },
         error: (err) => {
@@ -207,6 +240,8 @@ export class ApiKeys {
       'memory:write': 'Guardar memoria',
       'tasks:read': 'Leer tareas',
       'tasks:create': 'Crear tareas',
+      'tasks:manage': 'Cerrar y planificar tareas',
+      'calendar:read': 'Ver calendario',
     };
     return key.scopes.map((scope) => names[scope]).join(', ');
   }

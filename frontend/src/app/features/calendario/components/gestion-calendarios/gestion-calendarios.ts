@@ -1,12 +1,15 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, linkedSignal, output, signal } from '@angular/core';
 import { LucidePencil, LucideTrash2 } from '@lucide/angular';
 import {
   Calendario,
   CalendarioRequest,
   COLORES_CALENDARIO,
+  DISPONIBILIDADES,
+  DisponibilidadCalendario,
   TipoCalendario,
 } from '../../data/calendario.model';
 import { CalendarioSelectorColor } from '../selector-color/selector-color';
+import { CalendarioSelectorDisponibilidad } from '../selector-disponibilidad/selector-disponibilidad';
 
 const CAMPO =
   'h-11 w-full px-3 rounded-lg border border-surface-border bg-background text-text-main outline-none focus:border-primary';
@@ -15,12 +18,16 @@ export interface EditarCalendario {
   id: number;
   nombre: string;
   color: string;
+  disponibilidad: DisponibilidadCalendario;
 }
 
-/** Crear, editar (nombre y color) y eliminar calendarios propios. */
+/**
+ * Crear, editar (nombre, color y cómo cuenta para el tiempo libre) y eliminar calendarios
+ * propios. Al final, el acceso al horario de trabajo que usa el asistente para planificar.
+ */
 @Component({
   selector: 'app-calendario-gestion',
-  imports: [LucidePencil, LucideTrash2, CalendarioSelectorColor],
+  imports: [LucidePencil, LucideTrash2, CalendarioSelectorColor, CalendarioSelectorDisponibilidad],
   template: `
     @if (calendarios().length) {
       <ul
@@ -45,6 +52,7 @@ export interface EditarCalendario {
                   />
                 </label>
                 <app-calendario-selector-color [(color)]="colorEdicion" />
+                <app-calendario-selector-disponibilidad [(valor)]="disponibilidadEdicion" />
                 <div class="flex gap-2">
                   <button
                     type="button"
@@ -73,13 +81,7 @@ export interface EditarCalendario {
                   <span class="block text-sm font-medium text-text-main truncate">{{
                     c.nombre
                   }}</span>
-                  <span class="block text-xs text-text-muted">{{
-                    c.tipo === 'turnos'
-                      ? c.primer_largo
-                        ? 'Turnos'
-                        : 'Turnos · falta fijar el ciclo'
-                      : 'Actividades'
-                  }}</span>
+                  <span class="block text-xs text-text-muted">{{ detalle(c) }}</span>
                 </span>
                 @if (c.tipo === 'turnos') {
                   <button
@@ -152,6 +154,7 @@ export interface EditarCalendario {
           </div>
         </fieldset>
         <app-calendario-selector-color [(color)]="color" />
+        <app-calendario-selector-disponibilidad [(valor)]="disponibilidad" />
         <button
           type="submit"
           [disabled]="!nombre().trim() || guardando()"
@@ -160,6 +163,13 @@ export interface EditarCalendario {
           Crear calendario
         </button>
       </form>
+      <button
+        type="button"
+        (click)="horario.emit()"
+        class="min-h-11 rounded-lg border border-dashed border-surface-border text-sm font-semibold text-text-main hover:bg-background"
+      >
+        Horario de trabajo…
+      </button>
     }
   `,
   host: { class: 'flex flex-col gap-4' },
@@ -171,6 +181,8 @@ export class CalendarioGestion {
   readonly actualizar = output<EditarCalendario>();
   readonly eliminar = output<Calendario>();
   readonly ciclo = output<Calendario>();
+  /** Abrir el horario base de trabajo. */
+  readonly horario = output<void>();
 
   readonly campo = CAMPO;
   readonly tipos: { valor: TipoCalendario; nombre: string; detalle: string }[] = [
@@ -181,15 +193,32 @@ export class CalendarioGestion {
   readonly nombre = signal('');
   readonly tipo = signal<TipoCalendario>('actividades');
   readonly color = signal(COLORES_CALENDARIO[2]);
+  /** Los turnos de otra persona suelen ser solo contexto; las actividades, ocupar. */
+  readonly disponibilidad = linkedSignal<DisponibilidadCalendario>(() =>
+    this.tipo() === 'turnos' ? 'contexto' : 'ocupa',
+  );
 
   /** Calendario en edición (uno a la vez); el tipo no cambia porque sus datos dependen de él. */
   readonly editandoId = signal<number | null>(null);
   readonly nombreEdicion = signal('');
   readonly colorEdicion = signal('');
+  readonly disponibilidadEdicion = signal<DisponibilidadCalendario>('ocupa');
+
+  detalle(c: Calendario): string {
+    const tipo =
+      c.tipo === 'turnos'
+        ? c.primer_largo
+          ? 'Turnos'
+          : 'Turnos · falta fijar el ciclo'
+        : 'Actividades';
+    const disp = DISPONIBILIDADES.find((d) => d.valor === c.disponibilidad)?.nombre;
+    return disp ? `${tipo} · ${disp.toLowerCase()}` : tipo;
+  }
 
   editar(c: Calendario) {
     this.nombreEdicion.set(c.nombre);
     this.colorEdicion.set(c.color);
+    this.disponibilidadEdicion.set(c.disponibilidad ?? 'ocupa');
     this.editandoId.set(c.id);
   }
 
@@ -197,7 +226,12 @@ export class CalendarioGestion {
     ev.preventDefault();
     const nombre = this.nombreEdicion().trim();
     if (!nombre) return;
-    this.actualizar.emit({ id: c.id, nombre, color: this.colorEdicion() });
+    this.actualizar.emit({
+      id: c.id,
+      nombre,
+      color: this.colorEdicion(),
+      disponibilidad: this.disponibilidadEdicion(),
+    });
     this.editandoId.set(null);
   }
 
@@ -205,7 +239,12 @@ export class CalendarioGestion {
     ev.preventDefault();
     const nombre = this.nombre().trim();
     if (!nombre) return;
-    this.crear.emit({ nombre, tipo: this.tipo(), color: this.color() });
+    this.crear.emit({
+      nombre,
+      tipo: this.tipo(),
+      color: this.color(),
+      disponibilidad: this.disponibilidad(),
+    });
     this.nombre.set('');
   }
 }

@@ -35,12 +35,16 @@ por defecto es `contexto`; en uno de actividades es `ocupa`.
    la disponibilidad de los calendarios, el horario base, los bloques y los
    permisos nuevos. Los calendarios de turnos que ya existían pasan a `contexto`;
    el resto queda en `ocupa`.
-2. Fijar el horario base con `PUT /api/calendario/horario-base` y la
-   disponibilidad de cada calendario con `PUT /api/calendarios/{id}`. Ambas
-   requieren sesión normal; en Bruno están en la carpeta `calendario`.
-3. Emitir una clave nueva. Además de los permisos de memoria y tareas, debe
-   tener `calendar:read`, `tasks:manage` o ambos, y los calendarios que puede ver
-   en `calendario_ids`:
+2. En **Calendario → Calendarios…**, editar cada calendario y elegir en
+   **Para planificar tareas** si *me ocupa*, *me libera* o es *solo contexto*.
+   Luego abrir **Horario de trabajo…** y fijar las franjas de cada día. Por REST:
+   `PUT /api/calendarios/{id}` con `disponibilidad` y
+   `PUT /api/calendario/horario-base`.
+3. En **Configuración → Conexiones → Claves API**, emitir una clave nueva con
+   **Tareas: Leer, crear, cerrar y planificar tareas** y **Calendario: Ver mi
+   tiempo libre**, y marcar los calendarios que el asistente puede ver con
+   detalle. Por REST, los permisos son `tasks:manage` y `calendar:read`, y los
+   calendarios van en `calendario_ids`:
 
    ```json
    {
@@ -119,8 +123,12 @@ lo que liberan los calendarios.
 - `hora_fin` admite `24:00`.
 - Repetir la misma petición con el mismo `operacion_id` devuelve el resultado
   original. Usar el mismo identificador con otros datos responde `409`.
-- Los bloques aparecen en `GET /api/calendario` (campo `bloques`) y se pueden
-  quitar con sesión mediante `DELETE /api/calendario/bloques/{id}`.
+- En la aplicación, los bloques aparecen en la capa **Planificado** del
+  calendario. Esa capa se puede ocultar y solo se muestra cuando hay bloques.
+  Al tocar dos veces un bloque se abren sus opciones: **Abrir proyecto** y
+  **Quitar bloque**. Por REST, los bloques vienen en `GET /api/calendario`
+  (campo `bloques`) y se quitan con `DELETE /api/calendario/bloques/{id}`.
+- La estimación también se edita en el detalle de la tarea (**Estimación**).
 
 ### Reglas de los cambios de tareas
 

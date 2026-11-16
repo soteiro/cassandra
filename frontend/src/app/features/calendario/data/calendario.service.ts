@@ -11,6 +11,7 @@ import {
   CalendarioRango,
   CalendarioRequest,
   CodigoTurno,
+  FranjaHorario,
 } from './calendario.model';
 
 export interface RangoParams {
@@ -41,13 +42,20 @@ export class CalendarioService {
     });
   }
 
+  /** Calendarios propios (para elegir cuáles ve una clave). Solo pide mientras `activo`. */
+  calendariosResource(activo: () => boolean) {
+    return httpResource<Calendario[]>(() =>
+      activo() && this.authService.isLoggedIn() ? `${this.apiUrl}/calendarios` : undefined,
+    );
+  }
+
   crearCalendario(req: CalendarioRequest): Observable<Calendario> {
     return this.http.post<Calendario>(`${this.apiUrl}/calendarios`, req);
   }
 
   actualizarCalendario(
     id: number,
-    req: Partial<Pick<Calendario, 'nombre' | 'color' | 'oculto'>>,
+    req: Partial<Pick<Calendario, 'nombre' | 'color' | 'oculto' | 'disponibilidad'>>,
   ): Observable<Calendario> {
     return this.http.put<Calendario>(`${this.apiUrl}/calendarios/${id}`, req);
   }
@@ -90,6 +98,19 @@ export class CalendarioService {
   cancelarDia(actividadId: number, fecha: string, cancelar: boolean): Observable<void> {
     const url = `${this.apiUrl}/calendario/actividades/${actividadId}/cancelaciones/${fecha}`;
     return cancelar ? this.http.put<void>(url, null) : this.http.delete<void>(url);
+  }
+
+  horarioBase(): Observable<FranjaHorario[]> {
+    return this.http.get<FranjaHorario[]>(`${this.apiUrl}/calendario/horario-base`);
+  }
+
+  /** Reemplaza todas las franjas. */
+  guardarHorarioBase(franjas: FranjaHorario[]): Observable<FranjaHorario[]> {
+    return this.http.put<FranjaHorario[]>(`${this.apiUrl}/calendario/horario-base`, { franjas });
+  }
+
+  quitarBloque(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/calendario/bloques/${id}`);
   }
 
   ocultarDeadlines(ocultar: boolean): Observable<Preferencias> {
