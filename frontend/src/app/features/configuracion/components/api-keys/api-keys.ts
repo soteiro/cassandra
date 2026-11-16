@@ -163,7 +163,7 @@ export class ApiKeys {
     this.notice.set('');
     this.editing.set(key);
     this.nameInput()?.nativeElement.focus();
-    this.nameInput()?.nativeElement.scrollIntoView({ block: 'center' });
+    this.nameInput()?.nativeElement.scrollIntoView?.({ block: 'center' });
   }
 
   protected cancelEdit(): void {
