@@ -81,13 +81,14 @@ const rango: CalendarioRango = {
       origen: 'mcp',
     },
   ],
+  tiempo_libre: [{ fecha: '2026-11-17', hora_inicio: '07:00', hora_fin: '11:30', minutos: 270 }],
 };
 
 describe('construirDias', () => {
   it('reparte deadlines en curso y el día que vencen, con turnos y choques', () => {
     const dias = construirDias(
       rango,
-      { calendarios: new Set([1, 2]), deadlines: true, planificado: true },
+      { calendarios: new Set([1, 2]), deadlines: true, planificado: true, libre: true },
       '2026-11-16',
     );
     const lunes = dias.get('2026-11-16')!;
@@ -103,7 +104,7 @@ describe('construirDias', () => {
   it('un deadline sin inicio solo aparece el día que vence', () => {
     const dias = construirDias(
       rango,
-      { calendarios: new Set(), deadlines: true, planificado: true },
+      { calendarios: new Set(), deadlines: true, planificado: true, libre: true },
       '2026-11-16',
     );
     const conContribuciones = [...dias.values()].filter((d) =>
@@ -116,7 +117,7 @@ describe('construirDias', () => {
   it('respeta las capas ocultas', () => {
     const dias = construirDias(
       rango,
-      { calendarios: new Set([1]), deadlines: false, planificado: true },
+      { calendarios: new Set([1]), deadlines: false, planificado: true, libre: true },
       '2026-11-16',
     );
     const martes = dias.get('2026-11-17')!;
@@ -134,7 +135,7 @@ describe('bloques de trabajo', () => {
     };
     const dias = construirDias(
       conTerapia,
-      { calendarios: new Set([2]), deadlines: false, planificado: true },
+      { calendarios: new Set([2]), deadlines: false, planificado: true, libre: true },
       '2026-11-16',
     );
     const [terapia, bloque] = dias.get('2026-11-18')!.actividades;
@@ -153,10 +154,124 @@ describe('bloques de trabajo', () => {
   it('desaparecen al ocultar la capa', () => {
     const dias = construirDias(
       rango,
-      { calendarios: new Set([1, 2]), deadlines: true, planificado: false },
+      { calendarios: new Set([1, 2]), deadlines: true, planificado: false, libre: true },
       '2026-11-16',
     );
     expect(dias.get('2026-11-18')?.actividades ?? []).toEqual([]);
+  });
+});
+
+describe('actividades que cruzan la medianoche', () => {
+  it('se dibujan en dos tramos y la madrugada no se cuenta dos veces', () => {
+    const dormir = {
+      actividad_id: 9,
+      calendario_id: 2,
+      fecha: '2026-11-16',
+      titulo: 'Dormir',
+      hora_inicio: '22:30',
+      hora_fin: '07:00',
+      semanal: true,
+      cancelada: false,
+    };
+    // La del día anterior al rango solo aporta su madrugada.
+    const conNoche = {
+      ...rango,
+      ocurrencias: [{ ...dormir, fecha: '2026-11-15' }, dormir],
+      bloques: [],
+    };
+    const dias = construirDias(
+      conNoche,
+      { calendarios: new Set([2]), deadlines: false, planificado: true, libre: true },
+      '2026-11-16',
+    );
+    expect(dias.has('2026-11-15')).toBe(false);
+    const lunes = dias.get('2026-11-16')!.actividades;
+    expect(lunes.map((a) => [a.clave, a.desde, a.hasta, a.parte])).toEqual([
+      ['9v', 0, 7, 'viene'],
+      ['9', 22.5, 24, 'sigue'],
+    ]);
+    expect(lunes[0].horas).toBe('22:30–07:00');
+    expect(lunes[0].fecha).toBe('2026-11-15');
+    expect(dias.get('2026-11-17')!.actividades[0]).toMatchObject({
+      clave: '9v',
+      desde: 0,
+      hasta: 7,
+    });
+  });
+});
+
+describe('choques del mismo dueño', () => {
+  const conCalendarios = {
+    ...rango,
+    calendarios: [
+      ...rango.calendarios,
+      {
+        id: 3,
+        nombre: 'Traslados',
+        color: '#ff9e64',
+        tipo: 'actividades' as const,
+        oculto: false,
+        disponibilidad: 'ocupa' as const,
+      },
+      {
+        id: 4,
+        nombre: 'Colegio',
+        color: '#7ee787',
+        tipo: 'actividades' as const,
+        oculto: false,
+        disponibilidad: 'libera' as const,
+      },
+    ],
+    bloques: [],
+  };
+  const oc = (id: number, cal: number, titulo: string, ini: string, fin: string) => ({
+    actividad_id: id,
+    calendario_id: cal,
+    fecha: '2026-11-17',
+    titulo,
+    hora_inicio: ini,
+    hora_fin: fin,
+    semanal: false,
+    cancelada: false,
+  });
+  const choquesDe = (ocurrencias: ReturnType<typeof oc>[]) => {
+    const dias = construirDias(
+      { ...conCalendarios, ocurrencias },
+      { calendarios: new Set([2, 3, 4]), deadlines: false, planificado: true, libre: true },
+      '2026-11-16',
+    );
+    return Object.fromEntries(
+      dias.get('2026-11-17')!.actividades.map((a) => [a.titulo, a.choques]),
+    );
+  };
+
+  it('el colegio (libera) no choca con un traslado tuyo (ocupa)', () => {
+    expect(
+      choquesDe([oc(1, 4, 'Colegio', '14:30', '17:45'), oc(2, 3, 'Traslado', '13:40', '15:00')]),
+    ).toEqual({ Colegio: [], Traslado: [] });
+  });
+
+  it('dos cosas que te ocupan a ti sí chocan, aunque sean de calendarios distintos', () => {
+    expect(
+      choquesDe([oc(1, 2, 'Terapia', '16:00', '17:00'), oc(2, 3, 'Traslado', '16:30', '17:30')]),
+    ).toEqual({ Terapia: ['Traslado'], Traslado: ['Terapia'] });
+  });
+
+  it('dos cosas del mismo calendario chocan aunque no te ocupen', () => {
+    expect(
+      choquesDe([oc(1, 4, 'Colegio', '08:00', '13:00'), oc(2, 4, 'Acto', '12:00', '14:00')]),
+    ).toEqual({ Colegio: ['Acto'], Acto: ['Colegio'] });
+  });
+});
+
+describe('tiempo para trabajar', () => {
+  it('se reparte por día y se oculta con su capa', () => {
+    const vis = { calendarios: new Set([1, 2]), deadlines: true, planificado: true, libre: true };
+    expect(construirDias(rango, vis, '2026-11-16').get('2026-11-17')!.libre).toEqual([
+      { desde: 7, hasta: 11.5, horas: '07:00–11:30' },
+    ]);
+    const oculto = construirDias(rango, { ...vis, libre: false }, '2026-11-16');
+    expect(oculto.get('2026-11-17')!.libre).toEqual([]);
   });
 });
 
@@ -164,7 +279,7 @@ describe('resumenFranja', () => {
   it('cuenta vencidos, próximos y choques de la semana', () => {
     const dias = construirDias(
       rango,
-      { calendarios: new Set([1, 2]), deadlines: true, planificado: true },
+      { calendarios: new Set([1, 2]), deadlines: true, planificado: true, libre: true },
       '2026-11-16',
     );
     const r = resumenFranja(rango, dias, '2026-11-16');

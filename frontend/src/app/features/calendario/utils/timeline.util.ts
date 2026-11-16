@@ -1,5 +1,5 @@
 import { Calendario } from '../data/calendario.model';
-import { horaANumero, sumarDias } from './dias.util';
+import { sumarDias } from './dias.util';
 import { fondo } from './estilo.util';
 import { asignarCarriles, segmentosTurnoDia, SegmentoTurno } from './layout.util';
 import { ActividadDia, DiaInfo, diaVacio } from './modelo.util';
@@ -17,12 +17,13 @@ export interface Bloque {
 
 /** Actividades de un día con su nivel de solapamiento (las que se cruzan se montan). */
 export function bloquesDelDia(info: DiaInfo): Bloque[] {
-  const items = info.actividades.map((a) => {
-    const inicio = horaANumero(a.hora_inicio);
-    return { a: inicio, b: Math.max(horaANumero(a.hora_fin), inicio + 0.5), actividad: a };
-  });
+  const items = info.actividades.map((a) => ({
+    a: a.desde,
+    b: Math.max(a.hasta, a.desde + 0.5),
+    actividad: a,
+  }));
   return asignarCarriles(items).map((x) => ({
-    clave: `${info.fecha}|${x.actividad.actividad_id}`,
+    clave: `${info.fecha}|${x.actividad.clave}`,
     actividad: x.actividad,
     inicio: x.a,
     fin: x.b,
@@ -30,6 +31,8 @@ export function bloquesDelDia(info: DiaInfo): Bloque[] {
     corto: x.b - x.a < 1,
     aria:
       `${x.actividad.titulo}, ${x.actividad.hora_inicio} a ${x.actividad.hora_fin}` +
+      (x.actividad.parte === 'sigue' ? ' del día siguiente' : '') +
+      (x.actividad.parte === 'viene' ? ', desde el día anterior' : '') +
       (x.actividad.cancelada ? ', no ocurre este día' : '') +
       (x.actividad.choques.length ? `, choca con ${x.actividad.choques.join(' y ')}` : ''),
   }));

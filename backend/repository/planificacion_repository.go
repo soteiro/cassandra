@@ -149,7 +149,7 @@ func (r *CalendarioRepository) calcular(ctx context.Context, userID int, desde, 
 		}
 		c.turnos = append(c.turnos, t...)
 	}
-	if c.ocurrencias, err = r.ocurrencias(ctx, userID, desde, hasta); err != nil {
+	if c.ocurrencias, err = r.ocurrenciasConNoche(ctx, userID, desde, hasta); err != nil {
 		return nil, err
 	}
 	if c.bloques, err = r.bloques(ctx, userID, desde, hasta); err != nil {
@@ -158,7 +158,38 @@ func (r *CalendarioRepository) calcular(ctx context.Context, userID int, desde, 
 	if c.base, err = r.HorarioBase(ctx, userID); err != nil {
 		return nil, err
 	}
+	c.huecos = huecosDe(desde, hasta, c.cals, c.turnos, c.ocurrencias, c.bloques, c.base, inicio)
+	return c, nil
+}
 
+// cruzaMedianoche: una actividad cuyo fin no es posterior a su inicio termina al día siguiente.
+func cruzaMedianoche(inicio, fin string) bool { return fin <= inicio }
+
+// ocurrenciasConNoche son las ocurrencias del rango más las del día anterior que cruzan
+// la medianoche: dormir desde las 22:30 de ayer también ocupa esta mañana.
+func (r *CalendarioRepository) ocurrenciasConNoche(ctx context.Context, userID int, desde, hasta time.Time) ([]models.OcurrenciaDia, error) {
+	ocs, err := r.ocurrencias(ctx, userID, desde.AddDate(0, 0, -1), hasta)
+	if err != nil {
+		return nil, err
+	}
+	antes := desde.AddDate(0, 0, -1).Format(calendario.Layout)
+	out := ocs[:0]
+	for _, o := range ocs {
+		if o.Fecha != antes || cruzaMedianoche(o.HoraInicio, o.HoraFin) {
+			out = append(out, o)
+		}
+	}
+	return out, nil
+}
+
+// huecosDe calcula el tiempo libre del rango con los datos ya leídos: horario base más lo
+// que libera, menos lo que ocupa y los bloques. inicio son minutos desde las 00:00 de desde.
+func huecosDe(desde, hasta time.Time, cals []models.Calendario, turnos []models.TurnoDia,
+	ocurrencias []models.OcurrenciaDia, bloques []models.Bloque, base []models.FranjaHorario, inicio int) []calendario.Hueco {
+	disp := map[int]string{}
+	for _, cal := range cals {
+		disp[cal.ID] = cal.Disponibilidad
+	}
 	offset := func(fecha string) int {
 		d, _ := calendario.ParseDia(fecha)
 		return int(d.Sub(desde).Hours()/24) * calendario.MinutosDia
@@ -172,29 +203,42 @@ func (r *CalendarioRepository) calcular(ctx context.Context, userID int, desde, 
 			libera = append(libera, x)
 		}
 	}
-	for _, t := range c.turnos {
+	for _, t := range turnos {
 		if ini, fin, ok := calendario.HorarioTurno(t.Codigo); ok {
 			o := offset(t.Fecha)
 			agregar(disp[t.CalendarioID], calendario.Intervalo{Ini: o + ini, Fin: o + fin})
 		}
 	}
-	for _, oc := range c.ocurrencias {
-		if !oc.Cancelada {
-			o := offset(oc.Fecha)
-			agregar(disp[oc.CalendarioID], calendario.Intervalo{Ini: o + minutos(oc.HoraInicio), Fin: o + minutos(oc.HoraFin)})
+	for _, oc := range ocurrencias {
+		if oc.Cancelada {
+			continue
 		}
+		o, ini, fin := offset(oc.Fecha), minutos(oc.HoraInicio), minutos(oc.HoraFin)
+		if cruzaMedianoche(oc.HoraInicio, oc.HoraFin) {
+			fin += calendario.MinutosDia
+		}
+		agregar(disp[oc.CalendarioID], calendario.Intervalo{Ini: o + ini, Fin: o + fin})
 	}
-	for _, b := range c.bloques {
+	for _, b := range bloques {
 		o := offset(b.Fecha)
 		ocupa = append(ocupa, calendario.Intervalo{Ini: o + minutos(b.HoraInicio), Fin: o + minutos(b.HoraFin)})
 	}
-	franjas := make([]calendario.Franja, 0, len(c.base))
-	for _, f := range c.base {
+	franjas := make([]calendario.Franja, 0, len(base))
+	for _, f := range base {
 		franjas = append(franjas, calendario.Franja{DiaSemana: f.DiaSemana, Ini: minutos(f.HoraInicio), Fin: minutos(f.HoraFin)})
 	}
 	dias := int(hasta.Sub(desde).Hours()/24) + 1
-	c.huecos = calendario.Huecos(desde, dias, franjas, libera, ocupa, inicio, MinutosHuecoMinimo)
-	return c, nil
+	return calendario.Huecos(desde, dias, franjas, libera, ocupa, inicio, MinutosHuecoMinimo)
+}
+
+// HuecosLibres convierte huecos al formato de la API.
+func huecosLibres(hs []calendario.Hueco) []models.HuecoLibre {
+	out := make([]models.HuecoLibre, 0, len(hs))
+	for _, h := range hs {
+		out = append(out, models.HuecoLibre{Fecha: h.Fecha.Format(calendario.Layout),
+			HoraInicio: calendario.FormatoHora(h.Ini), HoraFin: calendario.FormatoHora(h.Fin), Minutos: h.Minutos()})
+	}
+	return out
 }
 
 var nombresTurno = map[string]string{"L": "Largo", "N": "Noche", "S": "Saliente", "F": "Libre", "V": "Vacaciones", "M": "Licencia"}
@@ -222,9 +266,8 @@ func (r *CalendarioRepository) Disponibilidad(ctx context.Context, userID int, d
 			res.Calendarios = append(res.Calendarios, models.CalendarioVisible{ID: cal.ID, Nombre: cal.Nombre, Tipo: cal.Tipo, Disponibilidad: cal.Disponibilidad})
 		}
 	}
+	res.Huecos = huecosLibres(c.huecos)
 	for _, h := range c.huecos {
-		res.Huecos = append(res.Huecos, models.HuecoLibre{Fecha: h.Fecha.Format(calendario.Layout),
-			HoraInicio: calendario.FormatoHora(h.Ini), HoraFin: calendario.FormatoHora(h.Fin), Minutos: h.Minutos()})
 		res.MinutosLibres += h.Minutos()
 	}
 
@@ -252,10 +295,11 @@ func (r *CalendarioRepository) Disponibilidad(ctx context.Context, userID int, d
 		}
 	}
 	for _, oc := range c.ocurrencias {
-		if oc.Cancelada {
+		if oc.Cancelada || !enRango(oc.Fecha) {
 			continue
 		}
-		e := models.EventoCalendario{Fecha: oc.Fecha, HoraInicio: oc.HoraInicio, HoraFin: oc.HoraFin, Titulo: oc.Titulo, Disponibilidad: disp[oc.CalendarioID]}
+		e := models.EventoCalendario{Fecha: oc.Fecha, HoraInicio: oc.HoraInicio, HoraFin: oc.HoraFin, Titulo: oc.Titulo,
+			TerminaDiaSig: cruzaMedianoche(oc.HoraInicio, oc.HoraFin), Disponibilidad: disp[oc.CalendarioID]}
 		switch id := oc.CalendarioID; {
 		case ve(calendarios, id):
 			e.CalendarioID = &id

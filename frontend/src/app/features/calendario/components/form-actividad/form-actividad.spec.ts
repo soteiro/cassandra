@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CalendarioFormActividad, GuardarActividad } from './form-actividad';
 import { Actividad, Calendario } from '../../data/calendario.model';
+import { ActividadDia } from '../../utils/modelo.util';
 
 const CALENDARIOS: Calendario[] = [
   {
@@ -95,5 +96,61 @@ describe('CalendarioFormActividad', () => {
     expect(select.className).toContain('min-h-11');
     expect(select.className).toContain('py-2');
     expect(select.className).not.toMatch(/(^|\s)h-11(\s|$)/);
+  });
+
+  it('acepta una actividad que termina al día siguiente y rechaza horas iguales', () => {
+    crear();
+    fixture.componentInstance.horaInicio.set('22:30');
+    fixture.componentInstance.horaFin.set('07:00');
+    fixture.detectChanges();
+    expect(el.textContent).toContain('Termina al día siguiente.');
+    enviar();
+    expect(guardados[0].req).toMatchObject({ hora_inicio: '22:30', hora_fin: '07:00' });
+
+    fixture.componentInstance.horaFin.set('22:30');
+    enviar();
+    expect(guardados).toHaveLength(1);
+    expect(el.textContent).toContain('distinta de la de inicio');
+  });
+
+  it('solo avisa choques con cosas del mismo dueño', () => {
+    crear();
+    const traslado = {
+      actividad_id: 7,
+      calendario_id: 3,
+      titulo: 'Traslado',
+      desde: 13.5,
+      hasta: 15,
+      horas: '13:30–15:00',
+      mio: true,
+      cancelada: false,
+    } as ActividadDia;
+    fixture.componentRef.setInput('ocupado', () => [traslado]);
+    fixture.componentRef.setInput('calendarios', [
+      {
+        id: 4,
+        nombre: 'Colegio',
+        color: '#7ee787',
+        tipo: 'actividades',
+        oculto: false,
+        disponibilidad: 'libera',
+      },
+      {
+        id: 5,
+        nombre: 'Citas',
+        color: '#f778ba',
+        tipo: 'actividades',
+        oculto: false,
+        disponibilidad: 'ocupa',
+      },
+    ]);
+    fixture.componentInstance.calendarioId.set(4);
+    fixture.componentInstance.horaInicio.set('14:30');
+    fixture.componentInstance.horaFin.set('17:45');
+    fixture.detectChanges();
+    expect(fixture.componentInstance.choque()).toBe('');
+
+    fixture.componentInstance.calendarioId.set(5);
+    expect(fixture.componentInstance.choque()).toContain('Traslado (13:30–15:00)');
   });
 });

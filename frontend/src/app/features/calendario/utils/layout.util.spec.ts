@@ -1,18 +1,5 @@
-import { Deadline, OcurrenciaDia, TurnoDia } from '../data/calendario.model';
+import { Deadline, TurnoDia } from '../data/calendario.model';
 import { asignarCarriles, barrasSemana, choquesDelDia, segmentosTurnoDia } from './layout.util';
-
-function ocurrencia(id: number, titulo: string, ini: string, fin: string): OcurrenciaDia {
-  return {
-    actividad_id: id,
-    calendario_id: 1,
-    fecha: '2026-11-17',
-    titulo,
-    hora_inicio: ini,
-    hora_fin: fin,
-    semanal: false,
-    cancelada: false,
-  };
-}
 
 function deadline(titulo: string, limite: string, inicio?: string): Deadline {
   return {
@@ -51,18 +38,39 @@ describe('asignarCarriles', () => {
 });
 
 describe('choquesDelDia', () => {
-  it('lista con qué choca cada actividad e ignora las canceladas', () => {
-    const cancelada = { ...ocurrencia(3, 'Cancelada', '16:00', '18:00'), cancelada: true };
+  const item = (clave: string, titulo: string, desde: number, hasta: number, extra = {}) => ({
+    clave,
+    titulo,
+    desde,
+    hasta,
+    cancelada: false,
+    grupo: '1',
+    mio: false,
+    ...extra,
+  });
+
+  it('lista con qué choca cada cosa del mismo dueño e ignora las canceladas', () => {
     const m = choquesDelDia([
-      ocurrencia(1, 'Terapia', '16:00', '17:00'),
-      ocurrencia(2, 'Reunión', '16:30', '17:30'),
-      cancelada,
-      ocurrencia(4, 'Colegio', '08:00', '13:00'),
+      item('1', 'Terapia', 16, 17),
+      item('2', 'Reunión', 16.5, 17.5),
+      item('3', 'Cancelada', 16, 18, { cancelada: true }),
+      item('4', 'Colegio', 8, 13),
     ]);
-    expect(m.get(1)).toEqual(['Reunión']);
-    expect(m.get(2)).toEqual(['Terapia']);
-    expect(m.has(3)).toBe(false);
-    expect(m.has(4)).toBe(false);
+    expect(m.get('1')).toEqual(['Reunión']);
+    expect(m.get('2')).toEqual(['Terapia']);
+    expect(m.has('3')).toBe(false);
+    expect(m.has('4')).toBe(false);
+  });
+
+  it('entre calendarios distintos solo chocan si las dos te ocupan', () => {
+    const m = choquesDelDia([
+      item('1', 'Colegio', 14.5, 17.75, { grupo: 'colegio' }),
+      item('2', 'Traslado', 13.5, 15, { grupo: 'traslados', mio: true }),
+      item('3', 'Bloque', 14, 15, { grupo: 'trabajo', mio: true }),
+    ]);
+    expect(m.has('1')).toBe(false);
+    expect(m.get('2')).toEqual(['Bloque']);
+    expect(m.get('3')).toEqual(['Traslado']);
   });
 });
 

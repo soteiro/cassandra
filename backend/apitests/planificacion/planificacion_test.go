@@ -482,3 +482,62 @@ func TestEditarPermisosDeUnaKeySinRegenerarla(t *testing.T) {
 	e.api.Do(e.ana, http.MethodDelete, ruta, nil).Expect(t, http.StatusNoContent)
 	e.api.Do(e.ana, http.MethodPut, ruta, cambio).Expect(t, http.StatusConflict)
 }
+
+func TestActividadQueCruzaLaMedianoche(t *testing.T) {
+	e := preparar(t)
+	hogar := calendario(t, e.api, e.ana, "Hogar", "actividades", "ocupa")
+	// Dormir todos los días de 22:30 a 07:00 del día siguiente.
+	actividad(t, e.api, e.ana, hogar.ID, "Dormir", "22:30", "07:00", []int{0, 1, 2, 3, 4, 5, 6})
+	e.api.Do(e.ana, http.MethodPost, apitest.Path("/api/calendarios/%d/actividades", hogar.ID), map[string]any{
+		"titulo": "Igual", "fecha": "2026-11-02", "hora_inicio": "10:00", "hora_fin": "10:00", "dias_semana": []int{},
+	}).Expect(t, http.StatusBadRequest)
+	// Horario base del martes desde la madrugada: el sueño del lunes ocupa hasta las 07:00.
+	e.api.Do(e.ana, http.MethodPut, "/api/calendario/horario-base", models.HorarioBaseRequest{Franjas: []models.FranjaHorario{
+		{DiaSemana: 1, HoraInicio: "05:00", HoraFin: "09:00"}, {DiaSemana: 1, HoraInicio: "21:00", HoraFin: "24:00"},
+	}}).Expect(t, http.StatusOK)
+
+	pm := key(t, e.api, e.ana, []int{e.p}, []int{hogar.ID}, models.CalendarRead)
+	d := disponibilidad(t, e.api, pm, "?desde=2026-11-17&hasta=2026-11-17&ahora=2026-11-17T00:00")
+	// Libre desde que termina el sueño del lunes (07:00), más el colegio que libera hasta
+	// las 13:00, y en la noche hasta que empieza el sueño del martes.
+	if got := huecosDe(d, "2026-11-17"); !reflect.DeepEqual(got, []string{"07:00-13:00", "21:00-22:30"}) {
+		t.Fatalf("martes con sueño de noche a noche: %v", got)
+	}
+	var noche bool
+	for _, ev := range d.Eventos {
+		if ev.Titulo == "Dormir" {
+			if ev.Fecha != "2026-11-17" || !ev.TerminaDiaSig || ev.HoraFin != "07:00" {
+				t.Fatalf("evento de sueño: %+v", ev)
+			}
+			noche = true
+		}
+	}
+	if !noche {
+		t.Fatal("faltó el sueño del martes")
+	}
+
+	// La app recibe también la noche anterior (para dibujar la madrugada) y el tiempo libre.
+	var rango models.CalendarioRango
+	e.api.Do(e.ana, http.MethodGet, "/api/calendario?desde=2026-11-17&hasta=2026-11-17", nil).Expect(t, http.StatusOK).JSON(t, &rango)
+	fechas := []string{}
+	for _, o := range rango.Ocurrencias {
+		if o.Titulo == "Dormir" {
+			fechas = append(fechas, o.Fecha)
+		}
+	}
+	if !reflect.DeepEqual(fechas, []string{"2026-11-16", "2026-11-17"}) {
+		t.Fatalf("ocurrencias del sueño en el rango: %v", fechas)
+	}
+	for _, o := range rango.Ocurrencias {
+		if o.Fecha == "2026-11-16" && o.Titulo != "Dormir" {
+			t.Fatalf("del día anterior solo deben venir las que cruzan la medianoche: %+v", o)
+		}
+	}
+	libre := []string{}
+	for _, h := range rango.TiempoLibre {
+		libre = append(libre, h.HoraInicio+"-"+h.HoraFin)
+	}
+	if !reflect.DeepEqual(libre, []string{"07:00-13:00", "21:00-22:30"}) {
+		t.Fatalf("tiempo libre del rango: %v", libre)
+	}
+}

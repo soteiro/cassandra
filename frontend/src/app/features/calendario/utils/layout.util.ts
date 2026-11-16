@@ -1,5 +1,5 @@
-import { CodigoTurno, Deadline, OcurrenciaDia, TURNOS, TurnoDia } from '../data/calendario.model';
-import { diasEntre, horaANumero, sumarDias } from './dias.util';
+import { CodigoTurno, Deadline, TURNOS, TurnoDia } from '../data/calendario.model';
+import { diasEntre, sumarDias } from './dias.util';
 
 /** Horas de una semana: las barras se ubican de 0 (lunes 00:00) a 168 (lunes siguiente). */
 export const HORAS_SEMANA = 168;
@@ -48,17 +48,39 @@ export function asignarCarriles<T extends { a: number; b: number }>(items: T[]):
   return out;
 }
 
-/** Por actividad: los títulos de las otras actividades del mismo día con que se solapa. */
-export function choquesDelDia(ocurrencias: OcurrenciaDia[]): Map<number, string[]> {
-  const activas = ocurrencias.filter((o) => !o.cancelada);
-  const choques = new Map<number, string[]>();
-  for (const o of activas) {
-    const a = horaANumero(o.hora_inicio);
-    const b = horaANumero(o.hora_fin);
-    const con = activas
-      .filter((x) => x !== o && horaANumero(x.hora_inicio) < b && a < horaANumero(x.hora_fin))
+/** Lo que hace falta para saber si dos cosas del mismo día chocan. */
+export interface ItemChoque {
+  clave: string;
+  titulo: string;
+  /** Horas del día (0–24) que ocupa en ese día. */
+  desde: number;
+  hasta: number;
+  cancelada: boolean;
+  /** Calendario (o "trabajo" para los bloques de tareas). */
+  grupo: string;
+  /** Te ocupa a ti: calendarios "Me ocupa" y bloques de trabajo. */
+  mio: boolean;
+}
+
+/**
+ * Por clave: los títulos de las otras cosas del mismo día con que choca. Solo chocan si se
+ * cruzan y son del mismo dueño: del mismo calendario (dos cosas de tu hijo a la vez) o las
+ * dos te ocupan a ti. El colegio (libera) no choca con tu traslado (ocupa).
+ */
+export function choquesDelDia(items: ItemChoque[]): Map<string, string[]> {
+  const activos = items.filter((o) => !o.cancelada);
+  const choques = new Map<string, string[]>();
+  for (const o of activos) {
+    const con = activos
+      .filter(
+        (x) =>
+          x !== o &&
+          x.desde < o.hasta &&
+          o.desde < x.hasta &&
+          (x.grupo === o.grupo || (x.mio && o.mio)),
+      )
       .map((x) => x.titulo);
-    if (con.length) choques.set(o.actividad_id, con);
+    if (con.length) choques.set(o.clave, con);
   }
   return choques;
 }

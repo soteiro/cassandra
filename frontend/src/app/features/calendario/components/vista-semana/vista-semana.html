@@ -84,6 +84,14 @@
             class="relative border-l border-surface-border"
             [class.bg-surface/40]="d.hoy"
           >
+            @for (l of d.libre; track l.clave) {
+              <div
+                class="absolute inset-x-0 pointer-events-none"
+                [style]="l.estilo"
+                role="img"
+                [attr.aria-label]="l.aria"
+              ></div>
+            }
             @for (t of d.tramos; track t.clave) {
               <div
                 class="absolute w-1 rounded-full"
@@ -107,7 +115,7 @@
                 >
                 <span
                   class="hidden md:block text-[10px] leading-3 text-text-muted whitespace-nowrap"
-                  >{{ b.actividad.hora_inicio }}–{{ b.actividad.hora_fin }}</span
+                  >{{ b.actividad.horas }}</span
                 >
               </button>
             }
