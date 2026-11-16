@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.23.0](https://github.com/soteiro/cassandra/compare/v0.22.0...v0.23.0) (2026-11-16)
+
+
+### Features
+
+* **calendario:** overnight activities, same-owner clashes and work time ([c96923d](https://github.com/soteiro/cassandra/commit/c96923d95f715d8890db879c911c317ff0294c03))
+* **calendario:** overnight activities, same-owner clashes and work time ([6ae5308](https://github.com/soteiro/cassandra/commit/6ae530885f48b10ee611e1cde302d1f13d5f54b2))
+
 ## [0.22.0](https://github.com/soteiro/cassandra/compare/v0.21.0...v0.22.0) (2026-11-16)
 
 
