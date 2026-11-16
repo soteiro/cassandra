@@ -17,8 +17,10 @@ permisos independientes de **Memoria** y **Tareas**:
 
 La opción **Leer y crear tareas** concede ambos. También se admite `tasks:create`
 sin lectura por REST. Los permisos de memoria no conceden acceso a tareas, y los
-de tareas no conceden acceso a memoria. Las claves no permiten editar, completar,
-eliminar o mover tareas, ni acceder al REST general.
+de tareas no conceden acceso a memoria. Con `tasks:manage` se puede cambiar el
+estado (incluido cerrar), la prioridad, las fechas y la estimación, y reservar
+bloques de trabajo; ver [la planificación](MCP_PLANIFICACION.md). Las claves no
+permiten renombrar, eliminar o mover tareas, ni acceder al REST general.
 
 La migración 31 amplía los permisos admitidos y añade el registro de operaciones;
 conserva los permisos de las claves existentes. Desplegar backend y frontend,
@@ -78,7 +80,8 @@ La consulta admite hasta 300 bytes; `limit` admite 1–20 (10 por defecto), y
 altas o borrados entre consultas pueden desplazar los resultados.
 
 El listado devuelve `{ "tareas": [], "hay_mas": false }` si no hay coincidencias.
-Cada fila contiene `proyecto_id`, datos de la tarea, fechas y `tarea_padre_id`.
+Cada fila contiene `proyecto_id`, datos de la tarea, fechas, `tarea_padre_id`,
+`fecha_inicio`, `fecha_limite`, `estimacion_min` y `minutos_planificados`.
 Es un listado plano: omitir el filtro de padre devuelve todos los niveles; usar
 `tarea_padre_id: 0` devuelve solo principales y un ID positivo sus subtareas directas.
 El detalle no carga un árbol de subtareas. Los textos antiguos que superen 4000

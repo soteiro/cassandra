@@ -63,7 +63,9 @@ func NewRouter(opts Options) http.Handler {
 	actividadHandler := handlers.NewActividadHandler(repository.NewActividadRepository(db), owner)
 	pronosticosHandler := handlers.NewPronosticosHandler(repository.NewPronosticosRepository(db), owner)
 	revisionHandler := handlers.NewRevisionHandler(repository.NewRevisionRepository(db))
-	calendarioHandler := handlers.NewCalendarioHandler(repository.NewCalendarioRepository(db), owner)
+	calendarioRepo := repository.NewCalendarioRepository(db)
+	calendarioHandler := handlers.NewCalendarioHandler(calendarioRepo, owner)
+	planificacionHandler := handlers.NewPlanificacionHandler(calendarioRepo)
 	ticktickHandler := handlers.NewTickTickHandler(repository.NewTickTickRepository(db), cfg.TickTick, opts.TickTickClient)
 
 	r := chi.NewRouter()
@@ -111,6 +113,13 @@ func NewRouter(opts Options) http.Handler {
 		r.Get("/", integrationTasksHandler.List)
 		r.Post("/", integrationTasksHandler.Create)
 		r.Get("/{task_id}", integrationTasksHandler.Get)
+		r.Patch("/{task_id}", integrationTasksHandler.Update)
+		r.Post("/{task_id}/bloques", planificacionHandler.Planificar)
+	})
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.IntegrationAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
+		r.Get("/api/integrations/calendar", planificacionHandler.Disponibilidad)
+		r.Delete("/api/integrations/projects/{project_id}/bloques/{bloque_id}", planificacionHandler.QuitarBloque)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -173,6 +182,9 @@ func NewRouter(opts Options) http.Handler {
 		r.Delete("/api/calendario/actividades/{id}", calendarioHandler.DeleteActividad)
 		r.Put("/api/calendario/actividades/{id}/cancelaciones/{fecha}", calendarioHandler.Cancelar)
 		r.Delete("/api/calendario/actividades/{id}/cancelaciones/{fecha}", calendarioHandler.Restaurar)
+		r.Get("/api/calendario/horario-base", planificacionHandler.HorarioBase)
+		r.Put("/api/calendario/horario-base", planificacionHandler.SetHorarioBase)
+		r.Delete("/api/calendario/bloques/{id}", planificacionHandler.DeleteBloque)
 
 		// Rutas de Logs en Crudo de Proyectos
 		r.Post("/api/proyects/{proyect_id}/logs", logsHandler.CreateLog)

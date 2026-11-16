@@ -9,6 +9,7 @@ con Capacitor.
 - **Cambios por versión:** [CHANGELOG.md](CHANGELOG.md)
 - **Memoria de proyectos y MCP:** [docs/PROJECT_MEMORY.md](docs/PROJECT_MEMORY.md)
 - **Crear y consultar tareas por MCP:** [docs/MCP_TASKS.md](docs/MCP_TASKS.md)
+- **Planificar tareas en el calendario por MCP:** [docs/MCP_PLANIFICACION.md](docs/MCP_PLANIFICACION.md)
 - **Configurar MCP en Codex, Claude Code y OpenCode:** [guía](docs/MCP_CLIENT_SETUP.md)
 
 ## Desarrollo

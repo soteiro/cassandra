@@ -9,7 +9,7 @@ http:
   body:
     type: json
     data: |-
-      {"oculto": true}
+      {"oculto": true, "disponibilidad": "libera"}
   auth: inherit
 
 settings:
@@ -17,3 +17,6 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  disponibilidad: ocupa (terapias, citas), libera (colegio: hay tiempo libre mientras ocurre) o contexto (no cambia los huecos).

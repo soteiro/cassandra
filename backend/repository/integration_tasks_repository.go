@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"cassandra/models"
 
@@ -100,14 +101,18 @@ func (r *IntegrationTasksRepository) Create(ctx context.Context, userID, project
 const integrationTaskColumns = `SELECT t.id,t.proyecto_id,t.nombre,
 	left(COALESCE(t.descripcion,''),4000),left(COALESCE(t.comentario,''),4000),
 	COALESCE(t.estado,'Abierto'),t.prioridad,t.tarea_padre_id,t.fecha_creacion,t.fecha_actualizacion,t.fecha_terminado,
-	(COALESCE(length(t.descripcion),0)>4000 OR COALESCE(length(t.comentario),0)>4000)
+	(COALESCE(length(t.descripcion),0)>4000 OR COALESCE(length(t.comentario),0)>4000),
+	to_char((t.fecha_inicio AT TIME ZONE 'UTC')::date,'YYYY-MM-DD'),to_char((t.fecha_limite AT TIME ZONE 'UTC')::date,'YYYY-MM-DD'),
+	t.estimacion_min,
+	(SELECT COALESCE(sum(extract(epoch FROM b.hora_fin-b.hora_inicio)),0)::integer/60 FROM calendario_bloques b WHERE b.tarea_id=t.id)
 	FROM tareas_proyectos t JOIN proyectos p ON p.id=t.proyecto_id AND p.user_id=t.user_id
 	WHERE t.user_id=$1 AND t.proyecto_id=$2 AND t.eliminado=false AND p.eliminado=false`
 
 func scanIntegrationTask(row interface{ Scan(...any) error }) (models.IntegrationTask, error) {
 	var t models.IntegrationTask
 	err := row.Scan(&t.ID, &t.ProyectoID, &t.Nombre, &t.Descripcion, &t.Comentario, &t.Estado, &t.Prioridad,
-		&t.TareaPadreID, &t.FechaCreacion, &t.FechaActualizacion, &t.FechaTerminado, &t.TextoTruncado)
+		&t.TareaPadreID, &t.FechaCreacion, &t.FechaActualizacion, &t.FechaTerminado, &t.TextoTruncado,
+		&t.FechaInicio, &t.FechaLimite, &t.EstimacionMin, &t.MinutosPlanificados)
 	return t, err
 }
 
@@ -153,4 +158,55 @@ func (r *IntegrationTasksRepository) List(ctx context.Context, userID, projectID
 		out.Tareas = out.Tareas[:query.Limit]
 	}
 	return out, nil
+}
+
+// Update cambia estado, prioridad, fechas o estimación de una tarea del proyecto. Pasar a
+// Terminado cierra también sus subtareas pendientes, como en la aplicación. El cambio
+// queda en el historial con origen mcp.
+func (r *IntegrationTasksRepository) Update(ctx context.Context, userID, projectID, taskID int, req models.UpdateIntegrationTaskRequest) (*models.IntegrationTask, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+	upd := &models.TareaUpdateRequest{Estado: req.Estado, Prioridad: req.Prioridad, EstimacionMin: req.EstimacionMin}
+	for _, f := range []struct {
+		src  *string
+		dest **time.Time
+	}{{req.FechaInicio, &upd.FechaInicio}, {req.FechaLimite, &upd.FechaLimite}} {
+		if f.src != nil {
+			d, err := time.Parse("2006-01-02", *f.src)
+			if err != nil {
+				return nil, err
+			}
+			*f.dest = &d
+		}
+	}
+	quitar := func(b bool) *bool {
+		if b {
+			return &b
+		}
+		return nil
+	}
+	upd.ClearFechaInicio, upd.ClearFechaLimite, upd.ClearEstimacion = quitar(req.QuitarFechaInicio), quitar(req.QuitarFechaLimite), quitar(req.QuitarEstimacion)
+
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+	var id int
+	if err := tx.QueryRow(ctx, `SELECT t.id FROM tareas_proyectos t
+		JOIN proyectos p ON p.id=t.proyecto_id AND p.user_id=t.user_id AND p.eliminado=false
+		WHERE t.id=$1 AND t.proyecto_id=$2 AND t.user_id=$3 AND t.eliminado=false FOR UPDATE OF t`, taskID, projectID, userID).Scan(&id); err != nil {
+		return nil, err
+	}
+	if _, err := tx.Exec(ctx, `SELECT set_config('cassandra.origen','mcp',true)`); err != nil {
+		return nil, err
+	}
+	if _, err := updateTarea(ctx, tx, taskID, userID, upd); err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return r.Get(ctx, userID, projectID, taskID)
 }

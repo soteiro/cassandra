@@ -334,7 +334,7 @@ func TestRealMCPClientThroughHTTPToPostgres(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(tools.Tools) != 7 {
+	if len(tools.Tools) != 11 {
 		t.Fatalf("herramientas expuestas: %d", len(tools.Tools))
 	}
 	call := func(name string, args any) *mcp.CallToolResult {
