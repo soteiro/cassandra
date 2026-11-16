@@ -220,3 +220,95 @@ test('edita el nombre y el color de un calendario', async ({ page, request }, te
   const guardado = (await res.json()).find((c: { id: number }) => c.id === cal.id);
   expect(guardado).toMatchObject({ nombre: `Hijo terapias ${sufijo}`, color: '#db61a2' });
 });
+
+test('muestra los bloques de trabajo planificados y permite quitarlos', async ({
+  page,
+  request,
+}, testInfo) => {
+  const sufijo = uniqueName('plan', testInfo);
+  const base = diaBase(testInfo, 4);
+  const proyecto = await createProject(request, `Proyecto ${sufijo}`);
+  const tarea = await createTask(request, proyecto.id, `Informe ${sufijo}`, {
+    fecha_limite: `${dia(base + 1)}T00:00:00.000Z`,
+  });
+  // Lo mismo que hace el asistente por MCP, aquí con la sesión.
+  await post(request, `/api/integrations/projects/${proyecto.id}/tasks/${tarea.id}/bloques`, {
+    operacion_id: `e2e-${sufijo}`.replace(/[^a-zA-Z0-9_.:-]/g, '-').slice(0, 100),
+    bloques: [{ fecha: dia(base), hora_inicio: '09:00', hora_fin: '10:30' }],
+  });
+
+  await page.goto(`/calendario?vista=dia&fecha=${dia(base)}`);
+  await expect(
+    page
+      .getByRole('group', { name: 'Calendarios visibles' })
+      .getByRole('button', { name: 'Planificado' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  const bloque = page.getByRole('button', {
+    name: new RegExp(`^Informe ${sufijo}, 09:00 a 10:30`),
+  });
+  await bloque.click({ position: { x: 5, y: 5 } });
+  await bloque.click({ position: { x: 5, y: 5 } });
+  const hoja = page.getByRole('dialog', { name: `Informe ${sufijo}` });
+  await expect(hoja.getByText(`Proyecto ${sufijo}`)).toBeVisible();
+  if (process.env['CAPTURAS_DIR']) {
+    await page.screenshot({
+      path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-bloque.png`,
+    });
+  }
+  page.once('dialog', (d) => d.accept());
+  await hoja.getByRole('button', { name: 'Quitar bloque' }).click();
+  await expect(page.getByText('Bloque quitado')).toBeVisible();
+  await expect(bloque).toHaveCount(0);
+});
+
+test('marca qué calendario libera tiempo y fija el horario de trabajo', async ({
+  page,
+  request,
+}, testInfo) => {
+  const sufijo = uniqueName('horario', testInfo);
+  const cal = await post<{ id: number; nombre: string; disponibilidad: string }>(
+    request,
+    '/api/calendarios',
+    { nombre: `Colegio ${sufijo}`, tipo: 'actividades' },
+  );
+  expect(cal.disponibilidad).toBe('ocupa');
+  await page.goto('/calendario');
+  await page.getByRole('button', { name: 'Calendarios…' }).click();
+  const hoja = page.getByRole('dialog', { name: 'Calendarios' });
+  await hoja.getByRole('button', { name: `Editar ${cal.nombre}` }).click();
+  const form = hoja.getByRole('form', { name: `Editar ${cal.nombre}` });
+  await form.getByRole('button', { name: 'Me libera' }).click();
+  await form.getByRole('button', { name: 'Guardar' }).click();
+  await expect(page.getByText('Calendario actualizado')).toBeVisible();
+  await expect(hoja.getByText('Actividades · me libera').first()).toBeVisible();
+  const guardado = (await (await request.get('/api/calendarios')).json()).find(
+    (c: { id: number }) => c.id === cal.id,
+  );
+  expect(guardado.disponibilidad).toBe('libera');
+
+  await hoja.getByRole('button', { name: 'Horario de trabajo…' }).click();
+  const horario = page.getByRole('dialog', { name: 'Horario de trabajo' });
+  await expect(horario).toBeVisible();
+  // Otro proyecto de Playwright puede haber guardado ya el horario: se parte de cero.
+  const quitar = horario.getByRole('button', { name: /^Quitar franja/ });
+  for (let n = await quitar.count(); n > 0; n--) {
+    await quitar.first().click();
+    await expect(quitar).toHaveCount(n - 1);
+  }
+  await horario.getByRole('button', { name: 'Agregar franja el lunes' }).click();
+  await horario.getByLabel('Lunes, desde').fill('14:00');
+  await horario.getByLabel('Lunes, hasta').fill('18:00');
+  await horario
+    .getByRole('button', { name: 'Usar el horario del lunes de martes a viernes' })
+    .click();
+  if (process.env['CAPTURAS_DIR']) {
+    await page.screenshot({
+      path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-horario.png`,
+    });
+  }
+  await horario.getByRole('button', { name: 'Guardar horario' }).click();
+  await expect(page.getByText('Horario guardado')).toBeVisible();
+  const franjas = await (await request.get('/api/calendario/horario-base')).json();
+  expect(franjas).toHaveLength(5);
+  expect(franjas[4]).toEqual({ dia_semana: 4, hora_inicio: '14:00', hora_fin: '18:00' });
+});

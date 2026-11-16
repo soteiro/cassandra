@@ -31,6 +31,7 @@ import { TaskStatusSelect } from '../task-status-select/task-status-select';
 import { TaskPrioritySelect } from '../task-priority-select/task-priority-select';
 import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
 import { diaAISO, isoADia } from '../../../../shared/utils/fecha.util';
+import { opcionesEstimacion } from '../../utils/estimacion.util';
 
 @Component({
   selector: 'app-task-detail-modal',
@@ -86,6 +87,9 @@ export class TaskDetailModal {
   /** "YYYY-MM-DD" o vacío. */
   fechaInicio = signal('');
   fechaLimite = signal('');
+  /** Minutos estimados; null = sin estimar. */
+  estimacion = signal<number | null>(null);
+  opcionesEstimacion = computed(() => opcionesEstimacion(this.estimacion()));
 
   isSaving = signal(false);
   isDeleting = signal(false);
@@ -168,6 +172,7 @@ export class TaskDetailModal {
     this.prioridad.set((t.prioridad as TaskPrioridad) || 'normal');
     this.fechaInicio.set(isoADia(t.fecha_inicio));
     this.fechaLimite.set(isoADia(t.fecha_limite));
+    this.estimacion.set(t.estimacion_min ?? null);
     this.nuevaSubtareaNombre.set('');
     this.isSaving.set(false);
     this.isDeleting.set(false);
@@ -218,6 +223,9 @@ export class TaskDetailModal {
         prioridad: this.prioridad(),
         ...(inicio ? { fecha_inicio: inicio } : { clear_fecha_inicio: true }),
         ...(limite ? { fecha_limite: limite } : { clear_fecha_limite: true }),
+        ...(this.estimacion()
+          ? { estimacion_min: this.estimacion()! }
+          : { clear_estimacion: true }),
       })
       .subscribe({
         next: () => {
@@ -230,6 +238,7 @@ export class TaskDetailModal {
           t.prioridad = this.prioridad();
           t.fecha_inicio = inicio;
           t.fecha_limite = limite;
+          t.estimacion_min = this.estimacion();
           this.taskUpdated.emit();
           this.onClose();
         },

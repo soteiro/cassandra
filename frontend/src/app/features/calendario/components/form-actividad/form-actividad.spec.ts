@@ -3,7 +3,14 @@ import { CalendarioFormActividad, GuardarActividad } from './form-actividad';
 import { Actividad, Calendario } from '../../data/calendario.model';
 
 const CALENDARIOS: Calendario[] = [
-  { id: 2, nombre: 'Hijo', color: '#58a6ff', tipo: 'actividades', oculto: false },
+  {
+    id: 2,
+    nombre: 'Hijo',
+    color: '#58a6ff',
+    tipo: 'actividades',
+    oculto: false,
+    disponibilidad: 'ocupa',
+  },
 ];
 
 describe('CalendarioFormActividad', () => {

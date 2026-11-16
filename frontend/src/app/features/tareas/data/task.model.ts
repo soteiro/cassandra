@@ -18,6 +18,8 @@ export interface Task {
   /** Medianoche UTC del día (ver diaAISO). */
   fecha_inicio?: string | null;
   fecha_limite?: string | null;
+  /** Minutos estimados para terminarla. */
+  estimacion_min?: number | null;
   subtareas?: Task[];
 }
 
@@ -35,4 +37,6 @@ export interface TaskRequest {
   /** true quita la fecha al actualizar. */
   clear_fecha_inicio?: boolean;
   clear_fecha_limite?: boolean;
+  estimacion_min?: number;
+  clear_estimacion?: boolean;
 }

@@ -83,6 +83,31 @@ func (h *APIKeysHandler) List(w http.ResponseWriter, r *http.Request) {
 	integrationJSON(w, http.StatusOK, keys)
 }
 
+// Update atiende PUT /api/api-keys/{key_id}: cambia permisos, proyectos, calendarios,
+// nombre y vencimiento sin generar otro secreto.
+func (h *APIKeysHandler) Update(w http.ResponseWriter, r *http.Request) {
+	userID, _ := middleware.GetUserIDFromContext(r.Context())
+	id, err := strconv.ParseInt(chi.URLParam(r, "key_id"), 10, 64)
+	if err != nil || id <= 0 {
+		http.Error(w, "ID de key inválido", http.StatusBadRequest)
+		return
+	}
+	var req models.CreateAPIKeyRequest
+	if !integrationBody(w, r, &req) {
+		return
+	}
+	key, err := h.repo.Update(r.Context(), userID, id, req)
+	if errors.Is(err, repository.ErrKeyRevocada) {
+		http.Error(w, "La clave está revocada: genera una nueva", http.StatusConflict)
+		return
+	}
+	if err != nil {
+		integrationError(w, err)
+		return
+	}
+	integrationJSON(w, http.StatusOK, key)
+}
+
 func (h *APIKeysHandler) Revoke(w http.ResponseWriter, r *http.Request) {
 	userID, _ := middleware.GetUserIDFromContext(r.Context())
 	id, err := strconv.ParseInt(chi.URLParam(r, "key_id"), 10, 64)
