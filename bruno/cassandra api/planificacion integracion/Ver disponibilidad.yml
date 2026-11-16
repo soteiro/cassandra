@@ -1,0 +1,17 @@
+info:
+  name: Ver disponibilidad
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/api/integrations/calendar?desde=2026-11-16&hasta=2026-11-29&ahora=2026-11-16T09:30"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Huecos libres (horario base + lo que libera − lo que ocupa), eventos, bloques y deadlines. ahora es la hora local del cliente; por defecto el rango es hoy + 13 días, máximo 31. Eventos sin calendario_id son tiempo ocupado que la key no ve.

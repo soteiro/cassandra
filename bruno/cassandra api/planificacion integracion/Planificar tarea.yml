@@ -1,0 +1,28 @@
+info:
+  name: Planificar tarea
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}/api/integrations/projects/{{proyecto_id}}/tasks/{{tarea_id}}/bloques"
+  body:
+    type: json
+    data: |-
+      {"operacion_id": "{{plan_operacion_id}}", "bloques": [{"fecha": "2026-11-17", "hora_inicio": "16:00", "hora_fin": "17:30"}]}
+  auth: inherit
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201) {
+          bru.setEnvVar('bloque_id', String(res.getBody().bloques[0].id));
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Reserva de 1 a 20 bloques, todos o ninguno. Un solape con otro bloque responde 409; fuera de un hueco se guarda con aviso. Reintentar el mismo cuerpo con el mismo operacion_id devuelve el resultado original.

@@ -24,13 +24,13 @@ func NewCalendarioRepository(db *pgxpool.Pool) *CalendarioRepository {
 }
 
 // El ciclo que se muestra en la configuración es el último que se fijó.
-const calendarioCols = `c.id, c.nombre, c.color, c.tipo, c.oculto,
+const calendarioCols = `c.id, c.nombre, c.color, c.tipo, c.oculto, c.disponibilidad,
 	(SELECT to_char(cc.ancla, 'YYYY-MM-DD') FROM calendario_ciclos cc
 	  WHERE cc.calendario_id = c.id ORDER BY cc.desde DESC LIMIT 1)`
 
 func scanCalendario(row pgx.Row) (*models.Calendario, error) {
 	var c models.Calendario
-	if err := row.Scan(&c.ID, &c.Nombre, &c.Color, &c.Tipo, &c.Oculto, &c.PrimerLargo); err != nil {
+	if err := row.Scan(&c.ID, &c.Nombre, &c.Color, &c.Tipo, &c.Oculto, &c.Disponibilidad, &c.PrimerLargo); err != nil {
 		return nil, err
 	}
 	return &c, nil
@@ -62,8 +62,15 @@ func (r *CalendarioRepository) Get(ctx context.Context, id, userID int) (*models
 
 func (r *CalendarioRepository) Create(ctx context.Context, userID int, req *models.CalendarioRequest) (*models.Calendario, error) {
 	var id int
-	err := r.db.QueryRow(ctx, `INSERT INTO calendarios (user_id, nombre, color, tipo)
-		VALUES ($1, $2, $3, $4) RETURNING id`, userID, req.Nombre, req.Color, req.Tipo).Scan(&id)
+	disp := req.Disponibilidad
+	if disp == "" {
+		disp = "ocupa"
+		if req.Tipo == "turnos" {
+			disp = "contexto"
+		}
+	}
+	err := r.db.QueryRow(ctx, `INSERT INTO calendarios (user_id, nombre, color, tipo, disponibilidad)
+		VALUES ($1, $2, $3, $4, $5) RETURNING id`, userID, req.Nombre, req.Color, req.Tipo, disp).Scan(&id)
 	if err != nil {
 		log.Printf("[REPO:Calendario.Create] Error en SQL: %v | user_id=%d", err, userID)
 		return nil, err
@@ -73,8 +80,9 @@ func (r *CalendarioRepository) Create(ctx context.Context, userID int, req *mode
 
 func (r *CalendarioRepository) Update(ctx context.Context, id, userID int, req *models.CalendarioUpdateRequest) (*models.Calendario, error) {
 	tag, err := r.db.Exec(ctx, `UPDATE calendarios
-		SET nombre = COALESCE($1, nombre), color = COALESCE($2, color), oculto = COALESCE($3, oculto)
-		WHERE id = $4 AND user_id = $5 AND eliminado = false`, req.Nombre, req.Color, req.Oculto, id, userID)
+		SET nombre = COALESCE($1, nombre), color = COALESCE($2, color), oculto = COALESCE($3, oculto),
+		    disponibilidad = COALESCE($6, disponibilidad)
+		WHERE id = $4 AND user_id = $5 AND eliminado = false`, req.Nombre, req.Color, req.Oculto, id, userID, req.Disponibilidad)
 	if err != nil {
 		log.Printf("[REPO:Calendario.Update] Error en SQL: %v | id=%d user_id=%d", err, id, userID)
 		return nil, err
@@ -249,6 +257,9 @@ func (r *CalendarioRepository) Rango(ctx context.Context, userID int, desde, has
 		res.Turnos = append(res.Turnos, turnos...)
 	}
 	if res.Ocurrencias, err = r.ocurrencias(ctx, userID, desde, hasta); err != nil {
+		return nil, err
+	}
+	if res.Bloques, err = r.bloques(ctx, userID, desde, hasta); err != nil {
 		return nil, err
 	}
 	return res, nil

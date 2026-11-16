@@ -1,0 +1,17 @@
+info:
+  name: Horario base
+  type: http
+  seq: 16
+
+http:
+  method: GET
+  url: "{{base_url}}/api/calendario/horario-base"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Franjas en que el usuario puede trabajar, por día de la semana (0 = lunes).

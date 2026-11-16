@@ -152,6 +152,10 @@ func (h *CalendarioHandler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Tipo inválido: debe ser turnos o actividades", http.StatusBadRequest)
 		return
 	}
+	if req.Disponibilidad != "" && !models.DisponibilidadValida(req.Disponibilidad) {
+		http.Error(w, "disponibilidad debe ser ocupa, libera o contexto", http.StatusBadRequest)
+		return
+	}
 	cal, err := h.repo.Create(r.Context(), userID, &req)
 	if err != nil {
 		dbError(w, "Error al crear el calendario", err)
@@ -183,6 +187,10 @@ func (h *CalendarioHandler) Update(w http.ResponseWriter, r *http.Request) {
 		req.Nombre = &nombre
 	}
 	if req.Color != nil && !validarColor(w, *req.Color) {
+		return
+	}
+	if req.Disponibilidad != nil && !models.DisponibilidadValida(*req.Disponibilidad) {
+		http.Error(w, "disponibilidad debe ser ocupa, libera o contexto", http.StatusBadRequest)
 		return
 	}
 	cal, err := h.repo.Update(r.Context(), id, userID, &req)

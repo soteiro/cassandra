@@ -1,0 +1,17 @@
+info:
+  name: Quitar bloque de integración
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{base_url}}/api/integrations/projects/{{proyecto_id}}/bloques/{{bloque_id}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Solo bloques de tareas del proyecto de la ruta.

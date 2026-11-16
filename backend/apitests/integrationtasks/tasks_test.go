@@ -335,7 +335,7 @@ func TestTaskToolsThroughMCPHTTPAndPostgres(t *testing.T) {
 	}
 	defer cs.Close()
 	available, err := cs.ListTools(ctx, nil)
-	if err != nil || len(available.Tools) != 7 {
+	if err != nil || len(available.Tools) != 11 {
 		t.Fatalf("herramientas: %+v, err=%v", available, err)
 	}
 	for _, tool := range available.Tools {
