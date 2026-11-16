@@ -1,0 +1,27 @@
+info:
+  name: Editar clave
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{base_url}}/api/api-keys/{{api_key_id}}"
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "Bruno local",
+        "scopes": ["tasks:read", "tasks:manage", "calendar:read"],
+        "proyecto_ids": [{{proyecto_id}}],
+        "calendario_ids": []
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  Reemplaza nombre, permisos, proyectos, calendarios y vencimiento sin cambiar el secreto; rige desde la siguiente petición. Sin expira_en la clave queda sin vencimiento. Una clave revocada responde 409. Solo con sesión: una clave no puede editarse a sí misma.

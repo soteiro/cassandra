@@ -27,6 +27,7 @@ describe('ApiKeys', () => {
   let api: {
     list: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
     revoke: ReturnType<typeof vi.fn>;
   };
   const resource = {
@@ -58,6 +59,7 @@ describe('ApiKeys', () => {
     api = {
       list: vi.fn().mockReturnValue(of([])),
       create: vi.fn().mockReturnValue(of(issued)),
+      update: vi.fn((id: number, req: object) => of({ ...key, ...req, id })),
       revoke: vi.fn().mockReturnValue(of(undefined)),
     };
     resource.value.set([{ id: 12, nombre: 'Cassandra' }]);
@@ -191,6 +193,66 @@ describe('ApiKeys', () => {
       scopes: ['tasks:read', 'tasks:create', 'tasks:manage', 'calendar:read'],
       calendario_ids: [3],
     });
+  });
+
+  it('edits the permissions of an existing key without issuing a new secret', async () => {
+    const vigente: APIKey = {
+      ...key,
+      scopes: ['memory:read', 'tasks:read'],
+      expira_en: '2099-01-01T00:00:00Z',
+    };
+    api.list.mockReturnValue(of([vigente]));
+    fixture = TestBed.createComponent(ApiKeys);
+    el = fixture.nativeElement;
+    await render();
+
+    el.querySelector<HTMLButtonElement>('[aria-label="Editar clave Asistente"]')!.click();
+    await render();
+    expect(el.querySelector('#create-title')?.textContent).toContain('Editar «Asistente»');
+    expect(el.querySelector<HTMLInputElement>('#key-name')!.value).toBe('Asistente');
+    expect(el.querySelector<HTMLSelectElement>('#key-tasks')!.value).toBe('read');
+    expect(el.querySelector<HTMLSelectElement>('#key-expiry')!.value).toBe('keep');
+    expect(el.querySelector<HTMLInputElement>('input[type="checkbox"]')!.checked).toBe(true);
+
+    select('key-tasks', 'manage');
+    select('key-calendar', 'read');
+    await render();
+    Array.from(el.querySelectorAll('label'))
+      .find((l) => l.textContent?.includes('Terapias'))!
+      .querySelector('input')!
+      .click();
+    button('Guardar cambios').click();
+    await render();
+
+    expect(api.create).not.toHaveBeenCalled();
+    expect(api.update).toHaveBeenCalledExactlyOnceWith(1, {
+      nombre: 'Asistente',
+      scopes: ['memory:read', 'tasks:read', 'tasks:create', 'tasks:manage', 'calendar:read'],
+      proyecto_ids: [12],
+      calendario_ids: [4],
+      expira_en: '2099-01-01T00:00:00Z',
+    });
+    expect(el.querySelector('#issued-key')).toBeNull();
+    expect(el.textContent).toContain('con la misma clave');
+    expect(el.textContent).toContain('Cerrar y planificar tareas');
+    expect(el.querySelector('#create-title')?.textContent).toContain('Generar una clave');
+  });
+
+  it('cancels editing and offers a new expiry for an expired key', async () => {
+    api.list.mockReturnValue(of([{ ...key, expira_en: '2020-01-01T00:00:00Z' }]));
+    fixture = TestBed.createComponent(ApiKeys);
+    el = fixture.nativeElement;
+    await render();
+    el.querySelector<HTMLButtonElement>('[aria-label="Editar clave Asistente"]')!.click();
+    await render();
+    const expiry = el.querySelector<HTMLSelectElement>('#key-expiry')!;
+    expect(expiry.value).toBe('90');
+    expect(Array.from(expiry.options).map((o) => o.value)).not.toContain('keep');
+    button('Cancelar edición').click();
+    await render();
+    expect(el.querySelector('#create-title')?.textContent).toContain('Generar una clave');
+    expect(el.querySelector<HTMLInputElement>('#key-name')!.value).toBe('');
+    expect(api.update).not.toHaveBeenCalled();
   });
 
   it('keeps task access read-only when combining it with memory permissions', async () => {

@@ -60,7 +60,15 @@
           >
         </div>
       } @else {
-        <h2 id="create-title" class="text-lg font-semibold text-text-main">Generar una clave</h2>
+        <h2 id="create-title" class="text-lg font-semibold text-text-main break-words">
+          {{ editing() ? 'Editar «' + editing()!.nombre + '»' : 'Generar una clave' }}
+        </h2>
+        @if (editing()) {
+          <p class="text-sm text-text-muted mt-2"
+            >Los cambios rigen desde la próxima petición del asistente. La clave guardada en el
+            conector sigue sirviendo.</p
+          >
+        }
         <form [formGroup]="form" (ngSubmit)="generate()" class="mt-5 space-y-5">
           <fieldset [disabled]="saving()" class="space-y-5 min-w-0">
             <div>
@@ -223,6 +231,15 @@
             <div>
               <label for="key-expiry" class="block text-sm font-medium mb-2">Vencimiento</label>
               <select id="key-expiry" formControlName="dias" class="field">
+                @if (editing(); as key) {
+                  @if (keyStatus(key) !== 'Vencida') {
+                    <option value="keep">{{
+                      key.expira_en
+                        ? 'Mantener: ' + (key.expira_en | date: 'dd/MM/yyyy')
+                        : 'Mantener: sin vencimiento'
+                    }}</option>
+                  }
+                }
                 <option value="30">En 30 días</option>
                 <option value="90">En 90 días</option>
                 <option value="365">En un año</option>
@@ -244,8 +261,21 @@
               projects().length === 0
             "
           >
-            {{ saving() ? 'Generando…' : 'Generar clave' }}
+            @if (editing()) {
+              {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+            } @else {
+              {{ saving() ? 'Generando…' : 'Generar clave' }}
+            }
           </button>
+          @if (editing()) {
+            <button
+              type="button"
+              class="button-secondary w-full"
+              (click)="cancelEdit()"
+              [disabled]="saving()"
+              >Cancelar edición</button
+            >
+          }
         </form>
       }
     </section>
@@ -255,7 +285,7 @@
       <p class="text-sm text-text-muted mt-2 mb-5"
         >Aquí solo se muestra el prefijo. Puedes revocar el acceso cuando quieras.</p
       >
-      <p role="status" class="text-sm text-success mb-3">{{ notice() }}</p>
+      <p #noticeEl role="status" class="text-sm text-success mb-3">{{ notice() }}</p>
       @if (loading()) {
         <p role="status" class="text-sm text-text-muted py-6">Cargando claves…</p>
       } @else if (loadError()) {
@@ -340,6 +370,15 @@
                 </div>
               }
               @if (!key.revocada_en) {
+                <button
+                  type="button"
+                  class="button-secondary mr-2"
+                  (click)="startEdit(key)"
+                  [disabled]="saving() || !!issued() || editing()?.id === key.id"
+                  [hidden]="pendingRevoke()?.id === key.id"
+                  [attr.aria-label]="'Editar clave ' + key.nombre"
+                  >Editar</button
+                >
                 <button
                   #revokeButton
                   type="button"

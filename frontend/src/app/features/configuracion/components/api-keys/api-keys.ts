@@ -42,6 +42,8 @@ export class ApiKeys {
   protected readonly createError = signal('');
   protected readonly selectedProjects = signal<number[]>([]);
   protected readonly submitted = signal(false);
+  /** Clave cargada en el formulario para editar sus permisos (sin cambiar el secreto). */
+  protected readonly editing = signal<APIKey | null>(null);
   protected readonly issued = signal<{ id: number; nombre: string; token: string } | null>(null);
   protected readonly copyStatus = signal('');
   protected readonly copyFailed = signal(false);
@@ -70,6 +72,9 @@ export class ApiKeys {
 
   private readonly secretInput = viewChild<ElementRef<HTMLInputElement>>('secretInput');
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
+  private readonly noticeEl = viewChild<ElementRef<HTMLElement>>('noticeEl');
+  /** Tras guardar una edición, el aviso puede quedar fuera de la pantalla en el celular. */
+  private readonly showNotice = signal(false);
   private readonly revokeConfirm = viewChild<ElementRef<HTMLButtonElement>>('revokeConfirm');
   private revokeTrigger?: HTMLButtonElement;
 
@@ -83,6 +88,11 @@ export class ApiKeys {
       }
     });
     afterRenderEffect(() => this.revokeConfirm()?.nativeElement.focus());
+    afterRenderEffect(() => {
+      if (!this.showNotice()) return;
+      this.noticeEl()?.nativeElement.scrollIntoView?.({ block: 'center' });
+      this.showNotice.set(false);
+    });
     afterRenderEffect(() => {
       if (this.focusName()) this.nameInput()?.nativeElement.focus();
     });
@@ -128,6 +138,48 @@ export class ApiKeys {
     );
   }
 
+  protected startEdit(key: APIKey): void {
+    if (this.saving() || this.issued()) return;
+    const has = (scope: APIKeyScope) => key.scopes.includes(scope);
+    const vencida = this.keyStatus(key) === 'Vencida';
+    this.form.reset({
+      nombre: key.nombre,
+      acceso: has('memory:write') ? 'write' : has('memory:read') ? 'read' : 'none',
+      tareas: has('tasks:manage')
+        ? 'manage'
+        : has('tasks:create')
+          ? 'create'
+          : has('tasks:read')
+            ? 'read'
+            : 'none',
+      calendario: has('calendar:read') ? 'read' : 'none',
+      // Una clave vencida se reactiva con un vencimiento nuevo.
+      dias: vencida ? '90' : 'keep',
+    });
+    this.selectedProjects.set([...key.proyecto_ids]);
+    this.selectedCalendars.set([...(key.calendario_ids ?? [])]);
+    this.submitted.set(false);
+    this.createError.set('');
+    this.notice.set('');
+    this.editing.set(key);
+    this.nameInput()?.nativeElement.focus();
+    this.nameInput()?.nativeElement.scrollIntoView({ block: 'center' });
+  }
+
+  protected cancelEdit(): void {
+    this.editing.set(null);
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.form.reset({ nombre: '', acceso: 'read', tareas: 'none', calendario: 'none', dias: '90' });
+    this.calendarioValue.set('none');
+    this.selectedProjects.set([]);
+    this.selectedCalendars.set([]);
+    this.submitted.set(false);
+    this.createError.set('');
+  }
+
   protected generate(): void {
     if (this.saving() || this.loading() || this.issued()) return;
     this.submitted.set(true);
@@ -159,8 +211,16 @@ export class ApiKeys {
       proyecto_ids: [...this.selectedProjects()],
     };
     if (calendario === 'read') request.calendario_ids = [...this.selectedCalendars()];
-    if (dias !== 'never')
+    const editing = this.editing();
+    if (dias === 'keep') {
+      if (editing?.expira_en) request.expira_en = editing.expira_en;
+    } else if (dias !== 'never') {
       request.expira_en = new Date(Date.now() + Number(dias) * 86_400_000).toISOString();
+    }
+    if (editing) {
+      this.save(editing, request);
+      return;
+    }
     this.focusName.set(false);
     this.saving.set(true);
     this.service
@@ -174,23 +234,41 @@ export class ApiKeys {
           this.copyFailed.set(false);
           this.notice.set('');
           this.saving.set(false);
-          this.form.reset({
-            nombre: '',
-            acceso: 'read',
-            tareas: 'none',
-            calendario: 'none',
-            dias: '90',
-          });
-          this.calendarioValue.set('none');
-          this.selectedProjects.set([]);
-          this.selectedCalendars.set([]);
-          this.submitted.set(false);
+          this.resetForm();
         },
         error: (err) => {
           this.createError.set(
             getErrorMessage(
               err,
               'No se pudo generar la clave. Conservamos los datos para reintentar.',
+            ),
+          );
+          this.saving.set(false);
+        },
+      });
+  }
+
+  private save(key: APIKey, request: CreateAPIKeyRequest): void {
+    this.saving.set(true);
+    this.service
+      .update(key.id, request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updated) => {
+          this.keys.update((keys) => keys.map((item) => (item.id === updated.id ? updated : item)));
+          this.saving.set(false);
+          this.editing.set(null);
+          this.resetForm();
+          this.notice.set(
+            `Clave «${updated.nombre}» actualizada. El asistente usa los permisos nuevos desde su próxima petición, con la misma clave.`,
+          );
+          this.showNotice.set(true);
+        },
+        error: (err) => {
+          this.createError.set(
+            getErrorMessage(
+              err,
+              'No se pudo guardar la clave. Conservamos los cambios para reintentar.',
             ),
           );
           this.saving.set(false);
@@ -243,7 +321,11 @@ export class ApiKeys {
       'tasks:manage': 'Cerrar y planificar tareas',
       'calendar:read': 'Ver calendario',
     };
-    return key.scopes.map((scope) => names[scope]).join(', ');
+    // Orden lógico (memoria, tareas, calendario), no el alfabético del servidor.
+    return (Object.keys(names) as APIKeyScope[])
+      .filter((scope) => key.scopes.includes(scope))
+      .map((scope) => names[scope])
+      .join(', ');
   }
 
   protected keyStatus(key: APIKey): 'Activa' | 'Revocada' | 'Vencida' {
@@ -281,6 +363,7 @@ export class ApiKeys {
             ),
           );
           if (this.issued()?.id === key.id) this.issued.set(null);
+          if (this.editing()?.id === key.id) this.cancelEdit();
           this.pendingRevoke.set(null);
           this.revoking.set(false);
           this.notice.set(`Clave «${key.nombre}» revocada.`);

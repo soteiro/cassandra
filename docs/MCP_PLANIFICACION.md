@@ -40,7 +40,8 @@ por defecto es `contexto`; en uno de actividades es `ocupa`.
    Luego abrir **Horario de trabajo…** y fijar las franjas de cada día. Por REST:
    `PUT /api/calendarios/{id}` con `disponibilidad` y
    `PUT /api/calendario/horario-base`.
-3. En **Configuración → Conexiones → Claves API**, emitir una clave nueva con
+3. En **Configuración → Conexiones → Claves API**, editar la clave del
+   asistente (o emitir una nueva) con
    **Tareas: Leer, crear, cerrar y planificar tareas** y **Calendario: Ver mi
    tiempo libre**, y marcar los calendarios que el asistente puede ver con
    detalle. Por REST, los permisos son `tasks:manage` y `calendar:read`, y los
@@ -55,8 +56,8 @@ por defecto es `contexto`; en uno de actividades es `ocupa`.
    }
    ```
 
-4. Compilar el conector (`make build-memory-mcp`), reemplazar la clave guardada y
-   reiniciar el cliente MCP.
+4. Compilar el conector (`make build-memory-mcp`) y reiniciar el cliente MCP. Si
+   se editó la clave existente, no hay que reemplazarla en el conector.
 
 | Permiso | Autoriza |
 |---|---|

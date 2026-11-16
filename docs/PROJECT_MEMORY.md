@@ -29,7 +29,9 @@ redirige a esa pantalla.
    con **Ya la guardé**. El secreto no vuelve a mostrarse; si se pierde, revocar
    esa clave y generar otra. Si el portapapeles falla, el campo permite copia manual.
 
-La lista muestra prefijo, proyectos, permisos, vencimiento y último uso. **Revocar**
+La lista muestra prefijo, proyectos, permisos, vencimiento y último uso. **Editar**
+carga la clave en el formulario para cambiar sus permisos, proyectos, calendarios o
+vencimiento; el secreto no cambia y el conector no necesita otra clave. **Revocar**
 pide confirmación y corta el acceso en próximas peticiones. El secreto solo se
 mantiene en memoria mientras se muestra el aviso; no se guarda en el navegador.
 
@@ -39,6 +41,7 @@ La gestión de keys usa la sesión existente y también está disponible por RES
 |---|---|
 | `POST /api/api-keys` | Emitir key: el secreto aparece una sola vez en `token`. |
 | `GET /api/api-keys` | Listar metadatos propios, sin secreto ni huella. |
+| `PUT /api/api-keys/{id}` | Cambiar nombre, permisos, proyectos, calendarios y vencimiento sin generar otro secreto. |
 | `DELETE /api/api-keys/{id}` | Revocar inmediatamente para próximas peticiones. |
 
 Por ejemplo, desde Bruno con sesión válida en el servidor de destino:
@@ -59,7 +62,7 @@ fuera del repositorio y de la conversación. Estos permisos permiten solo memori
 `tasks:manage` y `calendar:read`, la [planificación](MCP_PLANIFICACION.md).
 Una key no es una sesión JWT ni autoriza REST general, administración de keys,
 edición o borrado de tareas, CRM o finanzas. Las claves anteriores no reciben
-permisos nuevos automáticamente.
+permisos nuevos automáticamente: se pueden agregar editando la clave, sin generar otra.
 
 El login actual devuelve cookies: conservarlas en el cookie jar de Bruno/curl.
 Si se usa cookie, quitar un header Authorization heredado vacío o incorrecto:

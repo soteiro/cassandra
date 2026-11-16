@@ -174,9 +174,9 @@ preguntes qué es.
 
 Si faltan las herramientas de tareas, informa la limitación y revisa la conexión
 y las versiones del conector y del backend; reinicia el cliente MCP tras actualizar
-el conector. Si la clave no permite la operación, informa el permiso necesario y
-que se debe emitir una clave nueva con él. Las claves anteriores de memoria no
-reciben permisos de tareas automáticamente. La clave se configura fuera de la
+el conector. Si la clave no permite la operación, informa el permiso necesario:
+el usuario puede agregarlo editando la clave en **Configuración → Claves API**, sin
+generar otra. Las claves anteriores no reciben permisos nuevos automáticamente. La clave se configura fuera de la
 conversación. No uses el REST general como alternativa para eludir estos límites.
 
 No muestres ni pidas keys, cookies o credenciales en la conversación; la

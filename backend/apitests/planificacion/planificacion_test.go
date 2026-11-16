@@ -425,3 +425,60 @@ func TestHerramientasDePMPorMCP(t *testing.T) {
 	}
 	call("quitar_bloque", map[string]any{"proyecto_id": e.p, "bloque_id": plan.Bloques[0].ID}, true, nil)
 }
+
+func TestEditarPermisosDeUnaKeySinRegenerarla(t *testing.T) {
+	e := preparar(t)
+	var issued models.IssuedAPIKey
+	e.api.Do(e.ana, http.MethodPost, "/api/api-keys", models.CreateAPIKeyRequest{
+		Nombre: "Asistente", ProyectoIDs: []int{e.p}, Scopes: []string{models.TasksRead},
+	}).Expect(t, http.StatusCreated).JSON(t, &issued)
+	agente := &apitest.User{ID: int(issued.ID), Token: issued.Token}
+	ruta := apitest.Path("/api/api-keys/%d", issued.ID)
+	e.api.Do(agente, http.MethodGet, "/api/integrations/calendar", nil).Expect(t, http.StatusForbidden)
+
+	// Más permisos, otro proyecto, un calendario y vencimiento nuevo: el mismo secreto sirve.
+	expira := time.Now().Add(30 * 24 * time.Hour).UTC().Truncate(time.Second)
+	cambio := models.CreateAPIKeyRequest{
+		Nombre: "  PM  ", ProyectoIDs: []int{e.q, e.p}, CalendarioIDs: []int{e.colegio.ID},
+		Scopes: []string{models.TasksRead, models.TasksManage, models.CalendarRead}, ExpiraEn: &expira,
+	}
+	var editada models.APIKey
+	e.api.Do(e.ana, http.MethodPut, ruta, cambio).Expect(t, http.StatusOK).JSON(t, &editada)
+	if editada.Nombre != "PM" || editada.Prefijo != issued.Prefijo || !reflect.DeepEqual(editada.ProyectoIDs, []int{e.p, e.q}) ||
+		!reflect.DeepEqual(editada.CalendarioIDs, []int{e.colegio.ID}) || editada.ExpiraEn == nil || !editada.ExpiraEn.Equal(expira) {
+		t.Fatalf("key editada: %+v", editada)
+	}
+	d := disponibilidad(t, e.api, agente, "?desde=2026-11-16&hasta=2026-11-20&ahora=2026-11-16T00:00")
+	if len(d.Calendarios) != 1 || len(d.Deadlines) != 2 {
+		t.Fatalf("la key editada debía ver el colegio y los dos proyectos: %+v %+v", d.Calendarios, d.Deadlines)
+	}
+
+	// Quitar un proyecto corta el acceso a él en la siguiente petición.
+	cambio.ProyectoIDs, cambio.ExpiraEn = []int{e.q}, nil
+	e.api.Do(e.ana, http.MethodPut, ruta, cambio).Expect(t, http.StatusOK).JSON(t, &editada)
+	if editada.ExpiraEn != nil {
+		t.Fatalf("sin expira_en la key queda sin vencimiento: %+v", editada)
+	}
+	e.api.Do(agente, http.MethodGet, apitest.Path("/api/integrations/projects/%d/tasks", e.p), nil).Expect(t, http.StatusNotFound)
+	e.api.Do(agente, http.MethodGet, apitest.Path("/api/integrations/projects/%d/tasks", e.q), nil).Expect(t, http.StatusOK)
+
+	// Validaciones y alcance.
+	sinCalendar := cambio
+	sinCalendar.Scopes = []string{models.TasksRead}
+	e.api.Do(e.ana, http.MethodPut, ruta, sinCalendar).Expect(t, http.StatusBadRequest)
+	pasado := time.Now().Add(-time.Hour)
+	vencida := cambio
+	vencida.ExpiraEn = &pasado
+	e.api.Do(e.ana, http.MethodPut, ruta, vencida).Expect(t, http.StatusBadRequest)
+	beto := e.api.User("beto@plan.test")
+	e.api.Do(beto, http.MethodPut, ruta, cambio).Expect(t, http.StatusNotFound)
+	ajeno := cambio
+	ajeno.ProyectoIDs = []int{proyecto(t, e.api, beto, "De Beto")}
+	e.api.Do(e.ana, http.MethodPut, ruta, ajeno).Expect(t, http.StatusNotFound)
+	// La propia key no puede ampliarse sus permisos.
+	e.api.Do(agente, http.MethodPut, ruta, cambio).Expect(t, http.StatusUnauthorized)
+
+	// Revocada no se edita.
+	e.api.Do(e.ana, http.MethodDelete, ruta, nil).Expect(t, http.StatusNoContent)
+	e.api.Do(e.ana, http.MethodPut, ruta, cambio).Expect(t, http.StatusConflict)
+}

@@ -298,6 +298,59 @@
       }
     },
     "{base_url}/api/api-keys/{api_key_id}": {
+      "put": {
+        "tags": [
+          "Api keys"
+        ],
+        "summary": "Editar clave",
+        "operationId": "put__base_url__api_api_keys__api_key_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "api_key_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro api_key_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "delete": {
         "tags": [
           "Api keys"

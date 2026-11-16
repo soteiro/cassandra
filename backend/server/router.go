@@ -130,6 +130,7 @@ func NewRouter(opts Options) http.Handler {
 		r.Get("/api/ticktick/tasks/today", ticktickHandler.Today)
 		r.Get("/api/api-keys", apiKeysHandler.List)
 		r.Post("/api/api-keys", apiKeysHandler.Create)
+		r.Put("/api/api-keys/{key_id}", apiKeysHandler.Update)
 		r.Delete("/api/api-keys/{key_id}", apiKeysHandler.Revoke)
 
 		// Las cuentas se crean desde la terminal del servidor (cassandra-app create-user).

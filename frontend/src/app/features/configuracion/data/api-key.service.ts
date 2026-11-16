@@ -16,6 +16,11 @@ export class APIKeyService {
     return this.http.post<IssuedAPIKey>(`${this.serverConfig.apiUrl()}/api-keys`, request);
   }
 
+  /** Cambia permisos, proyectos, calendarios, nombre y vencimiento; el secreto no cambia. */
+  update(id: number, request: CreateAPIKeyRequest) {
+    return this.http.put<APIKey>(`${this.serverConfig.apiUrl()}/api-keys/${id}`, request);
+  }
+
   revoke(id: number) {
     return this.http.delete<void>(`${this.serverConfig.apiUrl()}/api-keys/${id}`);
   }
