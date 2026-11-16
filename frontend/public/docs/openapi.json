@@ -65,6 +65,10 @@
       "description": "Operaciones de Personas"
     },
     {
+      "name": "Planificacion integracion",
+      "description": "Operaciones de Planificacion integracion"
+    },
+    {
       "name": "Pronosticos",
       "description": "Operaciones de Pronosticos"
     },
@@ -294,6 +298,59 @@
       }
     },
     "{base_url}/api/api-keys/{api_key_id}": {
+      "put": {
+        "tags": [
+          "Api keys"
+        ],
+        "summary": "Editar clave",
+        "operationId": "put__base_url__api_api_keys__api_key_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "api_key_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro api_key_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "delete": {
         "tags": [
           "Api keys"
@@ -1108,6 +1165,96 @@
         ]
       }
     },
+    "{base_url}/api/calendario/horario-base": {
+      "put": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Fijar horario base",
+        "operationId": "put__base_url__api_calendario_horario_base",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Horario base",
+        "operationId": "get__base_url__api_calendario_horario_base",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "{base_url}/api/calendarios/{calendario_id}/excepciones/2026-11-15": {
       "put": {
         "tags": [
@@ -1188,6 +1335,61 @@
               "example": 1
             },
             "description": "ID numérico de calendario"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/calendario/bloques/{bloque_id}": {
+      "delete": {
+        "tags": [
+          "Calendario"
+        ],
+        "summary": "Quitar bloque",
+        "operationId": "delete__base_url__api_calendario_bloques__bloque_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "bloque_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro bloque_id"
           }
         ],
         "responses": {
@@ -4393,6 +4595,306 @@
         ]
       }
     },
+    "{base_url}/api/integrations/projects/{proyecto_id}/tasks/{tarea_id}": {
+      "patch": {
+        "tags": [
+          "Planificacion integracion"
+        ],
+        "summary": "Actualizar tarea de integración",
+        "operationId": "patch__base_url__api_integrations_projects__proyecto_id__tasks__tarea_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          },
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro tarea_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Tareas integracion"
+        ],
+        "summary": "Obtener tarea de integración",
+        "operationId": "get__base_url__api_integrations_projects__proyecto_id__tasks__tarea_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          },
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro tarea_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/integrations/projects/{proyecto_id}/tasks/{tarea_id}/bloques": {
+      "post": {
+        "tags": [
+          "Planificacion integracion"
+        ],
+        "summary": "Planificar tarea",
+        "operationId": "post__base_url__api_integrations_projects__proyecto_id__tasks__tarea_id__bloques",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          },
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro tarea_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/integrations/projects/{proyecto_id}/bloques/{bloque_id}": {
+      "delete": {
+        "tags": [
+          "Planificacion integracion"
+        ],
+        "summary": "Quitar bloque de integración",
+        "operationId": "delete__base_url__api_integrations_projects__proyecto_id__bloques__bloque_id_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          },
+          {
+            "name": "proyecto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro proyecto_id"
+          },
+          {
+            "name": "bloque_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro bloque_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "{base_url}/api/integrations/calendar?desde=2026-11-16&hasta=2026-11-29&ahora=2026-11-16T09{30}": {
+      "get": {
+        "tags": [
+          "Planificacion integracion"
+        ],
+        "summary": "Ver disponibilidad",
+        "operationId": "get__base_url__api_integrations_calendar_desde_2026_11_16_hasta_2026_11_29_ahora_2026_11_16T09_30_",
+        "parameters": [
+          {
+            "name": "base_url",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Parámetro base_url"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado / Token inválido"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "{base_url}/api/pronosticos/planificacion": {
       "get": {
         "tags": [
@@ -5801,70 +6303,6 @@
               "type": "string"
             },
             "description": "Parámetro proyecto_id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Operación exitosa",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Solicitud inválida"
-          },
-          "401": {
-            "description": "No autorizado / Token inválido"
-          },
-          "500": {
-            "description": "Error interno del servidor"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "{base_url}/api/integrations/projects/{proyecto_id}/tasks/{tarea_id}": {
-      "get": {
-        "tags": [
-          "Tareas integracion"
-        ],
-        "summary": "Obtener tarea de integración",
-        "operationId": "get__base_url__api_integrations_projects__proyecto_id__tasks__tarea_id_",
-        "parameters": [
-          {
-            "name": "base_url",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Parámetro base_url"
-          },
-          {
-            "name": "proyecto_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Parámetro proyecto_id"
-          },
-          {
-            "name": "tarea_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Parámetro tarea_id"
           }
         ],
         "responses": {

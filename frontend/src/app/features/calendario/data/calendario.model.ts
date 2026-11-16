@@ -5,12 +5,26 @@ export type TipoCalendario = 'turnos' | 'actividades';
 /** L largo, N noche, S saliente, F libre, V vacaciones, M licencia. */
 export type CodigoTurno = 'L' | 'N' | 'S' | 'F' | 'V' | 'M';
 
+/** Cómo cuenta un calendario al calcular el tiempo libre para planificar tareas. */
+export type DisponibilidadCalendario = 'ocupa' | 'libera' | 'contexto';
+
+export const DISPONIBILIDADES: {
+  valor: DisponibilidadCalendario;
+  nombre: string;
+  ayuda: string;
+}[] = [
+  { valor: 'ocupa', nombre: 'Me ocupa', ayuda: 'Terapias, citas: no hay tiempo libre.' },
+  { valor: 'libera', nombre: 'Me libera', ayuda: 'Colegio: mientras ocurre, tengo tiempo libre.' },
+  { valor: 'contexto', nombre: 'Solo contexto', ayuda: 'No cambia mi tiempo libre.' },
+];
+
 export interface Calendario {
   id: number;
   nombre: string;
   color: string;
   tipo: TipoCalendario;
   oculto: boolean;
+  disponibilidad: DisponibilidadCalendario;
   /** Turnos: primer día del último ciclo fijado. Sin él, el calendario no tiene días. */
   primer_largo?: string | null;
 }
@@ -19,6 +33,7 @@ export interface CalendarioRequest {
   nombre: string;
   color: string;
   tipo: TipoCalendario;
+  disponibilidad?: DisponibilidadCalendario;
 }
 
 export interface Deadline {
@@ -59,6 +74,28 @@ export interface CalendarioRango {
   deadlines: Deadline[];
   turnos: TurnoDia[];
   ocurrencias: OcurrenciaDia[];
+  bloques: BloqueTrabajo[];
+}
+
+/** Horas reservadas para trabajar en una tarea (las pone el asistente o el usuario). */
+export interface BloqueTrabajo {
+  id: number;
+  tarea_id: number;
+  tarea: string;
+  proyecto_id: number;
+  proyecto_nombre: string;
+  estado: string;
+  fecha: string;
+  hora_inicio: string;
+  hora_fin: string;
+  origen: 'app' | 'mcp';
+}
+
+/** Franja del horario base: cuándo se puede trabajar ese día (0 = lunes). */
+export interface FranjaHorario {
+  dia_semana: number;
+  hora_inicio: string;
+  hora_fin: string;
 }
 
 export interface Actividad {

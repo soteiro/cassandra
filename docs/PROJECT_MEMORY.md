@@ -1,7 +1,7 @@
 # Memoria de proyectos y MCP
 
-El conector local ofrece cuatro herramientas de memoria y tres de
-[tareas](MCP_TASKS.md) a un asistente de programación. El
+El conector local ofrece cuatro herramientas de memoria, tres de
+[tareas](MCP_TASKS.md) y cuatro de [planificación](MCP_PLANIFICACION.md) a un asistente de programación. El
 asistente redacta la memoria con la conversación y el repositorio que tiene
 disponibles; Cassandra la valida y guarda. No se contrata ni ejecuta un modelo en
 el servidor, no se ingieren chats automáticamente y no se publica un MCP remoto.
@@ -29,7 +29,9 @@ redirige a esa pantalla.
    con **Ya la guardé**. El secreto no vuelve a mostrarse; si se pierde, revocar
    esa clave y generar otra. Si el portapapeles falla, el campo permite copia manual.
 
-La lista muestra prefijo, proyectos, permisos, vencimiento y último uso. **Revocar**
+La lista muestra prefijo, proyectos, permisos, vencimiento y último uso. **Editar**
+carga la clave en el formulario para cambiar sus permisos, proyectos, calendarios o
+vencimiento; el secreto no cambia y el conector no necesita otra clave. **Revocar**
 pide confirmación y corta el acceso en próximas peticiones. El secreto solo se
 mantiene en memoria mientras se muestra el aviso; no se guarda en el navegador.
 
@@ -39,6 +41,7 @@ La gestión de keys usa la sesión existente y también está disponible por RES
 |---|---|
 | `POST /api/api-keys` | Emitir key: el secreto aparece una sola vez en `token`. |
 | `GET /api/api-keys` | Listar metadatos propios, sin secreto ni huella. |
+| `PUT /api/api-keys/{id}` | Cambiar nombre, permisos, proyectos, calendarios y vencimiento sin generar otro secreto. |
 | `DELETE /api/api-keys/{id}` | Revocar inmediatamente para próximas peticiones. |
 
 Por ejemplo, desde Bruno con sesión válida en el servidor de destino:
@@ -55,10 +58,11 @@ Sustituir `12` por un proyecto propio existente. Puede añadirse `expira_en` en
 RFC3339; el vencimiento debe estar en el futuro. Se admiten de uno a cincuenta
 proyectos por key. Guardar el secreto en el gestor de secretos/entorno del cliente,
 fuera del repositorio y de la conversación. Estos permisos permiten solo memoria;
-`tasks:read` y `tasks:create` habilitan por separado la integración de tareas.
+`tasks:read` y `tasks:create` habilitan por separado la integración de tareas;
+`tasks:manage` y `calendar:read`, la [planificación](MCP_PLANIFICACION.md).
 Una key no es una sesión JWT ni autoriza REST general, administración de keys,
 edición o borrado de tareas, CRM o finanzas. Las claves anteriores no reciben
-permisos nuevos automáticamente.
+permisos nuevos automáticamente: se pueden agregar editando la clave, sin generar otra.
 
 El login actual devuelve cookies: conservarlas en el cookie jar de Bruno/curl.
 Si se usa cookie, quitar un header Authorization heredado vacío o incorrecto:

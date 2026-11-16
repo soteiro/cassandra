@@ -133,7 +133,8 @@ Después, para comprobar escritura:
 > confirma que puedes recuperarla con buscar_memoria.
 
 El cliente anuncia `obtener_contexto`, `buscar_memoria`, `guardar_avance`,
-`registrar_decision`, `crear_tarea`, `listar_tareas` y `obtener_tarea`. Los permisos
+`registrar_decision`, `crear_tarea`, `listar_tareas`, `obtener_tarea`,
+`ver_disponibilidad`, `actualizar_tarea`, `planificar_tarea` y `quitar_bloque`. Los permisos
 de la clave determinan cuáles puede ejecutar. La memoria y sus fichas aparecen
 en **Documentos → Project logs**; las tareas aparecen en el módulo habitual de tareas.
 
@@ -141,9 +142,11 @@ Para comprobar lectura de tareas con una clave autorizada, pedir:
 
 > Consulta las primeras diez tareas del proyecto vinculado usando listar_tareas.
 
-Ver [el contrato de tareas](MCP_TASKS.md) para creación, subtareas y reintentos.
-Después de actualizar el backend y el conector, emitir una clave con los permisos
-necesarios, reemplazar la guardada para el proyecto y reiniciar el cliente MCP.
+Ver [el contrato de tareas](MCP_TASKS.md) para creación, subtareas y reintentos, y
+[la planificación](MCP_PLANIFICACION.md) para la disponibilidad y los bloques de trabajo.
+Después de actualizar el backend y el conector, dar a la clave los permisos
+necesarios (editándola en **Claves API**, sin cambiar el secreto) y reiniciar el
+cliente MCP. Solo si se emite una clave nueva hay que reemplazar la guardada.
 
 QA reinicia su base en cada despliegue según el flujo actual de
 [deploy](../deploy/README.md): después hay que generar otra clave y revisar el

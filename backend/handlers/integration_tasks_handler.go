@@ -105,3 +105,26 @@ func (h *IntegrationTasksHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 	integrationJSON(w, http.StatusOK, list)
 }
+
+// Update atiende PATCH /api/integrations/projects/{project_id}/tasks/{task_id}.
+func (h *IntegrationTasksHandler) Update(w http.ResponseWriter, r *http.Request) {
+	userID, projectID, ok := integrationProject(w, r, models.TasksManage)
+	if !ok {
+		return
+	}
+	taskID, err := atoi32(chi.URLParam(r, "task_id"))
+	if err != nil || taskID <= 0 {
+		http.Error(w, "ID de tarea inválido", http.StatusBadRequest)
+		return
+	}
+	var req models.UpdateIntegrationTaskRequest
+	if !integrationBody(w, r, &req) {
+		return
+	}
+	task, err := h.repo.Update(r.Context(), userID, projectID, taskID, req)
+	if err != nil {
+		integrationTaskError(w, err)
+		return
+	}
+	integrationJSON(w, http.StatusOK, task)
+}

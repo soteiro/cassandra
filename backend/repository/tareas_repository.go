@@ -60,10 +60,11 @@ func insertTarea(ctx context.Context, db interface {
 			tarea_padre_id,
 			fecha_terminado,
 			fecha_inicio,
-			fecha_limite
+			fecha_limite,
+			estimacion_min
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		RETURNING id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite, estimacion_min
 	`
 
 	err := db.QueryRow(
@@ -80,6 +81,7 @@ func insertTarea(ctx context.Context, db interface {
 		fechaTerminado,
 		req.FechaInicio,
 		req.FechaLimite,
+		req.EstimacionMin,
 	).Scan(
 		&tarea.ID,
 		&tarea.Nombre,
@@ -95,6 +97,7 @@ func insertTarea(ctx context.Context, db interface {
 		&tarea.TareaPadreID,
 		&tarea.FechaInicio,
 		&tarea.FechaLimite,
+		&tarea.EstimacionMin,
 	)
 
 	if err != nil {
@@ -112,7 +115,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 	if estadoFilter != "" {
 		query = `
 			SELECT 
-				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.fecha_actualizacion, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id, t.fecha_inicio, t.fecha_limite,
+				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.fecha_actualizacion, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id, t.fecha_inicio, t.fecha_limite, t.estimacion_min,
 				COALESCE(p.nombre, '') AS proyecto_nombre
 			FROM tareas_proyectos t
 			LEFT JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id
@@ -125,7 +128,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 	} else {
 		query = `
 			SELECT 
-				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.fecha_actualizacion, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id, t.fecha_inicio, t.fecha_limite,
+				t.id, t.nombre, t.descripcion, t.comentario, t.fecha_creacion, t.fecha_terminado, t.fecha_actualizacion, t.estado, t.prioridad, t.user_id, t.proyecto_id, t.tarea_padre_id, t.fecha_inicio, t.fecha_limite, t.estimacion_min,
 				COALESCE(p.nombre, '') AS proyecto_nombre
 			FROM tareas_proyectos t
 			LEFT JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id
@@ -162,6 +165,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 			&tarea.TareaPadreID,
 			&tarea.FechaInicio,
 			&tarea.FechaLimite,
+			&tarea.EstimacionMin,
 			&tarea.ProyectoNombre,
 		)
 		if err != nil {
@@ -182,7 +186,7 @@ func (r *TareasRepository) GetAll(ctx context.Context, userID int, estadoFilter 
 // GetByProyectoID obtiene las tareas de un proyecto pertenecientes a un usuario agrupadas jerárquicamente con sus subtareas
 func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, userID int) ([]models.TareaResponse, error) {
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite, estimacion_min
 		FROM tareas_proyectos
 		WHERE proyecto_id = $1
 		AND user_id = $2
@@ -216,6 +220,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 			&tarea.TareaPadreID,
 			&tarea.FechaInicio,
 			&tarea.FechaLimite,
+			&tarea.EstimacionMin,
 		)
 		if err != nil {
 			log.Printf("[REPO:Tareas.GetByProyectoID] Error al escanear fila: %v | proyecto_id=%d user_id=%d", err, proyectoID, userID)
@@ -263,7 +268,7 @@ func (r *TareasRepository) GetByProyectoID(ctx context.Context, proyectoID int, 
 func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*models.TareaResponse, error) {
 	var tarea models.TareaResponse
 	query := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite, estimacion_min
 		FROM tareas_proyectos
 		WHERE id = $1
 		AND user_id = $2
@@ -285,6 +290,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 		&tarea.TareaPadreID,
 		&tarea.FechaInicio,
 		&tarea.FechaLimite,
+		&tarea.EstimacionMin,
 	)
 
 	if err != nil {
@@ -294,7 +300,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 
 	// Buscar subtareas directas
 	subQuery := `
-		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite
+		SELECT id, nombre, descripcion, comentario, fecha_creacion, fecha_terminado, fecha_actualizacion, estado, prioridad, user_id, proyecto_id, tarea_padre_id, fecha_inicio, fecha_limite, estimacion_min
 		FROM tareas_proyectos
 		WHERE tarea_padre_id = $1
 		AND user_id = $2
@@ -324,6 +330,7 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 				&sub.TareaPadreID,
 				&sub.FechaInicio,
 				&sub.FechaLimite,
+				&sub.EstimacionMin,
 			); err != nil {
 				// Se omite la subtarea pero queda registrado, en vez de perderla en silencio.
 				log.Printf("[REPO:Tareas.GetByID] Error al leer subtarea: %v | tarea_id=%d", err, id)
@@ -342,6 +349,24 @@ func (r *TareasRepository) GetByID(ctx context.Context, id int, userID int) (*mo
 
 // Update actualiza una tarea usando COALESCE y asegurando la pertenencia del usuario
 func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *models.TareaUpdateRequest) (*models.TareaUpdateResponse, error) {
+	// La tarea y, si se completa, sus subtareas cambian juntas o no cambia nada.
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error al iniciar transacción: %w", err)
+	}
+	defer tx.Rollback(ctx)
+	tarea, err := updateTarea(ctx, tx, id, userID, req)
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return tarea, nil
+}
+
+// updateTarea aplica la actualización dentro de tx (también la usa la integración MCP).
+func updateTarea(ctx context.Context, tx pgx.Tx, id int, userID int, req *models.TareaUpdateRequest) (*models.TareaUpdateResponse, error) {
 	var tarea models.TareaUpdateResponse
 	var modoFechaTerminado int // 0 = no change, 1 = completado (NOW si null), 2 = reabierto (NULL)
 	if req.Estado != nil {
@@ -363,23 +388,17 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 			tarea_padre_id = COALESCE($7, tarea_padre_id),
 			fecha_inicio = CASE WHEN $11 THEN NULL ELSE COALESCE($12, fecha_inicio) END,
 			fecha_limite = CASE WHEN $13 THEN NULL ELSE COALESCE($14, fecha_limite) END,
+			estimacion_min = CASE WHEN $15 THEN NULL ELSE COALESCE($16, estimacion_min) END,
 			fecha_terminado = CASE 
 				WHEN $8 = 1 THEN COALESCE(fecha_terminado, NOW())
 				WHEN $8 = 2 THEN NULL
 				ELSE fecha_terminado
 			END
 		WHERE id = $9 AND user_id = $10 AND eliminado = false
-		RETURNING id, nombre, descripcion, comentario, estado, prioridad, fecha_terminado, eliminado, tarea_padre_id, fecha_inicio, fecha_limite
+		RETURNING id, nombre, descripcion, comentario, estado, prioridad, fecha_terminado, eliminado, tarea_padre_id, fecha_inicio, fecha_limite, estimacion_min
 	`
 
-	// La tarea y, si se completa, sus subtareas cambian juntas o no cambia nada.
-	tx, err := r.db.Begin(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("error al iniciar transacción: %w", err)
-	}
-	defer tx.Rollback(ctx)
-
-	err = tx.QueryRow(
+	err := tx.QueryRow(
 		ctx,
 		query,
 		req.Nombre,
@@ -396,6 +415,8 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		req.FechaInicio,
 		req.ClearFechaLimite != nil && *req.ClearFechaLimite,
 		req.FechaLimite,
+		req.ClearEstimacion != nil && *req.ClearEstimacion,
+		req.EstimacionMin,
 	).Scan(
 		&tarea.ID,
 		&tarea.Nombre,
@@ -408,6 +429,7 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 		&tarea.TareaPadreID,
 		&tarea.FechaInicio,
 		&tarea.FechaLimite,
+		&tarea.EstimacionMin,
 	)
 
 	if err != nil {
@@ -428,10 +450,6 @@ func (r *TareasRepository) Update(ctx context.Context, id int, userID int, req *
 			log.Printf("[REPO:Tareas.Update] Error al completar subtareas: %v | id=%d user_id=%d", err, id, userID)
 			return nil, err
 		}
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return nil, err
 	}
 
 	return &tarea, nil

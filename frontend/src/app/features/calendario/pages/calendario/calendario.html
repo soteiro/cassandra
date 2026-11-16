@@ -201,7 +201,17 @@
           (actualizar)="actualizarCalendario($event)"
           (eliminar)="eliminarCalendario($event)"
           (ciclo)="abrirCiclo($event.id)"
+          (horario)="abrirHorario()"
         />
+      }
+      @case ('horario') {
+        @if (h.tipo === 'horario') {
+          <app-calendario-horario-base
+            [franjas]="h.franjas"
+            [guardando]="guardando()"
+            (guardar)="guardarHorario($event)"
+          />
+        }
       }
       @case ('ciclo') {
         @if (h.tipo === 'ciclo') {
@@ -272,6 +282,39 @@
               class="min-h-11 rounded-lg border border-danger/40 text-sm font-semibold text-danger hover:bg-danger/10"
             >
               {{ h.actividad.semanal ? 'Eliminar todas las semanas' : 'Eliminar actividad' }}
+            </button>
+          </div>
+        }
+      }
+      @case ('trabajo') {
+        @if (h.tipo === 'trabajo') {
+          <div class="flex flex-col gap-3">
+            <p class="text-sm text-text-muted">{{ rotuloTrabajo(h.bloque) }}</p>
+            <p class="text-sm text-text-main">
+              Bloque de trabajo · estado: {{ h.bloque.estado }}
+              @if (h.bloque.origen === 'mcp') {
+                · lo planificó el asistente
+              }
+            </p>
+            @if (h.actividad.choques.length) {
+              <p class="text-sm font-semibold text-danger">
+                Choca con {{ h.actividad.choques.join(' y ') }}
+              </p>
+            }
+            <button
+              type="button"
+              (click)="abrirProyecto(h.bloque)"
+              class="min-h-11 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-background"
+            >
+              Abrir proyecto
+            </button>
+            <button
+              type="button"
+              [disabled]="guardando()"
+              (click)="quitarBloque(h.bloque)"
+              class="min-h-11 rounded-lg border border-danger/40 text-sm font-semibold text-danger hover:bg-danger/10"
+            >
+              Quitar bloque
             </button>
           </div>
         }

@@ -1,0 +1,21 @@
+info:
+  name: Fijar horario base
+  type: http
+  seq: 17
+
+http:
+  method: PUT
+  url: "{{base_url}}/api/calendario/horario-base"
+  body:
+    type: json
+    data: |-
+      {"franjas": [{"dia_semana": 0, "hora_inicio": "14:00", "hora_fin": "18:00"}, {"dia_semana": 1, "hora_inicio": "14:00", "hora_fin": "18:00"}]}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Reemplaza todas las franjas. Horas HH:MM; el fin admite 24:00. No se admiten solapes en un mismo día.

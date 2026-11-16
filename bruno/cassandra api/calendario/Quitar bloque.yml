@@ -1,0 +1,17 @@
+info:
+  name: Quitar bloque
+  type: http
+  seq: 18
+
+http:
+  method: DELETE
+  url: "{{base_url}}/api/calendario/bloques/{{bloque_id}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Quita un bloque de trabajo propio. Responde 204.

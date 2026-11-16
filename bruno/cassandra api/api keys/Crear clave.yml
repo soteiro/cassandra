@@ -14,11 +14,14 @@ http:
           "memory:read",
           "memory:write",
           "tasks:read",
-          "tasks:create"
+          "tasks:create",
+          "tasks:manage",
+          "calendar:read"
         ],
         "proyecto_ids": [
           {{proyecto_id}}
-        ]
+        ],
+        "calendario_ids": []
       }
   auth: inherit
 runtime:
@@ -36,4 +39,4 @@ settings:
   followRedirects: true
   maxRedirects: 5
 docs: |-
-  Limitada al proyecto del entorno. Guarda api_key y api_key_id solo en memoria. expira_en es opcional (RFC3339).
+  Limitada al proyecto del entorno. Guarda api_key y api_key_id solo en memoria. expira_en es opcional (RFC3339). calendario_ids (requiere calendar:read) elige qué calendarios muestran su contenido; los demás solo cuentan como ocupado.

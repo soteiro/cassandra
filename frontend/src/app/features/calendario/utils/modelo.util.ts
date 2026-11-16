@@ -1,4 +1,5 @@
 import {
+  BloqueTrabajo,
   Calendario,
   CalendarioRango,
   Deadline,
@@ -7,12 +8,15 @@ import {
 } from '../data/calendario.model';
 import { diasEntre, sumarDias } from './dias.util';
 import { choquesDelDia } from './layout.util';
+import { COLOR_PLANIFICADO } from './estilo.util';
 
 export interface ActividadDia extends OcurrenciaDia {
   color: string;
   calendario: string;
   /** Títulos de las actividades del mismo día con que se solapa. */
   choques: string[];
+  /** Bloque de trabajo de una tarea (capa Planificado): actividad_id es -id del bloque. */
+  trabajo?: BloqueTrabajo;
 }
 
 export interface DeadlineDia {
@@ -38,6 +42,25 @@ export interface Visibilidad {
   /** Calendarios propios visibles. */
   calendarios: Set<number>;
   deadlines: boolean;
+  /** Bloques de trabajo de tareas. */
+  planificado: boolean;
+}
+
+/** Nombre de la capa de bloques de trabajo. */
+export const CAPA_PLANIFICADO = 'Planificado';
+
+/** Un bloque de trabajo con forma de ocurrencia, para dibujarlo como una actividad más. */
+export function ocurrenciaDeBloque(b: BloqueTrabajo): OcurrenciaDia {
+  return {
+    actividad_id: -b.id,
+    calendario_id: 0,
+    fecha: b.fecha,
+    titulo: b.tarea,
+    hora_inicio: b.hora_inicio,
+    hora_fin: b.hora_fin,
+    semanal: false,
+    cancelada: false,
+  };
 }
 
 export function diaVacio(fecha: string): DiaInfo {
@@ -84,19 +107,28 @@ export function construirDias(
   }
 
   const porDia = new Map<string, OcurrenciaDia[]>();
+  const agregar = (o: OcurrenciaDia) => porDia.set(o.fecha, [...(porDia.get(o.fecha) ?? []), o]);
   for (const o of rango.ocurrencias) {
-    if (!visibles.calendarios.has(o.calendario_id)) continue;
-    porDia.set(o.fecha, [...(porDia.get(o.fecha) ?? []), o]);
+    if (visibles.calendarios.has(o.calendario_id)) agregar(o);
+  }
+  const trabajos = new Map<number, BloqueTrabajo>();
+  if (visibles.planificado) {
+    for (const b of rango.bloques ?? []) {
+      trabajos.set(-b.id, b);
+      agregar(ocurrenciaDeBloque(b));
+    }
   }
   for (const [f, ocs] of porDia) {
     const choques = choquesDelDia(ocs);
     dia(f).actividades = ocs.map((o) => {
+      const trabajo = trabajos.get(o.actividad_id);
       const cal = cals.get(o.calendario_id);
       return {
         ...o,
-        color: cal?.color ?? '#58a6ff',
-        calendario: cal?.nombre ?? '',
+        color: trabajo ? COLOR_PLANIFICADO : (cal?.color ?? '#58a6ff'),
+        calendario: trabajo ? CAPA_PLANIFICADO : (cal?.nombre ?? ''),
         choques: choques.get(o.actividad_id) ?? [],
+        ...(trabajo ? { trabajo } : {}),
       };
     });
   }

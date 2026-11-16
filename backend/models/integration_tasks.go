@@ -29,6 +29,11 @@ type IntegrationTask struct {
 	FechaActualizacion *time.Time `json:"fecha_actualizacion"`
 	FechaTerminado     *time.Time `json:"fecha_terminado"`
 	TextoTruncado      bool       `json:"texto_truncado"`
+	FechaInicio        *string    `json:"fecha_inicio"`
+	FechaLimite        *string    `json:"fecha_limite"`
+	EstimacionMin      *int       `json:"estimacion_min"`
+	// Minutos ya reservados en bloques de trabajo.
+	MinutosPlanificados int `json:"minutos_planificados"`
 }
 
 type CreateIntegrationTaskRequest struct {

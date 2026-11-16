@@ -10,6 +10,8 @@ type Calendario struct {
 	Color  string `json:"color"`
 	Tipo   string `json:"tipo"`
 	Oculto bool   `json:"oculto"`
+	// Cómo cuenta para los huecos libres: ocupa, libera o contexto.
+	Disponibilidad string `json:"disponibilidad"`
 	// Ciclo vigente (solo turnos): primer día del ciclo que rige hoy. nil = sin configurar.
 	PrimerLargo *string `json:"primer_largo,omitempty"`
 }
@@ -18,12 +20,20 @@ type CalendarioRequest struct {
 	Nombre string `json:"nombre"`
 	Color  string `json:"color"`
 	Tipo   string `json:"tipo"`
+	// Vacío: contexto para turnos y ocupa para actividades.
+	Disponibilidad string `json:"disponibilidad,omitempty"`
 }
 
 type CalendarioUpdateRequest struct {
-	Nombre *string `json:"nombre"`
-	Color  *string `json:"color"`
-	Oculto *bool   `json:"oculto"`
+	Nombre         *string `json:"nombre"`
+	Color          *string `json:"color"`
+	Oculto         *bool   `json:"oculto"`
+	Disponibilidad *string `json:"disponibilidad,omitempty"`
+}
+
+// DisponibilidadValida: ocupa, libera o contexto.
+func DisponibilidadValida(s string) bool {
+	return s == "ocupa" || s == "libera" || s == "contexto"
 }
 
 // CicloRequest fija el primer Largo: desde esa fecha se recalcula el ciclo.
@@ -65,6 +75,7 @@ type CalendarioRango struct {
 	Deadlines        []Deadline      `json:"deadlines"`
 	Turnos           []TurnoDia      `json:"turnos"`
 	Ocurrencias      []OcurrenciaDia `json:"ocurrencias"`
+	Bloques          []Bloque        `json:"bloques"`
 }
 
 // Deadline: tarea o proyecto pendiente con fecha límite.

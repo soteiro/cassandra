@@ -1,0 +1,21 @@
+info:
+  name: Actualizar tarea de integración
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{base_url}}/api/integrations/projects/{{proyecto_id}}/tasks/{{tarea_id}}"
+  body:
+    type: json
+    data: |-
+      {"estimacion_min": 120, "fecha_limite": "2026-11-20", "prioridad": "alta"}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+docs: |-
+  Cambia estado, prioridad, fecha_inicio, fecha_limite o estimacion_min. quitar_fecha_inicio, quitar_fecha_limite y quitar_estimacion las borran. Terminado cierra también las subtareas.
