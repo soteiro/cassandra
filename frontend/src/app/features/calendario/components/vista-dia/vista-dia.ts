@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Calendario } from '../../data/calendario.model';
 import { DiaInfo, diaVacio } from '../../utils/modelo.util';
-import { fondo, textoTono } from '../../utils/estilo.util';
+import { COLOR_LIBRE_TRABAJO, fondo, textoTono } from '../../utils/estilo.util';
 import {
   Bloque,
   bloquesDelDia,
@@ -35,6 +35,20 @@ import {
             <span class="block pl-2 pt-0.5 text-[11px] text-text-muted tabular-nums">{{
               h.etiqueta
             }}</span>
+          </div>
+        }
+        @for (l of libre(); track l.desde) {
+          <div
+            class="absolute right-0 rounded-md pointer-events-none"
+            [style]="l.estilo"
+            role="img"
+            [attr.aria-label]="'Para trabajar: ' + l.horas"
+          >
+            <span
+              class="block px-1.5 pt-0.5 text-[10px] font-semibold text-success"
+              aria-hidden="true"
+              >Para trabajar · {{ l.horas }}</span
+            >
           </div>
         }
         @for (t of tramos(); track t.clave) {
@@ -69,7 +83,7 @@ import {
                   [class.text-danger]="b.actividad.choques.length && !b.actividad.cancelada"
                   [class.text-text-muted]="!b.actividad.choques.length || b.actividad.cancelada"
                 >
-                  · {{ b.actividad.hora_inicio }}–{{ b.actividad.hora_fin
+                  · {{ b.actividad.horas
                   }}{{
                     b.actividad.choques.length && !b.actividad.cancelada ? ' · choque' : ''
                   }}</span
@@ -86,8 +100,7 @@ import {
                 [class.text-danger]="b.actividad.choques.length && !b.actividad.cancelada"
                 [class.text-text-muted]="!b.actividad.choques.length || b.actividad.cancelada"
               >
-                {{ b.actividad.calendario }} · {{ b.actividad.hora_inicio }}–{{
-                  b.actividad.hora_fin
+                {{ b.actividad.calendario }} · {{ b.actividad.horas
                 }}{{ b.actividad.choques.length && !b.actividad.cancelada ? ' · choque' : '' }}
               </span>
             }
@@ -129,6 +142,21 @@ export class CalendarioVistaDia {
         left: `${52 + t.columna * 28}px`,
         background: fondo(t.calendario.color, t.codigo === 'N' ? 40 : 22),
         border: `1px solid ${t.calendario.color}`,
+      },
+    })),
+  );
+
+  /** Tiempo para trabajar como fondo, detrás de las actividades. */
+  readonly libre = computed(() =>
+    (this.dias().get(this.fecha())?.libre ?? []).map((l) => ({
+      ...l,
+      estilo: {
+        top: `calc(var(--h) * ${l.desde})`,
+        height: `calc(var(--h) * ${l.hasta - l.desde})`,
+        left: `${this.izquierda() - 4}px`,
+        background: fondo(COLOR_LIBRE_TRABAJO, 10),
+        'border-left': `3px solid ${COLOR_LIBRE_TRABAJO}`,
+        'z-index': '1',
       },
     })),
   );

@@ -69,6 +69,9 @@ const CAMPO =
           />
         </label>
       </div>
+      @if (terminaDiaSiguiente()) {
+        <p class="-mt-1 text-[13px] text-text-muted">Termina al día siguiente.</p>
+      }
       <label class="flex items-center gap-2.5 min-h-11 text-sm font-medium text-text-main">
         <input
           type="checkbox"
@@ -209,23 +212,37 @@ export class CalendarioFormActividad {
   readonly conFin = linkedSignal(() => !!this.actividad()?.hasta);
   readonly error = signal('');
 
+  /** Un término anterior al inicio: la actividad termina al día siguiente (dormir). */
+  readonly terminaDiaSiguiente = computed(() => {
+    const a = this.horaInicio();
+    const b = this.horaFin();
+    return !!a && !!b && b < a;
+  });
+
+  /**
+   * Avisa si choca con algo del mismo dueño: del mismo calendario, o si las dos cosas te
+   * ocupan a ti. Si cruza la medianoche, revisa el tramo del día en que empieza.
+   */
   readonly choque = computed(() => {
     const f = this.fecha();
     const a = this.horaInicio();
     const b = this.horaFin();
-    if (!f || !a || !b || b <= a) return '';
+    if (!f || !a || !b || b === a) return '';
     const ini = horaANumero(a);
-    const fin = horaANumero(b);
+    const fin = b < a ? 24 : horaANumero(b);
     const propia = this.actividad()?.id;
+    const cal = this.calendarios().find((c) => c.id === this.calendarioId());
+    const mia = cal?.disponibilidad === 'ocupa';
     const con = this.ocupado()(f).filter(
       (o) =>
         o.actividad_id !== propia &&
         !o.cancelada &&
-        horaANumero(o.hora_inicio) < fin &&
-        ini < horaANumero(o.hora_fin),
+        o.desde < fin &&
+        ini < o.hasta &&
+        ((!o.trabajo && o.calendario_id === cal?.id) || (mia && o.mio)),
     );
     if (!con.length) return '';
-    const lista = con.map((o) => `${o.titulo} (${o.hora_inicio}–${o.hora_fin})`).join(' y ');
+    const lista = con.map((o) => `${o.titulo} (${o.horas})`).join(' y ');
     return `El ${f.slice(8)} choca con ${lista}. Puedes guardarla igual.`;
   });
 
@@ -243,8 +260,8 @@ export class CalendarioFormActividad {
     const titulo = this.titulo().trim();
     if (!titulo) return this.error.set('Escribe un título.');
     if (!this.fecha()) return this.error.set('Elige la fecha.');
-    if (!this.horaInicio() || !this.horaFin() || this.horaFin() <= this.horaInicio())
-      return this.error.set('La hora de término debe ser posterior a la de inicio.');
+    if (!this.horaInicio() || !this.horaFin() || this.horaFin() === this.horaInicio())
+      return this.error.set('La hora de término debe ser distinta de la de inicio.');
     if (this.semanal() && !this.dias().length) return this.error.set('Elige al menos un día.');
     if (this.semanal() && this.conFin() && !this.hasta())
       return this.error.set('Elige el último día o marca que no termina.');

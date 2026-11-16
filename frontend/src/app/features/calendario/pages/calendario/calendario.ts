@@ -71,8 +71,17 @@ type Hoja =
   | { tipo: 'horario'; franjas: FranjaHorario[] };
 
 const CLAVE_VISTA = 'cassandra.calendario.vista';
-/** La capa Planificado se recuerda en el navegador: no es un calendario del servidor. */
-const CLAVE_PLANIFICADO = 'cassandra.calendario.planificado';
+/**
+ * Capas que no son calendarios del servidor (bloques de trabajo y tiempo para trabajar):
+ * se recuerdan en el navegador.
+ */
+const CAPAS_LOCALES = {
+  planificado: 'cassandra.calendario.planificado',
+  libre: 'cassandra.calendario.libre',
+} as const;
+type CapaLocal = keyof typeof CAPAS_LOCALES;
+const CAPA_LIBRE = 'Para trabajar';
+const COLOR_LIBRE = 'var(--theme-success)';
 const VISTAS: { valor: Vista; nombre: string }[] = [
   { valor: 'tres', nombre: '3 meses' },
   { valor: 'mes', nombre: 'Mes' },
@@ -88,9 +97,9 @@ function fechaValida(f: string | null): string | null {
   return f && /^\d{4}-\d{2}-\d{2}$/.test(f) ? f : null;
 }
 
-function leerPlanificado(): boolean {
+function leerCapaLocal(capa: CapaLocal): boolean {
   try {
-    return localStorage.getItem(CLAVE_PLANIFICADO) !== 'oculto';
+    return localStorage.getItem(CAPAS_LOCALES[capa]) !== 'oculto';
   } catch {
     return true;
   }
@@ -147,8 +156,11 @@ export class CalendarioPage {
   readonly guardando = signal(false);
   /** Visibilidad cambiada aquí mientras el servidor confirma. */
   private readonly visibilidadLocal = signal<Record<string, boolean>>({});
-  /** Capa de bloques de trabajo (guardada en el navegador). */
-  readonly planificadoVisible = signal(leerPlanificado());
+  /** Capas guardadas en el navegador: bloques de trabajo y tiempo para trabajar. */
+  readonly capasLocales = signal<Record<CapaLocal, boolean>>({
+    planificado: leerCapaLocal('planificado'),
+    libre: leerCapaLocal('libre'),
+  });
 
   constructor() {
     effect(() => {
@@ -201,7 +213,8 @@ export class CalendarioPage {
     const local = this.visibilidadLocal();
     return {
       deadlines: local['deadlines'] ?? !rango.ocultar_deadlines,
-      planificado: this.planificadoVisible(),
+      planificado: this.capasLocales().planificado,
+      libre: this.capasLocales().libre,
       calendarios: new Set(
         rango.calendarios.filter((c) => local[String(c.id)] ?? !c.oculto).map((c) => c.id),
       ),
@@ -212,7 +225,7 @@ export class CalendarioPage {
     const r = this.rango();
     return r
       ? this.visibilidadDe(r)
-      : { deadlines: true, planificado: true, calendarios: new Set() };
+      : { deadlines: true, planificado: true, libre: true, calendarios: new Set() };
   });
 
   readonly dias = computed(() => {
@@ -238,10 +251,15 @@ export class CalendarioPage {
 
   readonly capas = computed<Capa[]>(() => {
     const vis = this.visibles();
-    // Planificado solo aparece si hay bloques en el rango (o está oculta, para poder volver).
+    // Planificado y Para trabajar solo aparecen si tienen algo en el rango (o están ocultas,
+    // para poder volver a mostrarlas).
     const conBloques = !!this.rango()?.bloques?.length || !vis.planificado;
+    const conLibre = !!this.rango()?.tiempo_libre?.length || !vis.libre;
     return [
       { clave: 'deadlines', nombre: 'Deadlines', color: COLOR_DEADLINE, visible: vis.deadlines },
+      ...(conLibre
+        ? [{ clave: 'libre', nombre: CAPA_LIBRE, color: COLOR_LIBRE, visible: vis.libre }]
+        : []),
       ...(conBloques
         ? [
             {
@@ -380,10 +398,11 @@ export class CalendarioPage {
 
   alternarCapa(capa: Capa) {
     const visible = !capa.visible;
-    if (capa.clave === 'planificado') {
-      this.planificadoVisible.set(visible);
+    if (capa.clave === 'planificado' || capa.clave === 'libre') {
+      const clave = capa.clave;
+      this.capasLocales.update((c) => ({ ...c, [clave]: visible }));
       try {
-        localStorage.setItem(CLAVE_PLANIFICADO, visible ? 'visible' : 'oculto');
+        localStorage.setItem(CAPAS_LOCALES[clave], visible ? 'visible' : 'oculto');
       } catch {
         // Sin almacenamiento la capa solo dura la sesión.
       }
@@ -560,6 +579,7 @@ export class CalendarioPage {
   }
 
   rotuloOcurrencia(a: ActividadDia): string {
-    return `${a.calendario} · ${diaCorto(a.fecha)} · ${a.hora_inicio}–${a.hora_fin}`;
+    const sigue = a.hora_fin <= a.hora_inicio ? ' (termina al día siguiente)' : '';
+    return `${a.calendario} · ${diaCorto(a.fecha)} · ${a.horas}${sigue}`;
   }
 }

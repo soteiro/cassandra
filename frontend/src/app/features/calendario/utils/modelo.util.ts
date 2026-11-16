@@ -6,7 +6,7 @@ import {
   OcurrenciaDia,
   TurnoDia,
 } from '../data/calendario.model';
-import { diasEntre, sumarDias } from './dias.util';
+import { diasEntre, horaANumero, sumarDias } from './dias.util';
 import { choquesDelDia } from './layout.util';
 import { COLOR_PLANIFICADO } from './estilo.util';
 
@@ -17,6 +17,24 @@ export interface ActividadDia extends OcurrenciaDia {
   choques: string[];
   /** Bloque de trabajo de una tarea (capa Planificado): actividad_id es -id del bloque. */
   trabajo?: BloqueTrabajo;
+  /** Única en el día (una actividad que cruza la medianoche tiene dos tramos). */
+  clave: string;
+  /** Horas de este día que ocupa (0–24). */
+  desde: number;
+  hasta: number;
+  /** "22:30–07:00": el horario completo, aunque este tramo sea solo una parte. */
+  horas: string;
+  /** Cruza la medianoche: 'sigue' al día siguiente o 'viene' del día anterior. */
+  parte?: 'sigue' | 'viene';
+  /** Te ocupa a ti (calendario "Me ocupa" o bloque de trabajo). */
+  mio: boolean;
+}
+
+/** Un tramo de tiempo para trabajar en el día. */
+export interface TramoLibre {
+  desde: number;
+  hasta: number;
+  horas: string;
 }
 
 export interface DeadlineDia {
@@ -36,6 +54,8 @@ export interface DiaInfo {
   turnos: TurnoVista[];
   deadlines: DeadlineDia[];
   actividades: ActividadDia[];
+  /** Tiempo para trabajar (capa "Para trabajar"). */
+  libre: TramoLibre[];
 }
 
 export interface Visibilidad {
@@ -44,6 +64,8 @@ export interface Visibilidad {
   deadlines: boolean;
   /** Bloques de trabajo de tareas. */
   planificado: boolean;
+  /** Tiempo para trabajar. */
+  libre: boolean;
 }
 
 /** Nombre de la capa de bloques de trabajo. */
@@ -64,7 +86,7 @@ export function ocurrenciaDeBloque(b: BloqueTrabajo): OcurrenciaDia {
 }
 
 export function diaVacio(fecha: string): DiaInfo {
-  return { fecha, turnos: [], deadlines: [], actividades: [] };
+  return { fecha, turnos: [], deadlines: [], actividades: [], libre: [] };
 }
 
 /** Agrupa el rango por día, solo con las capas visibles. */
@@ -106,31 +128,59 @@ export function construirDias(
     }
   }
 
-  const porDia = new Map<string, OcurrenciaDia[]>();
-  const agregar = (o: OcurrenciaDia) => porDia.set(o.fecha, [...(porDia.get(o.fecha) ?? []), o]);
+  // Cada ocurrencia en uno o dos tramos: una que cruza la medianoche (dormir de 22:30 a
+  // 07:00) se dibuja hasta las 24 en su día y desde las 0 en el siguiente.
+  const enRango = (f: string) => f >= rango.desde && f <= rango.hasta;
+  const porDia = new Map<string, ActividadDia[]>();
+  const agregar = (o: OcurrenciaDia, trabajo?: BloqueTrabajo) => {
+    const cal = cals.get(o.calendario_id);
+    const base = {
+      ...o,
+      color: trabajo ? COLOR_PLANIFICADO : (cal?.color ?? '#58a6ff'),
+      calendario: trabajo ? CAPA_PLANIFICADO : (cal?.nombre ?? ''),
+      choques: [],
+      horas: `${o.hora_inicio}–${o.hora_fin}`,
+      mio: !!trabajo || cal?.disponibilidad === 'ocupa',
+      ...(trabajo ? { trabajo } : {}),
+    };
+    const clave = trabajo ? `b${trabajo.id}` : String(o.actividad_id);
+    const ini = horaANumero(o.hora_inicio);
+    const fin = horaANumero(o.hora_fin);
+    const tramos: [string, ActividadDia][] = [];
+    if (fin <= ini) {
+      tramos.push([o.fecha, { ...base, clave, desde: ini, hasta: 24, parte: 'sigue' }]);
+      const sig = sumarDias(o.fecha, 1);
+      tramos.push([sig, { ...base, clave: `${clave}v`, desde: 0, hasta: fin, parte: 'viene' }]);
+    } else {
+      tramos.push([o.fecha, { ...base, clave, desde: ini, hasta: fin }]);
+    }
+    for (const [f, a] of tramos) {
+      if (enRango(f)) porDia.set(f, [...(porDia.get(f) ?? []), a]);
+    }
+  };
   for (const o of rango.ocurrencias) {
     if (visibles.calendarios.has(o.calendario_id)) agregar(o);
   }
-  const trabajos = new Map<number, BloqueTrabajo>();
   if (visibles.planificado) {
-    for (const b of rango.bloques ?? []) {
-      trabajos.set(-b.id, b);
-      agregar(ocurrenciaDeBloque(b));
-    }
+    for (const b of rango.bloques ?? []) agregar(ocurrenciaDeBloque(b), b);
   }
-  for (const [f, ocs] of porDia) {
-    const choques = choquesDelDia(ocs);
-    dia(f).actividades = ocs.map((o) => {
-      const trabajo = trabajos.get(o.actividad_id);
-      const cal = cals.get(o.calendario_id);
-      return {
-        ...o,
-        color: trabajo ? COLOR_PLANIFICADO : (cal?.color ?? '#58a6ff'),
-        calendario: trabajo ? CAPA_PLANIFICADO : (cal?.nombre ?? ''),
-        choques: choques.get(o.actividad_id) ?? [],
-        ...(trabajo ? { trabajo } : {}),
-      };
-    });
+  for (const [f, acts] of porDia) {
+    acts.sort((a, b) => a.desde - b.desde);
+    const choques = choquesDelDia(
+      acts.map((a) => ({ ...a, grupo: a.trabajo ? 'trabajo' : String(a.calendario_id) })),
+    );
+    dia(f).actividades = acts.map((a) => ({ ...a, choques: choques.get(a.clave) ?? [] }));
+  }
+
+  if (visibles.libre) {
+    for (const h of rango.tiempo_libre ?? []) {
+      if (!enRango(h.fecha)) continue;
+      dia(h.fecha).libre.push({
+        desde: horaANumero(h.hora_inicio),
+        hasta: horaANumero(h.hora_fin),
+        horas: `${h.hora_inicio}–${h.hora_fin}`,
+      });
+    }
   }
 
   for (const d of dias.values()) {

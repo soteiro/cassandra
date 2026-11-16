@@ -78,6 +78,7 @@ function rangoDe(hoy: string, desde: string, hasta: string): CalendarioRango {
         origen: 'mcp',
       },
     ],
+    tiempo_libre: [],
   };
 }
 

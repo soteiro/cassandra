@@ -75,6 +75,15 @@ export interface CalendarioRango {
   turnos: TurnoDia[];
   ocurrencias: OcurrenciaDia[];
   bloques: BloqueTrabajo[];
+  /** Tiempo para trabajar: horario base más lo que libera, menos lo que ocupa. */
+  tiempo_libre: HuecoLibre[];
+}
+
+export interface HuecoLibre {
+  fecha: string;
+  hora_inicio: string;
+  hora_fin: string;
+  minutos: number;
 }
 
 /** Horas reservadas para trabajar en una tarea (las pone el asistente o el usuario). */

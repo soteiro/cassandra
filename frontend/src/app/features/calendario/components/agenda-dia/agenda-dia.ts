@@ -37,6 +37,12 @@ import { diaCorto, diaLargo } from '../../utils/dias.util';
         }
       </div>
 
+      @if (libre()) {
+        <p class="text-xs text-text-muted">
+          <span class="font-semibold text-success">Para trabajar:</span> {{ libre() }}
+        </p>
+      }
+
       <ul class="flex flex-col gap-2.5">
         @for (d of info().deadlines; track d.deadline.tipo + d.deadline.id) {
           <li>
@@ -71,7 +77,7 @@ import { diaCorto, diaLargo } from '../../utils/dias.util';
             </button>
           </li>
         }
-        @for (a of info().actividades; track a.actividad_id) {
+        @for (a of actividades(); track a.clave) {
           <li>
             <button
               type="button"
@@ -93,7 +99,8 @@ import { diaCorto, diaLargo } from '../../utils/dias.util';
                   >{{ a.titulo }}</span
                 >
                 <span class="block text-xs leading-4 text-text-muted">
-                  {{ a.calendario }} · {{ a.hora_inicio }}–{{ a.hora_fin
+                  {{ a.calendario }} · {{ a.horas
+                  }}{{ a.parte === 'sigue' ? ' · termina al día siguiente' : ''
                   }}{{ a.cancelada ? ' · no ocurre este día' : a.semanal ? ' · cada semana' : '' }}
                 </span>
                 @if (a.choques.length && !a.cancelada) {
@@ -125,7 +132,14 @@ export class CalendarioAgenda {
 
   readonly titulo = computed(() => diaLargo(this.info().fecha));
   readonly esHoy = computed(() => this.info().fecha === this.hoy());
-  readonly vacio = computed(() => !this.info().deadlines.length && !this.info().actividades.length);
+  /** La madrugada de algo que empezó el día anterior ya aparece en ese día. */
+  readonly actividades = computed(() => this.info().actividades.filter((a) => a.parte !== 'viene'));
+  readonly libre = computed(() =>
+    this.info()
+      .libre.map((l) => l.horas)
+      .join(' · '),
+  );
+  readonly vacio = computed(() => !this.info().deadlines.length && !this.actividades().length);
 
   trabaja(t: TurnoVista): boolean {
     return TURNOS[t.turno.codigo].trabaja;
