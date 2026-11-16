@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.22.0](https://github.com/soteiro/cassandra/compare/v0.21.0...v0.22.0) (2026-11-16)
+
+
+### Features
+
+* **api-keys:** edit a key's permissions without issuing a new one ([dbfc7eb](https://github.com/soteiro/cassandra/commit/dbfc7ebb3f5f564c7b6bd640f9c4ff89d8ef48b3))
+* **calendario:** show planned work blocks and set up planning ([7d5187a](https://github.com/soteiro/cassandra/commit/7d5187a17e43127125856cc7c9cbdfba28e90d40))
+* **calendario:** show planned work blocks and set up planning ([16d806b](https://github.com/soteiro/cassandra/commit/16d806b4b013dc97ed46cc82bac1e1bf91f88bb1))
+* **mcp:** plan tasks in free calendar time as a PM ([aae2c89](https://github.com/soteiro/cassandra/commit/aae2c8941d394e50374b75000d0a3016ffe9f895))
+* **mcp:** plan tasks in free calendar time as a PM ([aac21d9](https://github.com/soteiro/cassandra/commit/aac21d90e20f6e832c7d918adf52957d87293e94))
+
+
+### Bug Fixes
+
+* **api-keys:** don't call scrollIntoView where the DOM lacks it ([ec7831b](https://github.com/soteiro/cassandra/commit/ec7831b46267dc7be762969999bf3b7724250790))
+* **api-keys:** don't call scrollIntoView where the DOM lacks it ([41cbeb6](https://github.com/soteiro/cassandra/commit/41cbeb6b853d4ccc8f60c4340ca42a35c21a8a59))
+
 ## [0.21.0](https://github.com/soteiro/cassandra/compare/v0.20.0...v0.21.0) (2026-11-15)
 
 
