@@ -76,6 +76,8 @@ type CalendarioRango struct {
 	Turnos           []TurnoDia      `json:"turnos"`
 	Ocurrencias      []OcurrenciaDia `json:"ocurrencias"`
 	Bloques          []Bloque        `json:"bloques"`
+	// Tiempo para trabajar: horario base más lo que libera, menos lo que ocupa.
+	TiempoLibre []HuecoLibre `json:"tiempo_libre"`
 }
 
 // Deadline: tarea o proyecto pendiente con fecha límite.

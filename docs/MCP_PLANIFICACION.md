@@ -24,6 +24,21 @@ ofrecen los de menos de 15 minutos. Las actividades canceladas no cuentan. Los
 turnos usan sus horas reales: el Largo va de 08:00 a 20:00 y la Noche de 20:00 a
 08:00 del día siguiente.
 
+Una actividad también puede cruzar la medianoche. Si su término es anterior a su
+inicio (por ejemplo, dormir de 22:30 a 07:00), termina al día siguiente: ocupa la
+noche de su día y la madrugada del siguiente. En `ver_disponibilidad` aparece con
+`termina_dia_siguiente: true`.
+
+En la aplicación, la capa **Para trabajar** muestra estos huecos como fondo verde
+en las vistas de semana y día, y como una línea en la agenda del día. Ahí no se
+descuentan los bloques ya reservados (se dibujan encima) ni la hora actual. Se
+puede ocultar como cualquier capa.
+
+Un **choque** solo se marca entre cosas del mismo dueño: dos del mismo
+calendario (dos cosas del hijo a la vez), o dos que te ocupan a ti (calendarios
+*me ocupa* y bloques de trabajo). Que el colegio, que libera, se cruce con tu
+traslado, que ocupa, no es un choque.
+
 La disponibilidad se fija **por calendario**. Si un mismo calendario mezcla cosas
 que liberan y cosas que ocupan (el colegio y las terapias del hijo), hay que
 separarlas en dos calendarios. Al crear un calendario de turnos, la disponibilidad

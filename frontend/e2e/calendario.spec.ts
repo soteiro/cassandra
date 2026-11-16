@@ -312,3 +312,65 @@ test('marca qué calendario libera tiempo y fija el horario de trabajo', async (
   expect(franjas).toHaveLength(5);
   expect(franjas[4]).toEqual({ dia_semana: 4, hora_inicio: '14:00', hora_fin: '18:00' });
 });
+
+test('dormir cruza la medianoche, el colegio no choca con el traslado y se ve el tiempo para trabajar', async ({
+  page,
+  request,
+}, testInfo) => {
+  const sufijo = uniqueName('noche', testInfo);
+  const base = diaBase(testInfo, 5);
+  const hogar = await post<{ id: number }>(request, '/api/calendarios', {
+    nombre: `Hogar ${sufijo}`,
+    tipo: 'actividades',
+    disponibilidad: 'ocupa',
+  });
+  const colegio = await post<{ id: number }>(request, '/api/calendarios', {
+    nombre: `Colegio ${sufijo}`,
+    tipo: 'actividades',
+    disponibilidad: 'libera',
+  });
+  const actividad = (cal: number, titulo: string, ini: string, fin: string) =>
+    post(request, `/api/calendarios/${cal}/actividades`, {
+      titulo: `${titulo} ${sufijo}`,
+      fecha: dia(base),
+      hora_inicio: ini,
+      hora_fin: fin,
+      dias_semana: [],
+    });
+  await actividad(hogar.id, 'Dormir', '22:30', '07:00');
+  await actividad(colegio.id, 'Clases', '14:30', '17:45');
+  await actividad(hogar.id, 'Traslado', '13:40', '15:00');
+
+  await page.goto(`/calendario?vista=dia&fecha=${dia(base)}`);
+  await expect(
+    page.getByRole('button', {
+      name: new RegExp(`^Dormir ${sufijo}, 22:30 a 07:00 del día siguiente`),
+    }),
+  ).toBeVisible();
+  // Cada uno es de otro dueño: no se marcan como choque.
+  await expect(
+    page.getByRole('button', {
+      name: new RegExp(`^Clases ${sufijo}, 14:30 a 17:45(?!.*Traslado)`),
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', {
+      name: new RegExp(`^Traslado ${sufijo}, 13:40 a 15:00(?!.*Clases)`),
+    }),
+  ).toBeVisible();
+  // El colegio libera tiempo; el traslado lo recorta hasta las 15:00.
+  await expect(page.getByRole('img', { name: /^Para trabajar: 15:00–/ }).first()).toBeAttached();
+  if (process.env['CAPTURAS_DIR']) {
+    await page.screenshot({
+      path: `${process.env['CAPTURAS_DIR']}/${testInfo.project.name}-noche.png`,
+    });
+  }
+
+  // Al día siguiente se ve la madrugada.
+  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  await expect(
+    page.getByRole('button', {
+      name: new RegExp(`^Dormir ${sufijo}, 22:30 a 07:00, desde el día anterior`),
+    }),
+  ).toBeVisible();
+});

@@ -190,7 +190,7 @@ func TestActividades(t *testing.T) {
 
 	// Validaciones y aislamiento.
 	api.Do(ana, http.MethodPost, apitest.Path("/api/calendarios/%d/actividades", hijo.ID), map[string]any{
-		"titulo": "Mal", "fecha": "2026-11-19", "hora_inicio": "16:00", "hora_fin": "15:00"}).Expect(t, http.StatusBadRequest)
+		"titulo": "Mal", "fecha": "2026-11-19", "hora_inicio": "16:00", "hora_fin": "16:00"}).Expect(t, http.StatusBadRequest)
 	api.Do(ana, http.MethodPost, apitest.Path("/api/calendarios/%d/actividades", hijo.ID), map[string]any{
 		"titulo": "Mal", "fecha": "2026-11-19", "hora_inicio": "15:00", "hora_fin": "16:00", "dias_semana": []int{7}}).Expect(t, http.StatusBadRequest)
 	api.Do(beto, http.MethodPut, apitest.Path("/api/calendario/actividades/%d/cancelaciones/2026-11-18", colegio), nil).

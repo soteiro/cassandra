@@ -256,12 +256,19 @@ func (r *CalendarioRepository) Rango(ctx context.Context, userID int, desde, has
 		}
 		res.Turnos = append(res.Turnos, turnos...)
 	}
-	if res.Ocurrencias, err = r.ocurrencias(ctx, userID, desde, hasta); err != nil {
+	// Con las del día anterior que cruzan la medianoche: su madrugada cae en el rango.
+	if res.Ocurrencias, err = r.ocurrenciasConNoche(ctx, userID, desde, hasta); err != nil {
 		return nil, err
 	}
 	if res.Bloques, err = r.bloques(ctx, userID, desde, hasta); err != nil {
 		return nil, err
 	}
+	base, err := r.HorarioBase(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	// Tiempo para trabajar, sin descontar los bloques (se dibujan encima) ni la hora actual.
+	res.TiempoLibre = huecosLibres(huecosDe(desde, hasta, cals, res.Turnos, res.Ocurrencias, nil, base, 0))
 	return res, nil
 }
 

@@ -73,7 +73,8 @@ export class CalendarioVistaMes {
 
   private celda(fecha: string, mes: number, mas: number): Celda {
     const info = this.dias().get(fecha) ?? diaVacio(fecha);
-    const activas = info.actividades.filter((a) => !a.cancelada);
+    // La madrugada de algo que empezó el día anterior ya se ve en ese día.
+    const activas = info.actividades.filter((a) => !a.cancelada && a.parte !== 'viene');
     const vistos = new Set<number>();
     const puntos = activas
       .filter((a) => !vistos.has(a.calendario_id) && vistos.add(a.calendario_id))

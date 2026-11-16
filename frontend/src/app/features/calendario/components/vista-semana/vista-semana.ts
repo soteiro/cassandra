@@ -19,7 +19,7 @@ import {
   sumarDias,
 } from '../../utils/dias.util';
 import { estiloBarra } from '../../utils/barra.util';
-import { fondo } from '../../utils/estilo.util';
+import { COLOR_LIBRE_TRABAJO, fondo } from '../../utils/estilo.util';
 import {
   Bloque,
   bloquesDelDia,
@@ -108,6 +108,16 @@ export class CalendarioVistaSemana {
             background: fondo(t.calendario.color, t.codigo === 'N' ? 85 : 55),
           },
           aria: `${t.calendario.nombre}: ${t.etiqueta}`,
+        })),
+        libre: info.libre.map((l) => ({
+          clave: l.desde,
+          aria: `Para trabajar: ${l.horas}`,
+          estilo: {
+            top: `calc(var(--h) * ${l.desde})`,
+            height: `calc(var(--h) * ${l.hasta - l.desde})`,
+            background: fondo(COLOR_LIBRE_TRABAJO, 12),
+            'border-left': `2px solid ${COLOR_LIBRE_TRABAJO}`,
+          },
         })),
         bloques: bloquesDelDia(info),
       };

@@ -341,8 +341,9 @@ func actividadInput(w http.ResponseWriter, r *http.Request) (*repository.Activid
 	if !ok {
 		return nil, false
 	}
-	if !horaValida(req.HoraInicio) || !horaValida(req.HoraFin) || req.HoraFin <= req.HoraInicio {
-		http.Error(w, "Horas inválidas: usa HH:MM y una hora de término posterior a la de inicio", http.StatusBadRequest)
+	// Un término anterior al inicio significa que la actividad termina al día siguiente.
+	if !horaValida(req.HoraInicio) || !horaValida(req.HoraFin) || req.HoraFin == req.HoraInicio {
+		http.Error(w, "Horas inválidas: usa HH:MM y una hora de término distinta de la de inicio", http.StatusBadRequest)
 		return nil, false
 	}
 	vistos := map[int]bool{}
