@@ -3,14 +3,24 @@
        dice dónde estás, y así el calendario empieza más arriba. -->
   <header class="contents md:flex md:items-center md:justify-between md:gap-3">
     <h1 class="sr-only md:not-sr-only md:text-2xl md:font-bold md:text-text-main">Calendario</h1>
-    <button
-      type="button"
-      (click)="nuevaActividad()"
-      class="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover"
-    >
-      <svg lucidePlus class="w-4 h-4" aria-hidden="true" />
-      Nueva actividad
-    </button>
+    <div class="hidden md:flex items-center gap-2">
+      <button
+        type="button"
+        (click)="planificarTarea()"
+        class="inline-flex items-center gap-2 h-10 px-4 rounded-lg border border-surface-border text-sm font-semibold text-text-main hover:bg-surface-border/60"
+      >
+        <svg lucideCalendarClock class="w-4 h-4" aria-hidden="true" />
+        Planificar tarea
+      </button>
+      <button
+        type="button"
+        (click)="nuevaActividad()"
+        class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover"
+      >
+        <svg lucidePlus class="w-4 h-4" aria-hidden="true" />
+        Nueva actividad
+      </button>
+    </div>
   </header>
 
   <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
@@ -183,6 +193,14 @@
 
 <button
   type="button"
+  (click)="planificarTarea()"
+  aria-label="Planificar tarea"
+  class="md:hidden fixed right-5 bottom-41 z-30 w-12 h-12 rounded-full bg-surface border border-surface-border text-text-main shadow-lg flex items-center justify-center"
+>
+  <svg lucideCalendarClock class="w-5 h-5" aria-hidden="true" />
+</button>
+<button
+  type="button"
   (click)="nuevaActividad()"
   aria-label="Nueva actividad"
   class="md:hidden fixed right-4 bottom-24 z-30 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center"
@@ -286,10 +304,24 @@
           </div>
         }
       }
+      @case ('planificar') {
+        <app-reservar-tiempo
+          [proyectos]="proyectos()"
+          [fechaInicial]="cursor()"
+          (guardado)="bloqueReservado($event)"
+          (cancelar)="cerrarHoja()"
+        />
+      }
       @case ('trabajo') {
         @if (h.tipo === 'trabajo') {
           <div class="flex flex-col gap-3">
-            <p class="text-sm text-text-muted">{{ rotuloTrabajo(h.bloque) }}</p>
+            <div class="flex items-center gap-2 min-w-0">
+              <span
+                class="text-xs font-mono text-text-muted bg-background px-2 py-0.5 rounded-md border border-surface-border shrink-0"
+                ><span class="sr-only">Tarea </span>#{{ h.bloque.tarea_id }}</span
+              >
+              <p class="text-sm text-text-muted min-w-0">{{ rotuloTrabajo(h.bloque) }}</p>
+            </div>
             <p class="text-sm text-text-main">
               Bloque de trabajo · estado: {{ h.bloque.estado }}
               @if (h.bloque.origen === 'mcp') {
@@ -301,6 +333,14 @@
                 Choca con {{ h.actividad.choques.join(' y ') }}
               </p>
             }
+            <button
+              type="button"
+              [disabled]="abriendoTarea()"
+              (click)="abrirTarea(h.bloque.tarea_id)"
+              class="min-h-11 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover disabled:opacity-60"
+            >
+              {{ abriendoTarea() ? 'Abriendo…' : 'Abrir tarea' }}
+            </button>
             <button
               type="button"
               (click)="abrirProyecto(h.bloque)"
@@ -322,3 +362,12 @@
     }
   </app-calendario-hoja>
 }
+
+<app-task-detail-modal
+  [isOpen]="!!tareaAbierta()"
+  [task]="tareaAbierta()"
+  [projectId]="tareaAbierta()?.proyect_id ?? 0"
+  (closeModal)="tareaAbierta.set(null)"
+  (taskUpdated)="tareaCambiada()"
+  (taskDeleted)="tareaEliminada()"
+/>

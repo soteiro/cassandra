@@ -1,7 +1,12 @@
 import { Component, computed, effect, inject, linkedSignal, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { LucideChevronLeft, LucideChevronRight, LucidePlus } from '@lucide/angular';
+import {
+  LucideCalendarClock,
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucidePlus,
+} from '@lucide/angular';
 import { CalendarioService, RangoParams } from '../../data/calendario.service';
 import {
   Actividad,
@@ -58,6 +63,12 @@ import {
   EditarCalendario,
 } from '../../components/gestion-calendarios/gestion-calendarios';
 import { CalendarioHorarioBase } from '../../components/horario-base/horario-base';
+import { ReservarTiempo } from '../../../tareas/components/reservar-tiempo/reservar-tiempo';
+import { PlanificacionResult } from '../../../tareas/data/planificacion.model';
+import { ProjectService } from '../../../proyectos/data/project.service';
+import { TaskDetailModal } from '../../../tareas/components/task-detail-modal/task-detail-modal';
+import { Task } from '../../../tareas/data/task.model';
+import { TaskService } from '../../../tareas/data/task.service';
 
 type Vista = 'tres' | 'mes' | 'sem' | 'dia';
 
@@ -68,7 +79,8 @@ type Hoja =
   | { tipo: 'actividad'; actividad: Actividad | null; fecha: string }
   | { tipo: 'ocurrencia'; actividad: ActividadDia }
   | { tipo: 'trabajo'; actividad: ActividadDia; bloque: BloqueTrabajo }
-  | { tipo: 'horario'; franjas: FranjaHorario[] };
+  | { tipo: 'horario'; franjas: FranjaHorario[] }
+  | { tipo: 'planificar' };
 
 const CLAVE_VISTA = 'cassandra.calendario.vista';
 /**
@@ -123,6 +135,7 @@ function leerVista(): Vista {
     LucideChevronLeft,
     LucideChevronRight,
     LucidePlus,
+    LucideCalendarClock,
     CalendarioCapas,
     CalendarioFranja,
     CalendarioAgenda,
@@ -136,12 +149,23 @@ function leerVista(): Vista {
     CalendarioFormActividad,
     CalendarioGestion,
     CalendarioHorarioBase,
+    ReservarTiempo,
+    TaskDetailModal,
   ],
   templateUrl: './calendario.html',
 })
 export class CalendarioPage {
   private readonly service = inject(CalendarioService);
   private readonly toast = inject(ToastService);
+  private readonly projectsResource = inject(ProjectService).projectsResource;
+  private readonly taskService = inject(TaskService);
+  /** Tarea abierta en el mismo detalle que se usa en Proyectos. */
+  readonly tareaAbierta = signal<Task | null>(null);
+  readonly abriendoTarea = signal(false);
+  /** Proyectos para planificar una tarea desde el calendario. */
+  readonly proyectos = computed(() =>
+    this.projectsResource.hasValue() ? this.projectsResource.value() : [],
+  );
   private readonly router = inject(Router);
   private readonly query = inject(ActivatedRoute).snapshot.queryParamMap;
 
@@ -314,6 +338,8 @@ export class CalendarioPage {
         return 'Calendarios';
       case 'horario':
         return 'Horario de trabajo';
+      case 'planificar':
+        return 'Planificar tarea';
       case 'ciclo':
         return `Ciclo · ${h.calendario.nombre}`;
       case 'turno':
@@ -381,8 +407,10 @@ export class CalendarioPage {
     this.cambiarVista('dia');
   }
 
+  /** Un deadline de tarea abre su detalle, como un bloque; el de un proyecto, el proyecto. */
   abrirDeadline(d: Deadline) {
-    this.router.navigate(['/proyectos', d.proyecto_id]);
+    if (d.tipo === 'tarea') this.abrirTarea(d.id);
+    else this.router.navigate(['/proyectos', d.proyecto_id]);
   }
 
   /** Primer toque: trae el bloque al frente. Segundo: abre sus opciones. */
@@ -462,12 +490,52 @@ export class CalendarioPage {
     this.hoja.set({ tipo: 'actividad', actividad: null, fecha: this.cursor() });
   }
 
+  /** Reserva un bloque de trabajo para una tarea, por defecto en el día visible. */
+  planificarTarea() {
+    this.hoja.set({ tipo: 'planificar' });
+  }
+
+  bloqueReservado(res: PlanificacionResult) {
+    this.toast.success('Bloque reservado');
+    // Fuera del tiempo libre se guarda igual, pero conviene saberlo.
+    if (res.avisos?.length) this.toast.warning(res.avisos.join(' '));
+    this.recargar();
+    this.cerrarHoja();
+  }
+
   abrirOcurrencia(a: ActividadDia) {
     this.hoja.set(
       a.trabajo
         ? { tipo: 'trabajo', actividad: a, bloque: a.trabajo }
         : { tipo: 'ocurrencia', actividad: a },
     );
+  }
+
+  /** Cierra la hoja abierta y abre el detalle completo de la tarea. */
+  abrirTarea(tareaId: number) {
+    if (this.abriendoTarea()) return;
+    this.abriendoTarea.set(true);
+    this.taskService.getTaskById(tareaId).subscribe({
+      next: (tarea) => {
+        this.abriendoTarea.set(false);
+        this.cerrarHoja();
+        this.tareaAbierta.set(tarea);
+      },
+      error: (err) => {
+        this.abriendoTarea.set(false);
+        this.toast.error(getErrorMessage(err, 'No se pudo abrir la tarea'));
+      },
+    });
+  }
+
+  /** El nombre o el estado de la tarea se ven en sus bloques y deadlines. */
+  tareaCambiada() {
+    this.recargar();
+  }
+
+  tareaEliminada() {
+    this.tareaAbierta.set(null);
+    this.recargar();
   }
 
   abrirProyecto(b: BloqueTrabajo) {
