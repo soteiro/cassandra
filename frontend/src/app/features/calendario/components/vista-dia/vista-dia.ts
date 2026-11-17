@@ -2,9 +2,12 @@ import {
   afterNextRender,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
+  inject,
   input,
   output,
+  signal,
   viewChild,
 } from '@angular/core';
 import { Calendario } from '../../data/calendario.model';
@@ -15,6 +18,7 @@ import {
   bloquesDelDia,
   estiloBloque,
   HORAS_DIA,
+  marcaAhora,
   tramosTurno,
 } from '../../utils/timeline.util';
 
@@ -106,6 +110,20 @@ import {
             }
           </button>
         }
+        @if (ahora(); as a) {
+          <div
+            class="absolute right-0 h-0.5 bg-danger pointer-events-none z-50"
+            [style.top]="'calc(var(--h) * ' + a.hora + ' - 1px)'"
+            [style.left]="izquierda() - 4 + 'px'"
+            role="img"
+            [attr.aria-label]="'Ahora, ' + a.etiqueta"
+          >
+            <span
+              class="absolute -left-1.5 -top-[5px] size-3 rounded-full bg-danger"
+              aria-hidden="true"
+            ></span>
+          </div>
+        }
       </div>
     </div>
   `,
@@ -120,15 +138,36 @@ export class CalendarioVistaDia {
   readonly horas = HORAS_DIA.map((h) => ({ h, etiqueta: `${String(h).padStart(2, '0')}:00` }));
   private readonly scroll = viewChild.required<ElementRef<HTMLElement>>('scroll');
 
+  /** Reloj para la línea de la hora actual: se actualiza cada minuto y al volver a la pestaña. */
+  private readonly reloj = signal(new Date());
+
+  /** Línea de la hora actual, solo si el día mostrado es hoy. */
+  readonly ahora = computed(() => marcaAhora(this.fecha(), this.reloj()));
+
   constructor() {
+    // Al abrir: hoy, con la hora actual a un tercio del alto (como Google Calendar); otro día, desde las 07:00.
     afterNextRender(() => {
       const el = this.scroll().nativeElement;
-      el.scrollTop = (el.scrollHeight * 7) / 24;
+      const ahora = this.ahora();
+      el.scrollTop = ahora
+        ? Math.max(0, (el.scrollHeight * ahora.hora) / 24 - el.clientHeight / 3)
+        : (el.scrollHeight * 7) / 24;
+    });
+
+    const tic = () => this.reloj.set(new Date());
+    const timer = setInterval(tic, 60_000);
+    const visible = () => {
+      if (document.visibilityState === 'visible') tic();
+    };
+    document.addEventListener('visibilitychange', visible);
+    inject(DestroyRef).onDestroy(() => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', visible);
     });
   }
 
   /** Columna de horas (52px) y una columna de 28px por cada calendario de turnos. */
-  private readonly izquierda = computed(() => 56 + this.turnosVisibles().length * 28);
+  protected readonly izquierda = computed(() => 56 + this.turnosVisibles().length * 28);
 
   readonly tramos = computed(() =>
     tramosTurno(this.fecha(), this.dias(), this.turnosVisibles()).map((t) => ({

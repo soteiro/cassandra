@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.23.0](https://github.com/soteiro/cassandra/compare/v0.22.0...v0.23.0) (2026-11-16)
+
+
+### Features
+
+* **calendario:** overnight activities, same-owner clashes and work time ([c96923d](https://github.com/soteiro/cassandra/commit/c96923d95f715d8890db879c911c317ff0294c03))
+* **calendario:** overnight activities, same-owner clashes and work time ([6ae5308](https://github.com/soteiro/cassandra/commit/6ae530885f48b10ee611e1cde302d1f13d5f54b2))
+
+## [0.22.0](https://github.com/soteiro/cassandra/compare/v0.21.0...v0.22.0) (2026-11-16)
+
+
+### Features
+
+* **api-keys:** edit a key's permissions without issuing a new one ([dbfc7eb](https://github.com/soteiro/cassandra/commit/dbfc7ebb3f5f564c7b6bd640f9c4ff89d8ef48b3))
+* **calendario:** show planned work blocks and set up planning ([7d5187a](https://github.com/soteiro/cassandra/commit/7d5187a17e43127125856cc7c9cbdfba28e90d40))
+* **calendario:** show planned work blocks and set up planning ([16d806b](https://github.com/soteiro/cassandra/commit/16d806b4b013dc97ed46cc82bac1e1bf91f88bb1))
+* **mcp:** plan tasks in free calendar time as a PM ([aae2c89](https://github.com/soteiro/cassandra/commit/aae2c8941d394e50374b75000d0a3016ffe9f895))
+* **mcp:** plan tasks in free calendar time as a PM ([aac21d9](https://github.com/soteiro/cassandra/commit/aac21d90e20f6e832c7d918adf52957d87293e94))
+
+
+### Bug Fixes
+
+* **api-keys:** don't call scrollIntoView where the DOM lacks it ([ec7831b](https://github.com/soteiro/cassandra/commit/ec7831b46267dc7be762969999bf3b7724250790))
+* **api-keys:** don't call scrollIntoView where the DOM lacks it ([41cbeb6](https://github.com/soteiro/cassandra/commit/41cbeb6b853d4ccc8f60c4340ca42a35c21a8a59))
+
+## [0.21.0](https://github.com/soteiro/cassandra/compare/v0.20.0...v0.21.0) (2026-11-15)
+
+
+### Features
+
+* agrega cuatro temas a configuracion ([da964b1](https://github.com/soteiro/cassandra/commit/da964b17e2a2cd79ff3547a3c84e73b40ac7593d))
+* agrega cuatro temas en Configuración ([afc6f8e](https://github.com/soteiro/cassandra/commit/afc6f8ece261d5ea68cc37069be44161e4fd4fbb))
+
+
+### Bug Fixes
+
+* **calendario:** align the week day headers with the grid columns ([1b342e7](https://github.com/soteiro/cassandra/commit/1b342e763fb50763c68d9c6089d48188b85cb964))
+* **calendario:** endless repeats, compact controls and aligned week view ([126150c](https://github.com/soteiro/cassandra/commit/126150c12b0ccaa8388ec1490dd4927d2ebd83c2))
+* **calendario:** repeat activities forever and fix the activity form layout ([77342f1](https://github.com/soteiro/cassandra/commit/77342f195a6a98b1078283d4a3606a92cfbfae62))
+
 ## [0.20.0](https://github.com/soteiro/cassandra/compare/v0.19.3...v0.20.0) (2026-11-14)
 
 

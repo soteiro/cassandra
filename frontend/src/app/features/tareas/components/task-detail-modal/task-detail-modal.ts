@@ -26,17 +26,22 @@ import {
   LucideCornerDownRight,
   LucideFileText,
   LucideCopy,
+  LucideCalendarClock,
 } from '@lucide/angular';
 import { TaskStatusSelect } from '../task-status-select/task-status-select';
 import { TaskPrioritySelect } from '../task-priority-select/task-priority-select';
 import { getTaskPriorityBorderClass } from '../../utils/task-styles.util';
 import { diaAISO, isoADia } from '../../../../shared/utils/fecha.util';
 import { opcionesEstimacion } from '../../utils/estimacion.util';
+import { ReservarTiempo } from '../reservar-tiempo/reservar-tiempo';
+import { PlanificacionResult } from '../../data/planificacion.model';
 
 @Component({
   selector: 'app-task-detail-modal',
   imports: [
     CommonModule,
+    ReservarTiempo,
+    LucideCalendarClock,
     FormsModule,
     LucideX,
     LucideCheck,
@@ -92,6 +97,8 @@ export class TaskDetailModal {
   opcionesEstimacion = computed(() => opcionesEstimacion(this.estimacion()));
 
   isSaving = signal(false);
+  /** Formulario para reservar un bloque de trabajo, desplegado. */
+  reservando = signal(false);
   isDeleting = signal(false);
 
   // Notas de la tarea (Cápsulas de bitácora y solución)
@@ -100,6 +107,16 @@ export class TaskDetailModal {
   newNotaTexto = signal('');
   isSavingNota = signal(false);
   copiedNotaId = signal<number | null>(null);
+
+  tiempoReservado(res: PlanificacionResult) {
+    const b = res.bloques[0];
+    this.toastService.success(
+      b ? `Bloque reservado: ${b.fecha}, ${b.hora_inicio}–${b.hora_fin}` : 'Bloque reservado',
+    );
+    // Fuera del tiempo libre se guarda igual, pero conviene saberlo.
+    if (res.avisos?.length) this.toastService.warning(res.avisos.join(' '));
+    this.reservando.set(false);
+  }
 
   copyNotaContent(nota: NotaProyecto) {
     if (!navigator?.clipboard) return;
@@ -145,6 +162,7 @@ export class TaskDetailModal {
         }
         this.currentTask.set(t);
         this.populateForm(t);
+        this.reservando.set(false);
         this.shouldRender.set(true);
         // Wait a frame so initial translate-x-full is registered before transitioning to translate-x-0
         this.animTimer = setTimeout(() => {
