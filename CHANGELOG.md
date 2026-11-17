@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.24.0](https://github.com/soteiro/cassandra/compare/v0.23.0...v0.24.0) (2026-11-17)
+
+
+### Features
+
+* **api-keys:** enhance dialog functionality and styling ([77de91c](https://github.com/soteiro/cassandra/commit/77de91c9379dc0a95ae35dbf32610a9b59024da4))
+* **api-keys:** enhance key item display with animated details and improved focus styles ([49b648f](https://github.com/soteiro/cassandra/commit/49b648f99a0b3ac9746a019c6cba37d72fc7ddff))
+* **calendario:** add current time marker and improve scrolling behavior ([000aa8c](https://github.com/soteiro/cassandra/commit/000aa8c9a65f7a06bfc7925d8fc20efd48d4bf4e))
+* **calendario:** reserve work blocks from the app and open task details ([109a0bc](https://github.com/soteiro/cassandra/commit/109a0bc5fc3d4c05a7a0e8bc33b366423bb2ece3))
+* **calendario:** reserve work blocks from the app and open task details ([783e460](https://github.com/soteiro/cassandra/commit/783e4608ba28a5b4d561f31bafa3561ac81a1d4d))
+* **styles:** refactor button and field styles for improved consistency and accessibility ([a2d7546](https://github.com/soteiro/cassandra/commit/a2d754680a72ac4e39555425958043105278616a))
+
 ## [0.23.0](https://github.com/soteiro/cassandra/compare/v0.22.0...v0.23.0) (2026-11-16)
 
 
