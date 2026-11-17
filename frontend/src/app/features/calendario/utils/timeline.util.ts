@@ -1,5 +1,5 @@
 import { Calendario } from '../data/calendario.model';
-import { sumarDias } from './dias.util';
+import { hoyLocal, sumarDias } from './dias.util';
 import { fondo } from './estilo.util';
 import { asignarCarriles, segmentosTurnoDia, SegmentoTurno } from './layout.util';
 import { ActividadDia, DiaInfo, diaVacio } from './modelo.util';
@@ -92,3 +92,20 @@ export function tramosTurno(
 }
 
 export const HORAS_DIA = Array.from({ length: 24 }, (_, h) => h);
+
+export interface MarcaAhora {
+  /** Horas desde la medianoche, con decimales (16,5 = 16:30). */
+  hora: number;
+  etiqueta: string;
+}
+
+/** La línea de la hora actual, solo si `fecha` es el día local de `ahora`. */
+export function marcaAhora(fecha: string, ahora: Date): MarcaAhora | null {
+  if (fecha !== hoyLocal(ahora)) return null;
+  const h = ahora.getHours();
+  const m = ahora.getMinutes();
+  return {
+    hora: h + m / 60,
+    etiqueta: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+  };
+}

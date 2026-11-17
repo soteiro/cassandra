@@ -53,7 +53,9 @@ export class ApiKeys {
   protected readonly revokeError = signal('');
   protected readonly notice = signal('');
   private readonly restoreRevokeFocus = signal(false);
-  private readonly focusName = signal(false);
+  /** Elemento que recibe el foco al cerrar el diálogo (quien lo abrió). */
+  private readonly focusTarget = signal<HTMLElement | null>(null);
+  private dialogTrigger?: HTMLElement;
   protected readonly form = inject(FormBuilder).nonNullable.group({
     nombre: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/\S/)]],
     acceso: ['read'],
@@ -71,7 +73,8 @@ export class ApiKeys {
   );
 
   private readonly secretInput = viewChild<ElementRef<HTMLInputElement>>('secretInput');
-  private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
+  private readonly formDialog = viewChild.required<ElementRef<HTMLDialogElement>>('formDialog');
+  private readonly openButton = viewChild.required<ElementRef<HTMLButtonElement>>('openButton');
   private readonly noticeEl = viewChild<ElementRef<HTMLElement>>('noticeEl');
   /** Tras guardar una edición, el aviso puede quedar fuera de la pantalla en el celular. */
   private readonly showNotice = signal(false);
@@ -89,12 +92,15 @@ export class ApiKeys {
     });
     afterRenderEffect(() => this.revokeConfirm()?.nativeElement.focus());
     afterRenderEffect(() => {
+      const target = this.focusTarget();
+      if (!target) return;
+      target.focus();
+      this.focusTarget.set(null);
+    });
+    afterRenderEffect(() => {
       if (!this.showNotice()) return;
       this.noticeEl()?.nativeElement.scrollIntoView?.({ block: 'center' });
       this.showNotice.set(false);
-    });
-    afterRenderEffect(() => {
-      if (this.focusName()) this.nameInput()?.nativeElement.focus();
     });
     afterRenderEffect(() => {
       if (this.restoreRevokeFocus() && !this.pendingRevoke()) this.revokeTrigger?.focus();
@@ -138,7 +144,35 @@ export class ApiKeys {
     );
   }
 
-  protected startEdit(key: APIKey): void {
+  protected openCreate(trigger: HTMLElement): void {
+    this.notice.set('');
+    this.openDialog(trigger);
+  }
+
+  private openDialog(trigger: HTMLElement): void {
+    const dialog = this.formDialog().nativeElement;
+    if (dialog.open) return;
+    this.dialogTrigger = trigger;
+    dialog.showModal();
+  }
+
+  protected closeDialog(): void {
+    this.formDialog().nativeElement.close();
+  }
+
+  /** Esc no cierra mientras se guarda o mientras la clave nueva sigue sin confirmar. */
+  protected onDialogCancel(event: Event): void {
+    if (this.saving() || this.issued()) event.preventDefault();
+  }
+
+  protected onDialogClose(): void {
+    // Un borrador de clave nueva se conserva; una edición a medias se descarta.
+    if (this.editing()) this.cancelEdit();
+    this.focusTarget.set(this.dialogTrigger ?? this.openButton().nativeElement);
+    this.dialogTrigger = undefined;
+  }
+
+  protected startEdit(key: APIKey, trigger: HTMLElement): void {
     if (this.saving() || this.issued()) return;
     const has = (scope: APIKeyScope) => key.scopes.includes(scope);
     const vencida = this.keyStatus(key) === 'Vencida';
@@ -162,8 +196,7 @@ export class ApiKeys {
     this.createError.set('');
     this.notice.set('');
     this.editing.set(key);
-    this.nameInput()?.nativeElement.focus();
-    this.nameInput()?.nativeElement.scrollIntoView?.({ block: 'center' });
+    this.openDialog(trigger);
   }
 
   protected cancelEdit(): void {
@@ -221,7 +254,6 @@ export class ApiKeys {
       this.save(editing, request);
       return;
     }
-    this.focusName.set(false);
     this.saving.set(true);
     this.service
       .create(request)
@@ -259,6 +291,7 @@ export class ApiKeys {
           this.saving.set(false);
           this.editing.set(null);
           this.resetForm();
+          this.closeDialog();
           this.notice.set(
             `Clave «${updated.nombre}» actualizada. El asistente usa los permisos nuevos desde su próxima petición, con la misma clave.`,
           );
@@ -299,9 +332,9 @@ export class ApiKeys {
   }
 
   protected dismissSecret(): void {
-    this.focusName.set(true);
     this.issued.set(null);
     this.copyStatus.set('');
+    this.closeDialog();
   }
 
   protected projectNames(key: APIKey): string {
@@ -367,8 +400,7 @@ export class ApiKeys {
           this.pendingRevoke.set(null);
           this.revoking.set(false);
           this.notice.set(`Clave «${key.nombre}» revocada.`);
-          this.focusName.set(true);
-          this.nameInput()?.nativeElement.focus();
+          this.focusTarget.set(this.openButton().nativeElement);
         },
         error: (err) => {
           this.revokeError.set(

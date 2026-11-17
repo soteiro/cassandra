@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { setupHttpTesting, settle } from '../../../../../testing/http-testing';
 import { CalendarioPage } from './calendario';
@@ -87,8 +87,11 @@ describe('CalendarioPage', () => {
   let component: CalendarioPage;
   let http: HttpTestingController;
 
-  /** Responde todas las peticiones de rango pendientes. */
+  /** Responde todas las peticiones de rango (y la lista de proyectos) pendientes. */
   async function responder() {
+    for (const req of http.match((r) => r.url.endsWith('/proyects'))) {
+      req.flush([{ id: 3, nombre: 'Finanzas' }]);
+    }
     for (const req of http.match((r) => r.url.endsWith('/calendario'))) {
       const p = req.request.params;
       req.flush(rangoDe(component.hoy, p.get('desde')!, p.get('hasta')!));
@@ -187,6 +190,7 @@ describe('CalendarioPage', () => {
     expect(component.hoja()).toMatchObject({ tipo: 'trabajo', bloque: { id: 5 } });
     const texto = document.body.textContent as string;
     expect(texto).toContain('lo planificó el asistente');
+    expect(texto).toContain('Tarea #41');
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     component.quitarBloque(trabajo.trabajo!);
@@ -196,6 +200,75 @@ describe('CalendarioPage', () => {
     TestBed.tick();
     await responder();
     expect(component.hoja()).toBeNull();
+  });
+
+  it('desde un bloque de trabajo abre el detalle completo de su tarea', async () => {
+    const trabajo = component
+      .dias()
+      .get(component.hoy)!
+      .actividades.find((a) => a.trabajo)!;
+    component.abrirOcurrencia(trabajo);
+    fixture.detectChanges();
+    Array.from(document.body.querySelectorAll('button'))
+      .find((b) => b.textContent?.trim() === 'Abrir tarea')!
+      .click();
+    http
+      .expectOne((r) => r.url.endsWith('/tareas/41'))
+      .flush({
+        id: 41,
+        nombre: 'Informe',
+        estado: 'Abierto',
+        prioridad: 'normal',
+        proyect_id: 3,
+        subtareas: [],
+      });
+    fixture.detectChanges();
+    expect(component.hoja()).toBeNull();
+    expect(component.tareaAbierta()).toMatchObject({ id: 41, proyect_id: 3 });
+    TestBed.tick();
+    // El detalle carga las notas de la tarea, como en Proyectos.
+    for (const req of http.match(() => true)) req.flush([]);
+    await settle();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-task-detail-modal').textContent).toContain(
+      '#41',
+    );
+  });
+
+  it('un deadline de tarea abre su detalle y uno de proyecto lleva al proyecto', () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const base = {
+      titulo: 'X',
+      proyecto_id: 3,
+      proyecto_nombre: 'Finanzas',
+      estado: 'Abierto',
+      fecha_limite: component.hoy,
+    };
+    component.abrirDeadline({ ...base, tipo: 'tarea', id: 41 });
+    http.expectOne((r) => r.url.endsWith('/tareas/41')).flush({ id: 41, proyect_id: 3 });
+    expect(component.tareaAbierta()).toMatchObject({ id: 41 });
+    expect(navigate).not.toHaveBeenCalled();
+    component.tareaAbierta.set(null);
+
+    component.abrirDeadline({ ...base, tipo: 'proyecto', id: 3 });
+    expect(navigate).toHaveBeenCalledWith(['/proyectos', 3]);
+  });
+
+  it('planifica una tarea desde el día visible y recarga al reservar', async () => {
+    component.planificarTarea();
+    fixture.detectChanges();
+    TestBed.tick();
+    expect(component.tituloHoja()).toBe('Planificar tarea');
+    expect(document.body.querySelector('app-reservar-tiempo')).not.toBeNull();
+    expect(component.proyectos()).toEqual([{ id: 3, nombre: 'Finanzas' }]);
+    const huecos = http.expectOne((r) => r.url.endsWith('/integrations/calendar'));
+    expect(huecos.request.params.get('desde')).toBe(component.cursor());
+    huecos.flush({ huecos: [] });
+
+    component.bloqueReservado({ bloques: [], avisos: null });
+    fixture.detectChanges();
+    expect(component.hoja()).toBeNull();
+    await responder();
   });
 
   it('cambia de vista y pide el nuevo rango', async () => {

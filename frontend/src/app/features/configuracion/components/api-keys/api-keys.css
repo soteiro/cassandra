@@ -1,36 +1,13 @@
-@reference "../../../../../styles.css";
+/* CSS normal en vez de @apply: Tailwind expande cada utilidad (con variables y fallbacks) y
+   Angular le suma [_ngcontent] a cada selector. .field y .button-* viven en styles.css. */
 
 :host {
   display: block;
   color-scheme: var(--theme-color-scheme);
 }
 
-.field {
-  @apply block w-full min-w-0 min-h-11 rounded-lg border border-surface-border bg-background px-3 py-2 text-text-main caret-primary placeholder:text-text-muted;
-}
-
-.button-primary,
-.button-secondary,
-.button-danger {
-  @apply inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed;
-  transition:
-    background-color 150ms,
-    border-color 150ms,
-    color 150ms;
-}
-.button-primary {
-  @apply bg-primary text-on-primary hover:bg-primary-hover;
-}
-.button-secondary {
-  @apply border border-surface-border text-text-main hover:bg-surface-border/60;
-}
-.button-danger {
-  @apply border border-danger text-danger hover:bg-danger/10;
-}
-
 /* El rojo de texto necesita más contraste sobre la superficie del formulario. */
-.text-danger,
-.button-danger {
+.text-danger {
   color: color-mix(in oklch, var(--color-danger) 90%, var(--color-text-main));
 }
 
@@ -39,9 +16,120 @@ input::selection {
   color: var(--color-on-primary);
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  @apply outline-2 outline-offset-2 outline-primary;
+:is(button, summary, a, input, select):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Diálogo del formulario: entra subiendo y se desvanece al cerrar. */
+.key-dialog {
+  position: relative;
+  margin: auto;
+  width: min(36rem, calc(100% - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem;
+  border: 1px solid var(--color-surface-border);
+  border-radius: 1rem;
+  background-color: var(--color-surface);
+  color: var(--color-text-main);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  opacity: 0;
+  transform: translateY(1rem) scale(0.97);
+  transition:
+    opacity 200ms ease-in,
+    transform 200ms ease-in,
+    overlay 200ms ease-in allow-discrete,
+    display 200ms ease-in allow-discrete;
+}
+@media (min-width: 48rem) {
+  .key-dialog {
+    padding: 1.5rem;
+  }
+}
+.key-dialog[open] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 280ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@starting-style {
+  .key-dialog[open] {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.97);
+  }
+}
+
+.key-dialog::backdrop {
+  background-color: rgb(0 0 0 / 0);
+  backdrop-filter: blur(0);
+  transition:
+    background-color 200ms,
+    backdrop-filter 200ms,
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+.key-dialog[open]::backdrop {
+  background-color: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(4px);
+}
+@starting-style {
+  .key-dialog[open]::backdrop {
+    background-color: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0);
+  }
+}
+
+.dialog-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .dialog-close:hover {
+    background-color: color-mix(in oklab, var(--color-surface-border) 60%, transparent);
+    color: var(--color-text-main);
+  }
+}
+.dialog-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Cada clave se despliega con altura animada donde el navegador lo soporta. */
+.key-item {
+  interpolate-size: allow-keywords;
+}
+.key-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    content-visibility 250ms allow-discrete;
+}
+.key-item[open]::details-content {
+  block-size: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key-item::details-content,
+  .key-dialog,
+  .key-dialog[open],
+  .key-dialog::backdrop {
+    transition-duration: 0ms;
+  }
+  .key-dialog,
+  .key-dialog[open] {
+    transform: none;
+  }
 }

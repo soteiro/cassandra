@@ -55,6 +55,18 @@ describe('ApiKeys', () => {
     input.dispatchEvent(new Event('change'));
   };
 
+  beforeAll(() => {
+    // jsdom no implementa los diálogos modales.
+    HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+      if (!this.open) return;
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+  });
+
   beforeEach(async () => {
     api = {
       list: vi.fn().mockReturnValue(of([])),
@@ -105,6 +117,11 @@ describe('ApiKeys', () => {
   });
 
   it('generates a bounded, read-only key by default and shows its secret once', async () => {
+    const open = button('Nueva clave');
+    open.click();
+    await render();
+    const dialog = el.querySelector('dialog')!;
+    expect(dialog.open).toBe(true);
     await fill();
     const before = Date.now();
     button('Generar clave').click();
@@ -124,7 +141,8 @@ describe('ApiKeys', () => {
     await render();
     expect(el.querySelector('#issued-key')).toBeNull();
     expect(el.innerHTML).not.toContain(issued.token);
-    expect(document.activeElement).toBe(el.querySelector('#key-name'));
+    expect(dialog.open).toBe(false);
+    expect(document.activeElement).toBe(open);
   });
 
   it('supports write permission and no expiration, without submitting twice', async () => {
@@ -208,6 +226,7 @@ describe('ApiKeys', () => {
 
     el.querySelector<HTMLButtonElement>('[aria-label="Editar clave Asistente"]')!.click();
     await render();
+    expect(el.querySelector('dialog')!.open).toBe(true);
     expect(el.querySelector('#create-title')?.textContent).toContain('Editar «Asistente»');
     expect(el.querySelector<HTMLInputElement>('#key-name')!.value).toBe('Asistente');
     expect(el.querySelector<HTMLSelectElement>('#key-tasks')!.value).toBe('read');
@@ -235,6 +254,8 @@ describe('ApiKeys', () => {
     expect(el.querySelector('#issued-key')).toBeNull();
     expect(el.textContent).toContain('con la misma clave');
     expect(el.textContent).toContain('Cerrar y planificar tareas');
+    expect(el.querySelector('dialog')!.open).toBe(false);
+    expect(document.activeElement).toBe(el.querySelector('[aria-label="Editar clave Asistente"]'));
     expect(el.querySelector('#create-title')?.textContent).toContain('Generar una clave');
   });
 
