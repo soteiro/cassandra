@@ -40,6 +40,7 @@ input::selection {
 }
 
 button:focus-visible,
+summary:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
@@ -99,7 +100,26 @@ select:focus-visible {
   @apply absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-text-muted cursor-pointer hover:bg-surface-border/60 hover:text-text-main disabled:opacity-60 disabled:cursor-not-allowed;
 }
 
+/* Cada clave se despliega con altura animada donde el navegador lo soporta. */
+.key-item {
+  interpolate-size: allow-keywords;
+}
+.key-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    content-visibility 250ms allow-discrete;
+}
+.key-item[open]::details-content {
+  block-size: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .key-item::details-content {
+    transition-duration: 0ms;
+  }
+
   .key-dialog,
   .key-dialog[open] {
     transform: none;
