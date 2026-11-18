@@ -1,6 +1,6 @@
 # Memoria de proyectos y MCP
 
-El conector local ofrece cuatro herramientas de memoria, tres de
+El conector local ofrece `listar_proyectos`, cuatro herramientas de memoria, tres de
 [tareas](MCP_TASKS.md) y cuatro de [planificación](MCP_PLANIFICACION.md) a un asistente de programación. El
 asistente redacta la memoria con la conversación y el repositorio que tiene
 disponibles; Cassandra la valida y guarda. No se contrata ni ejecuta un modelo en
@@ -80,7 +80,9 @@ make build-memory-mcp
 Produce `./cassandra-memory-mcp`, independiente del binario del servidor. El
 conector requiere `CASSANDRA_URL` y `CASSANDRA_API_KEY` en su entorno; sin
 `CASSANDRA_API_KEY` usa la key guardada del proyecto vinculado (ver
-[guía de clientes MCP](MCP_CLIENT_SETUP.md#alternativa-un-mcp-global-con-una-key-por-proyecto)). HTTPS es
+[guía de clientes MCP](MCP_CLIENT_SETUP.md#alternativa-un-mcp-global-con-una-key-por-proyecto)),
+o la key global con `CASSANDRA_PROYECTO=all` (ver
+[asistente PM](MCP_CLIENT_SETUP.md#alternativa-un-asistente-pm-con-una-key-global)). HTTPS es
 obligatorio salvo `localhost`, `127.0.0.1` o `::1` para pruebas. No sigue
 redirecciones. stdout está reservado al protocolo MCP; los diagnósticos van a stderr.
 
@@ -125,8 +127,14 @@ Las rutas bajo `/api/memory` y las de tareas bajo `/api/integrations` aceptan
 sesión normal o `Authorization: Bearer cass_mem_…`, con permisos específicos por
 operación y proyecto. Las demás rutas solo admiten su autenticación normal.
 
+Una clave puede limitarse a una lista de proyectos y calendarios o tener alcance
+total (`todos_proyectos`, `todos_calendarios`, migración 36), que incluye lo que se
+cree después. El alcance total es un flag explícito: una lista vacía nunca
+equivale a "todos".
+
 | Herramienta | Operación REST |
 |---|---|
+| `listar_proyectos` | `GET /api/integrations/projects` (cualquier permiso de lectura; devuelve solo los proyectos de la clave) |
 | `obtener_contexto` | `GET /api/memory/projects/{id}` |
 | `buscar_memoria` | `GET /api/memory/projects/{id}/entries?q=texto&limit=10&offset=0&historico=false` |
 | `guardar_avance` | `POST /api/memory/projects/{id}/advances` |

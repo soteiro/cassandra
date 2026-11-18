@@ -155,10 +155,7 @@ func (h *PlanificacionHandler) Disponibilidad(w http.ResponseWriter, r *http.Req
 	}
 	var calendarios, proyectos []int
 	if access != nil {
-		calendarios, proyectos = access.CalendarioIDs, access.ProyectoIDs
-		if calendarios == nil {
-			calendarios = []int{}
-		}
+		calendarios, proyectos = access.FiltroCalendarios(), access.FiltroProyectos()
 	}
 	res, err := h.repo.Disponibilidad(r.Context(), userID, desde, hasta, ahora, calendarios, proyectos)
 	if err != nil {

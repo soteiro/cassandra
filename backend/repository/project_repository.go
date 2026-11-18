@@ -400,3 +400,31 @@ func (r *ProjectRepository) Update(ctx context.Context, id int, userID int, req 
 
 	return &p, nil
 }
+
+// MaxProyectosIntegracion acota la respuesta de listar_proyectos.
+const MaxProyectosIntegracion = 500
+
+// ListIntegracion devuelve la ficha breve de los proyectos no eliminados del usuario.
+// ids limita el resultado (nil = todos). Orden: activos primero y luego por ID descendente.
+func (r *ProjectRepository) ListIntegracion(ctx context.Context, userID int, ids []int) ([]models.IntegrationProject, error) {
+	rows, err := r.db.Query(ctx, `SELECT p.id, p.nombre, p.estado, p.prioridad,
+		to_char((p.fecha_limite AT TIME ZONE 'UTC')::date,'YYYY-MM-DD'), p.proyecto_padre_id,
+		(SELECT max(e.ocurrido_en) FROM eventos e WHERE e.user_id = p.user_id AND e.proyecto_id = p.id)
+		FROM proyectos p
+		WHERE p.user_id = $1 AND p.eliminado = false AND ($2::integer[] IS NULL OR p.id = ANY($2))
+		ORDER BY (p.estado IN ('Completado','Cancelado')), p.id DESC
+		LIMIT $3`, userID, ids, MaxProyectosIntegracion)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []models.IntegrationProject{}
+	for rows.Next() {
+		var p models.IntegrationProject
+		if err := rows.Scan(&p.ID, &p.Nombre, &p.Estado, &p.Prioridad, &p.FechaLimite, &p.ProyectoPadreID, &p.UltimaActividad); err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}

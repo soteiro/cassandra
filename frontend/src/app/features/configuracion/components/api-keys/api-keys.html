@@ -140,9 +140,24 @@
           <fieldset aria-describedby="projects-help">
             <legend class="text-sm font-medium mb-2">Proyectos autorizados</legend>
             <p id="projects-help" class="text-xs text-text-muted mb-3"
-              >Elige entre 1 y 50 proyectos. Los permisos se aplican solo a los seleccionados.</p
+              >Elige entre 1 y 50 proyectos, o todos. Los permisos se aplican solo a los
+              seleccionados.</p
             >
-            @if (projectsResource.isLoading()) {
+            <label
+              class="flex gap-3 items-start min-h-11 p-3 mb-2 text-sm cursor-pointer rounded-lg border border-surface-border hover:bg-surface-border/50"
+            >
+              <input
+                id="key-all-projects"
+                type="checkbox"
+                class="mt-0.5 size-4 shrink-0 accent-primary"
+                [checked]="allProjects()"
+                (change)="allProjects.set(!allProjects())"
+              />
+              <span class="min-w-0">Todos los proyectos, incluidos los que crees después</span>
+            </label>
+            @if (allProjects()) {
+              <!-- Alcance total: no se eligen proyectos sueltos. -->
+            } @else if (projectsResource.isLoading()) {
               <p role="status" class="text-sm text-text-muted">Cargando proyectos…</p>
             } @else if (projectsResource.error()) {
               <p role="alert" class="text-sm text-danger">No se pudieron cargar los proyectos.</p>
@@ -184,7 +199,12 @@
                 >{{ selectedProjects().length }} seleccionados</p
               >
             }
-            @if (submitted() && selectedProjects().length === 0 && projects().length > 0) {
+            @if (
+              submitted() &&
+              !allProjects() &&
+              selectedProjects().length === 0 &&
+              projects().length > 0
+            ) {
               <p role="alert" class="mt-2 text-sm text-danger">Selecciona al menos un proyecto.</p>
             }
           </fieldset>
@@ -241,7 +261,23 @@
             @if (calendarioValue() === 'read') {
               <fieldset class="mt-3">
                 <legend class="text-sm font-medium mb-2">Calendarios visibles con detalle</legend>
-                @if (calendarios().length === 0) {
+                <label
+                  class="flex gap-3 items-start min-h-11 p-3 mb-2 text-sm cursor-pointer rounded-lg border border-surface-border hover:bg-surface-border/50"
+                >
+                  <input
+                    id="key-all-calendars"
+                    type="checkbox"
+                    class="mt-0.5 size-4 shrink-0 accent-primary"
+                    [checked]="allCalendars()"
+                    (change)="allCalendars.set(!allCalendars())"
+                  />
+                  <span class="min-w-0"
+                    >Todos los calendarios, incluidos los que crees después</span
+                  >
+                </label>
+                @if (allCalendars()) {
+                  <!-- Alcance total: no se eligen calendarios sueltos. -->
+                } @else if (calendarios().length === 0) {
                   <p class="text-sm text-text-muted">No tienes calendarios propios.</p>
                 } @else {
                   <div class="rounded-xl border border-surface-border bg-background p-1">
@@ -268,6 +304,13 @@
               </fieldset>
             }
           </div>
+          @if (allProjects() || (calendarioValue() === 'read' && allCalendars())) {
+            <p
+              class="rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm text-warning-text"
+              >Esta clave alcanza también lo que crees después. Úsala solo con asistentes de
+              confianza y ponle vencimiento.</p
+            >
+          }
           <div>
             <label for="key-expiry" class="block text-sm font-medium mb-2">Vencimiento</label>
             <select id="key-expiry" formControlName="dias" class="field">
@@ -296,9 +339,10 @@
           [disabled]="
             saving() ||
             loading() ||
-            projectsResource.isLoading() ||
-            !!projectsResource.error() ||
-            projects().length === 0
+            (!allProjects() &&
+              (projectsResource.isLoading() ||
+                !!projectsResource.error() ||
+                projects().length === 0))
           "
         >
           @if (editing()) {

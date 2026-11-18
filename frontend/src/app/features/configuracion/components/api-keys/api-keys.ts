@@ -41,6 +41,10 @@ export class ApiKeys {
   protected readonly saving = signal(false);
   protected readonly createError = signal('');
   protected readonly selectedProjects = signal<number[]>([]);
+  /** Alcance total: la clave cubre todos los proyectos, también los que se creen después. */
+  protected readonly allProjects = signal(false);
+  /** Alcance total del calendario: ve el detalle de todos, también los futuros. */
+  protected readonly allCalendars = signal(false);
   protected readonly submitted = signal(false);
   /** Clave cargada en el formulario para editar sus permisos (sin cambiar el secreto). */
   protected readonly editing = signal<APIKey | null>(null);
@@ -192,6 +196,8 @@ export class ApiKeys {
     });
     this.selectedProjects.set([...key.proyecto_ids]);
     this.selectedCalendars.set([...(key.calendario_ids ?? [])]);
+    this.allProjects.set(!!key.todos_proyectos);
+    this.allCalendars.set(!!key.todos_calendarios);
     this.submitted.set(false);
     this.createError.set('');
     this.notice.set('');
@@ -209,6 +215,8 @@ export class ApiKeys {
     this.calendarioValue.set('none');
     this.selectedProjects.set([]);
     this.selectedCalendars.set([]);
+    this.allProjects.set(false);
+    this.allCalendars.set(false);
     this.submitted.set(false);
     this.createError.set('');
   }
@@ -218,12 +226,14 @@ export class ApiKeys {
     this.submitted.set(true);
     this.form.markAllAsTouched();
     this.createError.set('');
+    const allProjects = this.allProjects();
     if (
       this.form.invalid ||
-      this.selectedProjects().length === 0 ||
-      this.selectedProjects().length > 50 ||
-      this.projectsResource.isLoading() ||
-      this.projectsResource.error()
+      (!allProjects &&
+        (this.selectedProjects().length === 0 ||
+          this.selectedProjects().length > 50 ||
+          this.projectsResource.isLoading() ||
+          this.projectsResource.error()))
     )
       return;
     const { nombre, acceso, tareas, calendario, dias } = this.form.getRawValue();
@@ -241,9 +251,13 @@ export class ApiKeys {
     const request: CreateAPIKeyRequest = {
       nombre: nombre.trim(),
       scopes,
-      proyecto_ids: [...this.selectedProjects()],
+      proyecto_ids: allProjects ? [] : [...this.selectedProjects()],
     };
-    if (calendario === 'read') request.calendario_ids = [...this.selectedCalendars()];
+    if (allProjects) request.todos_proyectos = true;
+    if (calendario === 'read') {
+      if (this.allCalendars()) request.todos_calendarios = true;
+      else request.calendario_ids = [...this.selectedCalendars()];
+    }
     const editing = this.editing();
     if (dias === 'keep') {
       if (editing?.expira_en) request.expira_en = editing.expira_en;
@@ -338,6 +352,7 @@ export class ApiKeys {
   }
 
   protected projectNames(key: APIKey): string {
+    if (key.todos_proyectos) return 'Todos, incluidos los futuros';
     return key.proyecto_ids
       .map(
         (id) => this.projects().find((project) => project.id === id)?.nombre ?? `Proyecto #${id}`,
@@ -352,7 +367,7 @@ export class ApiKeys {
       'tasks:read': 'Leer tareas',
       'tasks:create': 'Crear tareas',
       'tasks:manage': 'Cerrar y planificar tareas',
-      'calendar:read': 'Ver calendario',
+      'calendar:read': key.todos_calendarios ? 'Ver todo el calendario' : 'Ver calendario',
     };
     // Orden lógico (memoria, tareas, calendario), no el alfabético del servidor.
     return (Object.keys(names) as APIKeyScope[])
