@@ -20,13 +20,19 @@ const LinkFile = ".cassandra-memory.json"
 
 var hostDirUnsafe = regexp.MustCompile(`[^a-z0-9._-]`)
 
-// ResolveAPIKey devuelve la key que debe usar el conector. CASSANDRA_API_KEY manda;
-// si falta, busca el proyecto vinculado desde startDir hacia arriba (sin salir del
-// repositorio) y lee <keysDir>/<servidor>/<proyecto_id>.key. Así un único MCP global
-// usa una key distinta por proyecto. La carpeta por servidor evita que un
-// .cassandra-memory.json ajeno redirija una key a otro host: el destino es siempre
-// CASSANDRA_URL.
-func ResolveAPIKey(envKey, baseURL, startDir, keysDir string) (string, error) {
+// GlobalKeyName es el valor de CASSANDRA_PROYECTO que elige la key de alcance total
+// (<keysDir>/<servidor>/all.key), p. ej. para un asistente PM que no vive en un repositorio.
+const GlobalKeyName = "all"
+
+// ResolveAPIKey devuelve la key que debe usar el conector. CASSANDRA_API_KEY manda; luego
+// CASSANDRA_PROYECTO ("all" o un ID) elige el archivo de key; si falta, busca el proyecto
+// vinculado desde startDir hacia arriba (sin salir del repositorio) y lee
+// <keysDir>/<servidor>/<proyecto_id>.key. Así un único MCP global usa una key distinta por
+// proyecto. La carpeta por servidor evita que un .cassandra-memory.json ajeno redirija una
+// key a otro host: el destino es siempre CASSANDRA_URL. La key global solo se elige desde la
+// configuración del conector, nunca desde .cassandra-memory.json: un repositorio ajeno no
+// puede escalar al agente a todos los proyectos.
+func ResolveAPIKey(envKey, envProyecto, baseURL, startDir, keysDir string) (string, error) {
 	if envKey != "" {
 		return envKey, nil
 	}
@@ -38,14 +44,30 @@ func ResolveAPIKey(envKey, baseURL, startDir, keysDir string) (string, error) {
 	if strings.HasPrefix(hostDir, ".") {
 		return "", errors.New("CASSANDRA_URL inválida: servidor no admitido para guardar keys")
 	}
-	id, err := linkedProject(startDir)
-	if err != nil {
-		return "", err
+	var name string
+	switch envProyecto = strings.TrimSpace(envProyecto); {
+	case envProyecto == GlobalKeyName:
+		name = GlobalKeyName
+	case envProyecto != "":
+		id, err := strconv.Atoi(envProyecto)
+		if err != nil || id <= 0 || id > math.MaxInt32 {
+			return "", errors.New(`CASSANDRA_PROYECTO debe ser "all" o un ID de proyecto entero positivo`)
+		}
+		name = strconv.Itoa(id)
+	default:
+		id, err := linkedProject(startDir)
+		if err != nil {
+			return "", err
+		}
+		name = strconv.Itoa(id)
 	}
-	path := filepath.Join(keysDir, hostDir, strconv.Itoa(id)+".key")
+	path := filepath.Join(keysDir, hostDir, name+".key")
 	key, err := readKeyFile(path)
 	if err != nil {
-		return "", fmt.Errorf("falta la key del proyecto %d para %s: %w", id, u.Host, err)
+		if name == GlobalKeyName {
+			return "", fmt.Errorf("falta la key global para %s: %w", u.Host, err)
+		}
+		return "", fmt.Errorf("falta la key del proyecto %s para %s: %w", name, u.Host, err)
 	}
 	return key, nil
 }
@@ -91,7 +113,7 @@ func linkedProject(startDir string) (int, error) {
 		}
 		dir = parent
 	}
-	return 0, fmt.Errorf("CASSANDRA_API_KEY no está definida y no hay %s en %s ni en su repositorio", LinkFile, startDir)
+	return 0, fmt.Errorf("CASSANDRA_API_KEY y CASSANDRA_PROYECTO no están definidas y no hay %s en %s ni en su repositorio", LinkFile, startDir)
 }
 
 func readKeyFile(path string) (string, error) {

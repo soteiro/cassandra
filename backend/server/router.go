@@ -46,7 +46,9 @@ func NewRouter(opts Options) http.Handler {
 	// Verifica que los ids referenciados en una petición (proyecto padre, persona, banco...)
 	// sean del usuario autenticado.
 	owner := repository.NewOwnership(db)
-	projectHandler := handlers.NewProjectHandler(repository.NewProjectRepository(db), owner)
+	projectRepo := repository.NewProjectRepository(db)
+	projectHandler := handlers.NewProjectHandler(projectRepo, owner)
+	integrationProjectsHandler := handlers.NewIntegrationProjectsHandler(projectRepo)
 	tareasHandler := handlers.NewTareasHandler(repository.NewTareasRepository(db), owner)
 	logsHandler := handlers.NewLogsHandler(repository.NewLogsRepository(db), owner)
 	notasProyectoHandler := handlers.NewNotasProyectoHandler(repository.NewNotasProyectoRepository(db), owner)
@@ -118,6 +120,7 @@ func NewRouter(opts Options) http.Handler {
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.IntegrationAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
+		r.Get("/api/integrations/projects", integrationProjectsHandler.List)
 		r.Get("/api/integrations/calendar", planificacionHandler.Disponibilidad)
 		r.Delete("/api/integrations/projects/{project_id}/bloques/{bloque_id}", planificacionHandler.QuitarBloque)
 	})

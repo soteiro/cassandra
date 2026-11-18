@@ -99,3 +99,20 @@ type ProjectUpdateResponse struct {
 	FechaInicio          *time.Time `json:"fecha_inicio"`
 	ProyectoPadreID      *int       `json:"proyecto_padre_id"`
 }
+
+// IntegrationProject es la ficha breve de un proyecto que ve una integración (listar_proyectos).
+type IntegrationProject struct {
+	ID              int        `json:"id"`
+	Nombre          string     `json:"nombre"`
+	Estado          string     `json:"estado"`
+	Prioridad       string     `json:"prioridad"`
+	FechaLimite     *string    `json:"fecha_limite"`
+	ProyectoPadreID *int       `json:"proyecto_padre_id"`
+	UltimaActividad *time.Time `json:"ultima_actividad"`
+}
+
+type IntegrationProjectList struct {
+	Proyectos []IntegrationProject `json:"proyectos"`
+	// TodosProyectos indica que la key también alcanza los proyectos que se creen después.
+	TodosProyectos bool `json:"todos_proyectos"`
+}

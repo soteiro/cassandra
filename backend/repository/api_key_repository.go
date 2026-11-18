@@ -33,8 +33,16 @@ var ErrKeyRevocada = errors.New("la clave está revocada")
 // normalizeKeyRequest valida y ordena nombre, permisos, proyectos, calendarios y vencimiento.
 func normalizeKeyRequest(req *models.CreateAPIKeyRequest) error {
 	req.Nombre = strings.TrimSpace(req.Nombre)
-	if req.Nombre == "" || strings.ContainsRune(req.Nombre, '\x00') || utf8.RuneCountInString(req.Nombre) > 100 || len(req.Scopes) == 0 || len(req.Scopes) > 6 || len(req.CalendarioIDs) > 50 || len(req.ProyectoIDs) == 0 || len(req.ProyectoIDs) > 50 {
-		return fmt.Errorf("%w: nombre, permisos y entre uno y cincuenta proyectos son obligatorios", models.ErrMemoryInvalid)
+	if req.Nombre == "" || strings.ContainsRune(req.Nombre, '\x00') || utf8.RuneCountInString(req.Nombre) > 100 || len(req.Scopes) == 0 || len(req.Scopes) > 6 || len(req.CalendarioIDs) > 50 || len(req.ProyectoIDs) > 50 {
+		return fmt.Errorf("%w: nombre, permisos y hasta cincuenta proyectos son obligatorios", models.ErrMemoryInvalid)
+	}
+	switch {
+	case req.TodosProyectos && len(req.ProyectoIDs) > 0:
+		return fmt.Errorf("%w: con todos los proyectos no se eligen proyectos sueltos", models.ErrMemoryInvalid)
+	case !req.TodosProyectos && len(req.ProyectoIDs) == 0:
+		return fmt.Errorf("%w: elegir al menos un proyecto o todos", models.ErrMemoryInvalid)
+	case req.TodosCalendarios && len(req.CalendarioIDs) > 0:
+		return fmt.Errorf("%w: con todos los calendarios no se eligen calendarios sueltos", models.ErrMemoryInvalid)
 	}
 	for _, scope := range req.Scopes {
 		if !models.ValidScope(scope) {
@@ -48,12 +56,15 @@ func normalizeKeyRequest(req *models.CreateAPIKeyRequest) error {
 	req.Scopes = slices.Compact(req.Scopes)
 	slices.Sort(req.ProyectoIDs)
 	req.ProyectoIDs = slices.Compact(req.ProyectoIDs)
+	if req.ProyectoIDs == nil {
+		req.ProyectoIDs = []int{}
+	}
 	for _, id := range req.ProyectoIDs {
 		if id <= 0 || id > math.MaxInt32 {
 			return fmt.Errorf("%w: ID de proyecto inválido", models.ErrMemoryInvalid)
 		}
 	}
-	if len(req.CalendarioIDs) > 0 && !slices.Contains(req.Scopes, models.CalendarRead) {
+	if (len(req.CalendarioIDs) > 0 || req.TodosCalendarios) && !slices.Contains(req.Scopes, models.CalendarRead) {
 		return fmt.Errorf("%w: elegir calendarios requiere el permiso calendar:read", models.ErrMemoryInvalid)
 	}
 	slices.Sort(req.CalendarioIDs)
@@ -122,9 +133,10 @@ func (r *APIKeyRepository) Create(ctx context.Context, userID int, req models.Cr
 		return nil, err
 	}
 	defer tx.Rollback(ctx)
-	issued := &models.IssuedAPIKey{APIKey: models.APIKey{Nombre: req.Nombre, Prefijo: token[:20], Scopes: req.Scopes, ProyectoIDs: req.ProyectoIDs, CalendarioIDs: req.CalendarioIDs, ExpiraEn: req.ExpiraEn}, Token: token}
-	err = tx.QueryRow(ctx, `INSERT INTO api_keys(user_id,nombre,prefijo,token_hash,scopes,expira_en)
-		VALUES($1,$2,$3,$4,$5,$6) RETURNING id,fecha_creacion`, userID, req.Nombre, issued.Prefijo, keyHash(token), req.Scopes, req.ExpiraEn).Scan(&issued.ID, &issued.FechaCreacion)
+	issued := &models.IssuedAPIKey{APIKey: models.APIKey{Nombre: req.Nombre, Prefijo: token[:20], Scopes: req.Scopes, ProyectoIDs: req.ProyectoIDs, CalendarioIDs: req.CalendarioIDs,
+		TodosProyectos: req.TodosProyectos, TodosCalendarios: req.TodosCalendarios, ExpiraEn: req.ExpiraEn}, Token: token}
+	err = tx.QueryRow(ctx, `INSERT INTO api_keys(user_id,nombre,prefijo,token_hash,scopes,expira_en,todos_proyectos,todos_calendarios)
+		VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id,fecha_creacion`, userID, req.Nombre, issued.Prefijo, keyHash(token), req.Scopes, req.ExpiraEn, req.TodosProyectos, req.TodosCalendarios).Scan(&issued.ID, &issued.FechaCreacion)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +170,8 @@ func (r *APIKeyRepository) Update(ctx context.Context, userID int, id int64, req
 	if revocada != nil {
 		return nil, ErrKeyRevocada
 	}
-	if _, err := tx.Exec(ctx, `UPDATE api_keys SET nombre=$1, scopes=$2, expira_en=$3 WHERE id=$4`, req.Nombre, req.Scopes, req.ExpiraEn, id); err != nil {
+	if _, err := tx.Exec(ctx, `UPDATE api_keys SET nombre=$1, scopes=$2, expira_en=$3, todos_proyectos=$4, todos_calendarios=$5 WHERE id=$6`,
+		req.Nombre, req.Scopes, req.ExpiraEn, req.TodosProyectos, req.TodosCalendarios, id); err != nil {
 		return nil, err
 	}
 	if err := linkKey(ctx, tx, userID, id, req); err != nil {
@@ -183,6 +196,7 @@ func (r *APIKeyRepository) List(ctx context.Context, userID int) ([]models.APIKe
 	rows, err := r.db.Query(ctx, `SELECT k.id,k.nombre,k.prefijo,k.scopes,
 		ARRAY(SELECT proyecto_id FROM api_key_proyectos WHERE api_key_id=k.id ORDER BY proyecto_id),
 		ARRAY(SELECT calendario_id FROM api_key_calendarios WHERE api_key_id=k.id ORDER BY calendario_id),
+		k.todos_proyectos,k.todos_calendarios,
 		k.fecha_creacion,k.expira_en,k.revocada_en,k.ultimo_uso FROM api_keys k WHERE k.user_id=$1 ORDER BY k.id DESC`, userID)
 	if err != nil {
 		return nil, err
@@ -191,7 +205,7 @@ func (r *APIKeyRepository) List(ctx context.Context, userID int) ([]models.APIKe
 	keys := []models.APIKey{}
 	for rows.Next() {
 		var k models.APIKey
-		if err := rows.Scan(&k.ID, &k.Nombre, &k.Prefijo, &k.Scopes, &k.ProyectoIDs, &k.CalendarioIDs, &k.FechaCreacion, &k.ExpiraEn, &k.RevocadaEn, &k.UltimoUso); err != nil {
+		if err := rows.Scan(&k.ID, &k.Nombre, &k.Prefijo, &k.Scopes, &k.ProyectoIDs, &k.CalendarioIDs, &k.TodosProyectos, &k.TodosCalendarios, &k.FechaCreacion, &k.ExpiraEn, &k.RevocadaEn, &k.UltimoUso); err != nil {
 			return nil, err
 		}
 		keys = append(keys, k)
@@ -217,9 +231,13 @@ func (r *APIKeyRepository) Authenticate(ctx context.Context, token string) (*mod
 		WHERE k.token_hash=$1 AND k.user_id=u.id AND u.eliminado=false AND k.revocada_en IS NULL
 		AND (k.expira_en IS NULL OR k.expira_en>CURRENT_TIMESTAMP)
 		RETURNING k.id,k.user_id,k.scopes,ARRAY(SELECT proyecto_id FROM api_key_proyectos WHERE api_key_id=k.id ORDER BY proyecto_id),
-		ARRAY(SELECT calendario_id FROM api_key_calendarios WHERE api_key_id=k.id ORDER BY calendario_id)`, keyHash(token)).Scan(&a.APIKeyID, &a.UserID, &a.Scopes, &a.ProyectoIDs, &a.CalendarioIDs)
+		ARRAY(SELECT calendario_id FROM api_key_calendarios WHERE api_key_id=k.id ORDER BY calendario_id),
+		k.todos_proyectos,k.todos_calendarios`, keyHash(token)).Scan(&a.APIKeyID, &a.UserID, &a.Scopes, &a.ProyectoIDs, &a.CalendarioIDs, &a.TodosProyectos, &a.TodosCalendarios)
 	if err == nil && a.CalendarioIDs == nil {
 		a.CalendarioIDs = []int{}
+	}
+	if err == nil && a.ProyectoIDs == nil {
+		a.ProyectoIDs = []int{}
 	}
 	return a, err
 }

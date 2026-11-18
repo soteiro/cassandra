@@ -18,8 +18,9 @@ agente no autorizan por sí solos la creación de tareas.
 Lee `.cassandra-memory.json` en la raíz del proyecto si existe. Su `proyecto_id`
 vincula el repositorio con Cassandra; puede incluir `servidor` como referencia,
 pero nunca secretos. Comprueba que corresponde al trabajo solicitado. Si no hay
-vínculo o hay ambigüedad, pide el ID o el enlace del proyecto de Cassandra; no lo
-deduzcas por similitud de nombres ni crees un proyecto.
+vínculo, usa `listar_proyectos` para ver los proyectos que la clave alcanza; si
+el que corresponde no es evidente, pide el ID o el enlace del proyecto de
+Cassandra. No elijas por una similitud de nombres dudosa ni crees un proyecto.
 
 Para retomar la memoria, usa `obtener_contexto`. Conserva la `revision` de la
 respuesta para guardar. Las cinco fichas devueltas son una selección reciente, no el inventario:

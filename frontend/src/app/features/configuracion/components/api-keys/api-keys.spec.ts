@@ -42,11 +42,18 @@ describe('ApiKeys', () => {
   };
   const button = (text: string) =>
     Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === text)!;
-  const fill = async () => {
+  const checkbox = (text: string) =>
+    Array.from(el.querySelectorAll('label'))
+      .find((l) => l.textContent?.trim() === text)!
+      .querySelector<HTMLInputElement>('input[type="checkbox"]')!;
+  const fillName = () => {
     const name = el.querySelector<HTMLInputElement>('#key-name')!;
     name.value = '  Mi asistente  ';
     name.dispatchEvent(new Event('input'));
-    el.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
+  };
+  const fill = async () => {
+    fillName();
+    checkbox('Cassandra').click();
     await render();
   };
   const select = (id: string, value: string) => {
@@ -173,7 +180,7 @@ describe('ApiKeys', () => {
     await render();
     expect(el.querySelector('[role="alert"]')?.textContent).toContain('Proyecto no autorizado');
     expect(el.querySelector<HTMLInputElement>('#key-name')?.value).toBe('  Mi asistente  ');
-    expect(el.querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked).toBe(true);
+    expect(checkbox('Cassandra').checked).toBe(true);
     api.create.mockReturnValue(of(issued));
     button('Generar clave').click();
     await render();
@@ -213,6 +220,91 @@ describe('ApiKeys', () => {
     });
   });
 
+  it('issues a global PM key for all projects and calendars, with a scope warning', async () => {
+    resource.value.set([]);
+    await render();
+    fillName();
+    select('key-access', 'write');
+    select('key-tasks', 'manage');
+    select('key-calendar', 'read');
+    await render();
+    expect(el.textContent).not.toContain('Esta clave alcanza también');
+    el.querySelector<HTMLInputElement>('#key-all-projects')!.click();
+    await render();
+    expect(el.textContent).toContain('Esta clave alcanza también');
+    // Sin lista de proyectos: no hace falta tener proyectos para una clave global.
+    expect(el.textContent).not.toContain('Necesitas un proyecto');
+    el.querySelector<HTMLInputElement>('#key-all-calendars')!.click();
+    await render();
+    expect(el.textContent).not.toContain('Colegio');
+    button('Generar clave').click();
+    await render();
+    const request = api.create.mock.calls[0][0];
+    expect(request).toMatchObject({
+      scopes: [
+        'memory:read',
+        'memory:write',
+        'tasks:read',
+        'tasks:create',
+        'tasks:manage',
+        'calendar:read',
+      ],
+      proyecto_ids: [],
+      todos_proyectos: true,
+      todos_calendarios: true,
+    });
+    expect(request.calendario_ids).toBeUndefined();
+  });
+
+  it('does not send all calendars when calendar access is off', async () => {
+    await fill();
+    select('key-calendar', 'read');
+    await render();
+    el.querySelector<HTMLInputElement>('#key-all-calendars')!.click();
+    select('key-calendar', 'none');
+    await render();
+    button('Generar clave').click();
+    await render();
+    const request = api.create.mock.calls[0][0];
+    expect(request.todos_calendarios).toBeUndefined();
+    expect(request.todos_proyectos).toBeUndefined();
+    expect(request.proyecto_ids).toEqual([12]);
+  });
+
+  it('shows and edits a global key, and can narrow it to chosen projects', async () => {
+    const global: APIKey = {
+      ...key,
+      scopes: ['memory:read', 'calendar:read'],
+      proyecto_ids: [],
+      todos_proyectos: true,
+      todos_calendarios: true,
+      expira_en: '2099-01-01T00:00:00Z',
+    };
+    api.list.mockReturnValue(of([global]));
+    fixture = TestBed.createComponent(ApiKeys);
+    el = fixture.nativeElement;
+    await render();
+    expect(el.textContent).toContain('Todos, incluidos los futuros');
+    expect(el.textContent).toContain('Ver todo el calendario');
+
+    el.querySelector<HTMLButtonElement>('[aria-label="Editar clave Asistente"]')!.click();
+    await render();
+    expect(el.querySelector<HTMLInputElement>('#key-all-projects')!.checked).toBe(true);
+    expect(el.querySelector<HTMLInputElement>('#key-all-calendars')!.checked).toBe(true);
+    el.querySelector<HTMLInputElement>('#key-all-projects')!.click();
+    await render();
+    checkbox('Cassandra').click();
+    button('Guardar cambios').click();
+    await render();
+    expect(api.update).toHaveBeenCalledExactlyOnceWith(1, {
+      nombre: 'Asistente',
+      scopes: ['memory:read', 'calendar:read'],
+      proyecto_ids: [12],
+      todos_calendarios: true,
+      expira_en: '2099-01-01T00:00:00Z',
+    });
+  });
+
   it('edits the permissions of an existing key without issuing a new secret', async () => {
     const vigente: APIKey = {
       ...key,
@@ -231,7 +323,7 @@ describe('ApiKeys', () => {
     expect(el.querySelector<HTMLInputElement>('#key-name')!.value).toBe('Asistente');
     expect(el.querySelector<HTMLSelectElement>('#key-tasks')!.value).toBe('read');
     expect(el.querySelector<HTMLSelectElement>('#key-expiry')!.value).toBe('keep');
-    expect(el.querySelector<HTMLInputElement>('input[type="checkbox"]')!.checked).toBe(true);
+    expect(checkbox('Cassandra').checked).toBe(true);
 
     select('key-tasks', 'manage');
     select('key-calendar', 'read');
@@ -298,7 +390,7 @@ describe('ApiKeys', () => {
     expect(el.querySelector('[role="alert"]')?.textContent).toContain(
       'Selecciona al menos un permiso',
     );
-    expect(el.querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked).toBe(true);
+    expect(checkbox('Cassandra').checked).toBe(true);
   });
 
   it('shows the actual permissions for tasks-only and combined keys', async () => {

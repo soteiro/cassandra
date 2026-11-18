@@ -37,7 +37,7 @@ func repoWithLink(t *testing.T, id string) string {
 }
 
 func TestResolveAPIKeyPrefersEnvironment(t *testing.T) {
-	key, err := ResolveAPIKey("cass_mem_env", testServer, t.TempDir(), t.TempDir())
+	key, err := ResolveAPIKey("cass_mem_env", "", testServer, t.TempDir(), t.TempDir())
 	if err != nil || key != "cass_mem_env" {
 		t.Fatalf("key=%q err=%v", key, err)
 	}
@@ -55,17 +55,62 @@ func TestResolveAPIKeyUsesKeyOfLinkedProjectPerServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Desde un subdirectorio se encuentra el vínculo de la raíz del repositorio.
-	key, err := ResolveAPIKey("", testServer, sub, keys)
+	key, err := ResolveAPIKey("", "", testServer, sub, keys)
 	if err != nil || key != "cass_mem_siete" {
 		t.Fatalf("key=%q err=%v", key, err)
 	}
 	// El host sale de CASSANDRA_URL, no del archivo del repositorio.
-	key, err = ResolveAPIKey("", "https://otro.ejemplo.com", repo, keys)
+	key, err = ResolveAPIKey("", "", "https://otro.ejemplo.com", repo, keys)
 	if err != nil || key != "cass_mem_otro" {
 		t.Fatalf("key=%q err=%v", key, err)
 	}
-	if _, err = ResolveAPIKey("", "https://sin-keys.ejemplo.com", repo, keys); err == nil {
+	if _, err = ResolveAPIKey("", "", "https://sin-keys.ejemplo.com", repo, keys); err == nil {
 		t.Fatal("usó una key de otro servidor")
+	}
+}
+
+func TestResolveAPIKeyGlobalFromConnectorConfig(t *testing.T) {
+	keys := t.TempDir()
+	writeFile(t, filepath.Join(keys, "qa.ejemplo.com", "all.key"), "cass_mem_global\n", 0o600)
+	writeFile(t, filepath.Join(keys, "qa.ejemplo.com", "7.key"), "cass_mem_siete\n", 0o600)
+	writeFile(t, filepath.Join(keys, "qa.ejemplo.com", "8.key"), "cass_mem_ocho\n", 0o600)
+
+	// "all" usa la key global aunque el repositorio esté vinculado a otro proyecto.
+	key, err := ResolveAPIKey("", "all", testServer, repoWithLink(t, "7"), keys)
+	if err != nil || key != "cass_mem_global" {
+		t.Fatalf("key=%q err=%v", key, err)
+	}
+	// Fuera de un repositorio también funciona: el agente PM no necesita vínculo.
+	if key, err = ResolveAPIKey("", " all ", testServer, t.TempDir(), keys); err != nil || key != "cass_mem_global" {
+		t.Fatalf("key=%q err=%v", key, err)
+	}
+	// Un ID elige la key de ese proyecto sin vínculo.
+	if key, err = ResolveAPIKey("", "8", testServer, t.TempDir(), keys); err != nil || key != "cass_mem_ocho" {
+		t.Fatalf("key=%q err=%v", key, err)
+	}
+	// CASSANDRA_API_KEY sigue mandando.
+	if key, err = ResolveAPIKey("cass_mem_env", "all", testServer, t.TempDir(), keys); err != nil || key != "cass_mem_env" {
+		t.Fatalf("key=%q err=%v", key, err)
+	}
+	for _, bad := range []string{"todos", "ALL", "0", "-1", "../7", "7.key", "99999999999"} {
+		if key, err := ResolveAPIKey("", bad, testServer, t.TempDir(), keys); err == nil || key != "" {
+			t.Errorf("CASSANDRA_PROYECTO=%q aceptado: key=%q", bad, key)
+		}
+	}
+	// Sin all.key para el servidor, falla sin caer en otra key.
+	if key, err := ResolveAPIKey("", "all", "https://otro.ejemplo.com", repoWithLink(t, "7"), keys); err == nil || key != "" {
+		t.Fatalf("key=%q err=%v", key, err)
+	}
+}
+
+// Un .cassandra-memory.json de un repositorio (posiblemente ajeno) no puede elegir la key global.
+func TestResolveAPIKeyLinkFileCannotSelectGlobalKey(t *testing.T) {
+	keys := t.TempDir()
+	writeFile(t, filepath.Join(keys, "qa.ejemplo.com", "all.key"), "cass_mem_global", 0o600)
+	for _, id := range []string{`"all"`, `"7"`, `null`, `0`} {
+		if key, err := ResolveAPIKey("", "", testServer, repoWithLink(t, id), keys); err == nil || key != "" {
+			t.Errorf("proyecto_id %s aceptado: key=%q", id, key)
+		}
 	}
 }
 
@@ -95,7 +140,7 @@ func TestResolveAPIKeyErrors(t *testing.T) {
 	}
 	for name, setup := range cases {
 		dir, server := setup()
-		if key, err := ResolveAPIKey("", server, dir, keys); err == nil || key != "" {
+		if key, err := ResolveAPIKey("", "", server, dir, keys); err == nil || key != "" {
 			t.Errorf("%s: aceptó key=%q err=%v", name, key, err)
 		}
 	}
@@ -104,7 +149,7 @@ func TestResolveAPIKeyErrors(t *testing.T) {
 func TestResolveAPIKeyErrorsDoNotLeakKey(t *testing.T) {
 	keys := t.TempDir()
 	writeFile(t, filepath.Join(keys, "qa.ejemplo.com", "7.key"), "cass_mem_secreta", 0o644)
-	_, err := ResolveAPIKey("", testServer, repoWithLink(t, "7"), keys)
+	_, err := ResolveAPIKey("", "", testServer, repoWithLink(t, "7"), keys)
 	if err == nil || strings.Contains(err.Error(), "cass_mem_secreta") {
 		t.Fatalf("error ausente o filtra la key: %v", err)
 	}
@@ -113,7 +158,7 @@ func TestResolveAPIKeyErrorsDoNotLeakKey(t *testing.T) {
 func TestResolveAPIKeyRejectsOversizedKeyFile(t *testing.T) {
 	keys := t.TempDir()
 	writeFile(t, filepath.Join(keys, "qa.ejemplo.com", "7.key"), strings.Repeat("a", 1000), 0o600)
-	if _, err := ResolveAPIKey("", testServer, repoWithLink(t, "7"), keys); err == nil {
+	if _, err := ResolveAPIKey("", "", testServer, repoWithLink(t, "7"), keys); err == nil {
 		t.Fatal("aceptó un archivo de key desmesurado")
 	}
 }
