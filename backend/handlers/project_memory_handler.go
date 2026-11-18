@@ -142,7 +142,7 @@ func integrationProject(w http.ResponseWriter, r *http.Request, scope string) (i
 		return 0, 0, false
 	}
 	if a := middleware.GetAPIKeyAccess(r.Context()); a != nil {
-		if !slices.Contains(a.ProyectoIDs, projectID) {
+		if !a.PuedeProyecto(projectID) {
 			http.Error(w, "Recurso no encontrado", http.StatusNotFound)
 			return 0, 0, false
 		}

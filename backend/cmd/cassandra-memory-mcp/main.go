@@ -27,8 +27,9 @@ func main() {
 	}
 }
 
-// newClient usa CASSANDRA_API_KEY si existe; si no, la key guardada para el proyecto
-// vinculado al directorio de trabajo, de modo que un MCP global sirva a muchos proyectos.
+// newClient usa CASSANDRA_API_KEY si existe; si no, la key guardada que elige
+// CASSANDRA_PROYECTO ("all" para la key global) o, en su defecto, la del proyecto vinculado
+// al directorio de trabajo, de modo que un MCP global sirva a muchos proyectos.
 func newClient() (*memorymcp.Client, error) {
 	baseURL := os.Getenv("CASSANDRA_URL")
 	if key := os.Getenv("CASSANDRA_API_KEY"); key != "" {
@@ -42,14 +43,14 @@ func newClient() (*memorymcp.Client, error) {
 	if err != nil {
 		return memorymcp.NewUnavailableClient(baseURL, err)
 	}
-	key, err := memorymcp.ResolveAPIKey("", baseURL, cwd, keysDir)
+	key, err := memorymcp.ResolveAPIKey("", os.Getenv("CASSANDRA_PROYECTO"), baseURL, cwd, keysDir)
 	if err != nil {
 		return memorymcp.NewUnavailableClient(baseURL, err)
 	}
 	// Una key guardada con formato inválido es un error de configuración visible en las herramientas.
 	client, err := memorymcp.NewClient(baseURL, key)
 	if err != nil {
-		return memorymcp.NewUnavailableClient(baseURL, errors.New("la key guardada del proyecto no tiene el formato de una key de memoria"))
+		return memorymcp.NewUnavailableClient(baseURL, errors.New("la key guardada no tiene el formato de una key de memoria"))
 	}
 	return client, nil
 }

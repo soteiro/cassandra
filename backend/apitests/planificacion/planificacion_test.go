@@ -370,7 +370,7 @@ func TestHerramientasDePMPorMCP(t *testing.T) {
 	}
 	defer cs.Close()
 	tools, err := cs.ListTools(ctx, nil)
-	if err != nil || len(tools.Tools) != 11 {
+	if err != nil || len(tools.Tools) != 12 {
 		t.Fatalf("herramientas: %+v, err=%v", tools, err)
 	}
 	for _, tool := range tools.Tools {
@@ -540,4 +540,58 @@ func TestActividadQueCruzaLaMedianoche(t *testing.T) {
 	if !reflect.DeepEqual(libre, []string{"07:00-13:00", "21:00-22:30"}) {
 		t.Fatalf("tiempo libre del rango: %v", libre)
 	}
+}
+
+// Una key global ve todos los calendarios y proyectos del usuario, también los que se
+// crean después; los dos alcances son independientes.
+func TestKeyGlobalVeTodoElCalendario(t *testing.T) {
+	e := preparar(t)
+	var issued models.IssuedAPIKey
+	e.api.Do(e.ana, http.MethodPost, "/api/api-keys", models.CreateAPIKeyRequest{
+		Nombre: "PM global", Scopes: []string{models.CalendarRead, models.TasksManage}, TodosProyectos: true, TodosCalendarios: true,
+	}).Expect(t, http.StatusCreated).JSON(t, &issued)
+	pm := &apitest.User{Token: issued.Token}
+	nuevo := proyecto(t, e.api, e.ana, "Nuevo")
+	tareaNueva := tarea(t, e.api, e.ana, nuevo, "Postular", "2026-11-20")
+	futbol := calendario(t, e.api, e.ana, "Fútbol", "actividades", "")
+	actividad(t, e.api, e.ana, futbol.ID, "Entrenamiento", "17:00", "18:00", []int{3})
+
+	d := disponibilidad(t, e.api, pm, "?desde=2026-11-16&hasta=2026-11-20&ahora=2026-11-16T00:00")
+	if len(d.Calendarios) != 4 {
+		t.Errorf("calendarios: %+v", d.Calendarios)
+	}
+	vistos := map[string]bool{}
+	for _, ev := range d.Eventos {
+		vistos[ev.Titulo] = true
+	}
+	if !vistos["Fonoaudióloga"] || !vistos["Entrenamiento"] || vistos["Ocupado"] {
+		t.Errorf("eventos: %+v", d.Eventos)
+	}
+	deadlines := []int{}
+	for _, dl := range d.Deadlines {
+		deadlines = append(deadlines, dl.ID)
+	}
+	if !reflect.DeepEqual(deadlines, []int{e.tareaP, e.tareaQ, tareaNueva}) {
+		t.Errorf("deadlines: %+v", d.Deadlines)
+	}
+	// Planifica y quita bloques en un proyecto creado después de la key.
+	var plan models.PlanificacionResult
+	e.api.Do(pm, http.MethodPost, apitest.Path("/api/integrations/projects/%d/tasks/%d/bloques", nuevo, tareaNueva), models.PlanificarRequest{
+		OperacionID: "plan-global-1", Bloques: []models.BloqueInput{{Fecha: "2026-11-16", HoraInicio: "14:00", HoraFin: "15:00"}},
+	}).Expect(t, http.StatusCreated).JSON(t, &plan)
+
+	// Todos los proyectos sin todos los calendarios: los eventos siguen como "Ocupado".
+	e.api.Do(e.ana, http.MethodPut, apitest.Path("/api/api-keys/%d", issued.ID), models.CreateAPIKeyRequest{
+		Nombre: "PM global", Scopes: []string{models.CalendarRead, models.TasksManage}, TodosProyectos: true,
+	}).Expect(t, http.StatusOK)
+	d = disponibilidad(t, e.api, pm, "?desde=2026-11-16&hasta=2026-11-20&ahora=2026-11-16T00:00")
+	if len(d.Calendarios) != 0 || len(d.Deadlines) != 3 || len(d.Bloques) != 1 {
+		t.Errorf("solo proyectos: calendarios=%+v deadlines=%d bloques=%+v", d.Calendarios, len(d.Deadlines), d.Bloques)
+	}
+	for _, ev := range d.Eventos {
+		if ev.Titulo != "Ocupado" {
+			t.Errorf("sin todos los calendarios vio %+v", ev)
+		}
+	}
+	e.api.Do(pm, http.MethodDelete, apitest.Path("/api/integrations/projects/%d/bloques/%d", nuevo, d.Bloques[0].ID), nil).Expect(t, http.StatusOK)
 }
