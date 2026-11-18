@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.25.0](https://github.com/soteiro/cassandra/compare/v0.24.0...v0.25.0) (2026-11-18)
+
+
+### Features
+
+* **api-keys:** add global keys for PM assistants and listar_proyectos ([5a6704e](https://github.com/soteiro/cassandra/commit/5a6704eefc3588f966fd730f97d5f013991b65f4))
+* **api-keys:** add global keys for PM assistants and listar_proyectos ([96c81be](https://github.com/soteiro/cassandra/commit/96c81be4882b9662975512c349d68039df6cbf74))
+
 ## [0.24.0](https://github.com/soteiro/cassandra/compare/v0.23.0...v0.24.0) (2026-11-17)
 
 
