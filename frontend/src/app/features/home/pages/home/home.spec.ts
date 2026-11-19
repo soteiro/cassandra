@@ -9,6 +9,8 @@ import { Home } from './home';
 import { TaskService } from '../../../tareas/data/task.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { Task } from '../../../tareas/data/task.model';
+import { ProjectResponse } from '../../../proyectos/data/project.model';
+import { ProjectService } from '../../../proyectos/data/project.service';
 
 function task(over: Partial<Task>): Task {
   return {
@@ -37,7 +39,12 @@ describe('Home', () => {
     reload: ReturnType<typeof vi.fn>;
     update: (fn: (v: Task[] | undefined) => Task[] | undefined) => void;
   };
-  let taskService: { getAllTasks: ReturnType<typeof vi.fn>; updateTask: ReturnType<typeof vi.fn> };
+  let taskService: {
+    getAllTasks: ReturnType<typeof vi.fn>;
+    getTaskById: ReturnType<typeof vi.fn>;
+    updateTask: ReturnType<typeof vi.fn>;
+  };
+  let projects: ReturnType<typeof signal<Pick<ProjectResponse, 'id' | 'nombre'>[]>>;
   let toast: { success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
@@ -53,9 +60,11 @@ describe('Home', () => {
         estadoArg = estado;
         return resource;
       }),
+      getTaskById: vi.fn(),
       updateTask: vi.fn().mockReturnValue(of(task({}))),
     };
     toast = { success: vi.fn(), error: vi.fn() };
+    projects = signal([]);
 
     await TestBed.configureTestingModule({
       imports: [Home],
@@ -65,6 +74,18 @@ describe('Home', () => {
         provideHttpClientTesting(),
         { provide: TaskService, useValue: taskService },
         { provide: ToastService, useValue: toast },
+        {
+          provide: ProjectService,
+          useValue: {
+            projectsResource: {
+              value: projects,
+              hasValue: () => true,
+              isLoading: signal(false),
+              error: signal(undefined),
+              reload: vi.fn(),
+            },
+          },
+        },
       ],
     }).compileComponents();
 
@@ -85,6 +106,99 @@ describe('Home', () => {
     component.setEstado('Terminado');
     expect(component.selectedEstado()).toBe('Terminado');
     expect(estadoArg()).toBe('Terminado');
+  });
+
+  it('carga los proyectos y filtra las tareas por proyecto y por el estado activo', async () => {
+    projects.set([
+      { id: 1, nombre: 'Soporte' },
+      { id: 2, nombre: 'Archivo' },
+      { id: 3, nombre: 'Viajes' },
+    ]);
+    resource.value.set([
+      task({ id: 7, nombre: 'Revisar tickets', proyect_id: 1 }),
+      task({ id: 8, nombre: 'Ordenar informes', proyect_id: 2 }),
+    ]);
+    await fixture.whenStable();
+
+    const root: HTMLElement = fixture.nativeElement;
+    const select = root.querySelector<HTMLSelectElement>(
+      'select[aria-label="Filtrar por proyecto"]',
+    )!;
+    const visibles = () =>
+      Array.from(root.querySelectorAll('button[title="Editar tarea"]'), (button) =>
+        button.textContent?.trim(),
+      );
+    const seleccionar = async (index: number) => {
+      select.selectedIndex = index;
+      select.dispatchEvent(new Event('change'));
+      await fixture.whenStable();
+    };
+
+    expect(Array.from(select.options, (option) => option.text.trim())).toEqual([
+      'Todos los proyectos',
+      'Archivo',
+      'Soporte',
+      'Viajes',
+    ]);
+    expect(visibles()).toEqual(['Revisar tickets', 'Ordenar informes']);
+
+    await seleccionar(1);
+    expect(visibles()).toEqual(['Ordenar informes']);
+    expect(estadoArg()).toBe('En Curso');
+
+    await seleccionar(3);
+    expect(visibles()).toEqual([]);
+    expect(root.textContent).toContain('No hay tareas de este proyecto con el estado seleccionado');
+
+    await seleccionar(0);
+    expect(visibles()).toEqual(['Revisar tickets', 'Ordenar informes']);
+  });
+
+  it('abre el modal desde el listado con las subtareas del detalle, incluso si tienen otro estado', () => {
+    const padre = task({ id: 7, nombre: 'Preparar informe' });
+    const response = new Subject<Task>();
+    resource.value.set([padre]);
+    taskService.getTaskById.mockReturnValue(response);
+    fixture.detectChanges();
+
+    const root: HTMLElement = fixture.nativeElement;
+    const button = root.querySelector<HTMLButtonElement>('button[title="Editar tarea"]')!;
+    button.click();
+    fixture.detectChanges();
+
+    expect(taskService.getTaskById).toHaveBeenCalledWith(padre.id);
+    expect(component.selectedTask()).toBeNull();
+    expect(button.disabled).toBe(true);
+
+    response.next({
+      ...padre,
+      subtareas: [
+        task({ id: 8, nombre: 'Revisar cifras', estado: 'Terminado', tarea_padre_id: 7 }),
+      ],
+    });
+    response.complete();
+    fixture.detectChanges();
+
+    expect(root.querySelector('app-task-detail-modal')?.textContent).toContain('Revisar cifras');
+    expect(button.disabled).toBe(false);
+  });
+
+  it('avisa si el detalle falla y permite reintentar desde la misma tarea', () => {
+    const padre = task({ id: 7 });
+    resource.value.set([padre]);
+    taskService.getTaskById
+      .mockReturnValueOnce(throwError(() => new Error('x')))
+      .mockReturnValueOnce(of(padre));
+    fixture.detectChanges();
+
+    const root: HTMLElement = fixture.nativeElement;
+    const button = root.querySelector<HTMLButtonElement>('button[title="Editar tarea"]')!;
+    button.click();
+    expect(toast.error).toHaveBeenCalledWith('No se pudo abrir la tarea');
+    expect(component.selectedTask()).toBeNull();
+
+    button.click();
+    expect(component.selectedTask()).toEqual(padre);
   });
 
   it('sortedTasks orders by prioridad (urgente > alta > normal > baja > unknown)', () => {
