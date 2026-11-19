@@ -27,7 +27,7 @@
   </section>
 
   <!-- GRID DE WIDGETS MODULARES -->
-  <div class="flex flex-col gap-4 ">
+  <div class="flex flex-col gap-4">
     <!-- WIDGET: TAREAS & FOCO (COMPACTO) -->
     <div
       class="bg-surface border border-surface-border rounded-2xl shadow-xs overflow-hidden flex flex-col"
@@ -59,7 +59,7 @@
             aria-label="Filtrar por proyecto"
             [ngModel]="selectedProjectId()"
             (ngModelChange)="selectedProjectId.set($event)"
-            class="min-h-8 w-full min-w-0 truncate rounded-lg border border-control-border bg-control-background p-2 text-xs font-medium text-text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-text "
+            class="min-h-8 w-full min-w-0 truncate rounded-lg border border-control-border bg-control-background p-2 text-xs font-medium text-text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-text"
           >
             <option [ngValue]="null">
               {{
