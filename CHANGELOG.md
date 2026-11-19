@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.26.0](https://github.com/soteiro/cassandra/compare/v0.25.0...v0.26.0) (2026-11-19)
+
+
+### Features
+
+* **home:** enhance task filtering by project and add loading state for task details ([6fb8942](https://github.com/soteiro/cassandra/commit/6fb8942a27a12973c823d7e087f526c12e5f08fc))
+
+
+### Bug Fixes
+
+* **home, proyectos:** clean up HTML structure and formatting for consistency ([b4b7b52](https://github.com/soteiro/cassandra/commit/b4b7b52a9af26470b254f00e06235996450fad65))
+
 ## [0.25.0](https://github.com/soteiro/cassandra/compare/v0.24.0...v0.25.0) (2026-11-18)
 
 
