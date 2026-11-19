@@ -1,6 +1,6 @@
 <div
-  [appLoading]="tasksResource?.isLoading() || false"
-  loadingLabel="Cargando tareas…"
+  [appLoading]="abriendoTarea() || !!tasksResource?.isLoading()"
+  [loadingLabel]="abriendoTarea() ? 'Cargando detalle de la tarea…' : 'Cargando tareas…'"
   class="space-y-4"
 >
   <!-- HEADER COMPACTO DEL DASHBOARD -->
@@ -27,14 +27,14 @@
   </section>
 
   <!-- GRID DE WIDGETS MODULARES -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <div class="flex flex-col gap-4">
     <!-- WIDGET: TAREAS & FOCO (COMPACTO) -->
     <div
       class="bg-surface border border-surface-border rounded-2xl shadow-xs overflow-hidden flex flex-col"
     >
       <!-- HEADER DEL WIDGET -->
       <div
-        class="p-3 sm:px-4 sm:py-3 border-b border-surface-border flex items-center justify-between gap-3 bg-surface/80"
+        class="p-3 sm:px-4 sm:py-3 border-b border-surface-border flex flex-wrap items-center justify-between gap-x-3 gap-y-2 bg-surface/80"
       >
         <div class="flex items-center gap-2 min-w-0">
           <div
@@ -43,27 +43,57 @@
             <svg lucideListTodo class="w-3.5 h-3.5" />
           </div>
           <h2 class="text-xs sm:text-sm font-bold text-text-main truncate"> Tareas & Foco </h2>
-          @if (!tasksResource?.error() && tasksResource?.value(); as tareas) {
+          @if (!tasksResource?.error() && tasksResource?.value()) {
             <span
               class="px-1.5 py-0.5 bg-background border border-surface-border rounded-md text-[10px] font-mono text-text-muted"
             >
-              {{ tareas.length }}
+              {{ sortedTasks().length }}
             </span>
           }
         </div>
 
-        <!-- SELECTOR DE ESTADO MINIMALISTA -->
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div
+          class="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:w-auto sm:max-w-full sm:grid-cols-[minmax(0,12rem)_auto]"
+        >
           <select
+            aria-label="Filtrar por proyecto"
+            [ngModel]="selectedProjectId()"
+            (ngModelChange)="selectedProjectId.set($event)"
+            class="min-h-8 w-full min-w-0 truncate rounded-lg border border-control-border bg-control-background p-2 text-xs font-medium text-text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-text"
+          >
+            <option [ngValue]="null">
+              {{
+                projectsResource.isLoading() && !projectsResource.hasValue()
+                  ? 'Cargando proyectos…'
+                  : 'Todos los proyectos'
+              }}
+            </option>
+            @for (proyecto of proyectos(); track proyecto.id) {
+              <option [ngValue]="proyecto.id">{{ proyecto.nombre }}</option>
+            }
+          </select>
+          <select
+            aria-label="Filtrar por estado"
             [ngModel]="selectedEstado()"
             (ngModelChange)="setEstado($event)"
-            class="bg-background border border-surface-border focus:border-primary text-text-main text-[11px] font-medium rounded-lg px-2 py-1 outline-none cursor-pointer transition-colors"
+            class="min-h-8 w-full min-w-0 truncate rounded-lg border border-control-border bg-control-background p-2 text-xs font-medium text-text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-text"
           >
             <option value="En Curso">En Curso</option>
             <option value="Bloqueado">Bloqueado</option>
             <option value="Abierto">Abierto</option>
           </select>
         </div>
+        @if (projectsResource.error()) {
+          <div class="flex w-full flex-wrap items-center gap-x-2 text-xs" role="status">
+            <span class="text-danger">No se pudieron cargar los proyectos.</span>
+            <button
+              type="button"
+              (click)="projectsResource.reload()"
+              class="min-h-6 cursor-pointer text-primary-text underline"
+              >Reintentar</button
+            >
+          </div>
+        }
       </div>
 
       <!-- LISTADO DE TAREAS COMPACTO -->
@@ -91,7 +121,7 @@
               >Reintentar</button
             >
           </div>
-        } @else if (tasksResource?.value(); as tareas) {
+        } @else if (tasksResource?.value()) {
           @for (tarea of sortedTasks(); track tarea.id) {
             <div
               [class]="
@@ -122,9 +152,11 @@
                     >
                       #{{ tarea.id }}
                     </span>
-                    <span
-                      (click)="selectedTask.set(tarea)"
-                      class="text-xs font-medium tracking-tight truncate transition-colors cursor-pointer hover:text-primary-text"
+                    <button
+                      type="button"
+                      (click)="abrirTarea(tarea.id)"
+                      [disabled]="abriendoTarea()"
+                      class="text-xs text-left font-medium tracking-tight truncate transition-colors cursor-pointer hover:text-primary-text disabled:cursor-wait"
                       [class]="
                         tarea.estado === 'Terminado'
                           ? 'line-through text-text-muted/50'
@@ -133,7 +165,7 @@
                       title="Editar tarea"
                     >
                       {{ tarea.nombre }}
-                    </span>
+                    </button>
                     <span
                       [class]="
                         'text-[9px] font-semibold px-1.5 py-0.5 rounded-md border shrink-0 uppercase ' +
@@ -168,9 +200,11 @@
             <div class="py-8 text-center text-text-muted space-y-1">
               <p class="text-xs font-medium text-text-main">
                 {{
-                  selectedEstado() === 'En Curso'
-                    ? 'Sin tareas en curso'
-                    : 'No hay tareas con este estado'
+                  selectedProjectId() !== null
+                    ? 'No hay tareas de este proyecto con el estado seleccionado'
+                    : selectedEstado() === 'En Curso'
+                      ? 'Sin tareas en curso'
+                      : 'No hay tareas con este estado'
                 }}
               </p>
               <p class="text-[11px] text-text-muted/70">
