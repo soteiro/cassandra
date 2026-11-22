@@ -47,6 +47,10 @@ func (r *ProjectMemoryRepository) Context(ctx context.Context, userID, projectID
 	if err := tx.QueryRow(ctx, `SELECT count(*) FROM memoria_fichas WHERE proyecto_id=$1 AND user_id=$2 AND estado NOT IN ('sustituida','descartada')`, projectID, userID).Scan(&out.FichasVigentesTotal); err != nil {
 		return nil, err
 	}
+	// Solo el total: las notas se buscan por demanda para no inflar el contexto.
+	if err := tx.QueryRow(ctx, `SELECT count(*) FROM notas_proyecto WHERE proyecto_id=$1 AND user_id=$2 AND eliminado IS NOT TRUE`, projectID, userID).Scan(&out.NotasTotal); err != nil {
+		return nil, err
+	}
 	rows, err := tx.Query(ctx, entryColumns+` WHERE proyecto_id=$1 AND user_id=$2 AND estado NOT IN ('sustituida','descartada') ORDER BY id DESC LIMIT 5`, projectID, userID)
 	if err != nil {
 		return nil, err

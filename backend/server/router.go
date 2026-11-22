@@ -108,6 +108,7 @@ func NewRouter(opts Options) http.Handler {
 		r.Use(middleware.IntegrationAuth(cfg.JwtSecret, userRepo, apiKeysRepo))
 		r.Get("/projects/{project_id}", memoryHandler.Context)
 		r.Get("/projects/{project_id}/entries", memoryHandler.Search)
+		r.Get("/projects/{project_id}/notes", memoryHandler.Notes)
 		r.Post("/projects/{project_id}/advances", memoryHandler.Write)
 	})
 	r.Route("/api/integrations/projects/{project_id}/tasks", func(r chi.Router) {

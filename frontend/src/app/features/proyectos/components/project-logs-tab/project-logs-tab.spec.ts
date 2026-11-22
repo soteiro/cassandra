@@ -31,6 +31,13 @@ describe('ProjectLogsTab', () => {
     await fixture.whenStable();
     fixture.detectChanges();
   };
+  /** Despliega (o pliega) la entrada como lo haría el navegador al pulsar su <summary>. */
+  const toggle = async (id: number, open = true) => {
+    const details = el.querySelector<HTMLDetailsElement>(`details[data-log-id="${id}"]`)!;
+    details.open = open;
+    details.dispatchEvent(new Event('toggle'));
+    await render();
+  };
   const button = (text: string) =>
     Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === text)!;
   beforeEach(async () => {
@@ -53,33 +60,31 @@ describe('ProjectLogsTab', () => {
     vi.unstubAllGlobals();
   });
 
-  it('opens a log with the existing safe Markdown renderer and restores keyboard focus', async () => {
-    const trigger = el.querySelector<HTMLButtonElement>('[data-log-id="5"]')!;
-    trigger.click();
-    await render();
+  it('expands a log inline with the safe Markdown renderer, keeping the list', async () => {
+    expect(el.querySelector('.prose-container')).toBeNull();
+    expect(el.querySelector('details summary')?.textContent).toContain('Avance de memoria');
+    await toggle(5);
     expect(el.querySelector('.prose-container h2')?.textContent).toBe('Resultado');
     expect(el.querySelector('strong')?.textContent).toBe('Funciona');
     expect(el.querySelector('code')?.textContent).toBe('MCP');
     expect(el.querySelectorAll('.prose-container li').length).toBe(2);
     expect(el.querySelector('script')).toBeNull();
-    expect(document.activeElement).toBe(el.querySelector('header h2'));
     expect(el.textContent).toContain('Esta entrada se actualiza con la memoria del proyecto.');
-    button('Volver a Project logs').click();
-    await render();
-    expect((document.activeElement as HTMLElement).dataset['logId']).toBe('5');
+    expect(el.querySelector('input[type="search"]')).not.toBeNull();
+    await toggle(5, false);
+    expect(el.querySelector('.prose-container')).toBeNull();
   });
 
   it('copies raw Markdown and reports clipboard failures accurately', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
-    el.querySelector<HTMLButtonElement>('[data-log-id="5"]')!.click();
-    await render();
-    button('Copiar Markdown').click();
+    await toggle(5);
+    button('Copiar').click();
     await render();
     expect(writeText).toHaveBeenCalledWith(log.contenido_raw);
     expect(el.textContent).toContain('Markdown copiado.');
     writeText.mockRejectedValue(new Error('denied'));
-    button('Copiar Markdown').click();
+    button('Copiar').click();
     await render();
     expect(el.textContent).toContain('No se pudo copiar');
     expect(el.textContent).not.toContain('Markdown copiado.');
@@ -132,13 +137,13 @@ describe('ProjectLogsTab', () => {
     expect(button('Siguiente').disabled).toBe(true);
   });
 
-  it('clears the previous project selection when the route changes', async () => {
-    el.querySelector<HTMLButtonElement>('[data-log-id="5"]')!.click();
-    await render();
+  it('collapses expanded entries when the route changes', async () => {
+    await toggle(5);
     fixture.componentRef.setInput('projectId', 3);
+    await render();
+    expect(el.querySelector('.prose-container')).toBeNull();
     resource.value.set([]);
     await render();
-    expect(el.querySelector('article')).toBeNull();
     expect(get.mock.calls[0][0]()).toBe(3);
     expect(el.textContent).not.toContain('Avance de memoria');
   });
