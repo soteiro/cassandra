@@ -74,6 +74,8 @@ type MemoryContext struct {
 	FechaActualizacion  *time.Time        `json:"fecha_actualizacion"`
 	Fichas              []MemoryEntry     `json:"fichas"`
 	FichasVigentesTotal int               `json:"fichas_vigentes_total"`
+	// NotasTotal cuenta las notas del usuario en el proyecto; se leen con buscar_notas.
+	NotasTotal int `json:"notas_total"`
 }
 
 type MemorySearchResult struct {

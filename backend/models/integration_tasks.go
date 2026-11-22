@@ -34,6 +34,9 @@ type IntegrationTask struct {
 	EstimacionMin      *int       `json:"estimacion_min"`
 	// Minutos ya reservados en bloques de trabajo.
 	MinutosPlanificados int `json:"minutos_planificados"`
+	// Notas del usuario vinculadas a la tarea (las más recientes). Solo con memory:read.
+	Notas      []MemoryNote `json:"notas,omitempty"`
+	NotasTotal *int         `json:"notas_total,omitempty"`
 }
 
 type CreateIntegrationTaskRequest struct {

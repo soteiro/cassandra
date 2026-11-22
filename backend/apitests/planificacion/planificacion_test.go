@@ -370,7 +370,7 @@ func TestHerramientasDePMPorMCP(t *testing.T) {
 	}
 	defer cs.Close()
 	tools, err := cs.ListTools(ctx, nil)
-	if err != nil || len(tools.Tools) != 12 {
+	if err != nil || len(tools.Tools) != 13 {
 		t.Fatalf("herramientas: %+v, err=%v", tools, err)
 	}
 	for _, tool := range tools.Tools {

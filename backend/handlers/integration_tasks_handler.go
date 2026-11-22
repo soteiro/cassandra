@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"cassandra/middleware"
@@ -66,6 +67,15 @@ func (h *IntegrationTasksHandler) Get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		integrationTaskError(w, err)
 		return
+	}
+	// Las notas son parte de la memoria: solo se adjuntan si la key puede leerla.
+	if access := middleware.GetAPIKeyAccess(r.Context()); access == nil || slices.Contains(access.Scopes, models.MemoryRead) {
+		notes, total, err := h.repo.TaskNotes(r.Context(), userID, projectID, taskID)
+		if err != nil {
+			integrationTaskError(w, err)
+			return
+		}
+		task.Notas, task.NotasTotal = notes, &total
 	}
 	integrationJSON(w, http.StatusOK, task)
 }

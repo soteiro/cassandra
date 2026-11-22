@@ -166,10 +166,11 @@ Después, para comprobar escritura:
 > confirma que puedes recuperarla con buscar_memoria.
 
 El cliente anuncia `listar_proyectos`, `obtener_contexto`, `buscar_memoria`, `guardar_avance`,
-`registrar_decision`, `crear_tarea`, `listar_tareas`, `obtener_tarea`,
+`registrar_decision`, `buscar_notas`, `crear_tarea`, `listar_tareas`, `obtener_tarea`,
 `ver_disponibilidad`, `actualizar_tarea`, `planificar_tarea` y `quitar_bloque`. Los permisos
 de la clave determinan cuáles puede ejecutar. La memoria y sus fichas aparecen
 en **Documentos → Project logs**; las tareas aparecen en el módulo habitual de tareas.
+Las notas del proyecto solo se leen: ver [la lectura de notas](MCP_NOTAS.md).
 
 Para comprobar lectura de tareas con una clave autorizada, pedir:
 
