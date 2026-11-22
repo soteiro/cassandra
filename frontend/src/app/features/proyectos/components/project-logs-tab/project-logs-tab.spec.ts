@@ -79,12 +79,12 @@ describe('ProjectLogsTab', () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });
     await toggle(5);
-    button('Copiar Markdown').click();
+    button('Copiar').click();
     await render();
     expect(writeText).toHaveBeenCalledWith(log.contenido_raw);
     expect(el.textContent).toContain('Markdown copiado.');
     writeText.mockRejectedValue(new Error('denied'));
-    button('Copiar Markdown').click();
+    button('Copiar').click();
     await render();
     expect(el.textContent).toContain('No se pudo copiar');
     expect(el.textContent).not.toContain('Markdown copiado.');
