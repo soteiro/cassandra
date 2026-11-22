@@ -1,25 +1,26 @@
 import {
-  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   computed,
   effect,
-  ElementRef,
   inject,
   input,
   signal,
-  viewChild,
-  viewChildren,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { LucideChevronRight } from '@lucide/angular';
 import { ProjectLog } from '../../data/project-log.model';
 import { LOG_PAGE_SIZE, ProjectLogService } from '../../data/project-log.service';
 import { parseMarkdown } from '../../../../shared/utils/markdown.util';
 import { MermaidDirective } from '../../../../shared/directives/mermaid.directive';
 
+/**
+ * Bitácora del proyecto. Cada entrada se despliega en la misma lista (<details>), así no hay
+ * que entrar a otra vista y volver.
+ */
 @Component({
   selector: 'app-project-logs-tab',
-  imports: [DatePipe, MermaidDirective],
+  imports: [DatePipe, MermaidDirective, LucideChevronRight],
   templateUrl: './project-logs-tab.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -27,8 +28,9 @@ export class ProjectLogsTab {
   projectId = input.required<number>();
   protected readonly query = signal('');
   protected readonly offset = signal(0);
-  protected readonly selected = signal<ProjectLog | null>(null);
-  protected readonly copyStatus = signal('');
+  /** Entradas desplegadas: solo de ellas se renderiza el Markdown. */
+  protected readonly abiertos = signal<ReadonlySet<number>>(new Set());
+  protected readonly copyStatus = signal<{ id: number; texto: string } | null>(null);
   protected readonly copying = signal(false);
   protected readonly resource = inject(ProjectLogService).getByProyectoId(
     this.projectId,
@@ -44,52 +46,44 @@ export class ProjectLogsTab {
       (this.resource.value()?.length ?? 0) > LOG_PAGE_SIZE &&
       this.offset() + LOG_PAGE_SIZE <= 10000,
   );
-  protected readonly html = computed(() => parseMarkdown(this.selected()?.contenido_raw ?? ''));
-  private readonly detailTitle = viewChild<ElementRef<HTMLHeadingElement>>('detailTitle');
-  private readonly logButtons = viewChildren<ElementRef<HTMLButtonElement>>('logButton');
-  private readonly lastSelected = signal<number | null>(null);
-  private readonly restoreFocus = signal(false);
+  protected readonly htmls = computed(() => {
+    const abiertos = this.abiertos();
+    return new Map(
+      this.logs()
+        .filter((log) => abiertos.has(log.id))
+        .map((log) => [log.id, parseMarkdown(log.contenido_raw)]),
+    );
+  });
 
   constructor() {
     effect(() => {
       this.projectId();
       this.query.set('');
       this.offset.set(0);
-      this.selected.set(null);
-      this.copyStatus.set('');
-    });
-    afterRenderEffect(() => this.detailTitle()?.nativeElement.focus());
-    afterRenderEffect(() => {
-      if (this.restoreFocus() && !this.selected()) {
-        this.logButtons()
-          .find((button) => button.nativeElement.dataset['logId'] === String(this.lastSelected()))
-          ?.nativeElement.focus();
-      }
+      this.cerrarTodo();
     });
   }
 
   protected search(query: string): void {
     this.query.set(query);
     this.offset.set(0);
-    this.restoreFocus.set(false);
+    this.cerrarTodo();
   }
 
   protected page(direction: -1 | 1): void {
-    this.restoreFocus.set(false);
     this.offset.update((offset) => Math.max(0, offset + direction * LOG_PAGE_SIZE));
+    this.cerrarTodo();
   }
 
-  protected open(log: ProjectLog): void {
-    this.restoreFocus.set(false);
-    this.lastSelected.set(log.id);
-    this.copyStatus.set('');
-    this.selected.set(log);
-  }
-
-  protected back(): void {
-    this.selected.set(null);
-    this.copyStatus.set('');
-    this.restoreFocus.set(true);
+  protected alternar(id: number, abierto: boolean): void {
+    if (this.abiertos().has(id) === abierto) return;
+    this.abiertos.update((actual) => {
+      const siguiente = new Set(actual);
+      if (abierto) siguiente.add(id);
+      else siguiente.delete(id);
+      return siguiente;
+    });
+    if (!abierto && this.copyStatus()?.id === id) this.copyStatus.set(null);
   }
 
   protected async copy(log: ProjectLog): Promise<void> {
@@ -97,12 +91,19 @@ export class ProjectLogsTab {
     this.copying.set(true);
     try {
       await navigator.clipboard.writeText(log.contenido_raw);
-      if (this.selected()?.id === log.id) this.copyStatus.set('Markdown copiado.');
+      this.copyStatus.set({ id: log.id, texto: 'Markdown copiado.' });
     } catch {
-      if (this.selected()?.id === log.id)
-        this.copyStatus.set('No se pudo copiar al portapapeles. Intenta de nuevo.');
+      this.copyStatus.set({
+        id: log.id,
+        texto: 'No se pudo copiar al portapapeles. Intenta de nuevo.',
+      });
     } finally {
       this.copying.set(false);
     }
+  }
+
+  private cerrarTodo(): void {
+    this.abiertos.set(new Set());
+    this.copyStatus.set(null);
   }
 }
