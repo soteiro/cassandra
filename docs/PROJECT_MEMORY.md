@@ -1,7 +1,8 @@
 # Memoria de proyectos y MCP
 
 El conector local ofrece `listar_proyectos`, cuatro herramientas de memoria, tres de
-[tareas](MCP_TASKS.md) y cuatro de [planificación](MCP_PLANIFICACION.md) a un asistente de programación. El
+[tareas](MCP_TASKS.md), cuatro de [planificación](MCP_PLANIFICACION.md) y una de
+[lectura de notas](MCP_NOTAS.md) a un asistente de programación. El
 asistente redacta la memoria con la conversación y el repositorio que tiene
 disponibles; Cassandra la valida y guarda. No se contrata ni ejecuta un modelo en
 el servidor, no se ingieren chats automáticamente y no se publica un MCP remoto.

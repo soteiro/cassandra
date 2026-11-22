@@ -167,6 +167,43 @@ func (h *ProjectMemoryHandler) Context(w http.ResponseWriter, r *http.Request) {
 	integrationJSON(w, http.StatusOK, value)
 }
 
+// Notes atiende GET /api/memory/projects/{project_id}/notes: notas del usuario, solo lectura.
+func (h *ProjectMemoryHandler) Notes(w http.ResponseWriter, r *http.Request) {
+	userID, projectID, ok := integrationProject(w, r, models.MemoryRead)
+	if !ok {
+		return
+	}
+	params := r.URL.Query()
+	query := models.MemoryNoteQuery{Consulta: params.Get("q")}
+	for _, param := range []struct {
+		name string
+		dest *int
+	}{{"limit", &query.Limit}, {"offset", &query.Offset}} {
+		if params.Has(param.name) {
+			value, err := strconv.Atoi(params.Get(param.name))
+			if err != nil || (param.name == "limit" && value == 0) {
+				http.Error(w, "Paginación inválida", http.StatusBadRequest)
+				return
+			}
+			*param.dest = value
+		}
+	}
+	if params.Has("tarea_id") {
+		taskID, err := atoi32(params.Get("tarea_id"))
+		if err != nil {
+			http.Error(w, "ID de tarea inválido", http.StatusBadRequest)
+			return
+		}
+		query.TareaID = &taskID
+	}
+	value, err := h.repo.SearchNotes(r.Context(), userID, projectID, query)
+	if err != nil {
+		integrationError(w, err)
+		return
+	}
+	integrationJSON(w, http.StatusOK, value)
+}
+
 func (h *ProjectMemoryHandler) Search(w http.ResponseWriter, r *http.Request) {
 	userID, projectID, ok := integrationProject(w, r, models.MemoryRead)
 	if !ok {

@@ -72,7 +72,7 @@ func addTaskTools(s *mcp.Server, c *Client, read *mcp.ToolAnnotations) {
 		return nil, out, err
 	})
 	mcp.AddTool(s, &mcp.Tool{
-		Name: "obtener_tarea", Description: "Leer el detalle de una tarea del proyecto autorizado. Requiere tasks:read. No carga subtareas automáticamente; consultarlas con listar_tareas. texto_truncado indica si se acotaron textos antiguos a 4000 caracteres por campo.", Annotations: read,
+		Name: "obtener_tarea", Description: "Leer el detalle de una tarea del proyecto autorizado. Requiere tasks:read. No carga subtareas automáticamente; consultarlas con listar_tareas. Con memory:read incluye las cinco notas más recientes del usuario sobre la tarea y notas_total; el resto, con buscar_notas. texto_truncado indica si se acotaron textos antiguos a 4000 caracteres por campo.", Annotations: read,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in GetTaskInput) (*mcp.CallToolResult, models.IntegrationTask, error) {
 		var out models.IntegrationTask
 		path, err := tasksPath(in.ProyectoID)
