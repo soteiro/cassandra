@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.27.0](https://github.com/soteiro/cassandra/compare/v0.26.0...v0.27.0) (2026-11-22)
+
+
+### Features
+
+* **mcp:** leer notas de proyecto con buscar_notas ([7250391](https://github.com/soteiro/cassandra/commit/72503912089255fb514622ef9c2aad950ff5fa4b))
+* **mcp:** leer notas de proyecto con buscar_notas ([d7722d1](https://github.com/soteiro/cassandra/commit/d7722d121906b9c25a1f161d22b418edfb1624b8))
+* **proyectos:** desplegar Project logs en la misma lista ([4db0181](https://github.com/soteiro/cassandra/commit/4db0181b7ba068de607ff16fe27731925e3bfb76))
+* **proyectos:** desplegar Project logs en la misma lista con details ([e712432](https://github.com/soteiro/cassandra/commit/e71243225cbcc8aca55495b4d821c21cde41985b))
+
+
+### Bug Fixes
+
+* **proyectos:** enhance project log entry layout and button functionality ([7ef5f50](https://github.com/soteiro/cassandra/commit/7ef5f50ae2cd0e8eef109a3bfb0c04f5dd7ba98c))
+
 ## [0.26.0](https://github.com/soteiro/cassandra/compare/v0.25.0...v0.26.0) (2026-11-19)
 
 
