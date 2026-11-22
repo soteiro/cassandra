@@ -85,8 +85,10 @@
               </span>
             </summary>
             @if (htmls().get(log.id); as html) {
-              <div class="pl-8 pr-2 pb-5 space-y-3 min-w-0">
-                <div class="flex flex-wrap items-center justify-between gap-3">
+              <div
+                class="pl-8 pr-2 pb-5 space-y-3 min-w-0 transition duration-500 starting:opacity-0 starting:-translate-y-1 motion-reduce:transition-none"
+              >
+                <div class="flex flex-wrap items-center justify-between gap-6">
                   <div class="text-xs text-text-muted space-y-1">
                     @if (log.fecha_actualizacion !== log.fecha_creacion) {
                       <p>Actualizado: {{ log.fecha_actualizacion | date: 'dd/MM/yyyy, HH:mm' }}</p>
@@ -95,22 +97,22 @@
                       <p>Esta entrada se actualiza con la memoria del proyecto.</p>
                     }
                   </div>
-                  <button
-                    type="button"
-                    (click)="copy(log)"
-                    [disabled]="copying()"
-                    class="min-h-11 px-3 text-sm font-medium border border-surface-border rounded-lg hover:bg-surface-border/50 cursor-pointer disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary"
-                    >{{ copying() ? 'Copiando…' : 'Copiar Markdown' }}</button
-                  >
                 </div>
                 @if (copyStatus()?.id === log.id) {
                   <p role="status" class="text-sm text-text-muted">{{ copyStatus()?.texto }}</p>
                 }
                 <div
-                  class="prose-container max-w-none text-text-main min-w-0 break-words overflow-x-auto"
+                  class="prose-container max-w-none text-text-main min-w-0 wrap-break-word overflow-x-auto mt-6 mb-6"
                   [innerHTML]="html"
                   [appMermaid]="html"
                 ></div>
+                <button
+                  type="button"
+                  (click)="copy(log)"
+                  [disabled]="copying()"
+                  class="min-h-11 px-3 text-sm font-medium border border-surface-border rounded-lg hover:bg-surface-border/50 cursor-pointer disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-primary mb-5"
+                  >{{ copying() ? 'Copiando…' : 'Copiar' }}</button
+                >
               </div>
             }
           </details>
