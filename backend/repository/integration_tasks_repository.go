@@ -104,7 +104,8 @@ const integrationTaskColumns = `SELECT t.id,t.proyecto_id,t.nombre,
 	(COALESCE(length(t.descripcion),0)>4000 OR COALESCE(length(t.comentario),0)>4000),
 	to_char((t.fecha_inicio AT TIME ZONE 'UTC')::date,'YYYY-MM-DD'),to_char((t.fecha_limite AT TIME ZONE 'UTC')::date,'YYYY-MM-DD'),
 	t.estimacion_min,
-	(SELECT COALESCE(sum(extract(epoch FROM b.hora_fin-b.hora_inicio)),0)::integer/60 FROM calendario_bloques b WHERE b.tarea_id=t.id)
+	(SELECT COALESCE(sum(extract(epoch FROM b.hora_fin-b.hora_inicio)),0)::integer/60
+	 FROM calendario_bloques b WHERE b.tarea_id=t.id AND NOT b.liberado)
 	FROM tareas_proyectos t JOIN proyectos p ON p.id=t.proyecto_id AND p.user_id=t.user_id
 	WHERE t.user_id=$1 AND t.proyecto_id=$2 AND t.eliminado=false AND p.eliminado=false`
 

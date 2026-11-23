@@ -426,6 +426,75 @@ func TestHerramientasDePMPorMCP(t *testing.T) {
 	call("quitar_bloque", map[string]any{"proyecto_id": e.p, "bloque_id": plan.Bloques[0].ID}, true, nil)
 }
 
+func TestTerminarTareaLiberaSusBloquesYLosDeSusSubtareas(t *testing.T) {
+	e := preparar(t)
+	pm := key(t, e.api, e.ana, []int{e.p}, nil, models.CalendarRead, models.TasksManage, models.TasksRead)
+	sub := e.api.Do(e.ana, http.MethodPost, "/api/tareas", map[string]any{
+		"nombre": "Anexo", "proyect_id": e.p, "tarea_padre_id": e.tareaP,
+	}).Expect(t, http.StatusCreated).ID(t)
+
+	const dia = "2026-11-18"
+	plan := models.PlanificarRequest{OperacionID: "liberar-informe-1", Bloques: []models.BloqueInput{
+		{Fecha: dia, HoraInicio: "14:00", HoraFin: "15:00"},
+	}}
+	ruta := apitest.Path("/api/integrations/projects/%d/tasks/%d", e.p, e.tareaP)
+	var original, reintento models.PlanificacionResult
+	e.api.Do(pm, http.MethodPost, ruta+"/bloques", plan).Expect(t, http.StatusCreated).JSON(t, &original)
+
+	anexo := models.PlanificarRequest{OperacionID: "liberar-anexo-1", Bloques: []models.BloqueInput{
+		{Fecha: dia, HoraInicio: "15:00", HoraFin: "16:00"},
+	}}
+	rutaSub := apitest.Path("/api/integrations/projects/%d/tasks/%d", e.p, sub)
+	e.api.Do(e.ana, http.MethodPost, rutaSub+"/bloques", anexo).Expect(t, http.StatusCreated)
+
+	const query = "?desde=" + dia + "&hasta=" + dia
+	otraKey := key(t, e.api, e.ana, []int{e.q}, nil, models.CalendarRead)
+	antes := disponibilidad(t, e.api, otraKey, query+"&ahora="+dia+"T00:00")
+	if len(antes.Eventos) != 2 || antes.Eventos[0].Titulo != "Ocupado" || antes.Eventos[1].Titulo != "Ocupado" {
+		t.Fatalf("los bloques de otro proyecto debían aparecer como ocupados: %+v", antes.Eventos)
+	}
+
+	var terminada, subtarea models.IntegrationTask
+	e.api.Do(pm, http.MethodPatch, ruta, map[string]any{"estado": "Terminado"}).Expect(t, http.StatusOK).JSON(t, &terminada)
+	e.api.Do(pm, http.MethodGet, rutaSub, nil).Expect(t, http.StatusOK).JSON(t, &subtarea)
+	if terminada.MinutosPlanificados != 0 || subtarea.Estado != "Terminado" || subtarea.MinutosPlanificados != 0 {
+		t.Fatalf("tarea y subtarea debían liberar sus reservas: %+v %+v", terminada, subtarea)
+	}
+
+	var rango models.CalendarioRango
+	e.api.Do(e.ana, http.MethodGet, "/api/calendario"+query, nil).Expect(t, http.StatusOK).JSON(t, &rango)
+	d := disponibilidad(t, e.api, pm, query+"&ahora="+dia+"T00:00")
+	if len(rango.Bloques) != 0 || len(d.Bloques) != 0 || len(rango.Deadlines) != 0 || len(d.Deadlines) != 0 {
+		t.Fatalf("la tarea terminada seguía en el calendario: app=%+v %+v MCP=%+v %+v", rango.Bloques, rango.Deadlines, d.Bloques, d.Deadlines)
+	}
+	d = disponibilidad(t, e.api, otraKey, query+"&ahora="+dia+"T00:00")
+	if got := huecosDe(d, dia); len(d.Eventos) != 0 || !reflect.DeepEqual(got, []string{"08:00-13:00", "14:00-18:00"}) {
+		t.Fatalf("los bloques liberados seguían ocupando horas: eventos=%+v huecos=%v", d.Eventos, got)
+	}
+
+	// Un reintento conserva su respuesta original. Una planificación nueva se rechaza.
+	e.api.Do(pm, http.MethodPost, ruta+"/bloques", plan).Expect(t, http.StatusCreated).JSON(t, &reintento)
+	if !reflect.DeepEqual(original, reintento) {
+		t.Fatalf("el reintento debía devolver el resultado original: %+v", reintento)
+	}
+	plan.OperacionID = "liberar-informe-2"
+	e.api.Do(pm, http.MethodPost, ruta+"/bloques", plan).Expect(t, http.StatusBadRequest)
+
+	plan.Bloques[0].HoraFin = "16:00"
+	e.api.Do(e.ana, http.MethodPost, apitest.Path("/api/integrations/projects/%d/tasks/%d/bloques", e.q, e.tareaQ), plan).
+		Expect(t, http.StatusCreated)
+	e.api.Do(e.ana, http.MethodPut, apitest.Path("/api/tareas/%d", e.tareaP), map[string]any{"estado": "Abierto"}).Expect(t, http.StatusOK)
+	e.api.Do(e.ana, http.MethodGet, "/api/calendario"+query, nil).Expect(t, http.StatusOK).JSON(t, &rango)
+	if len(rango.Bloques) != 1 || rango.Bloques[0].TareaID != e.tareaQ {
+		t.Fatalf("reabrir la tarea no debía recuperar los bloques liberados: %+v", rango.Bloques)
+	}
+	e.api.Do(e.ana, http.MethodPut, apitest.Path("/api/tareas/%d", e.tareaQ), map[string]any{"estado": "Terminado"}).Expect(t, http.StatusOK)
+	e.api.Do(e.ana, http.MethodGet, "/api/calendario"+query, nil).Expect(t, http.StatusOK).JSON(t, &rango)
+	if len(rango.Bloques) != 0 {
+		t.Fatalf("cerrar la tarea desde la app debía liberar su bloque: %+v", rango.Bloques)
+	}
+}
+
 func TestEditarPermisosDeUnaKeySinRegenerarla(t *testing.T) {
 	e := preparar(t)
 	var issued models.IssuedAPIKey
