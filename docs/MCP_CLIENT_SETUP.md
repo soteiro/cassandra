@@ -116,13 +116,46 @@ vencimiento. Esa clave alcanza también los proyectos y calendarios que crees de
    (umask 077; read -rsp 'Clave global: ' k; printf '%s\n' "$k" > "$dir/all.key"); echo
    ```
 
-2. Registrar un conector aparte para el asistente PM con `CASSANDRA_PROYECTO=all`:
+2. Registrar un conector aparte para el asistente PM con `CASSANDRA_PROYECTO=all`,
+   limitado a la carpeta donde trabaja el asistente (por ejemplo `~/personal`). Así la
+   key global no queda disponible en las sesiones de otros proyectos.
+
+   **Claude Code:** ejecutar desde esa carpeta con scope `local`:
 
    ```bash
-   claude mcp add --scope user cassandra-pm \
+   cd ~/personal
+   claude mcp add --scope local cassandra-pm \
      -e CASSANDRA_URL=https://qa.ejemplo.com -e CASSANDRA_PROYECTO=all \
      -- /ruta/absoluta/cassandra-memory-mcp
    ```
+
+   **Codex:** crear `.codex/config.toml` en esa carpeta. No agregarlo a
+   `~/.codex/config.toml`, que aplica a todas las sesiones:
+
+   ```toml
+   [mcp_servers.cassandra-pm]
+   command = "/ruta/absoluta/cassandra-memory-mcp"
+
+   [mcp_servers.cassandra-pm.env]
+   CASSANDRA_URL = "https://qa.ejemplo.com"
+   CASSANDRA_PROYECTO = "all"
+   ```
+
+   Codex solo carga la configuración de un proyecto **de confianza**, y la confianza
+   debe quedar guardada: aceptar «Trust this folder?» al abrir `codex` en la carpeta,
+   o registrarla en `~/.codex/config.toml`:
+
+   ```toml
+   [projects."/home/usuario/personal"]
+   trust_level = "trusted"
+   ```
+
+   Confiar en la carpeta permite a Codex leer, editar y ejecutar archivos en ella
+   según sus permisos; es una decisión del usuario. Comprobar con `/mcp` dentro de
+   una sesión nueva: con Codex 0.171, `codex mcp list` y `codex doctor` solo
+   mostraron los servidores de `~/.codex/config.toml`. Si la carpeta no es un
+   repositorio git y Codex no carga su configuración, ver
+   `project_root_markers` en la documentación de Codex.
 
 El asistente descubre los proyectos con `listar_proyectos` y usa sus IDs en las
 demás herramientas. `CASSANDRA_PROYECTO` también acepta un ID (`12`) para usar la key
@@ -136,16 +169,64 @@ asistente PM sean entradas distintas.
 
 ## 4. Instalar la skill para retomar y guardar contexto
 
-Copiar la carpeta [cassandra-memory](../integrations/skills/cassandra-memory/SKILL.md)
-del repositorio de Cassandra a estas ubicaciones del repositorio de trabajo:
+La skill vive en [integrations/skills/cassandra-memory](../integrations/skills/cassandra-memory/SKILL.md).
+En cada repositorio de trabajo, **enlazarla con un symlink** en lugar de copiarla:
+al actualizar el repositorio de Cassandra, todos los proyectos y clientes leen la
+versión nueva sin repetir la instalación.
 
-| Cliente | Destino |
+| Cliente | Destino en el repositorio de trabajo |
 |---|---|
-| Codex y OpenCode | `.agents/skills/cassandra-memory/` |
-| Claude Code | `.claude/skills/cassandra-memory/` |
+| Claude Code | `.claude/skills/cassandra-memory` |
+| Codex y OpenCode | `.agents/skills/cassandra-memory` |
+| Gemini CLI | `.gemini/skills/cassandra-memory` |
 
-OpenCode también descubre la copia de `.claude/skills`; basta una de las dos
-ubicaciones para ese cliente. Mantener las copias de la skill sincronizadas.
+OpenCode también descubre `.claude/skills`. Enlazar la **carpeta**, no solo el
+`SKILL.md`, para que también aparezcan los archivos que la skill agregue después.
+
+Una función de shell (por ejemplo en `~/.bashrc`) lo hace en el proyecto actual:
+
+```bash
+# Enlaza la skill cassandra-memory en el proyecto actual (Claude, Codex/OpenCode y Gemini)
+cassandra-skill() {
+  local src=/ruta/absoluta/cassandra/integrations/skills/cassandra-memory
+  local dir
+  for dir in .claude .agents .gemini; do
+    mkdir -p "$dir/skills"
+    # Una copia anterior se respalda: `ln` no reemplaza una carpeta, crearía el enlace dentro.
+    if [ -e "$dir/skills/cassandra-memory" ] && [ ! -L "$dir/skills/cassandra-memory" ]; then
+      mv "$dir/skills/cassandra-memory" "/tmp/cassandra-memory-$(basename "$PWD")-${dir#.}.bak"
+    fi
+    ln -sfn "$src" "$dir/skills/cassandra-memory"
+    echo "$dir/skills/cassandra-memory -> $(readlink "$dir/skills/cassandra-memory")"
+  done
+  # El enlace apunta a una ruta de esta máquina: excluirlo de git solo localmente.
+  if git rev-parse --git-dir >/dev/null 2>&1; then
+    local exclude path
+    exclude="$(git rev-parse --git-dir)/info/exclude"
+    for path in .claude/skills/cassandra-memory .agents/skills/cassandra-memory .gemini/skills/cassandra-memory; do
+      grep -qxF "$path" "$exclude" 2>/dev/null || echo "$path" >> "$exclude"
+    done
+  fi
+}
+```
+
+Tener en cuenta:
+
+- **El enlace sigue la rama abierta** en el repositorio de Cassandra. Si se trabaja
+  en una rama de feature, los proyectos leen la skill de esa rama. Para fijarla a
+  `main`, apuntar los enlaces a un worktree dedicado
+  (`git worktree add ~/.local/share/cassandra-main main`) y actualizarlo con
+  `git -C ~/.local/share/cassandra-main pull`. Lo mismo aplica al compilar el
+  conector con `make build-memory-mcp`.
+- **No commitear el enlace** en el repositorio de trabajo: es una ruta absoluta de
+  la máquina y queda roto en otra máquina o en CI. Si una copia anterior estaba
+  versionada, sacarla del índice con `git rm --cached -r <destino>`.
+- **Comprobar que cada cliente sigue el enlace**: abrir una sesión nueva y revisar
+  que la skill aparezca (`/skills` en Claude Code, o preguntar al agente qué skills
+  tiene). Si un cliente no la ve, usar una copia para ese cliente.
+- El symlink solo comparte las instrucciones. El vínculo con el proyecto
+  (`.cassandra-memory.json`) y la key se configuran aparte en cada repositorio.
+
 La skill guía la captura de conclusiones y preguntas ante información faltante;
 su activación depende del agente y de los permisos de cada cliente.
 

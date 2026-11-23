@@ -112,9 +112,11 @@ conector. El endpoint efectivo es exclusivamente `CASSANDRA_URL`.
 
 La skill versionada está en
 [`integrations/skills/cassandra-memory`](../integrations/skills/cassandra-memory/SKILL.md).
-Copiar esa carpeta a la ubicación de skills del cliente. En Codex puede instalarse
-para el usuario en `~/.agents/skills/cassandra-memory/`. La copia de este repositorio
-no se instala ni modifica automáticamente configuraciones personales.
+Enlazarla con un symlink en la ubicación de skills de cada cliente, en cada
+repositorio de trabajo, para actualizarla una sola vez; ver
+[la guía de clientes](MCP_CLIENT_SETUP.md#4-instalar-la-skill-para-retomar-y-guardar-contexto).
+La skill de este repositorio no se instala ni modifica automáticamente
+configuraciones personales.
 
 La skill puede activarse por su descripción o invocarse como `$cassandra-memory`.
 Primero recuperar contexto, luego guardar conclusiones útiles y avances
