@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.27.1](https://github.com/soteiro/cassandra/compare/v0.27.0...v0.27.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **calendario:** liberar bloques de tareas terminadas ([#308](https://github.com/soteiro/cassandra/issues/308)) ([f69cd2b](https://github.com/soteiro/cassandra/commit/f69cd2b9716808261dbb04a035454a3ed3099317))
+* **calendario:** liberar bloques de tareas terminadas ([#308](https://github.com/soteiro/cassandra/issues/308)) ([e36d3c0](https://github.com/soteiro/cassandra/commit/e36d3c0a18c46bc8e0a8cbbc1240b4eba721bb7b))
+
 ## [0.27.0](https://github.com/soteiro/cassandra/compare/v0.26.0...v0.27.0) (2026-11-22)
 
 
