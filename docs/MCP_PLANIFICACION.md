@@ -150,11 +150,13 @@ lo que liberan los calendarios.
 
 - Pasar una tarea a `Terminado` también cierra sus subtareas pendientes, igual
   que en la aplicación.
+- Al cerrar una tarea se liberan sus bloques de trabajo y los de las subtareas
+  que se cierran con ella. Reabrir una tarea permite planificarla de nuevo.
 - Los cambios quedan en el historial con origen `mcp`.
 - `fecha_inicio` no puede ser posterior a `fecha_limite`.
 - `estimacion_min` admite de 1 a 10080 minutos.
 - Las tareas ahora incluyen `fecha_inicio`, `fecha_limite`, `estimacion_min` y
-  `minutos_planificados` (la suma de sus bloques) también en `listar_tareas` y
+  `minutos_planificados` (la suma de sus bloques vigentes) también en `listar_tareas` y
   `obtener_tarea`.
 
 ## Contrato REST

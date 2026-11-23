@@ -44,10 +44,10 @@ func scanBloques(rows pgx.Rows) ([]models.Bloque, error) {
 	return out, rows.Err()
 }
 
-// bloques de trabajo del usuario entre dos fechas (de tareas y proyectos no eliminados).
+// bloques de trabajo vigentes del usuario entre dos fechas.
 func (r *CalendarioRepository) bloques(ctx context.Context, userID int, desde, hasta time.Time) ([]models.Bloque, error) {
 	rows, err := r.db.Query(ctx, `SELECT `+bloqueCols+`
-		WHERE b.user_id = $1 AND b.fecha BETWEEN $2::date AND $3::date
+		WHERE b.user_id = $1 AND NOT b.liberado AND b.fecha BETWEEN $2::date AND $3::date
 		ORDER BY b.fecha, b.hora_inicio, b.id`, userID, desde, hasta)
 	if err != nil {
 		log.Printf("[REPO:Calendario.bloques] Error en SQL: %v | user_id=%d", err, userID)
@@ -369,8 +369,8 @@ func (r *CalendarioRepository) Planificar(ctx context.Context, userID, projectID
 		return nil, err
 	}
 	defer tx.Rollback(ctx)
-	// Serializa las planificaciones del usuario: el control de solapes no tiene carreras.
-	if _, err := tx.Exec(ctx, `SELECT id FROM users WHERE id = $1 FOR UPDATE`, userID); err != nil {
+	// Serializa las planificaciones y permite que los eventos de tareas referencien al usuario.
+	if _, err := tx.Exec(ctx, `SELECT id FROM users WHERE id = $1 FOR NO KEY UPDATE`, userID); err != nil {
 		return nil, err
 	}
 	var prevHash string
@@ -387,11 +387,16 @@ func (r *CalendarioRepository) Planificar(ctx context.Context, userID, projectID
 	if !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
-	var id int
-	if err := tx.QueryRow(ctx, `SELECT t.id FROM tareas_proyectos t
+	// El cierre de esta tarea debe ocurrir antes de planificar o después de guardar los bloques.
+	var terminada bool
+	if err := tx.QueryRow(ctx, `SELECT COALESCE(t.estado IN ('Terminado', 'Completado'), false) FROM tareas_proyectos t
 		JOIN proyectos p ON p.id = t.proyecto_id AND p.user_id = t.user_id AND p.eliminado = false
-		WHERE t.id = $1 AND t.proyecto_id = $2 AND t.user_id = $3 AND t.eliminado = false`, taskID, projectID, userID).Scan(&id); err != nil {
+		WHERE t.id = $1 AND t.proyecto_id = $2 AND t.user_id = $3 AND t.eliminado = false
+		FOR NO KEY UPDATE OF t`, taskID, projectID, userID).Scan(&terminada); err != nil {
 		return nil, err
+	}
+	if terminada {
+		return nil, fmt.Errorf("%w: la tarea está terminada", models.ErrTaskInvalid)
 	}
 
 	// Huecos del rango de los bloques, antes de insertarlos.
@@ -417,7 +422,8 @@ func (r *CalendarioRepository) Planificar(ctx context.Context, userID, projectID
 		var solapa bool
 		if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM calendario_bloques b
 			JOIN tareas_proyectos t ON t.id = b.tarea_id AND t.eliminado = false
-			WHERE b.user_id = $1 AND b.fecha = $2::date AND b.hora_inicio < $4::time AND $3::time < b.hora_fin)`,
+			WHERE b.user_id = $1 AND NOT b.liberado AND b.fecha = $2::date
+			  AND b.hora_inicio < $4::time AND $3::time < b.hora_fin)`,
 			userID, b.Fecha, b.HoraInicio, b.HoraFin).Scan(&solapa); err != nil {
 			return nil, err
 		}
