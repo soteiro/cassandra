@@ -92,6 +92,8 @@ jobs:
       - run: pnpm run format:check
       - run: pnpm run test:ci
       - run: pnpm run build
+      # La demo de portafolio (API simulada) debe seguir compilando con cada cambio.
+      - run: pnpm run build:demo
 
   e2e:
     name: E2E (Playwright)

@@ -3,7 +3,11 @@
   style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))"
   aria-label="Navegación principal móvil"
 >
-  <div class="grid grid-cols-6 items-center justify-around pt-1.5 px-1 max-w-lg mx-auto">
+  <div
+    class="grid items-center justify-around pt-1.5 px-1 max-w-lg mx-auto"
+    [class.grid-cols-6]="!demo"
+    [class.grid-cols-4]="demo"
+  >
     <!-- INICIO -->
     <a
       routerLink="/home"
@@ -95,61 +99,67 @@
       </span>
     </a>
 
-    <!-- CRM -->
-    <a
-      routerLink="/crm"
-      routerLinkActive
-      #rlaCrm="routerLinkActive"
-      (click)="sidebar.close()"
-      class="flex flex-col items-center justify-center py-1 rounded-xl active:scale-95 transition-transform duration-100 cursor-pointer"
-    >
-      <div
-        class="flex items-center justify-center w-12 h-7 rounded-full transition-all duration-200"
-        [class.bg-primary/20]="rlaCrm.isActive"
-        [class.text-primary-text]="rlaCrm.isActive"
-        [class.text-text-muted]="!rlaCrm.isActive"
+    @if (!demo) {
+      <!-- CRM -->
+      <a
+        routerLink="/crm"
+        routerLinkActive
+        #rlaCrm="routerLinkActive"
+        (click)="sidebar.close()"
+        class="flex flex-col items-center justify-center py-1 rounded-xl active:scale-95 transition-transform duration-100 cursor-pointer"
       >
-        <svg lucideUser class="w-5 h-5 transition-transform" [class.scale-110]="rlaCrm.isActive" />
-      </div>
-      <span
-        class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
-        [class.text-primary-text]="rlaCrm.isActive"
-        [class.font-semibold]="rlaCrm.isActive"
-        [class.text-text-muted]="!rlaCrm.isActive"
-      >
-        CRM
-      </span>
-    </a>
+        <div
+          class="flex items-center justify-center w-12 h-7 rounded-full transition-all duration-200"
+          [class.bg-primary/20]="rlaCrm.isActive"
+          [class.text-primary-text]="rlaCrm.isActive"
+          [class.text-text-muted]="!rlaCrm.isActive"
+        >
+          <svg
+            lucideUser
+            class="w-5 h-5 transition-transform"
+            [class.scale-110]="rlaCrm.isActive"
+          />
+        </div>
+        <span
+          class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
+          [class.text-primary-text]="rlaCrm.isActive"
+          [class.font-semibold]="rlaCrm.isActive"
+          [class.text-text-muted]="!rlaCrm.isActive"
+        >
+          CRM
+        </span>
+      </a>
 
-    <!-- FINANZAS -->
-    <a
-      routerLink="/finanzas"
-      routerLinkActive
-      #rlaFinanzas="routerLinkActive"
-      (click)="sidebar.close()"
-      class="flex flex-col items-center justify-center py-1 rounded-xl active:scale-95 transition-transform duration-100 cursor-pointer"
-    >
-      <div
-        class="flex items-center justify-center w-12 h-7 rounded-full transition-all duration-200"
-        [class.bg-primary/20]="rlaFinanzas.isActive"
-        [class.text-primary-text]="rlaFinanzas.isActive"
-        [class.text-text-muted]="!rlaFinanzas.isActive"
+      <!-- FINANZAS -->
+      <a
+        routerLink="/finanzas"
+        routerLinkActive
+        #rlaFinanzas="routerLinkActive"
+        (click)="sidebar.close()"
+        class="flex flex-col items-center justify-center py-1 rounded-xl active:scale-95 transition-transform duration-100 cursor-pointer"
       >
-        <svg
-          lucideWalletMinimal
-          class="w-5 h-5 transition-transform"
-          [class.scale-110]="rlaFinanzas.isActive"
-        />
-      </div>
-      <span
-        class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
-        [class.text-primary-text]="rlaFinanzas.isActive"
-        [class.font-semibold]="rlaFinanzas.isActive"
-        [class.text-text-muted]="!rlaFinanzas.isActive"
-      >
-        Finanzas
-      </span>
-    </a>
+        <div
+          class="flex items-center justify-center w-12 h-7 rounded-full transition-all duration-200"
+          [class.bg-primary/20]="rlaFinanzas.isActive"
+          [class.text-primary-text]="rlaFinanzas.isActive"
+          [class.text-text-muted]="!rlaFinanzas.isActive"
+        >
+          <svg
+            lucideWalletMinimal
+            class="w-5 h-5 transition-transform"
+            [class.scale-110]="rlaFinanzas.isActive"
+          />
+        </div>
+        <span
+          class="text-[11px] font-medium tracking-tight mt-0.5 leading-none transition-colors"
+          [class.text-primary-text]="rlaFinanzas.isActive"
+          [class.font-semibold]="rlaFinanzas.isActive"
+          [class.text-text-muted]="!rlaFinanzas.isActive"
+        >
+          Finanzas
+        </span>
+      </a>
+    }
 
     <!-- MENÚ / MÁS -->
     <button

@@ -1,0 +1,56 @@
+name: Deploy demo
+
+# Demo de portafolio en Cloudflare Pages: solo el frontend, con la API simulada en el
+# navegador (frontend/src/demo). No toca el servidor ni ninguna base de datos.
+on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+      - .github/workflows/deploy-demo.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '24'
+  PAGES_PROJECT: cassandra-demo
+
+jobs:
+  deploy:
+    name: Build y deploy a Cloudflare Pages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:demo
+
+      # Crea el proyecto la primera vez; después falla con "ya existe" y se ignora.
+      - name: Crear proyecto de Pages (si no existe)
+        run: npx --yes wrangler@4 pages project create "$PAGES_PROJECT" --production-branch=main || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # Sin 404.html en la raíz, Pages sirve index.html en cualquier ruta (SPA).
+      - name: Deploy
+        run: npx --yes wrangler@4 pages deploy dist/frontend/browser --project-name="$PAGES_PROJECT" --branch=main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

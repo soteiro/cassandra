@@ -6,6 +6,7 @@ import { AppUpdateService } from '../../platform/app-update.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ServerConfigService } from '../../server/server-config.service';
 import { useToggle } from '../../../shared/utils/use-toggle';
+import { environment } from '../../../../environments/environment';
 import {
   LucideHouse,
   LucideFolder,
@@ -41,6 +42,8 @@ import {
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
+  /** La demo de portafolio no muestra CRM ni finanzas. */
+  protected readonly demo = environment.demo;
   private readonly authservice = inject(AuthService);
   private readonly router = inject(Router);
   protected readonly commandBarService = inject(CommandBarService);
