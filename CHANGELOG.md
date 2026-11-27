@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.28.0](https://github.com/soteiro/cassandra/compare/v0.27.1...v0.28.0) (2026-11-27)
+
+
+### Features
+
+* **demo:** demo de portafolio con API simulada en el navegador ([b60162b](https://github.com/soteiro/cassandra/commit/b60162b0ac4bbd7db6955d61b8f67edcdc8dc04d))
+* **demo:** demo de portafolio con API simulada en el navegador ([83874d6](https://github.com/soteiro/cassandra/commit/83874d6b6ea243be0b548db0c96f49977e02a0f6))
+
 ## [0.27.1](https://github.com/soteiro/cassandra/compare/v0.27.0...v0.27.1) (2026-11-23)
 
 
