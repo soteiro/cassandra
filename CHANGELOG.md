@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.28.1](https://github.com/soteiro/cassandra/compare/v0.28.0...v0.28.1) (2026-11-27)
+
+
+### Performance Improvements
+
+* **demo:** acelerar la primera carga de la demo ([1b6502b](https://github.com/soteiro/cassandra/commit/1b6502b4e4a1641399db1ee1cc834ff2cc8a3bbe))
+* **demo:** acelerar la primera carga de la demo ([d6f7256](https://github.com/soteiro/cassandra/commit/d6f72564061bf656a9da281a811d1038a9dcf9a6))
+
 ## [0.28.0](https://github.com/soteiro/cassandra/compare/v0.27.1...v0.28.0) (2026-11-27)
 
 
