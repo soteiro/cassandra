@@ -1,14 +1,25 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
-import { delay, from, mergeMap, of, throwError } from 'rxjs';
+import { asapScheduler, from, map, of, type Observable } from 'rxjs';
 import type { MockResponse } from './mock/api';
 
 const PREFIJO = '/api';
-/** Latencia simulada: lo justo para que los estados de carga se vean naturales. */
-const LATENCIA_MS = 120;
 
-/** La API simulada (con sus datos de ejemplo) se carga aparte, fuera del bundle inicial. */
+/**
+ * La API simulada (con sus datos de ejemplo) va en un chunk aparte para no agrandar el
+ * bundle inicial. Se empieza a descargar al arrancar (ver providers.demo.ts), en paralelo
+ * con las rutas, así cuando la primera pantalla pide datos ya está lista.
+ */
 let api: Promise<typeof import('./mock/api')> | null = null;
-const cargarApi = () => (api ??= import('./mock/api'));
+export const cargarApi = () => (api ??= import('./mock/api'));
+
+/**
+ * Respuestas que no dependen de los datos. /api/auth/me bloquea el arranque
+ * (APP_INITIALIZER): contestarla sin esperar al mock evita sumarle una descarga.
+ */
+const FIJAS: Record<string, unknown> = {
+  'GET /auth/me': { user_id: 1 },
+  'GET /version': { version: 'demo' },
+};
 
 /** Responde /api/* desde la base de la demo; lo demás (GitHub, assets) pasa al servidor real. */
 export const demoInterceptor: HttpInterceptorFn = (req, next) => {
@@ -16,30 +27,35 @@ export const demoInterceptor: HttpInterceptorFn = (req, next) => {
   if (url.origin !== window.location.origin || !url.pathname.startsWith(`${PREFIJO}/`)) {
     return next(req);
   }
+  const path = url.pathname.slice(PREFIJO.length);
 
-  return from(cargarApi()).pipe(
-    delay(LATENCIA_MS),
-    mergeMap(({ manejar }) => {
-      let res: MockResponse;
+  const fija = FIJAS[`${req.method} ${path}`];
+  if (fija) {
+    return responder(of({ status: 200, body: fija }, asapScheduler), req.url);
+  }
+
+  const res$ = from(cargarApi()).pipe(
+    map(({ manejar }) => {
       try {
-        res = manejar({
-          method: req.method,
-          path: url.pathname.slice(PREFIJO.length),
-          query: url.searchParams,
-          body: req.body,
-        });
+        return manejar({ method: req.method, path, query: url.searchParams, body: req.body });
       } catch (err) {
         console.error('[demo] error en la API simulada', err);
-        res = { status: 500, body: 'Error en la API simulada' };
+        return { status: 500, body: 'Error en la API simulada' };
       }
+    }),
+  );
+  return responder(res$, req.url);
+};
+
+function responder(res$: Observable<MockResponse>, url: string) {
+  return res$.pipe(
+    map((res) => {
       if (res.status >= 400) {
-        return throwError(
-          () => new HttpErrorResponse({ status: res.status, error: res.body, url: req.url }),
-        );
+        throw new HttpErrorResponse({ status: res.status, error: res.body, url });
       }
       // Copia: así la UI no muta la base por referencia.
       const body = res.body === null ? null : structuredClone(res.body);
-      return of(new HttpResponse({ status: res.status, body, url: req.url }));
+      return new HttpResponse({ status: res.status, body, url });
     }),
   );
-};
+}

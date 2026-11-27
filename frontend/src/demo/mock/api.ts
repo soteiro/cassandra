@@ -29,6 +29,8 @@ import {
 import { huecos, minutosDesde, ocurrencias, ordenarFranjas, turnos } from './calendario';
 import { ahoraISO, diaRelativo, parseDia } from './fechas';
 
+export { restablecer } from './db';
+
 export interface MockRequest {
   method: string;
   path: string;

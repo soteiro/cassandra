@@ -41,6 +41,21 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build:demo
 
+      # Los archivos con hash en el nombre nunca cambian: el navegador los guarda un año sin
+      # revalidar. El resto (index.html, theme-init.js, theme.css, docs/) queda con el
+      # max-age=0 por defecto de Pages para que un deploy nuevo se vea al tiro.
+      - name: Cabeceras de caché para Pages
+        run: |
+          cat > dist/frontend/browser/_headers <<'HEADERS'
+          /main-*
+            Cache-Control: public, max-age=31536000, immutable
+          /chunk-*
+            Cache-Control: public, max-age=31536000, immutable
+          /styles-*
+            Cache-Control: public, max-age=31536000, immutable
+          HEADERS
+          cat dist/frontend/browser/_headers
+
       # Crea el proyecto la primera vez; después falla con "ya existe" y se ignora.
       - name: Crear proyecto de Pages (si no existe)
         run: npx --yes wrangler@4 pages project create "$PAGES_PROJECT" --production-branch=main || true
