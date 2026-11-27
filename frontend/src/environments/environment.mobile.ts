@@ -1,4 +1,6 @@
 export const environment = {
+  // Build de portafolio sin backend (ver src/demo).
+  demo: false,
   production: true,
   // Sin servidor de fábrica: la app pide el suyo al iniciar (ServerConfigService).
   apiUrl: '',

@@ -12,12 +12,14 @@ import { SystemBarsService } from './core/platform/system-bars.service';
 import { AppearanceService } from './shared/services/appearance.service';
 
 import { routes } from './app.routes';
+import { demoInterceptors, demoProviders } from '../demo/providers';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, ...demoInterceptors])),
+    ...demoProviders,
     provideAppInitializer(() => {
       inject(AppearanceService);
       inject(SystemBarsService);

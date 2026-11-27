@@ -68,6 +68,31 @@
                   "with": "src/environments/environment.mobile.ts"
                 }
               ]
+            },
+            "demo": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.demo.ts"
+                },
+                {
+                  "replace": "src/demo/providers.ts",
+                  "with": "src/demo/providers.demo.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -86,6 +111,9 @@
             },
             "mobile": {
               "buildTarget": "frontend:build:mobile"
+            },
+            "demo": {
+              "buildTarget": "frontend:build:demo"
             }
           },
           "defaultConfiguration": "development"

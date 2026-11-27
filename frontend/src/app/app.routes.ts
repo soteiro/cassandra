@@ -1,6 +1,10 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 import { serverConfiguredGuard } from './core/server/server-configured.guard';
+import { environment } from '../environments/environment';
+
+/** La demo de portafolio no incluye CRM ni finanzas: esas rutas caen al inicio. */
+const fueraDeLaDemo = () => !environment.demo;
 
 export const routes: Routes = [
   {
@@ -33,6 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'crm',
+        canMatch: [fueraDeLaDemo],
         loadChildren: () => import('./features/crm/crm.routes').then((m) => m.crmRoutes),
       },
       {
@@ -41,6 +46,7 @@ export const routes: Routes = [
       },
       {
         path: 'finanzas',
+        canMatch: [fueraDeLaDemo],
         loadChildren: () =>
           import('./features/finanzas/finanzas.routes').then((m) => m.finanzasRoutes),
       },
