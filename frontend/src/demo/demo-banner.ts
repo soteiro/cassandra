@@ -1,3 +1,5 @@
+import { cargarApi } from './demo.interceptor';
+
 /**
  * Aviso fijo de la demo con el botón para restablecer los datos. Es DOM plano a propósito:
  * vive fuera de la app para no tocar el layout real.
@@ -46,7 +48,7 @@ export function montarAvisoDemo(): void {
   boton.title = 'Volver a los datos de ejemplo';
   boton.addEventListener('click', async () => {
     if (confirm('¿Volver a los datos de ejemplo? Se perderán los cambios que hiciste.')) {
-      const { restablecer } = await import('./mock/db');
+      const { restablecer } = await cargarApi();
       restablecer();
       window.location.reload();
     }
